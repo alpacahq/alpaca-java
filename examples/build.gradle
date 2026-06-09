@@ -1,0 +1,84 @@
+plugins {
+    id 'application'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+dependencies {
+    implementation 'markets.alpaca:alpaca-java-client:0.1.0-SNAPSHOT'
+}
+
+def rootLocalProps = new Properties()
+def rootLocalPropsFile = file('../local.properties')
+if (rootLocalPropsFile.exists()) {
+    rootLocalPropsFile.withInputStream { rootLocalProps.load(it) }
+}
+
+def firstNonBlank = { String... values ->
+    values.find { it != null && !it.isBlank() }
+}
+
+def configureExampleRuntime = { JavaExec task ->
+    task.systemProperty 'alpaca.examples.localProperties', rootLocalPropsFile.absolutePath
+
+    def tradingKeyId = firstNonBlank(
+        rootLocalProps.getProperty('tradingApiKeyId'),
+        System.getenv('APCA_TRADING_KEY_ID'))
+    def tradingSecret = firstNonBlank(
+        rootLocalProps.getProperty('tradingApiSecretKey'),
+        System.getenv('APCA_TRADING_SECRET_KEY'))
+    def tradingEnvironment = rootLocalProps.getProperty('tradingApiEnvironment') ?: System.getenv('APCA_TRADING_ENVIRONMENT')
+    def tradingBaseUrl = rootLocalProps.getProperty('tradingApiBaseUrl') ?: System.getenv('APCA_TRADING_BASE_URL')
+    if (tradingKeyId) task.systemProperty 'APCA_TRADING_KEY_ID', tradingKeyId
+    if (tradingSecret) task.systemProperty 'APCA_TRADING_SECRET_KEY', tradingSecret
+    if (tradingEnvironment) task.systemProperty 'APCA_TRADING_ENVIRONMENT', tradingEnvironment
+    if (tradingBaseUrl) task.systemProperty 'APCA_TRADING_BASE_URL', tradingBaseUrl
+
+    def brokerKeyId = rootLocalProps.getProperty('brokerApiKeyId') ?: System.getenv('APCA_BROKER_KEY_ID')
+    def brokerSecret = rootLocalProps.getProperty('brokerApiSecretKey') ?: System.getenv('APCA_BROKER_SECRET_KEY')
+    def brokerEnvironment = rootLocalProps.getProperty('brokerApiEnvironment') ?: System.getenv('APCA_BROKER_ENVIRONMENT')
+    def brokerBaseUrl = rootLocalProps.getProperty('brokerApiBaseUrl') ?: System.getenv('APCA_BROKER_BASE_URL')
+    if (brokerKeyId) task.systemProperty 'APCA_BROKER_KEY_ID', brokerKeyId
+    if (brokerSecret) task.systemProperty 'APCA_BROKER_SECRET_KEY', brokerSecret
+    if (brokerEnvironment) task.systemProperty 'APCA_BROKER_ENVIRONMENT', brokerEnvironment
+    if (brokerBaseUrl) task.systemProperty 'APCA_BROKER_BASE_URL', brokerBaseUrl
+}
+
+application {
+    mainClass = 'markets.alpaca.client.examples.TradingApiExample'
+}
+
+tasks.withType(JavaExec).configureEach {
+    configureExampleRuntime(it)
+}
+
+tasks.register('runTrading', JavaExec) {
+    group = 'application'
+    description = 'Runs the Trading API example'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'markets.alpaca.client.examples.TradingApiExample'
+}
+
+tasks.register('runBroker', JavaExec) {
+    group = 'application'
+    description = 'Runs the Broker API example'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'markets.alpaca.client.examples.BrokerApiExample'
+}
+
+tasks.register('runMarketData', JavaExec) {
+    group = 'application'
+    description = 'Runs the Market Data API example'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'markets.alpaca.client.examples.MarketDataExample'
+}
+
+tasks.register('runPagination', JavaExec) {
+    group = 'application'
+    description = 'Runs the pagination helper example'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'markets.alpaca.client.examples.PaginationExample'
+}

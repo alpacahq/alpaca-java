@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Alpaca Java Client API</title>
+  </head>
+  <body>
+    <main>
+      <h1>Alpaca Java Client</h1>
+
+      <p>
+        The Alpaca Java client provides generated REST clients and handwritten convenience layers
+        for Alpaca Broker, Market Data, Trading, WebSocket, and Broker Events SSE APIs.
+      </p>
+
+      <h2>Start Here</h2>
+
+      <p>
+        Most applications should start with
+        <a href="markets/alpaca/client/AlpacaClient.html">AlpacaClient</a> or
+        <a href="markets/alpaca/client/AlpacaClientFactory.html">AlpacaClientFactory</a>.
+        <code>AlpacaClient</code> is the immutable facade for common workflows.
+        <code>AlpacaClientFactory</code> creates preconfigured generated REST clients, stream
+        clients, and SSE clients for lower-level use.
+      </p>
+
+      <h2>REST APIs</h2>
+
+      <p>
+        REST clients are generated at build time from the configured Alpaca OpenAPI specs. Each API
+        has independent generated <code>api</code>, <code>model</code>, and <code>http</code>
+        packages:
+      </p>
+
+      <ul>
+        <li>
+          <a href="markets/alpaca/client/openapi/broker/api/package-summary.html">Broker REST
+          API</a> with models under
+          <a href="markets/alpaca/client/openapi/broker/model/package-summary.html">
+          broker.model</a> and transport classes under
+          <a href="markets/alpaca/client/openapi/broker/http/package-summary.html">broker.http</a>.
+        </li>
+        <li>
+          <a href="markets/alpaca/client/openapi/data/api/package-summary.html">Market Data REST
+          API</a> with models under
+          <a href="markets/alpaca/client/openapi/data/model/package-summary.html">data.model</a>
+          and transport classes under
+          <a href="markets/alpaca/client/openapi/data/http/package-summary.html">data.http</a>.
+        </li>
+        <li>
+          <a href="markets/alpaca/client/openapi/trading/api/package-summary.html">Trading REST
+          API</a> with models under
+          <a href="markets/alpaca/client/openapi/trading/model/package-summary.html">
+          trading.model</a> and transport classes under
+          <a href="markets/alpaca/client/openapi/trading/http/package-summary.html">
+          trading.http</a>.
+        </li>
+      </ul>
+
+      <p>
+        Use the generated clients directly when you need complete endpoint coverage. Use the
+        handwritten packages when you want named request objects, immutable facades, pagination
+        helpers, futures adapters, or stream lifecycle management.
+      </p>
+
+      <h2>Handwritten Packages</h2>
+
+      <ul>
+        <li>
+          <a href="markets/alpaca/client/trading/package-summary.html">trading</a> contains
+          convenience facades for common Trading API workflows.
+        </li>
+        <li>
+          <a href="markets/alpaca/client/data/package-summary.html">data</a> contains convenience
+          facades for common Market Data workflows.
+        </li>
+        <li>
+          <a href="markets/alpaca/client/rest/package-summary.html">rest</a> contains pagination,
+          response metadata, rate-limit, and <code>CompletableFuture</code> adapters for generated
+          REST clients.
+        </li>
+        <li>
+          <a href="markets/alpaca/client/http/package-summary.html">http</a> contains shared
+          OkHttp configuration, logging, and retry helpers.
+        </li>
+        <li>
+          <a href="markets/alpaca/client/broker/sse/package-summary.html">broker.sse</a> contains
+          Broker Events Server-Sent Events clients.
+        </li>
+        <li>
+          <a href="markets/alpaca/client/ws/package-summary.html">ws</a> contains handwritten
+          WebSocket clients for stock data, crypto data, news, and trading updates.
+        </li>
+      </ul>
+
+      <h2>Generated Sources</h2>
+
+      <p>
+        Generated REST sources live under <code>build/generated</code> and are not committed. This
+        documentation is generated after <code>generateApis</code>, so it reflects whichever public
+        or local OpenAPI specs were configured for the build.
+      </p>
+    </main>
+  </body>
+</html>

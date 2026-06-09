@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <Package name="~markets\.alpaca\.client\.(broker|data|trading)(\..*)?"/>
+    </Match>
+    <Match>
+        <Class name="~markets\.alpaca\.client\.ws\.model\..*"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="markets.alpaca.client.http.AlpacaHttpConfig"/>
+        <Method name="defaultClient"/>
+        <Bug pattern="MS_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="~markets\.alpaca\.client\.Alpaca(Orders|Stocks)"/>
+        <Method name="generatedApi"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="markets.alpaca.client.ws.internal.AbstractAlpacaStream"/>
+        <Method name="authenticationFuture"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="~markets\.alpaca\.client\.ws\.internal\.Abstract(Alpaca|MarketData)Stream"/>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
+</FindBugsFilter>
