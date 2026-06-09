@@ -1,0 +1,80 @@
+name: 🐞 Bug report
+description: Create a bug report to help us improve the SDK
+title: "[Bug]: "
+labels: [ kind/bug ]
+assignees:
+  -
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please fill the form in English.
+
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search to see if an issue already exists for the bug you encountered.
+      options:
+        - label: I have searched the existing issues
+          required: true
+
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: A concise description of what you're experiencing.
+      placeholder: |
+        When I do <X>, <Y> happens and I see the error message attached below:
+        ```...```
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A concise description of what you expected to happen.
+      placeholder: When I do <X>, <Z> should happen instead.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: SDK version
+      description: |
+        What version of alpaca-java-client are you using? Check your `build.gradle` or `pom.xml`.
+        Before opening an issue, please try the latest version in case a fix has already been released.
+      placeholder: |
+        alpaca-java-client version: 0.x.x
+        Java version: 17
+        Build tool: Gradle 9.x
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Configure client with ...
+        2. Call ...
+        3. See error ...
+      render: markdown
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: Filled out the Steps to Reproduce section?
+      description: |
+        Please verify you have provided steps or a minimal code snippet that reproduces the issue so that maintainers
+        can investigate. Without this the issue will be flagged as invalid and may be closed after 30 days.
+      options:
+        - label: I have entered valid steps to reproduce my issue or attached a minimal reproducing case, and understand that without this my issue will be flagged as invalid and closed after 30 days.
+          required: true
+
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: |
+        Links? Stack traces? Anything that will give us more context about the issue you are encountering.
+    validations:
+      required: false

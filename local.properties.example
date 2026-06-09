@@ -1,0 +1,33 @@
+# Copy this file to local.properties (gitignored) and fill in your local paths.
+# local.properties is never committed — each developer maintains their own copy.
+
+# ---------------------------------------------------------------------------
+# OAS spec sources (all optional — defaults to official Alpaca public URLs)
+# ---------------------------------------------------------------------------
+# Option A: point all three specs at a local oas/ directory (legacy).
+#   All three spec files must exist under <oasRoot>/broker/, data/, trading/.
+#oasRoot=/path/to/alpaca-docs-private/oas
+
+# Option B: override specs individually (file path or URL).
+#   Individual keys take priority over oasRoot.
+#   Defaults (used when neither is set):
+#     https://docs.alpaca.markets/openapi/broker-api.json
+#     https://docs.alpaca.markets/openapi/market-data-api.json
+#     https://docs.alpaca.markets/openapi/trading-api.json
+#brokerSpec=/path/to/broker/openapi.yaml
+#dataSpec=/path/to/data/openapi.yaml
+#tradingSpec=/path/to/trading/openapi.yaml
+
+# ---------------------------------------------------------------------------
+# Trading API credentials for integration tests (./gradlew integrationTest)
+# Defaults to the paper endpoint unless tradingApiEnvironment=production is set.
+# ---------------------------------------------------------------------------
+#tradingApiKeyId=PKxxxxxxxxxxxxxxxxxx
+#tradingApiSecretKey=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#tradingApiEnvironment=paper
+
+# Broker API credentials for Broker integration tests and Broker examples.
+# Defaults to the sandbox endpoint unless brokerApiEnvironment=production is set.
+#brokerApiKeyId=xxxxxxxxxxxxxxxxxx
+#brokerApiSecretKey=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#brokerApiEnvironment=sandbox

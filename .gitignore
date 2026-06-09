@@ -1,0 +1,21 @@
+# Gradle build outputs — compiled classes, raw generator output, merged sources, preprocessed specs.
+# Generated sources are NOT committed; run ALPACA_OAS_ROOT=... ./gradlew build to regenerate.
+build/
+.gradle/
+
+# IDE
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+*.class
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local config overrides
+local.properties
+gradle-local.properties

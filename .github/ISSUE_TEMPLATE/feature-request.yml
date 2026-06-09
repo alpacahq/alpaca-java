@@ -1,0 +1,51 @@
+name: 🚀 Feature request
+description: I would like to see a new feature implemented in the SDK
+labels: [ kind/feature ]
+assignees:
+  -
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to request a feature! Please fill the form in English.
+
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search to see if an issue related to this feature request already exists.
+      options:
+        - label: I have searched the existing issues
+          required: true
+
+  - type: textarea
+    attributes:
+      label: Is your feature request related to a problem? Please describe.
+      description: A concise description of the problem you are facing or the motivation behind this feature request.
+      placeholder: |
+        I faced a problem where ...
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Describe the solution you'd like.
+      description: A concise description of what you would like to see added or changed.
+      placeholder: |
+        I would like to be able to ...
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Describe an alternative solution.
+      description: Are there any workarounds or alternate approaches you have considered?
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Anything else? (Additional context)
+      description: |
+        Links? References? Relevant Alpaca API docs? Anything that will give us more context.
+    validations:
+      required: false
