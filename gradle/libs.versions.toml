@@ -10,7 +10,7 @@ jacoco               = "0.8.15"
 junit-jupiter        = "5.14.4"
 junit-platform       = "1.14.4"
 openapi-generator    = "7.23.0"
-spotbugs-gradle-plugin = "6.5.6"
+spotbugs-gradle-plugin = "6.5.8"
 spotless-gradle-plugin = "8.7.0"
 
 [libraries]
