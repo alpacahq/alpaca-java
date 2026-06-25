@@ -118,7 +118,7 @@ public final class TradingApiExample {
     System.out.printf(
         "loaded by client order id: %s status=%s%n", byClientId.getId(), byClientId.getStatus());
 
-    orders.deleteOrderByOrderID(UUID.fromString(order.getId()));
+    orders.deleteOrderByOrderID(order.getId());
     System.out.printf("cancel requested for order=%s%n", order.getId());
   }
 }
