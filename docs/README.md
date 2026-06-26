@@ -33,3 +33,14 @@ cd docs
 npm run build
 npm run serve
 ```
+
+## GitHub Pages deployment
+
+The repository deploys this Docusaurus site with `.github/workflows/deploy-docs.yml`.
+The workflow builds the site with the GitHub Pages project URL:
+
+```bash
+DOCUSAURUS_URL=https://alpacahq.github.io DOCUSAURUS_BASE_URL=/alpaca-java-client/ npm run build
+```
+
+Before the workflow can publish, configure the repository's Pages source to use GitHub Actions.

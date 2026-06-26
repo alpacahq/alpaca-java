@@ -3,6 +3,9 @@
 const lightCodeTheme = require('prism-react-renderer').themes.github;
 const darkCodeTheme = require('prism-react-renderer').themes.dracula;
 
+const siteUrl = process.env.DOCUSAURUS_URL || 'https://alpaca.markets';
+const siteBaseUrl = process.env.DOCUSAURUS_BASE_URL || '/';
+
 function footerProjectLink(label, href, iconClassName) {
   return {
     html: `<a class="footer__link-item footer-project-link" href="${href}" target="_blank" rel="noopener noreferrer"><i class="${iconClassName} footer-project-link__icon" aria-hidden="true"></i><span>${label}</span></a>`,
@@ -15,8 +18,8 @@ const config = {
   tagline: 'Java SDK documentation for Alpaca Broker, Market Data, Trading, and streaming APIs.',
   favicon: 'img/alpaca-symbol-yellow.png',
 
-  url: 'https://alpaca.markets',
-  baseUrl: '/',
+  url: siteUrl,
+  baseUrl: siteBaseUrl,
 
   organizationName: 'alpacahq',
   projectName: 'alpaca-java-client',
