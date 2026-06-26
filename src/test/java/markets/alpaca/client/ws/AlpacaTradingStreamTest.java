@@ -445,6 +445,50 @@ class AlpacaTradingStreamTest {
   }
 
   @Test
+  void authenticationFuture_isCompleteWhenAuthenticationResultFutureCopyCompletes()
+      throws Exception {
+    CountDownLatch resultFutureCopyCompleted = new CountDownLatch(1);
+    CountDownLatch releaseResultFutureContinuation = new CountDownLatch(1);
+    var stream =
+        new AlpacaTradingStream(
+            client,
+            CREDS,
+            server.url("/stream").toString(),
+            new TradingStreamListener() {},
+            AlpacaStreamReconnectPolicy.disabled());
+    stream
+        .authenticationResultFuture()
+        .thenRun(
+            () -> {
+              resultFutureCopyCompleted.countDown();
+              try {
+                assertTrue(
+                    releaseResultFutureContinuation.await(TIMEOUT_S, TimeUnit.SECONDS),
+                    "Authentication result future continuation was not released in time");
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new AssertionError(e);
+              }
+            });
+
+    try {
+      var ss = new ServerSocket();
+      ss.enqueue();
+      stream.connect();
+      ss.awaitOpen();
+      ss.close(1008, "policy violation");
+
+      assertTrue(
+          resultFutureCopyCompleted.await(TIMEOUT_S, TimeUnit.SECONDS),
+          "Authentication result future copy did not complete");
+
+      assertEquals(Boolean.FALSE, stream.authenticationFuture().getNow(null));
+    } finally {
+      releaseResultFutureContinuation.countDown();
+    }
+  }
+
+  @Test
   void authorizationMessage_withoutData_isIgnored() throws Exception {
     var authenticated = new AtomicBoolean(false);
     var error = new AtomicBoolean(false);
