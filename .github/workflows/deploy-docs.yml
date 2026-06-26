@@ -53,7 +53,10 @@ jobs:
           cache-dependency-path: docs/package-lock.json
 
       - name: Configure GitHub Pages
+        id: pages
         uses: actions/configure-pages@v6
+        with:
+          enablement: true
 
       - name: Install docs dependencies
         run: npm ci --prefix docs
@@ -61,8 +64,8 @@ jobs:
       - name: Build docs
         run: npm run build --prefix docs
         env:
-          DOCUSAURUS_URL: https://alpacahq.github.io
-          DOCUSAURUS_BASE_URL: /alpaca-java-client/
+          DOCUSAURUS_URL: ${{ steps.pages.outputs.origin }}
+          DOCUSAURUS_BASE_URL: ${{ steps.pages.outputs.base_path == '/' && '/' || format('{0}/', steps.pages.outputs.base_path) }}
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v5
