@@ -202,6 +202,11 @@ def commonConfigOptions = [
     disallowAdditionalPropertiesIfNotPresent: 'false',
 ]
 
+def commonTypeMappings = [
+    'number+decimal': 'BigDecimal',
+    'string+decimal': 'BigDecimal',
+]
+
 // ---------------------------------------------------------------------------
 // Shared YAML helpers used by preprocessing tasks
 // ---------------------------------------------------------------------------
@@ -541,6 +546,7 @@ tasks.register('generateBrokerApi', GenerateTask) {
     modelPackage   = 'markets.alpaca.client.openapi.broker.model'
     invokerPackage = 'markets.alpaca.client.openapi.broker.http'
     configOptions  = commonConfigOptions
+    typeMappings   = commonTypeMappings
     templateDir    = openApiTemplateDir.asFile.absolutePath
     cleanupOutput  = true
     skipValidateSpec = false
@@ -571,6 +577,7 @@ tasks.register('generateDataApi', GenerateTask) {
     modelPackage   = 'markets.alpaca.client.openapi.data.model'
     invokerPackage = 'markets.alpaca.client.openapi.data.http'
     configOptions  = commonConfigOptions
+    typeMappings   = commonTypeMappings
     templateDir    = openApiTemplateDir.asFile.absolutePath
     cleanupOutput  = true
     skipValidateSpec = false
@@ -601,6 +608,7 @@ tasks.register('generateTradingApi', GenerateTask) {
     modelPackage    = 'markets.alpaca.client.openapi.trading.model'
     invokerPackage  = 'markets.alpaca.client.openapi.trading.http'
     configOptions   = commonConfigOptions
+    typeMappings    = commonTypeMappings
     templateDir     = openApiTemplateDir.asFile.absolutePath
     cleanupOutput   = true
     skipValidateSpec = false
