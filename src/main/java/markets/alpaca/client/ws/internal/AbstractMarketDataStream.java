@@ -149,10 +149,10 @@ public abstract class AbstractMarketDataStream extends AbstractAlpacaStream {
         String message = msg.has("msg") ? msg.get("msg").getAsString() : "";
         boolean authFailure = isAuthFailure(message);
         if (authFailure) {
-          completeAuthentication(AlpacaStreamAuthResult.serverRejected(code, message));
+          closeTerminal(
+              "authentication failed", AlpacaStreamAuthResult.serverRejected(code, message));
         }
         invokeCallback("onError", () -> notifyError(code, message));
-        if (authFailure) closeTerminal("authentication failed");
       }
       case "subscription" -> {
         Map<String, List<String>> confirmed = parseSubscriptionConfirmation(msg);

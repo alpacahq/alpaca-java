@@ -256,8 +256,17 @@ public abstract class AbstractAlpacaStream implements AutoCloseable {
 
   /** Closes the stream permanently after a terminal protocol failure such as failed auth. */
   protected final void closeTerminal(String reason) {
+    closeTerminal(reason, AlpacaStreamAuthResult.closed(reason));
+  }
+
+  /**
+   * Closes the stream permanently and completes authentication with the supplied terminal result.
+   */
+  protected final void closeTerminal(String reason, AlpacaStreamAuthResult result) {
+    Objects.requireNonNull(reason, "reason must not be null");
+    Objects.requireNonNull(result, "result must not be null");
     if (!closed.compareAndSet(false, true)) return;
-    completeAuthentication(AlpacaStreamAuthResult.closed(reason));
+    completeAuthentication(result);
     shutdownScheduler();
     WebSocket ws = webSocket;
     if (ws != null) ws.close(1000, reason);

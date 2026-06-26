@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -340,6 +341,54 @@ class AlpacaTradingStreamTest {
         IllegalStateException.class, () -> stream.listen(TradingSubscription.TRADE_UPDATES));
 
     stream.close();
+  }
+
+  @Test
+  void listen_afterRejectedAuthenticationResultWhileCallbackIsRunning_throwsIllegalStateException()
+      throws Exception {
+    CountDownLatch callbackExecutorEntered = new CountDownLatch(1);
+    CountDownLatch releaseCallbackExecutor = new CountDownLatch(1);
+    Executor blockingExecutor =
+        command -> {
+          callbackExecutorEntered.countDown();
+          try {
+            assertTrue(
+                releaseCallbackExecutor.await(TIMEOUT_S, TimeUnit.SECONDS),
+                "Callback executor was not released in time");
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError(e);
+          }
+          command.run();
+        };
+
+    try (var stream =
+        new AlpacaTradingStream(
+            client,
+            CREDS,
+            server.url("/stream").toString(),
+            new TradingStreamListener() {},
+            AlpacaStreamReconnectPolicy.defaultPolicy(),
+            blockingExecutor)) {
+      var ss = new ServerSocket();
+      ss.enqueue();
+      stream.connect();
+      ss.awaitOpen();
+      ss.pollMessage();
+      ss.send("{\"stream\":\"authorization\",\"data\":{\"status\":\"unauthorized\"}}");
+
+      AlpacaStreamAuthResult result =
+          stream.waitForAuthenticationResult(Duration.ofSeconds(TIMEOUT_S));
+      assertEquals(AlpacaStreamAuthResult.Status.SERVER_REJECTED, result.status());
+      assertTrue(
+          callbackExecutorEntered.await(TIMEOUT_S, TimeUnit.SECONDS),
+          "Unauthorized callback did not start");
+
+      assertThrows(
+          IllegalStateException.class, () -> stream.listen(TradingSubscription.TRADE_UPDATES));
+    } finally {
+      releaseCallbackExecutor.countDown();
+    }
   }
 
   @Test
