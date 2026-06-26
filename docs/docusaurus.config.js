@@ -24,6 +24,19 @@ const config = {
   organizationName: 'alpacahq',
   projectName: 'alpaca-java-client',
 
+  stylesheets: [
+    {
+      href: 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/fontawesome.min.css',
+      type: 'text/css',
+      crossorigin: 'anonymous',
+    },
+    {
+      href: 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/brands.min.css',
+      type: 'text/css',
+      crossorigin: 'anonymous',
+    },
+  ],
+
   onBrokenLinks: 'throw',
   markdown: {
     hooks: {
