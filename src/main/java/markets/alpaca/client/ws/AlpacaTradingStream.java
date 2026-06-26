@@ -229,9 +229,8 @@ public final class AlpacaTradingStream extends AbstractAlpacaStream {
     } else {
       // unauthorized — report as error; the server will close the connection
       String message = "authentication failed: " + status;
-      completeAuthentication(AlpacaStreamAuthResult.serverRejected(null, message));
+      closeTerminal("authentication failed", AlpacaStreamAuthResult.serverRejected(null, message));
       invokeCallback("onError", () -> listener.onError(message));
-      closeTerminal("authentication failed");
     }
   }
 
