@@ -46,13 +46,11 @@ public abstract class AbstractAlpacaStream implements AutoCloseable {
   private final boolean ownsScheduler;
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicBoolean connectStarted = new AtomicBoolean(false);
+  private final AtomicBoolean authenticationCompleted = new AtomicBoolean(false);
   private final AtomicInteger reconnectAttempt = new AtomicInteger(0);
   private final CompletableFuture<AlpacaStreamAuthResult> authenticationResultFuture =
       new CompletableFuture<>();
-  private final CompletableFuture<Boolean> authenticationFuture =
-      authenticationResultFuture
-          .thenApply(AlpacaStreamAuthResult::isAuthenticated)
-          .toCompletableFuture();
+  private final CompletableFuture<Boolean> authenticationFuture = new CompletableFuture<>();
 
   private volatile WebSocket webSocket;
 
@@ -251,13 +249,24 @@ public abstract class AbstractAlpacaStream implements AutoCloseable {
   /** Marks the first authentication attempt as completed with diagnostic details. */
   protected final void completeAuthentication(AlpacaStreamAuthResult result) {
     Objects.requireNonNull(result, "result must not be null");
+    if (!authenticationCompleted.compareAndSet(false, true)) return;
+    authenticationFuture.complete(result.isAuthenticated());
     authenticationResultFuture.complete(result);
   }
 
   /** Closes the stream permanently after a terminal protocol failure such as failed auth. */
   protected final void closeTerminal(String reason) {
+    closeTerminal(reason, AlpacaStreamAuthResult.closed(reason));
+  }
+
+  /**
+   * Closes the stream permanently and completes authentication with the supplied terminal result.
+   */
+  protected final void closeTerminal(String reason, AlpacaStreamAuthResult result) {
+    Objects.requireNonNull(reason, "reason must not be null");
+    Objects.requireNonNull(result, "result must not be null");
     if (!closed.compareAndSet(false, true)) return;
-    completeAuthentication(AlpacaStreamAuthResult.closed(reason));
+    completeAuthentication(result);
     shutdownScheduler();
     WebSocket ws = webSocket;
     if (ws != null) ws.close(1000, reason);
