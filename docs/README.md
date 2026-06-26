@@ -37,10 +37,11 @@ npm run serve
 ## GitHub Pages deployment
 
 The repository deploys this Docusaurus site with `.github/workflows/deploy-docs.yml`.
-The workflow builds the site with the GitHub Pages project URL:
+The workflow uses `actions/configure-pages` to detect the actual GitHub Pages URL (handling
+custom domains automatically) and enables GitHub Actions as the Pages source if not already set.
+It then builds the site with the detected values:
 
 ```bash
+# equivalent to what CI does (adjust if a custom domain is configured)
 DOCUSAURUS_URL=https://alpacahq.github.io DOCUSAURUS_BASE_URL=/alpaca-java-client/ npm run build
 ```
-
-Before the workflow can publish, configure the repository's Pages source to use GitHub Actions.
