@@ -17,7 +17,7 @@ being closed for missing information.)
 ## How do I contribute code?
 
 1. Fork this repo and create a branch for your changes.
-2. Follow the [Getting started](README.md#getting-started) section in the README to configure your local environment.
+2. Follow the [Build from source](README.md#build-from-source) section in the README to configure your local environment.
 3. Code away — see [Coding Guidelines](#coding-guidelines) below for what belongs where.
 4. Run `./gradlew check` and `./gradlew build` to verify everything passes. The root `check` task runs unit tests, code checks, and compiles `examples/` so they stay in sync without being packaged in the published artifact.
 5. Open a PR with your changes.
@@ -63,7 +63,7 @@ Monetary and price values in WebSocket model records must use `BigDecimal` — n
 
 ### Testing
 
-See the [Testing](README.md#testing) section in the README for how to run unit and integration tests and how to supply
+See the [Tests](README.md#tests) section in the README for how to run unit and integration tests and how to supply
 credentials for the live API tests.
 
 ### Code checks
@@ -81,9 +81,18 @@ Useful focused checks:
 ./gradlew checkstyleMain checkstyleTest # source style checks
 ./gradlew spotbugsMain                  # static bug analysis for handwritten classes
 ./gradlew spotlessApply                 # apply formatter changes
+npm run build --prefix docs             # validate generated Docusaurus docs
+pre-commit run markdown-links --all-files  # validate non-Docusaurus Markdown links
 ```
 
 Generated OpenAPI output under `build/generated/` is excluded from formatting and static-analysis checks.
+
+To run non-Docusaurus Markdown link validation before each commit, install the local hook once. The
+hook uses the local `lychee` binary, matching the CI link checker.
+
+```bash
+pre-commit install
+```
 
 ## PR Checklist
 
