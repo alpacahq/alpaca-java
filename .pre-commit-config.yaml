@@ -1,0 +1,17 @@
+repos:
+  - repo: local
+    hooks:
+      - id: markdown-links
+        name: Markdown links
+        language: system
+        pass_filenames: true
+        types: [markdown]
+        exclude: ^docs/content/
+        entry: >
+          bash -c 'root="$(git rev-parse --show-toplevel)" &&
+          if [ -z "${SSL_CERT_FILE:-}" ] && [ -f /etc/ssl/cert.pem ]; then export SSL_CERT_FILE=/etc/ssl/cert.pem; fi &&
+          lychee --offline --no-progress
+          --root-dir "$root"
+          --fallback-extensions md,mdx,html
+          --include-fragments
+          "$@"' --

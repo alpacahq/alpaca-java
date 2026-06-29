@@ -8,6 +8,62 @@ on:
   pull_request:
 
 jobs:
+  markdown-links:
+    name: Markdown links
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout client
+        uses: actions/checkout@v7
+
+      - name: Check Markdown links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          fail: true
+          args: >-
+            --offline
+            --no-progress
+            --root-dir ${{ github.workspace }}
+            --fallback-extensions md,mdx,html
+            --include-fragments
+            README.md
+            AGENTS.md
+            LLMS.md
+            CONTRIBUTING.md
+            CHANGELOG.md
+            examples/README.md
+            docs/README.md
+
+  docs:
+    name: Docusaurus docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout client
+        uses: actions/checkout@v7
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Install docs dependencies
+        run: npm ci --prefix docs
+
+      - name: Build docs
+        run: npm run build --prefix docs
+
   build:
     name: Gradle build (private specs)
     runs-on: ubuntu-latest
