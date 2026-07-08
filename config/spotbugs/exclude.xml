@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
     <Match>
-        <Package name="~markets\.alpaca\.client\.(broker|data|trading)(\..*)?"/>
-    </Match>
-    <Match>
         <Class name="~markets\.alpaca\.client\.ws\.model\..*"/>
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
     </Match>
@@ -13,7 +10,12 @@
         <Bug pattern="MS_EXPOSE_REP"/>
     </Match>
     <Match>
-        <Class name="~markets\.alpaca\.client\.Alpaca(Orders|Stocks)"/>
+        <Class name="markets.alpaca.client.data.AlpacaStocks"/>
+        <Method name="generatedApi"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="markets.alpaca.client.trading.AlpacaOrders"/>
         <Method name="generatedApi"/>
         <Bug pattern="EI_EXPOSE_REP"/>
     </Match>
