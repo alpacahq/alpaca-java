@@ -362,6 +362,40 @@ static void removeActivityV2DetailTrdRequired(Map spec) {
     if (schema instanceof Map) schema.remove('required')
 }
 
+/**
+ * Makes the two account-activity {@code oneOf} branches distinguishable.
+ *
+ * <p>The upstream schemas otherwise have no required fields and allow additional
+ * properties, so every activity object validates against both branches.
+ */
+static void requireDistinctAccountActivityTypes(Map spec) {
+    def schemas = spec?.components?.schemas
+    def activityTypes = schemas?.get('ActivityType')?.enum
+    if (!(schemas instanceof Map) || !(activityTypes instanceof List)) return
+
+    constrainActivityType(schemas.get('TradingActivities'), ['FILL'])
+    constrainActivityType(
+        schemas.get('NonTradeActivities'),
+        activityTypes.findAll { it != 'FILL' })
+}
+
+static void constrainActivityType(Object schema, List values) {
+    def property = schema?.properties?.get('activity_type')
+    if (!(schema instanceof Map) || !(property instanceof Map) || values.isEmpty()) {
+        return
+    }
+
+    def required = schema.required instanceof List
+        ? new LinkedHashSet(schema.required)
+        : new LinkedHashSet()
+    required.add('activity_type')
+    schema.required = new ArrayList(required)
+
+    property.clear()
+    property.type = 'string'
+    property.enum = new ArrayList(values)
+}
+
 /** Escapes plain text for use in generated Javadoc HTML. */
 static String javadocText(Object value) {
     def text = value == null ? '' : value.toString().trim()
@@ -510,7 +544,8 @@ tasks.register('preprocessDataSpec') {
 
 // ---------------------------------------------------------------------------
 // Trading spec preprocessing
-//   Remove required list from ActivityV2DetailTRD  (→ false-positive warnings)
+//   1. Remove required list from ActivityV2DetailTRD  (→ false-positive warnings)
+//   2. Require branch-specific account activity types  (→ ambiguous oneOf)
 // ---------------------------------------------------------------------------
 tasks.register('preprocessTradingSpec') {
     group       = 'openapi tools'
@@ -528,6 +563,7 @@ tasks.register('preprocessTradingSpec') {
         outputFile.parentFile.mkdirs()
         def spec = loadSpec(tradingSpecSource) as Map
         removeActivityV2DetailTrdRequired(spec)
+        requireDistinctAccountActivityTypes(spec)
         outputFile.text = dumpYaml(spec)
     }
 }
