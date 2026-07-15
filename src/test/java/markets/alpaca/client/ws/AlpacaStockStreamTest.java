@@ -299,6 +299,11 @@ class AlpacaStockStreamTest {
     stream.connect();
 
     ss.awaitOpen();
+    var upgradeRequest = server.takeRequest(TIMEOUT_S, TimeUnit.SECONDS);
+    assertNotNull(upgradeRequest);
+    String userAgent = upgradeRequest.getHeader("User-Agent");
+    assertNotNull(userAgent);
+    assertTrue(userAgent.startsWith("APCA-JAVA/"));
     ss.send("[{\"T\":\"success\",\"msg\":\"connected\"}]");
 
     String msg = ss.pollMessage();

@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import markets.alpaca.client.http.AlpacaHttpConfig;
 import markets.alpaca.client.openapi.broker.api.EventsApi;
 import markets.alpaca.client.openapi.broker.http.ApiException;
 import markets.alpaca.client.openapi.broker.http.JSON;
@@ -56,7 +57,10 @@ public final class BrokerEventsSseClient {
     this.callbackExecutor =
         Objects.requireNonNull(callbackExecutor, "callbackExecutor must not be null");
     OkHttpClient sseHttpClient =
-        eventsApi.getApiClient().getHttpClient().newBuilder().readTimeout(Duration.ZERO).build();
+        AlpacaHttpConfig.withAgentInformation(eventsApi.getApiClient().getHttpClient())
+            .newBuilder()
+            .readTimeout(Duration.ZERO)
+            .build();
     this.eventSourceFactory = EventSources.createFactory(sseHttpClient);
   }
 

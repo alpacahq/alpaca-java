@@ -220,6 +220,20 @@ var trades = client.stocks().tradesForSymbol(StockTradesRequest.builder()
     .build());
 ```
 
+## Request identification
+
+The SDK identifies all REST requests, WebSocket upgrade requests, and Broker Events SSE requests
+with a `User-Agent` header:
+
+```text
+APCA-JAVA/<sdk-version> Java/<runtime-version>
+```
+
+For example, SDK version `1.2.3` running on Java 17 sends
+`APCA-JAVA/1.2.3 Java/17.0.12`. This information helps Alpaca measure SDK adoption and diagnose
+version-specific compatibility issues. The canonical SDK value is also applied when you provide a
+custom OkHttp client.
+
 ## Choosing clients
 
 - Use `AlpacaClient` for common Trading and Market Data workflows.

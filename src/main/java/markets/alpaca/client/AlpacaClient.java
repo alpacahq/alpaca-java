@@ -241,7 +241,9 @@ public final class AlpacaClient {
     }
 
     private static OkHttpClient copyHttpClient(OkHttpClient httpClient, String name) {
-      return Objects.requireNonNull(httpClient, name + " must not be null").newBuilder().build();
+      var snapshot =
+          Objects.requireNonNull(httpClient, name + " must not be null").newBuilder().build();
+      return AlpacaHttpConfig.withAgentInformation(snapshot);
     }
 
     private static String normalizeBaseUrl(String baseUrl, String name) {

@@ -79,6 +79,9 @@ class BrokerEventsSseClientTest {
     assertEquals("/v2/events/trades?since=2026-06-01&since_id=since-ulid", request.getPath());
     assertEquals("text/event-stream", request.getHeader("Accept"));
     assertNotNull(request.getHeader("Authorization"), "Broker Basic auth must be applied");
+    String userAgent = request.getHeader("User-Agent");
+    assertNotNull(userAgent);
+    assertTrue(userAgent.startsWith("APCA-JAVA/"));
     assertNotNull(received.get());
     assertEquals("evt-1", received.get().getEventId());
   }

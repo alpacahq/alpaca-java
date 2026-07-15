@@ -46,7 +46,26 @@ public final class AlpacaHttpConfig {
     return new OkHttpClient.Builder()
         .connectTimeout(DEFAULT_CONNECT_TIMEOUT)
         .readTimeout(DEFAULT_READ_TIMEOUT)
-        .writeTimeout(DEFAULT_WRITE_TIMEOUT);
+        .writeTimeout(DEFAULT_WRITE_TIMEOUT)
+        .addInterceptor(AlpacaAgentInterceptor.INSTANCE);
+  }
+
+  /**
+   * Returns an HTTP client that identifies this SDK and its version in the {@code User-Agent}
+   * header using {@code APCA-JAVA/<sdk-version> Java/<runtime-version>}.
+   *
+   * <p>If the supplied client already has the Alpaca agent interceptor, the same instance is
+   * returned. Otherwise, a derived client is returned without modifying the supplied instance. The
+   * SDK's canonical agent value replaces any existing {@code User-Agent} header.
+   */
+  public static OkHttpClient withAgentInformation(OkHttpClient httpClient) {
+    if (httpClient == null) throw new NullPointerException("httpClient must not be null");
+    boolean configured =
+        httpClient.interceptors().stream()
+            .anyMatch(interceptor -> interceptor instanceof AlpacaAgentInterceptor);
+    return configured
+        ? httpClient
+        : httpClient.newBuilder().addInterceptor(AlpacaAgentInterceptor.INSTANCE).build();
   }
 
   /** Returns an OkHttp client with default timeouts and the default Alpaca retry policy. */

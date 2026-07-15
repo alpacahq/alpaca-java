@@ -41,6 +41,21 @@ java {
     withJavadocJar()
 }
 
+tasks.named('processResources').configure {
+    inputs.property('sdkVersion', project.version.toString())
+    filesMatching('markets/alpaca/client/version.properties') {
+        expand(version: project.version)
+    }
+}
+
+tasks.named('jar').configure {
+    manifest {
+        attributes(
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version)
+    }
+}
+
 repositories {
     mavenCentral()
 }

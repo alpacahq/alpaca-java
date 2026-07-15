@@ -177,7 +177,7 @@ public final class AlpacaClientFactory {
   public static markets.alpaca.client.openapi.broker.http.ApiClient brokerClient(
       AlpacaCredentials credentials, String baseUrl, OkHttpClient httpClient) {
     var client = new markets.alpaca.client.openapi.broker.http.ApiClient();
-    client.setHttpClient(httpClient);
+    client.setHttpClient(AlpacaHttpConfig.withAgentInformation(httpClient));
     client.setBasePath(normalizeBaseUrl(baseUrl, "baseUrl"));
     client.setUsername(credentials.apiKeyId());
     client.setPassword(credentials.apiSecretKey());
@@ -255,7 +255,7 @@ public final class AlpacaClientFactory {
   public static markets.alpaca.client.openapi.trading.http.ApiClient tradingClient(
       AlpacaCredentials credentials, String baseUrl, OkHttpClient httpClient) {
     var client = new markets.alpaca.client.openapi.trading.http.ApiClient();
-    client.setHttpClient(httpClient);
+    client.setHttpClient(AlpacaHttpConfig.withAgentInformation(httpClient));
     client.setBasePath(normalizeBaseUrl(baseUrl, "baseUrl"));
     applyTradingAuth(credentials, client.getAuthentications());
     return client;
@@ -281,7 +281,7 @@ public final class AlpacaClientFactory {
   public static markets.alpaca.client.openapi.data.http.ApiClient dataClient(
       AlpacaCredentials credentials, OkHttpClient httpClient) {
     var client = new markets.alpaca.client.openapi.data.http.ApiClient();
-    client.setHttpClient(httpClient);
+    client.setHttpClient(AlpacaHttpConfig.withAgentInformation(httpClient));
     applyDataAuth(credentials, client.getAuthentications());
     return client;
   }

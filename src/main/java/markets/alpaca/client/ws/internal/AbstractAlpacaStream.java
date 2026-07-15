@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import markets.alpaca.client.http.AlpacaHttpConfig;
 import markets.alpaca.client.ws.AlpacaStreamAuthResult;
 import markets.alpaca.client.ws.AlpacaStreamReconnectPolicy;
 import okhttp3.OkHttpClient;
@@ -92,7 +93,7 @@ public abstract class AbstractAlpacaStream implements AutoCloseable {
       Executor callbackExecutor,
       ScheduledExecutorService scheduler,
       boolean ownsScheduler) {
-    this.httpClient = Objects.requireNonNull(httpClient, "httpClient must not be null");
+    this.httpClient = AlpacaHttpConfig.withAgentInformation(httpClient);
     this.reconnectPolicy =
         Objects.requireNonNull(reconnectPolicy, "reconnectPolicy must not be null");
     this.callbackExecutor =

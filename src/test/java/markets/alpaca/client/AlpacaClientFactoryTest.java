@@ -105,6 +105,23 @@ class AlpacaClientFactoryTest {
   }
 
   @Test
+  void restFactories_decorateUnconfiguredHttpClientWithAgentInformation() {
+    var httpClient = new OkHttpClient();
+
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS, httpClient).getHttpClient();
+    var tradingClient = AlpacaClientFactory.tradingClient(CREDS, httpClient).getHttpClient();
+    var dataClient = AlpacaClientFactory.dataClient(CREDS, httpClient).getHttpClient();
+
+    assertAll(
+        () -> assertNotSame(httpClient, brokerClient),
+        () -> assertNotSame(httpClient, tradingClient),
+        () -> assertNotSame(httpClient, dataClient),
+        () -> assertEquals(1, brokerClient.interceptors().size()),
+        () -> assertEquals(1, tradingClient.interceptors().size()),
+        () -> assertEquals(1, dataClient.interceptors().size()));
+  }
+
+  @Test
   void brokerClient_noArgOverload_usesDefaultSingleton() {
     var client = AlpacaClientFactory.brokerClient(CREDS);
     assertSame(AlpacaHttpConfig.defaultClient(), client.getHttpClient());

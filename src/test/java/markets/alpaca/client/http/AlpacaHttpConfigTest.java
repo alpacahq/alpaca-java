@@ -67,6 +67,49 @@ class AlpacaHttpConfigTest {
         (int) AlpacaHttpConfig.DEFAULT_CONNECT_TIMEOUT.toMillis(), client.connectTimeoutMillis());
   }
 
+  @Test
+  void defaultClient_sendsSdkNameAndVersionAsUserAgent() throws Exception {
+    try (var server = new MockWebServer()) {
+      server.enqueue(new MockResponse());
+      var request = new Request.Builder().url(server.url("/")).build();
+
+      AlpacaHttpConfig.defaultClient().newCall(request).execute().close();
+
+      String userAgent = server.takeRequest().getHeader("User-Agent");
+      assertNotNull(userAgent);
+      assertTrue(userAgent.startsWith("APCA-JAVA/"));
+      assertTrue(userAgent.endsWith(" Java/" + Runtime.version()));
+      assertFalse(userAgent.contains("APCA-JAVA/unknown "));
+      assertFalse(userAgent.contains("${version}"));
+    }
+  }
+
+  @Test
+  void withAgentInformation_decoratesCustomClientAndOverridesExistingUserAgent() throws Exception {
+    var customClient = new OkHttpClient();
+    var client = AlpacaHttpConfig.withAgentInformation(customClient);
+
+    assertNotSame(customClient, client);
+    try (var server = new MockWebServer()) {
+      server.enqueue(new MockResponse());
+      var request =
+          new Request.Builder().url(server.url("/")).header("User-Agent", "custom-agent").build();
+
+      client.newCall(request).execute().close();
+
+      String userAgent = server.takeRequest().getHeader("User-Agent");
+      assertNotNull(userAgent);
+      assertTrue(userAgent.startsWith("APCA-JAVA/"));
+    }
+  }
+
+  @Test
+  void withAgentInformation_returnsAlreadyConfiguredClient() {
+    var client = AlpacaHttpConfig.defaultBuilder().build();
+
+    assertSame(client, AlpacaHttpConfig.withAgentInformation(client));
+  }
+
   // -------------------------------------------------------------------------
   // loggingClient() — returns a new instance with an HttpLoggingInterceptor
   // -------------------------------------------------------------------------
