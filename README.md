@@ -163,6 +163,38 @@ Integration tests call live Alpaca paper-trading, market-data, WebSocket, and Br
 They skip automatically when credentials are absent. See `AGENTS.md` for the supported
 `local.properties` keys and environment variables.
 
+## Publishing
+
+Every successful, current push to `main` automatically publishes the version in `gradle.properties`
+to Sonatype's Central Snapshots repository. To consume this module's snapshots without enabling
+snapshot resolution for every dependency:
+
+```groovy
+repositories {
+    mavenCentral()
+    maven {
+        url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+        mavenContent { snapshotsOnly() }
+        content { includeModule("markets.alpaca", "alpaca-java-client") }
+    }
+}
+
+dependencies {
+    implementation("markets.alpaca:alpaca-java-client:0.1.0-SNAPSHOT")
+}
+```
+
+Releases are dispatched only from `main` with an existing `vMAJOR.MINOR.PATCH` tag reachable from
+`main`. The protected `maven-central` environment must require reviewers and allow deployments only
+from `main`. The workflow resolves each OpenAPI spec once for the build and publication, publishes a
+signed release to Maven Central, creates the corresponding GitHub Release, and commits the next
+patch `-SNAPSHOT` version directly to `main`. It then explicitly builds, tests, and publishes that
+new development snapshot from one frozen set of OpenAPI inputs; this explicit step is necessary
+because GitHub does not trigger another workflow from the version-bump bot push.
+
+Maintainers: see [`AGENTS.md`](AGENTS.md#publishing) for local commands, credentials, workflow
+ordering, environment protection, recovery, and partial-failure handling.
+
 ## Documentation site
 
 The Docusaurus documentation site lives in `docs/`.

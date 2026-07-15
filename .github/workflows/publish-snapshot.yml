@@ -1,0 +1,188 @@
+name: Publish Snapshot
+
+on:
+  workflow_call:
+    inputs:
+      commit:
+        description: Exact current-main commit to build and publish
+        required: true
+        type: string
+      fail_if_stale:
+        description: Fail rather than skip when the requested commit is no longer main
+        required: false
+        default: false
+        type: boolean
+    secrets:
+      MAVEN_CENTRAL_USERNAME:
+        required: true
+      MAVEN_CENTRAL_PASSWORD:
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: central-snapshot-publication
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build and publish tested snapshot
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout requested commit
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ inputs.commit }}
+
+      - name: Check whether commit is current
+        id: freshness
+        shell: bash
+        env:
+          EXPECTED_COMMIT: ${{ inputs.commit }}
+          FAIL_IF_STALE: ${{ inputs.fail_if_stale }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$EXPECTED_COMMIT" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "::error::Snapshot commit must be a full 40-character Git SHA"
+            exit 1
+          fi
+          if [[ "$(git rev-parse HEAD)" != "$EXPECTED_COMMIT" ]]; then
+            echo "::error::Checked-out commit does not match the requested snapshot commit"
+            exit 1
+          fi
+          if ! remote_ref="$(git ls-remote --exit-code origin refs/heads/main)"; then
+            echo "::error::Unable to resolve remote refs/heads/main; refusing to publish"
+            exit 1
+          fi
+          remote_main_sha="$(awk '$2 == "refs/heads/main" { print $1; exit }' <<< "$remote_ref")"
+          if [[ ! "$remote_main_sha" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "::error::Remote refs/heads/main returned an invalid SHA; refusing to publish"
+            exit 1
+          fi
+          if [[ "$remote_main_sha" == "$EXPECTED_COMMIT" ]]; then
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+            echo "Commit $EXPECTED_COMMIT is current; snapshot verification will proceed"
+          else
+            if [[ "$FAIL_IF_STALE" == "true" ]]; then
+              echo "::error::Snapshot publication requires current main, but commit $EXPECTED_COMMIT is stale; current main is $remote_main_sha"
+              exit 1
+            fi
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping snapshot publication because commit $EXPECTED_COMMIT is stale; current main is $remote_main_sha"
+          fi
+
+      - name: Set up Java
+        if: steps.freshness.outputs.should_publish == 'true'
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        if: steps.freshness.outputs.should_publish == 'true'
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6
+
+      - name: Validate snapshot version
+        if: steps.freshness.outputs.should_publish == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! version="$(
+            python3 scripts/release_tools.py read-version \
+              --properties gradle.properties
+          )"; then
+            echo "::error file=gradle.properties::Version must be a semantic -SNAPSHOT"
+            exit 1
+          fi
+          echo "Snapshot version $version"
+
+      - name: Prepare immutable OpenAPI inputs
+        if: steps.freshness.outputs.should_publish == 'true'
+        id: specs
+        shell: bash
+        run: |
+          set -euo pipefail
+          spec_dir="$RUNNER_TEMP/alpaca-snapshot-specs"
+
+          ./gradlew \
+            preprocessBrokerSpec \
+            preprocessDataSpec \
+            preprocessTradingSpec
+
+          rm -rf "$spec_dir"
+          mkdir -p \
+            "$spec_dir/broker" \
+            "$spec_dir/data" \
+            "$spec_dir/trading"
+          cp build/specs/broker/openapi.yaml "$spec_dir/broker/openapi.yaml"
+          cp build/specs/data/openapi.yaml "$spec_dir/data/openapi.yaml"
+          cp build/specs/trading/openapi.yaml "$spec_dir/trading/openapi.yaml"
+
+          for spec in \
+            "$spec_dir/broker/openapi.yaml" \
+            "$spec_dir/data/openapi.yaml" \
+            "$spec_dir/trading/openapi.yaml"; do
+            if [[ ! -s "$spec" ]]; then
+              echo "::error::Prepared snapshot input '$spec' is missing or empty"
+              exit 1
+            fi
+            chmod 0444 "$spec"
+          done
+          chmod 0555 \
+            "$spec_dir/broker" \
+            "$spec_dir/data" \
+            "$spec_dir/trading" \
+            "$spec_dir"
+          echo "directory=$spec_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Build and test frozen snapshot inputs
+        if: steps.freshness.outputs.should_publish == 'true'
+        shell: bash
+        env:
+          SPEC_DIR: ${{ steps.specs.outputs.directory }}
+        run: |
+          set -euo pipefail
+          ./gradlew build \
+            -Palpaca.preprocessedSpecInputs=true \
+            "-PbrokerSpec=$SPEC_DIR/broker/openapi.yaml" \
+            "-PdataSpec=$SPEC_DIR/data/openapi.yaml" \
+            "-PtradingSpec=$SPEC_DIR/trading/openapi.yaml"
+
+      - name: Publish verified snapshot
+        if: steps.freshness.outputs.should_publish == 'true'
+        shell: bash
+        env:
+          EXPECTED_COMMIT: ${{ inputs.commit }}
+          FAIL_IF_STALE: ${{ inputs.fail_if_stale }}
+          SPEC_DIR: ${{ steps.specs.outputs.directory }}
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if ! remote_ref="$(git ls-remote --exit-code origin refs/heads/main)"; then
+            echo "::error::Unable to resolve remote refs/heads/main immediately before publication; refusing to publish"
+            exit 1
+          fi
+          remote_main_sha="$(awk '$2 == "refs/heads/main" { print $1; exit }' <<< "$remote_ref")"
+          if [[ ! "$remote_main_sha" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "::error::Remote refs/heads/main returned an invalid SHA immediately before publication; refusing to publish"
+            exit 1
+          fi
+          if [[ "$remote_main_sha" != "$EXPECTED_COMMIT" ]]; then
+            if [[ "$FAIL_IF_STALE" == "true" ]]; then
+              echo "::error::Snapshot publication requires current main, but commit $EXPECTED_COMMIT became stale; current main is $remote_main_sha"
+              exit 1
+            fi
+            echo "::notice::Skipping snapshot publication because commit $EXPECTED_COMMIT became stale; current main is $remote_main_sha"
+            exit 0
+          fi
+
+          ./gradlew publishMavenJavaPublicationToCentralSnapshotsRepository \
+            -Palpaca.preprocessedSpecInputs=true \
+            "-PbrokerSpec=$SPEC_DIR/broker/openapi.yaml" \
+            "-PdataSpec=$SPEC_DIR/data/openapi.yaml" \
+            "-PtradingSpec=$SPEC_DIR/trading/openapi.yaml"

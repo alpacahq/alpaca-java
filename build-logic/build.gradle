@@ -1,0 +1,12 @@
+plugins {
+    id 'groovy-gradle-plugin'
+}
+
+group = 'markets.alpaca.gradle'
+
+dependencies {
+    implementation "org.openapitools:openapi-generator-gradle-plugin:${libs.versions.openapi.generator.get()}"
+    implementation "com.github.spotbugs.snom:spotbugs-gradle-plugin:${libs.versions.spotbugs.gradle.plugin.get()}"
+    implementation "com.diffplug.spotless:spotless-plugin-gradle:${libs.versions.spotless.gradle.plugin.get()}"
+    implementation libs.snakeyaml
+}

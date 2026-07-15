@@ -1,0 +1,151 @@
+import groovy.xml.XmlParser
+import markets.alpaca.gradle.AlpacaBuildProperties
+import markets.alpaca.gradle.AlpacaTestSummaryListener
+import org.xml.sax.InputSource
+
+import javax.xml.parsers.SAXParserFactory
+
+plugins {
+    id 'jacoco'
+}
+
+def localProperties = AlpacaBuildProperties.loadLocalProperties(project)
+def testSummaryListener = new AlpacaTestSummaryListener()
+def rootBuildPrintsSpecVersions = false
+
+gradle.taskGraph.whenReady { graph ->
+    rootBuildPrintsSpecVersions = graph.hasTask(':printSpecVersions')
+}
+
+tasks.register('compileExamples', Exec) {
+    group = 'verification'
+    description = 'Compiles the example project without including it in published artifacts'
+    workingDir = rootDir
+    def gradleWrapper = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
+        ? 'gradlew.bat'
+        : './gradlew'
+    doFirst {
+        def forwardedProperties = gradle.startParameter.projectProperties.collect {
+            key, value -> "-P${key}=${value}"
+        }
+        def nestedBuildProperties = rootBuildPrintsSpecVersions
+            ? forwardedProperties + ['-Palpaca.skipSpecVersions=true']
+            : forwardedProperties
+        commandLine([gradleWrapper, '-p', 'examples', 'compileJava'] + nestedBuildProperties)
+    }
+}
+
+jacoco {
+    toolVersion = libs.versions.jacoco.get()
+}
+
+pluginManager.withPlugin('java') {
+    tasks.named('test').configure {
+        useJUnitPlatform {
+            excludeTags 'integration'
+        }
+        finalizedBy 'jacocoTestReport'
+        addTestListener(testSummaryListener)
+    }
+
+    tasks.named('check').configure {
+        dependsOn 'compileExamples'
+    }
+
+    tasks.register('integrationTest', Test) {
+        group = 'verification'
+        description = 'Runs @Tag("integration") tests against live Alpaca paper APIs'
+
+        useJUnitPlatform {
+            includeTags 'integration'
+        }
+
+        testClassesDirs = sourceSets.test.output.classesDirs
+        classpath = sourceSets.test.runtimeClasspath
+        shouldRunAfter 'test'
+        outputs.upToDateWhen { false }
+        addTestListener(testSummaryListener)
+
+        def tradingKeyId = AlpacaBuildProperties.firstNonBlank(
+            localProperties.getProperty('tradingApiKeyId'),
+            System.getenv('APCA_TRADING_KEY_ID'))
+        def tradingSecret = AlpacaBuildProperties.firstNonBlank(
+            localProperties.getProperty('tradingApiSecretKey'),
+            System.getenv('APCA_TRADING_SECRET_KEY'))
+        def tradingEnvironment = localProperties.getProperty('tradingApiEnvironment') ?:
+            System.getenv('APCA_TRADING_ENVIRONMENT')
+        if (tradingKeyId) systemProperty 'APCA_TRADING_KEY_ID', tradingKeyId
+        if (tradingSecret) systemProperty 'APCA_TRADING_SECRET_KEY', tradingSecret
+        if (tradingEnvironment) {
+            systemProperty 'APCA_TRADING_ENVIRONMENT', tradingEnvironment
+        }
+
+        def brokerKeyId = localProperties.getProperty('brokerApiKeyId') ?:
+            System.getenv('APCA_BROKER_KEY_ID')
+        def brokerSecret = localProperties.getProperty('brokerApiSecretKey') ?:
+            System.getenv('APCA_BROKER_SECRET_KEY')
+        def brokerEnvironment = localProperties.getProperty('brokerApiEnvironment') ?:
+            System.getenv('APCA_BROKER_ENVIRONMENT')
+        if (brokerKeyId) systemProperty 'APCA_BROKER_KEY_ID', brokerKeyId
+        if (brokerSecret) systemProperty 'APCA_BROKER_SECRET_KEY', brokerSecret
+        if (brokerEnvironment) systemProperty 'APCA_BROKER_ENVIRONMENT', brokerEnvironment
+    }
+
+    tasks.named('jacocoTestReport').configure {
+        dependsOn 'test'
+        reports {
+            xml.required = true
+            html.required = true
+        }
+        classDirectories.setFrom(
+            fileTree(
+                dir: layout.buildDirectory.dir('classes/java/main'),
+                exclude: ['markets/alpaca/client/openapi/**']))
+
+        doLast {
+            def reportXml = reports.xml.outputLocation.asFile.get()
+            if (!reportXml.exists()) return
+
+            def factory = SAXParserFactory.newInstance()
+            factory.setFeature(
+                'http://apache.org/xml/features/disallow-doctype-decl',
+                false)
+            def xmlParser = new XmlParser(factory.newSAXParser())
+            xmlParser.setEntityResolver { publicId, systemId ->
+                new InputSource(new StringReader(''))
+            }
+            def xml = xmlParser.parse(reportXml)
+
+            def totals = [:]
+            xml.counter.each { counter ->
+                def covered = (counter.@covered as String).toInteger()
+                def missed = (counter.@missed as String).toInteger()
+                totals[counter.@type as String] = [covered: covered, missed: missed]
+            }
+            if (totals.isEmpty()) return
+
+            println '\nCoverage (handwritten classes):'
+            [
+                ['INSTRUCTION', 'Instructions'],
+                ['BRANCH', 'Branches    '],
+                ['LINE', 'Lines       '],
+                ['METHOD', 'Methods     '],
+                ['CLASS', 'Classes     '],
+            ].each { type, label ->
+                def counter = totals[type]
+                if (!counter) return
+                def total = counter.covered + counter.missed
+                def percentage = total > 0
+                    ? (counter.covered * 100.0 / total)
+                    : 0.0
+                printf(
+                    '  %s  %5.1f%%  (%d / %d)%n',
+                    label,
+                    percentage,
+                    counter.covered,
+                    total)
+            }
+            println "  Report → ${reports.html.outputLocation.asFile.get().toURI()}"
+        }
+    }
+}

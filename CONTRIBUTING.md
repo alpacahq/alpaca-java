@@ -47,15 +47,17 @@ handwritten code there.
 
 Do **not** modify the generated file. Instead:
 
-- **Spec bug** → add a preprocessing fix to the relevant task in `build.gradle`.
+- **Spec bug** → add a preprocessing fix to the relevant task in
+  `build-logic/src/main/groovy/alpaca.openapi-generation.gradle`.
 - **Generator limitation** → wrap the generated class in a handwritten decorator under `src/main/java/`.
 
 ### Spec preprocessing fixes
 
 If generated code breaks due to an upstream spec issue, add a fix to the appropriate `preprocess*Spec` task in
-`build.gradle`. Use the SnakeYAML-based helpers already in the build script (`loadSpec` / `dumpYaml`). Do **not** patch
-OAS YAML with regex or raw string substitution, and do **not** modify the source specs in `alpaca-docs-private` from
-this repository.
+`build-logic/src/main/groovy/alpaca.openapi-generation.gradle`. Put reusable SnakeYAML transformations in
+`build-logic/src/main/groovy/markets/alpaca/gradle/OpenApiSpecSupport.groovy` and use its `loadSpec` / `dumpYaml`
+helpers. Do **not** patch OAS YAML with regex or raw string substitution, and do **not** modify the source specs in
+`alpaca-docs-private` from this repository.
 
 ### WebSocket models
 

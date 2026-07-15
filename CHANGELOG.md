@@ -20,21 +20,14 @@ the policy below applies strictly.
 
 ## [Unreleased]
 
+## [0.1.0] - YYYY-MM-DD
+
 ### Added
-- `AlpacaClientFactory`, `AlpacaCredentials`, HTTP helpers, REST helpers, and Trading/Market Data workflow helpers.
-- Handwritten WebSocket clients for stock data, crypto data, news, and trading updates.
-- `authenticationFuture()` and `waitForAuthentication(Duration)` for WebSocket streams.
-- Broker Events SSE wrapper for generated Broker SSE endpoints.
-- WebSocket monetary fields use `BigDecimal` rather than floating-point types.
-- OpenAPI Generator pipeline for Broker, Market Data, and Trading APIs (`okhttp-gson` library).
-- Maven publishing metadata, Apache-2.0 license, GitHub Actions build workflow, Dependabot configuration, and contributor guide.
-- Source and Javadoc JAR artifacts for published Maven packages.
-- Example applications for Broker, Market Data, Trading, and pagination workflows.
-- Read-only integration tests for live Alpaca REST, WebSocket, and Broker SSE workflows; tests skip when credentials are absent.
-- Spec preprocessing tasks in `build.gradle`: `removeEmptyKeyProperties`, `removeDiscriminatorEnums`, `removeActivityV2DetailTrdRequired`, `removeInternalSchemaMarkers`.
-- `printSpecVersions` Gradle task — prints `info.version` and last-modified date for each OAS spec.
-- JUnit 5 test suite for REST helpers, Broker SSE, and WebSocket code.
-- JaCoCo coverage reporting, scoped to handwritten classes and excluding generated REST packages.
-- `AlpacaCredentials.toString()` redacts `apiSecretKey` (`***`).
-- `AlpacaClientFactory.applyTradingAuth` / `applyDataAuth` throw `IllegalStateException` with an actionable message if the generated auth entry names change.
-- `markets.alpaca.client.http.AlpacaHttpConfig.loggingClient` redacts `APCA-API-KEY-ID` and `APCA-API-SECRET-KEY` headers at all logging levels.
+- Initial release of the Alpaca Java client SDK.
+- Generated REST API clients for Alpaca Trading, Market Data, and Broker APIs.
+- Authenticated client factories and shared HTTP, pagination, and asynchronous helper utilities.
+- WebSocket streaming clients for stocks, crypto, news, and trading updates.
+- Broker trade-event SSE support.
+- Type-safe monetary values using `BigDecimal` in handwritten streaming models.
+- Examples and read-only integration tests for REST, streaming, and broker workflows.
+- Maven Central publishing with source and Javadoc artifacts.

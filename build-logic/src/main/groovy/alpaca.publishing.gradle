@@ -1,0 +1,171 @@
+import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+
+plugins {
+    id 'maven-publish'
+    id 'signing'
+}
+
+def signingKey = providers.gradleProperty('signingKey')
+def signingPassword = providers.gradleProperty('signingPassword')
+def isReleaseVersion = !version.toString().endsWith('-SNAPSHOT')
+
+publishing {
+    repositories {
+        maven {
+            name = 'GitHubPackages'
+            url = uri('https://maven.pkg.github.com/alpacahq/alpaca-java-client')
+            credentials {
+                username = System.getenv('GITHUB_ACTOR') ?: ''
+                password = System.getenv('GITHUB_TOKEN') ?: ''
+            }
+        }
+
+        maven {
+            name = 'CentralSnapshots'
+            url = uri('https://central.sonatype.com/repository/maven-snapshots/')
+            credentials {
+                username = project.findProperty('mavenCentralUsername') ?:
+                    System.getenv('MAVEN_CENTRAL_USERNAME') ?: ''
+                password = project.findProperty('mavenCentralPassword') ?:
+                    System.getenv('MAVEN_CENTRAL_PASSWORD') ?: ''
+            }
+        }
+    }
+}
+
+pluginManager.withPlugin('java') {
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+
+                pom {
+                    name = 'Alpaca Java Client'
+                    description =
+                        'Java client for Alpaca Markets REST and WebSocket APIs'
+                    url = 'https://github.com/alpacahq/alpaca-java-client'
+                    licenses {
+                        license {
+                            name = 'Apache License, Version 2.0'
+                            url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                        }
+                    }
+                    developers {
+                        developer {
+                            organization = 'Alpaca'
+                            organizationUrl = 'https://alpaca.markets'
+                        }
+                    }
+                    scm {
+                        connection =
+                            'scm:git:https://github.com/alpacahq/alpaca-java-client.git'
+                        developerConnection =
+                            'scm:git:ssh://git@github.com:alpacahq/alpaca-java-client.git'
+                        url = 'https://github.com/alpacahq/alpaca-java-client'
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        required = { isReleaseVersion }
+        if (signingKey.isPresent() && signingPassword.isPresent()) {
+            useInMemoryPgpKeys(signingKey.get(), signingPassword.get())
+        }
+        sign publishing.publications.mavenJava
+    }
+
+    tasks.named('signMavenJavaPublication').configure {
+        doFirst {
+            if (!isReleaseVersion ||
+                signingKey.isPresent() == signingPassword.isPresent()) {
+                return
+            }
+
+            def missingProperty = signingKey.isPresent()
+                ? 'signingPassword'
+                : 'signingKey'
+            throw new GradleException(
+                "Cannot sign non-SNAPSHOT version '${version}': missing Gradle project " +
+                "property '${missingProperty}'. Provide both signingKey and signingPassword.")
+        }
+    }
+}
+
+def centralSnapshotsRouteError = {
+    new GradleException(
+        "Cannot publish non-SNAPSHOT version '${version}' to CentralSnapshots. " +
+        'Use publishAggregationToCentralPortal for releases.')
+}
+def centralPortalReleaseRouteError = {
+    new GradleException(
+        "Cannot publish SNAPSHOT version '${version}' through an NMCP Central Portal " +
+        'release task. Use publishMavenJavaPublicationToCentralSnapshotsRepository ' +
+        'for snapshots.')
+}
+def centralPortalSnapshotsRouteError = {
+    def supportedTask = isReleaseVersion
+        ? 'publishAggregationToCentralPortal'
+        : 'publishMavenJavaPublicationToCentralSnapshotsRepository'
+    def versionKind = isReleaseVersion ? 'non-SNAPSHOT' : 'SNAPSHOT'
+    new GradleException(
+        "Cannot publish ${versionKind} version '${version}' through an NMCP Central " +
+        "Portal snapshot task. Use ${supportedTask} instead.")
+}
+
+def nmcpCentralPortalReleaseUploadTaskNames = [
+    'nmcpPublishAggregationToCentralPortal',
+    'nmcpPublishAllPublicationsToCentralPortal',
+] as Set
+def nmcpCentralPortalSnapshotsUploadTaskNames = [
+    'nmcpPublishAggregationToCentralPortalSnapshots',
+    'nmcpPublishAllPublicationsToCentralPortalSnapshots',
+] as Set
+
+tasks.withType(PublishToMavenRepository).configureEach {
+    if (repository.name == 'CentralSnapshots') {
+        doFirst {
+            if (isReleaseVersion) throw centralSnapshotsRouteError()
+        }
+    }
+}
+
+tasks.matching {
+    nmcpCentralPortalReleaseUploadTaskNames.contains(it.name)
+}.configureEach {
+    doFirst {
+        if (!isReleaseVersion) throw centralPortalReleaseRouteError()
+    }
+}
+
+tasks.matching {
+    nmcpCentralPortalSnapshotsUploadTaskNames.contains(it.name)
+}.configureEach {
+    doFirst {
+        throw centralPortalSnapshotsRouteError()
+    }
+}
+
+gradle.taskGraph.whenReady { graph ->
+    def centralSnapshotsUpload = graph.allTasks.find { task ->
+        task instanceof PublishToMavenRepository &&
+            task.repository.name == 'CentralSnapshots'
+    }
+    if (isReleaseVersion && centralSnapshotsUpload != null) {
+        throw centralSnapshotsRouteError()
+    }
+    def nmcpReleaseUpload = graph.allTasks.find { task ->
+        nmcpCentralPortalReleaseUploadTaskNames.contains(task.name)
+    }
+    if (!isReleaseVersion && nmcpReleaseUpload != null) {
+        throw centralPortalReleaseRouteError()
+    }
+    def nmcpSnapshotsUpload = graph.allTasks.find { task ->
+        nmcpCentralPortalSnapshotsUploadTaskNames.contains(task.name)
+    }
+    if (nmcpSnapshotsUpload != null) {
+        throw centralPortalSnapshotsRouteError()
+    }
+}

@@ -1,0 +1,65 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'markets.alpaca'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
+    withJavadocJar()
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api libs.okhttp
+    api libs.okhttp.sse
+    api libs.okhttp.logging
+
+    implementation libs.gson
+    implementation libs.gson.fire
+    implementation libs.commons.lang3
+
+    compileOnly libs.swagger.annotations
+    compileOnly libs.jsr305
+    compileOnly libs.javax.annotation.api
+
+    testImplementation libs.junit.jupiter
+    testImplementation libs.mockwebserver
+    testRuntimeOnly libs.junit.platform.launcher
+}
+
+tasks.named('processResources').configure {
+    inputs.property('sdkVersion', project.version.toString())
+    filesMatching('markets/alpaca/client/version.properties') {
+        expand(version: project.version)
+    }
+}
+
+tasks.named('jar').configure {
+    manifest {
+        attributes(
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version)
+    }
+}
+
+tasks.named('javadoc').configure {
+    description =
+        'Generates Javadoc API documentation for handwritten helpers and generated REST clients'
+    inputs.file(layout.projectDirectory.file('src/main/javadoc/overview.html'))
+    options.overview = layout.projectDirectory.file('src/main/javadoc/overview.html').asFile
+    options.addBooleanOption('Xdoclint:all,-missing', true)
+    options.tags('http.response.details:a:HTTP Response Details:')
+    options.quiet()
+}
+
+tasks.register('generateJavadocs') {
+    group = 'documentation'
+    description = 'Generates Javadoc API documentation in build/docs/javadoc'
+    dependsOn 'javadoc'
+}

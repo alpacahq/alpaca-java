@@ -1,0 +1,81 @@
+import com.github.spotbugs.snom.Confidence
+import com.github.spotbugs.snom.Effort
+
+plugins {
+    id 'checkstyle'
+    id 'com.github.spotbugs'
+    id 'com.diffplug.spotless'
+}
+
+spotless {
+    java {
+        target 'src/**/*.java', 'examples/src/**/*.java'
+        importOrder()
+        removeUnusedImports()
+        googleJavaFormat()
+        formatAnnotations()
+    }
+
+    format 'misc', {
+        target '*.gradle', '*.md', '*.properties', '*.toml', '*.yml', '*.yaml',
+            '.gitignore',
+            'examples/*.gradle', 'examples/*.md',
+            'gradle/*.properties', 'gradle/*.toml',
+            'build-logic/*.gradle', 'build-logic/src/main/groovy/**/*.groovy'
+        trimTrailingWhitespace()
+        leadingTabsToSpaces(4)
+        endWithNewline()
+    }
+}
+
+checkstyle {
+    toolVersion = '10.26.1'
+    configDirectory = layout.projectDirectory.dir('config/checkstyle')
+}
+
+pluginManager.withPlugin('java') {
+    tasks.named('checkstyleMain').configure {
+        source = fileTree('src/main/java') {
+            include '**/*.java'
+        }
+    }
+
+    tasks.named('checkstyleTest').configure {
+        source = fileTree('src/test/java') {
+            include '**/*.java'
+        }
+    }
+
+    spotbugs {
+        effort = Effort.valueOf('MAX')
+        reportLevel = Confidence.valueOf('MEDIUM')
+    }
+
+    tasks.named('spotbugsMain').configure {
+        dependsOn 'compileJava'
+        sourceDirs = files('src/main/java')
+        classes = fileTree(
+            dir: layout.buildDirectory.dir('classes/java/main'),
+            include: [
+                'markets/alpaca/client/*.class',
+                'markets/alpaca/client/broker/sse/**/*.class',
+                'markets/alpaca/client/data/**/*.class',
+                'markets/alpaca/client/http/**/*.class',
+                'markets/alpaca/client/rest/**/*.class',
+                'markets/alpaca/client/trading/**/*.class',
+                'markets/alpaca/client/ws/**/*.class',
+            ])
+        auxClassPaths = files(
+            sourceSets.main.compileClasspath,
+            layout.buildDirectory.dir('classes/java/main'))
+        excludeFilter = file('config/spotbugs/exclude.xml')
+        reports {
+            xml.required = false
+            html.required = true
+        }
+    }
+
+    tasks.named('spotbugsTest').configure {
+        enabled = false
+    }
+}

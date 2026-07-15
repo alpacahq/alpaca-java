@@ -1,0 +1,494 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag (vMAJOR.MINOR.PATCH)
+        required: true
+        type: string
+      recover_existing_release:
+        description: Recovery only after confirming Central accepted an ambiguous NMCP publication
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+# GitHub keeps at most one running and one pending run per concurrency group;
+# a newer dispatch can replace an older pending run. Do not queue releases.
+concurrency:
+  group: maven-central-release
+  cancel-in-progress: false
+
+jobs:
+  central_publish:
+    name: Validate, build, and publish to Central (main only)
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # The maven-central environment must independently restrict deployments to
+    # main. That policy is the protection against modified workflows on branches.
+    environment: maven-central
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+      version: ${{ steps.release.outputs.version }}
+      commit: ${{ steps.release.outputs.commit }}
+
+    # Recovery warning: if NMCP times out after Central accepts this immutable
+    # GAV, verify Central and dispatch a new run with recover_existing_release.
+    # Rerunning later failed jobs does not repeat a successful publication job.
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate release tag
+        id: release
+        shell: bash
+        env:
+          RELEASE_TAG_INPUT: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+
+          release_tag="$RELEASE_TAG_INPUT"
+          if ! release_version="$(
+            python3 scripts/release_tools.py parse-tag "$release_tag"
+          )"; then
+            echo "::error::Release tag must exactly match vMAJOR.MINOR.PATCH (for example, v1.2.3)"
+            exit 1
+          fi
+
+          git fetch --force --tags origin \
+            refs/heads/main:refs/remotes/origin/main
+
+          tag_ref="refs/tags/$release_tag"
+          if ! git show-ref --verify --quiet "$tag_ref"; then
+            echo "::error::Tag '$release_tag' does not exist"
+            exit 1
+          fi
+          if ! tag_commit="$(git rev-parse --verify "${tag_ref}^{commit}")"; then
+            echo "::error::Tag '$release_tag' does not resolve to a commit"
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$tag_commit" refs/remotes/origin/main; then
+            echo "::error::Tagged commit $tag_commit is not reachable from origin/main"
+            exit 1
+          fi
+
+          {
+            echo "tag=$release_tag"
+            echo "version=$release_version"
+            echo "commit=$tag_commit"
+          } >> "$GITHUB_OUTPUT"
+
+          git checkout --detach "$tag_ref"
+          if [[ "$(git rev-parse HEAD)" != "$tag_commit" ]]; then
+            echo "::error::Detached checkout does not match the verified tagged commit"
+            exit 1
+          fi
+
+      - name: Test tagged release tooling
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
+
+      - name: Check exact Maven Central publication
+        id: central-check
+        shell: bash
+        env:
+          RECOVERY_MODE: ${{ inputs.recover_existing_release }}
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          pom_file="$RUNNER_TEMP/alpaca-java-client-$RELEASE_VERSION.pom"
+          pom_url="https://repo.maven.apache.org/maven2/markets/alpaca/alpaca-java-client/$RELEASE_VERSION/alpaca-java-client-$RELEASE_VERSION.pom"
+
+          if ! http_status="$(
+            curl \
+              --silent \
+              --show-error \
+              --location \
+              --max-redirs 3 \
+              --connect-timeout 10 \
+              --max-time 30 \
+              --max-filesize 1048576 \
+              --proto '=https' \
+              --proto-redir '=https' \
+              --output "$pom_file" \
+              --write-out '%{http_code}' \
+              "$pom_url"
+          )"; then
+            echo "::error::Unable to query Maven Central for the exact release POM; no publication or recovery action was attempted"
+            exit 1
+          fi
+
+          if [[ "$RECOVERY_MODE" == "true" ]]; then
+            if [[ "$http_status" == "404" ]]; then
+              echo "::error::Recovery requires the exact POM to be publicly available on Maven Central. It may still be propagating; wait, verify Central, and dispatch recovery again later."
+              exit 1
+            fi
+            if [[ "$http_status" != "200" ]]; then
+              echo "::error::Recovery POM lookup returned HTTP $http_status; refusing to skip publication"
+              exit 1
+            fi
+
+            if ! python3 scripts/release_tools.py validate-pom \
+              --pom "$pom_file" \
+              --group markets.alpaca \
+              --artifact alpaca-java-client \
+              --version "$RELEASE_VERSION"; then
+              echo "::error::The public recovery POM failed exact coordinate validation"
+              exit 1
+            fi
+
+            echo "publish_required=false" >> "$GITHUB_OUTPUT"
+            cat >> "$GITHUB_STEP_SUMMARY" <<EOF
+          ### Maven Central recovery verified
+          Confirmed the public POM for \`markets.alpaca:alpaca-java-client:$RELEASE_VERSION\`
+          and matched its XML coordinates. Build, signing, and upload were skipped; downstream
+          GitHub Release creation and the main version bump may proceed.
+          EOF
+            exit 0
+          fi
+
+          if [[ "$http_status" == "200" ]]; then
+            echo "::error::The immutable release markets.alpaca:alpaca-java-client:$RELEASE_VERSION already exists on Maven Central. Confirm it, then dispatch this workflow with recover_existing_release enabled."
+            exit 1
+          fi
+          if [[ "$http_status" != "404" ]]; then
+            echo "::error::Maven Central preflight returned HTTP $http_status; refusing to attempt publication"
+            exit 1
+          fi
+
+          echo "publish_required=true" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Java
+        if: steps.central-check.outputs.publish_required == 'true'
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        if: steps.central-check.outputs.publish_required == 'true'
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6
+
+      - name: Prepare release OpenAPI specs
+        if: steps.central-check.outputs.publish_required == 'true'
+        id: specs
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          spec_dir="$RUNNER_TEMP/alpaca-release-specs"
+
+          # This is the only invocation allowed to resolve configured/default
+          # OpenAPI sources. All later Gradle invocations use these local copies.
+          ./gradlew \
+            preprocessBrokerSpec \
+            preprocessDataSpec \
+            preprocessTradingSpec \
+            -Pversion="$RELEASE_VERSION"
+
+          rm -rf "$spec_dir"
+          mkdir -p \
+            "$spec_dir/broker" \
+            "$spec_dir/data" \
+            "$spec_dir/trading"
+          cp build/specs/broker/openapi.yaml "$spec_dir/broker/openapi.yaml"
+          cp build/specs/data/openapi.yaml "$spec_dir/data/openapi.yaml"
+          cp build/specs/trading/openapi.yaml "$spec_dir/trading/openapi.yaml"
+
+          for spec in \
+            "$spec_dir/broker/openapi.yaml" \
+            "$spec_dir/data/openapi.yaml" \
+            "$spec_dir/trading/openapi.yaml"; do
+            if [[ ! -s "$spec" ]]; then
+              echo "::error::Prepared release input '$spec' is missing or empty"
+              exit 1
+            fi
+            chmod 0444 "$spec"
+          done
+          chmod 0555 \
+            "$spec_dir/broker" \
+            "$spec_dir/data" \
+            "$spec_dir/trading" \
+            "$spec_dir"
+          echo "directory=$spec_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Upload verified release inputs
+        if: steps.central-check.outputs.publish_required == 'true'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: release-inputs-${{ steps.release.outputs.version }}
+          path: ${{ steps.specs.outputs.directory }}
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 9
+
+      - name: Build tagged release from prepared specs
+        if: steps.central-check.outputs.publish_required == 'true'
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+          SPEC_DIR: ${{ steps.specs.outputs.directory }}
+        run: |
+          set -euo pipefail
+          ./gradlew build \
+            -Pversion="$RELEASE_VERSION" \
+            -Palpaca.preprocessedSpecInputs=true \
+            "-PbrokerSpec=$SPEC_DIR/broker/openapi.yaml" \
+            "-PdataSpec=$SPEC_DIR/data/openapi.yaml" \
+            "-PtradingSpec=$SPEC_DIR/trading/openapi.yaml"
+
+      - name: Record Central recovery guidance
+        if: steps.central-check.outputs.publish_required == 'true'
+        shell: bash
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<'EOF'
+          ### Maven Central recovery
+          The release resolves and preprocesses each OpenAPI spec once, then uses those exact
+          local copies for both build and publication.
+          If NMCP times out after Central may have accepted the GAV, verify the deployment
+          in Central Portal. Once its POM is public, dispatch a new run with
+          \`recover_existing_release\` enabled instead of retrying publication. Use “rerun
+          failed jobs” when only the GitHub Release or main-version bump job failed.
+          EOF
+
+      - name: Publish immutable release to Maven Central
+        if: steps.central-check.outputs.publish_required == 'true'
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+          SPEC_DIR: ${{ steps.specs.outputs.directory }}
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+        run: |
+          set -euo pipefail
+          ./gradlew publishAggregationToCentralPortal \
+            -Pversion="$RELEASE_VERSION" \
+            -Palpaca.preprocessedSpecInputs=true \
+            "-PbrokerSpec=$SPEC_DIR/broker/openapi.yaml" \
+            "-PdataSpec=$SPEC_DIR/data/openapi.yaml" \
+            "-PtradingSpec=$SPEC_DIR/trading/openapi.yaml"
+
+  github_release:
+    name: Create GitHub Release
+    needs: central_publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout verified tag
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ needs.central_publish.outputs.tag }}
+
+      - name: Revalidate checked-out tag
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ needs.central_publish.outputs.tag }}
+          EXPECTED_COMMIT: ${{ needs.central_publish.outputs.commit }}
+        run: |
+          set -euo pipefail
+          tag_ref="refs/tags/$RELEASE_TAG"
+          git fetch --force --tags origin
+          if ! actual_commit="$(git rev-parse --verify "${tag_ref}^{commit}")"; then
+            echo "::error::Verified release tag '$RELEASE_TAG' is no longer available"
+            exit 1
+          fi
+          if [[ "$actual_commit" != "$EXPECTED_COMMIT" ]]; then
+            echo "::error::Release tag '$RELEASE_TAG' no longer resolves to the validated commit"
+            exit 1
+          fi
+          git checkout --detach "$tag_ref"
+
+      - name: Create GitHub Release if absent
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.central_publish.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          releases_file="$(mktemp)"
+          trap 'rm -f "$releases_file"' EXIT
+          if ! gh api \
+            --paginate \
+            "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+            --jq ".[] | select(.tag_name == \"$RELEASE_TAG\") | [.id, .draft] | @tsv" \
+            > "$releases_file"; then
+            echo "::error::GitHub Release lookup failed; refusing to create or publish"
+            exit 1
+          fi
+
+          mapfile -t matching_releases < "$releases_file"
+          if (( ${#matching_releases[@]} > 1 )); then
+            echo "::error::Multiple GitHub Releases use tag '$RELEASE_TAG'; refusing to choose one"
+            exit 1
+          fi
+          if (( ${#matching_releases[@]} == 1 )); then
+            IFS=$'\t' read -r release_id is_draft <<< "${matching_releases[0]}"
+            if [[ ! "$release_id" =~ ^[0-9]+$ ]]; then
+              echo "::error::GitHub Release lookup returned an invalid release ID"
+              exit 1
+            fi
+            if [[ "$is_draft" == "true" ]]; then
+              gh api \
+                --method PATCH \
+                "repos/$GITHUB_REPOSITORY/releases/$release_id" \
+                -F draft=false \
+                > /dev/null
+              echo "::notice::Published existing draft GitHub Release '$RELEASE_TAG' unchanged"
+            elif [[ "$is_draft" == "false" ]]; then
+              echo "::notice::GitHub Release '$RELEASE_TAG' already exists; leaving it unchanged"
+            else
+              echo "::error::GitHub Release lookup returned an invalid draft state"
+              exit 1
+            fi
+            exit 0
+          fi
+
+          gh release create "$RELEASE_TAG" \
+            --verify-tag \
+            --generate-notes \
+            --title "$RELEASE_TAG"
+
+  bump_main:
+    name: Start next patch development
+    needs:
+      - central_publish
+      - github_release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      snapshot_commit: ${{ steps.bump.outputs.commit || steps.recovered-bump.outputs.commit }}
+      snapshot_required: ${{ steps.bump.outputs.snapshot_required || steps.recovered-bump.outputs.snapshot_required }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Fetch latest main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --force origin \
+            refs/heads/main:refs/remotes/origin/main
+          git checkout --detach refs/remotes/origin/main
+
+      - name: Prepare next development version
+        id: next-version
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ needs.central_publish.outputs.version }}
+        run: |
+          set -euo pipefail
+          if ! python3 scripts/release_tools.py update-version \
+            --properties gradle.properties \
+            --release-version "$RELEASE_VERSION" \
+            --github-output "$GITHUB_OUTPUT"; then
+            echo "::error::Unable to calculate or safely apply the next development version"
+            exit 1
+          fi
+
+          case "$(awk -F= '$1 == "status" { value = $2 } END { print value }' "$GITHUB_OUTPUT")" in
+            equal)
+              echo "::notice::Main already has the next development version; no bump is needed"
+              ;;
+            ahead)
+              echo "::error::Main is ahead of the expected next development version; refusing to continue without an explicit recovery plan"
+              exit 1
+              ;;
+            behind)
+              mapfile -t changed_files < <(git diff --name-only)
+              if (( ${#changed_files[@]} != 1 )) || [[ "${changed_files[0]}" != "gradle.properties" ]]; then
+                echo "::error::Version bump must modify only gradle.properties"
+                exit 1
+              fi
+              ;;
+            *)
+              echo "::error::Version comparison did not produce a recognized status"
+              exit 1
+              ;;
+          esac
+
+      - name: Commit and push next development version
+        id: bump
+        if: steps.next-version.outputs.should_push == 'true'
+        shell: bash
+        env:
+          NEXT_VERSION: ${{ steps.next-version.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- gradle.properties
+
+          mapfile -t staged_files < <(git diff --cached --name-only)
+          if (( ${#staged_files[@]} != 1 )) || [[ "${staged_files[0]}" != "gradle.properties" ]]; then
+            echo "::error::Refusing to commit anything except gradle.properties"
+            exit 1
+          fi
+
+          git commit -m "chore: start $NEXT_VERSION development"
+          bump_commit="$(git rev-parse HEAD)"
+          if ! git push origin HEAD:main; then
+            if ! remote_ref="$(git ls-remote --exit-code origin refs/heads/main)"; then
+              echo "::error::Version-bump push failed and remote main could not be resolved"
+              exit 1
+            fi
+            remote_main_sha="$(awk '$2 == "refs/heads/main" { print $1; exit }' <<< "$remote_ref")"
+            if [[ "$remote_main_sha" != "$bump_commit" ]]; then
+              echo "::error::Unable to push the version bump to main. Main may have advanced, or branch protection may reject github-actions[bot]."
+              exit 1
+            fi
+            echo "::notice::Push reported failure, but remote main contains the exact version-bump commit; continuing recovery"
+          fi
+          echo "commit=$bump_commit" >> "$GITHUB_OUTPUT"
+          echo "snapshot_required=true" >> "$GITHUB_OUTPUT"
+
+      - name: Recover an already-completed version bump
+        id: recovered-bump
+        if: steps.next-version.outputs.status == 'equal'
+        shell: bash
+        run: |
+          set -euo pipefail
+          bump_commit="$(git rev-parse HEAD)"
+          if ! remote_ref="$(git ls-remote --exit-code origin refs/heads/main)"; then
+            echo "::error::Unable to resolve remote main while recovering the version bump"
+            exit 1
+          fi
+          remote_main_sha="$(awk '$2 == "refs/heads/main" { print $1; exit }' <<< "$remote_ref")"
+          if [[ "$remote_main_sha" != "$bump_commit" ]]; then
+            echo "::error::Checked-out main changed while recovering the version bump"
+            exit 1
+          fi
+          echo "commit=$bump_commit" >> "$GITHUB_OUTPUT"
+          echo "snapshot_required=true" >> "$GITHUB_OUTPUT"
+
+  publish_next_snapshot:
+    name: Publish next development snapshot
+    needs: bump_main
+    if: needs.bump_main.outputs.snapshot_required == 'true'
+    uses: ./.github/workflows/publish-snapshot.yml
+    with:
+      commit: ${{ needs.bump_main.outputs.snapshot_commit }}
+      fail_if_stale: true
+    secrets:
+      MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+      MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}

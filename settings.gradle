@@ -1,1 +1,32 @@
+pluginManagement {
+    includeBuild('build-logic')
+}
+
+plugins {
+    id 'com.gradleup.nmcp.settings' version '1.4.4'
+}
+
+def centralUsername = providers.gradleProperty('mavenCentralUsername')
+def centralPassword = providers.gradleProperty('mavenCentralPassword')
+// Gradle 9.6.1 cannot isolate providers.environmentVariable() when NMCP carries
+// settings configuration into projects, so read only the environment fallback eagerly.
+def centralUsernameFromEnvironment = System.getenv('MAVEN_CENTRAL_USERNAME')
+def centralPasswordFromEnvironment = System.getenv('MAVEN_CENTRAL_PASSWORD')
+if (centralUsernameFromEnvironment != null) {
+    centralUsername = centralUsername.orElse(centralUsernameFromEnvironment)
+}
+if (centralPasswordFromEnvironment != null) {
+    centralPassword = centralPassword.orElse(centralPasswordFromEnvironment)
+}
+def projectVersion = providers.gradleProperty('version').get()
+
+nmcpSettings {
+    centralPortal {
+        username.set(centralUsername)
+        password.set(centralPassword)
+        publishingType = 'AUTOMATIC'
+        publicationName = "markets.alpaca:alpaca-java-client:${projectVersion}"
+    }
+}
+
 rootProject.name = 'alpaca-java-client'

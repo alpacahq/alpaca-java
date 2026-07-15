@@ -3,6 +3,10 @@
 build/
 .gradle/
 
+# Python
+__pycache__/
+*.py[cod]
+
 # IDE
 .idea/
 *.iml

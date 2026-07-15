@@ -67,6 +67,21 @@ jobs:
       - name: Build docs
         run: npm run build --prefix docs
 
+  release-tools:
+    name: Release tooling tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout client
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - name: Test release tooling
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
+
   build:
     name: Gradle build (private specs)
     runs-on: ubuntu-latest
@@ -114,3 +129,16 @@ jobs:
 
       - name: Build
         run: ./gradlew build
+
+  publish-snapshot:
+    name: Publish snapshot to Maven Central
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs:
+      - build
+      - release-tools
+    uses: ./.github/workflows/publish-snapshot.yml
+    with:
+      commit: ${{ github.sha }}
+    secrets:
+      MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+      MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
