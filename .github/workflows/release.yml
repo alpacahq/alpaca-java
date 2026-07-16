@@ -50,6 +50,7 @@ jobs:
         shell: bash
         env:
           RELEASE_TAG_INPUT: ${{ inputs.tag }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
@@ -61,8 +62,13 @@ jobs:
             exit 1
           fi
 
-          git fetch --force --tags origin \
+          git_auth_header="$(
+            printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 | tr -d '\n'
+          )"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $git_auth_header" \
+            fetch --force --tags origin \
             refs/heads/main:refs/remotes/origin/main
+          unset git_auth_header
 
           tag_ref="refs/tags/$release_tag"
           if ! git show-ref --verify --quiet "$tag_ref"; then
@@ -299,10 +305,16 @@ jobs:
         env:
           RELEASE_TAG: ${{ needs.central_publish.outputs.tag }}
           EXPECTED_COMMIT: ${{ needs.central_publish.outputs.commit }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           tag_ref="refs/tags/$RELEASE_TAG"
-          git fetch --force --tags origin
+          git_auth_header="$(
+            printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 | tr -d '\n'
+          )"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $git_auth_header" \
+            fetch --force --tags origin
+          unset git_auth_header
           if ! actual_commit="$(git rev-parse --verify "${tag_ref}^{commit}")"; then
             echo "::error::Verified release tag '$RELEASE_TAG' is no longer available"
             exit 1
