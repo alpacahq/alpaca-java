@@ -1,9 +1,40 @@
 # Alpaca Java Client Docs
 
+[![Build](https://github.com/alpacahq/alpaca-java/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/alpacahq/alpaca-java/actions/workflows/build.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/markets.alpaca/alpaca-java)](https://central.sonatype.com/artifact/markets.alpaca/alpaca-java)
+[![Java 17+](https://img.shields.io/badge/Java-17%2B-007396?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/17/)
+[![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](../LICENSE)
+
 Local documentation site for `alpaca-java`.
 
 The narrative wiki is authored in `content/`. The generated Java API reference is produced by
 Gradle Javadocs and copied into `static/javadocs/` for local preview.
+
+## Consume the artifact
+
+Published releases are available from Maven Central:
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("markets.alpaca:alpaca-java:VERSION")
+}
+```
+
+```xml
+<dependency>
+  <groupId>markets.alpaca</groupId>
+  <artifactId>alpaca-java</artifactId>
+  <version>VERSION</version>
+</dependency>
+```
+
+Replace `VERSION` with a released version. For development snapshots, add the scoped Sonatype
+[Central Snapshots repository](../README.md#snapshots). See the
+[Getting Started guide](content/getting-started.md#installation) for complete instructions.
 
 ## Local setup
 

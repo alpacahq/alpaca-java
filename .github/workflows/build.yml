@@ -33,6 +33,8 @@ jobs:
             AGENTS.md
             LLMS.md
             CONTRIBUTING.md
+            RELEASING.md
+            TESTING.md
             CHANGELOG.md
             examples/README.md
             docs/README.md

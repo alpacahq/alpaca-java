@@ -44,13 +44,6 @@ Replace `VERSION` with the release you want to use.
 ```kotlin
 repositories {
     mavenCentral()
-    maven {
-        url = uri("https://maven.pkg.github.com/alpacahq/alpaca-java")
-        credentials {
-            username = System.getenv("GITHUB_ACTOR")
-            password = System.getenv("GITHUB_TOKEN")
-        }
-    }
 }
 
 dependencies {
@@ -61,13 +54,6 @@ dependencies {
 ### Maven
 
 ```xml
-<repositories>
-  <repository>
-    <id>github</id>
-    <url>https://maven.pkg.github.com/alpacahq/alpaca-java</url>
-  </repository>
-</repositories>
-
 <dependencies>
   <dependency>
     <groupId>markets.alpaca</groupId>
@@ -77,19 +63,31 @@ dependencies {
 </dependencies>
 ```
 
-If your Maven build needs credentials for GitHub Packages, add a matching server entry to your
-Maven settings:
+### Development snapshots
+
+Released versions require no repository configuration beyond Maven Central. To use a
+`-SNAPSHOT` version, add Sonatype's Central Snapshots repository and restrict it to this module:
+
+```kotlin
+repositories {
+    mavenCentral()
+    maven {
+        url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+        mavenContent { snapshotsOnly() }
+        content { includeModule("markets.alpaca", "alpaca-java") }
+    }
+}
+```
 
 ```xml
-<settings>
-  <servers>
-    <server>
-      <id>github</id>
-      <username>${env.GITHUB_ACTOR}</username>
-      <password>${env.GITHUB_TOKEN}</password>
-    </server>
-  </servers>
-</settings>
+<repositories>
+  <repository>
+    <id>central-snapshots</id>
+    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    <releases><enabled>false</enabled></releases>
+    <snapshots><enabled>true</enabled></snapshots>
+  </repository>
+</repositories>
 ```
 
 Repository `./gradlew` commands are only needed when you are contributing to this SDK itself. An
