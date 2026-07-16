@@ -113,9 +113,160 @@ jobs:
     needs:
       - build
       - release-tools
-    uses: ./.github/workflows/publish-snapshot.yml
-    with:
-      commit: ${{ github.sha }}
-    secrets:
-      MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-      MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    concurrency:
+      group: central-snapshot-publication
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout requested commit
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.sha }}
+
+      - name: Check whether commit is current
+        id: freshness
+        shell: bash
+        env:
+          EXPECTED_COMMIT: ${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$EXPECTED_COMMIT" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "::error::Snapshot commit must be a full 40-character Git SHA"
+            exit 1
+          fi
+          if [[ "$(git rev-parse HEAD)" != "$EXPECTED_COMMIT" ]]; then
+            echo "::error::Checked-out commit does not match the requested snapshot commit"
+            exit 1
+          fi
+          if ! remote_main_sha="$(
+            gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" \
+              --jq '.object.sha'
+          )"; then
+            echo "::error::Unable to resolve main through the GitHub API; refusing to publish"
+            exit 1
+          fi
+          if [[ ! "$remote_main_sha" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "::error::GitHub API returned an invalid main SHA; refusing to publish"
+            exit 1
+          fi
+
+          if ! decision="$(
+            python3 scripts/release_tools.py check-main-freshness \
+              --commit "$EXPECTED_COMMIT" \
+              --remote-main "$remote_main_sha"
+          )"; then
+            echo "::error::Snapshot publication requires current main, but commit $EXPECTED_COMMIT is stale; current main is $remote_main_sha"
+            exit 1
+          fi
+          echo "$decision" >> "$GITHUB_OUTPUT"
+          if [[ "$decision" == "should_publish=true" ]]; then
+            echo "Commit $EXPECTED_COMMIT is current; snapshot verification will proceed"
+          else
+            echo "::notice::Skipping snapshot publication because commit $EXPECTED_COMMIT is stale; current main is $remote_main_sha"
+          fi
+
+      - name: Set up Java
+        if: steps.freshness.outputs.should_publish == 'true'
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5.5.0
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        if: steps.freshness.outputs.should_publish == 'true'
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      - name: Validate snapshot version
+        if: steps.freshness.outputs.should_publish == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! version="$(
+            python3 scripts/release_tools.py read-version \
+              --properties gradle.properties
+          )"; then
+            echo "::error file=gradle.properties::Version must be a semantic -SNAPSHOT"
+            exit 1
+          fi
+          echo "Snapshot version $version"
+
+      - name: Prepare immutable OpenAPI inputs
+        if: steps.freshness.outputs.should_publish == 'true'
+        id: specs
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./gradlew \
+            preprocessBrokerSpec \
+            preprocessDataSpec \
+            preprocessTradingSpec
+
+          spec_dir="$RUNNER_TEMP/alpaca-snapshot-specs"
+          if ! python3 scripts/release_tools.py prepare-frozen-specs \
+            --source-root build/specs \
+            --output-dir "$spec_dir"; then
+            echo "::error::Unable to prepare immutable OpenAPI snapshot inputs"
+            exit 1
+          fi
+          echo "directory=$spec_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Build and test frozen snapshot inputs
+        if: steps.freshness.outputs.should_publish == 'true'
+        shell: bash
+        env:
+          SPEC_DIR: ${{ steps.specs.outputs.directory }}
+        run: |
+          set -euo pipefail
+          ./gradlew build \
+            -Palpaca.preprocessedSpecInputs=true \
+            "-PbrokerSpec=$SPEC_DIR/broker/openapi.yaml" \
+            "-PdataSpec=$SPEC_DIR/data/openapi.yaml" \
+            "-PtradingSpec=$SPEC_DIR/trading/openapi.yaml"
+
+      - name: Publish verified snapshot
+        if: steps.freshness.outputs.should_publish == 'true'
+        shell: bash
+        env:
+          EXPECTED_COMMIT: ${{ github.sha }}
+          SPEC_DIR: ${{ steps.specs.outputs.directory }}
+          GH_TOKEN: ${{ github.token }}
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if ! remote_main_sha="$(
+            gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" \
+              --jq '.object.sha'
+          )"; then
+            echo "::error::Unable to resolve main through the GitHub API immediately before publication; refusing to publish"
+            exit 1
+          fi
+          if [[ ! "$remote_main_sha" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "::error::GitHub API returned an invalid main SHA immediately before publication; refusing to publish"
+            exit 1
+          fi
+
+          if ! decision="$(
+            python3 scripts/release_tools.py check-main-freshness \
+              --commit "$EXPECTED_COMMIT" \
+              --remote-main "$remote_main_sha"
+          )"; then
+            echo "::error::Snapshot publication requires current main, but commit $EXPECTED_COMMIT became stale; current main is $remote_main_sha"
+            exit 1
+          fi
+          if [[ "$decision" != "should_publish=true" ]]; then
+            echo "::notice::Skipping snapshot publication because commit $EXPECTED_COMMIT became stale; current main is $remote_main_sha"
+            exit 0
+          fi
+
+          ./gradlew publishMavenJavaPublicationToCentralSnapshotsRepository \
+            -Palpaca.preprocessedSpecInputs=true \
+            "-PbrokerSpec=$SPEC_DIR/broker/openapi.yaml" \
+            "-PdataSpec=$SPEC_DIR/data/openapi.yaml" \
+            "-PtradingSpec=$SPEC_DIR/trading/openapi.yaml"
