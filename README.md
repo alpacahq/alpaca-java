@@ -1,4 +1,4 @@
-# alpaca-java-client
+# alpaca-java
 
 [![Java 17+](https://img.shields.io/badge/Java-17%2B-007396?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/17/)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
@@ -10,9 +10,9 @@ Broker Events SSE helpers are handwritten and committed in `src/main/java/market
 
 ## Documentation
 
-- [Project documentation](https://alpacahq.github.io/alpaca-java-client/)
-- [Getting started](https://alpacahq.github.io/alpaca-java-client/getting-started)
-- [API reference](https://alpacahq.github.io/alpaca-java-client/api)
+- [Project documentation](https://alpacahq.github.io/alpaca-java/)
+- [Getting started](https://alpacahq.github.io/alpaca-java/getting-started)
+- [API reference](https://alpacahq.github.io/alpaca-java/api)
 - [LLM usage guide](LLMS.md)
 
 Use the hosted documentation for SDK usage, installation, credentials, Trading, Market Data,
@@ -36,9 +36,9 @@ not use the blocking generated REST methods.
 ## Where to start
 
 - Building an application with this SDK: start with the
-  [hosted getting started guide](https://alpacahq.github.io/alpaca-java-client/getting-started).
+  [hosted getting started guide](https://alpacahq.github.io/alpaca-java/getting-started).
 - Looking for exact classes, methods, generated REST models, or package details: use the
-  [API reference](https://alpacahq.github.io/alpaca-java-client/api).
+  [API reference](https://alpacahq.github.io/alpaca-java/api).
 - Asking an LLM or coding assistant to write application code with this SDK: give it
   [`LLMS.md`](LLMS.md).
 - Contributing to this repository: read [`AGENTS.md`](AGENTS.md), then use the build and test
@@ -175,12 +175,12 @@ repositories {
     maven {
         url = uri("https://central.sonatype.com/repository/maven-snapshots/")
         mavenContent { snapshotsOnly() }
-        content { includeModule("markets.alpaca", "alpaca-java-client") }
+        content { includeModule("markets.alpaca", "alpaca-java") }
     }
 }
 
 dependencies {
-    implementation("markets.alpaca:alpaca-java-client:0.1.0-SNAPSHOT")
+    implementation("markets.alpaca:alpaca-java:0.1.0-SNAPSHOT")
 }
 ```
 

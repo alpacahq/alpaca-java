@@ -1,4 +1,4 @@
-# AGENTS.md — alpaca-java-client
+# AGENTS.md — alpaca-java
 
 Java client for Alpaca Markets APIs. REST clients are **generated from OpenAPI specs** at build time. WebSocket clients are handwritten and committed. Read this before making any changes.
 
@@ -204,7 +204,7 @@ Only run `./gradlew clean generateApis build` when:
 
 ## Publishing
 
-The published coordinates are `markets.alpaca:alpaca-java-client:<version>`.
+The published coordinates are `markets.alpaca:alpaca-java:<version>`.
 `gradle.properties` normally contains the next development `-SNAPSHOT` version.
 
 ### Repository endpoints
@@ -214,7 +214,7 @@ The published coordinates are `markets.alpaca:alpaca-java-client:<version>`.
 | Central Snapshots | `https://central.sonatype.com/repository/maven-snapshots/` | File-by-file, unsigned `-SNAPSHOT` deployments |
 | Maven Central | `https://repo.maven.apache.org/maven2/` | Public, immutable release artifacts after Portal validation |
 | Central Portal | `https://central.sonatype.com/` | Token management, namespace verification, and NMCP deployments |
-| GitHub Packages | `https://maven.pkg.github.com/alpacahq/alpaca-java-client` | Optional configured Gradle repository; current workflows do not publish here |
+| GitHub Packages | `https://maven.pkg.github.com/alpacahq/alpaca-java` | Optional configured Gradle repository; current workflows do not publish here |
 
 Central Snapshots and Central releases use different publication paths. Snapshots use Gradle's
 standard `maven-publish` file uploads. Releases use NMCP to assemble, sign, upload, validate, and
@@ -380,10 +380,10 @@ ambiguous NMCP failure:
 - If Central did not accept the deployment, fix the cause and run the normal workflow again.
 - If Central accepted and published the release but the workflow reported failure, wait until the
   exact POM is public at
-  `https://repo.maven.apache.org/maven2/markets/alpaca/alpaca-java-client/<version>/alpaca-java-client-<version>.pom`,
+  `https://repo.maven.apache.org/maven2/markets/alpaca/alpaca-java/<version>/alpaca-java-<version>.pom`,
   then dispatch a new workflow run with `recover_existing_release=true`.
 - Recovery mode verifies that canonical POM is well-formed and exactly matches
-  `markets.alpaca:alpaca-java-client:<version>`. It skips preprocessing, build, signing, and
+  `markets.alpaca:alpaca-java:<version>`. It skips preprocessing, build, signing, and
   republishing, then continues with the GitHub Release and next-patch bump. The POM transfer is
   limited to 1 MiB before XML parsing.
 - If only the GitHub Release or version-bump job failed after Central publication succeeded, use

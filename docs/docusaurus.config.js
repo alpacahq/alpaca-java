@@ -22,7 +22,7 @@ const config = {
   baseUrl: siteBaseUrl,
 
   organizationName: 'alpacahq',
-  projectName: 'alpaca-java-client',
+  projectName: 'alpaca-java',
 
   stylesheets: [
     {
@@ -111,7 +111,7 @@ const config = {
             position: 'left',
           },
           {
-            href: 'https://github.com/alpacahq/alpaca-java-client',
+            href: 'https://github.com/alpacahq/alpaca-java',
             html: '<i class="fa-brands fa-github navbar-github-icon" aria-hidden="true"></i><span class="sr-only">GitHub</span>',
             'aria-label': 'GitHub',
             position: 'right',

@@ -14,7 +14,7 @@ publishing {
     repositories {
         maven {
             name = 'GitHubPackages'
-            url = uri('https://maven.pkg.github.com/alpacahq/alpaca-java-client')
+            url = uri('https://maven.pkg.github.com/alpacahq/alpaca-java')
             credentials {
                 username = System.getenv('GITHUB_ACTOR') ?: ''
                 password = System.getenv('GITHUB_TOKEN') ?: ''
@@ -44,7 +44,7 @@ pluginManager.withPlugin('java') {
                     name = 'Alpaca Java Client'
                     description =
                         'Java client for Alpaca Markets REST and WebSocket APIs'
-                    url = 'https://github.com/alpacahq/alpaca-java-client'
+                    url = 'https://github.com/alpacahq/alpaca-java'
                     licenses {
                         license {
                             name = 'Apache License, Version 2.0'
@@ -59,10 +59,10 @@ pluginManager.withPlugin('java') {
                     }
                     scm {
                         connection =
-                            'scm:git:https://github.com/alpacahq/alpaca-java-client.git'
+                            'scm:git:https://github.com/alpacahq/alpaca-java.git'
                         developerConnection =
-                            'scm:git:ssh://git@github.com:alpacahq/alpaca-java-client.git'
-                        url = 'https://github.com/alpacahq/alpaca-java-client'
+                            'scm:git:ssh://git@github.com:alpacahq/alpaca-java.git'
+                        url = 'https://github.com/alpacahq/alpaca-java'
                     }
                 }
             }

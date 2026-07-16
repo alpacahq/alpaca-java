@@ -1,4 +1,4 @@
-Contributing to alpaca-java-client
+Contributing to alpaca-java
 ===================================
 
 Thank you for taking the time to contribute!
@@ -6,7 +6,7 @@ We are very open to contributions that improve the client, add missing features,
 
 ## How do I file a bug / ask a question / request a feature?
 
-We track these here on GitHub via our [issues](https://github.com/alpacahq/alpaca-java-client/issues/new/choose), with
+We track these here on GitHub via our [issues](https://github.com/alpacahq/alpaca-java/issues/new/choose), with
 a template for each case that will ask you to fill out some information to better help us solve your issue.
 (Note that not filling out the template or skipping questions is likely to delay resolution and may result in the issue
 being closed for missing information.)

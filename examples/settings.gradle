@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = 'alpaca-java-client-examples'
+rootProject.name = 'alpaca-java-examples'
 
 includeBuild('..')

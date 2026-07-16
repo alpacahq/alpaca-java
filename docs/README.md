@@ -1,6 +1,6 @@
 # Alpaca Java Client Docs
 
-Local documentation site for `alpaca-java-client`.
+Local documentation site for `alpaca-java`.
 
 The narrative wiki is authored in `content/`. The generated Java API reference is produced by
 Gradle Javadocs and copied into `static/javadocs/` for local preview.
@@ -43,5 +43,5 @@ It then builds the site with the detected values:
 
 ```bash
 # equivalent to what CI does (adjust if a custom domain is configured)
-DOCUSAURUS_URL=https://alpacahq.github.io DOCUSAURUS_BASE_URL=/alpaca-java-client/ npm run build
+DOCUSAURUS_URL=https://alpacahq.github.io DOCUSAURUS_BASE_URL=/alpaca-java/ npm run build
 ```

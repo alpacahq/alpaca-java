@@ -40,10 +40,10 @@ body:
     attributes:
       label: SDK version
       description: |
-        What version of alpaca-java-client are you using? Check your `build.gradle` or `pom.xml`.
+        What version of alpaca-java are you using? Check your `build.gradle` or `pom.xml`.
         Before opening an issue, please try the latest version in case a fix has already been released.
       placeholder: |
-        alpaca-java-client version: 0.x.x
+        alpaca-java version: 0.x.x
         Java version: 17
         Build tool: Gradle 9.x
     validations:

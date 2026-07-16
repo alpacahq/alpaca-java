@@ -46,7 +46,7 @@ class RecoveryPomTest(unittest.TestCase):
         return release_tools.validate_recovery_pom(
             self.pom,
             group="markets.alpaca",
-            artifact="alpaca-java-client",
+            artifact="alpaca-java",
             version="1.2.3",
         )
 
@@ -56,7 +56,7 @@ class RecoveryPomTest(unittest.TestCase):
 <project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
   <groupId>markets.alpaca</groupId>
-  <artifactId>alpaca-java-client</artifactId>
+  <artifactId>alpaca-java</artifactId>
   <version>1.2.3</version>
 </project>
 """,
@@ -66,7 +66,7 @@ class RecoveryPomTest(unittest.TestCase):
             self.validate(),
             {
                 "groupId": "markets.alpaca",
-                "artifactId": "alpaca-java-client",
+                "artifactId": "alpaca-java",
                 "version": "1.2.3",
             },
         )
@@ -76,7 +76,7 @@ class RecoveryPomTest(unittest.TestCase):
             release_tools._UTF8_BOM
             + (
                 "<project><groupId>markets.alpaca</groupId>"
-                "<artifactId>alpaca-java-client</artifactId>"
+                "<artifactId>alpaca-java</artifactId>"
                 "<version>1.2.3</version></project>"
             ).encode("utf-8")
         )
@@ -97,7 +97,7 @@ class RecoveryPomTest(unittest.TestCase):
     def test_doctype_is_rejected(self):
         self.pom.write_text(
             """<!DOCTYPE project [<!ENTITY x "markets.alpaca">]>
-<project><groupId>&x;</groupId><artifactId>alpaca-java-client</artifactId>
+<project><groupId>&x;</groupId><artifactId>alpaca-java</artifactId>
 <version>1.2.3</version></project>
 """,
             encoding="utf-8",
@@ -116,7 +116,7 @@ class RecoveryPomTest(unittest.TestCase):
                     "<project>"
                     + content
                     + "<groupId>markets.alpaca</groupId>"
-                    "<artifactId>alpaca-java-client</artifactId>"
+                    "<artifactId>alpaca-java</artifactId>"
                     "<version>1.2.3</version></project>",
                     encoding="utf-8",
                 )
@@ -125,7 +125,7 @@ class RecoveryPomTest(unittest.TestCase):
     def test_utf16_entity_bypass_is_rejected_before_elementtree(self):
         document = """<?xml version="1.0" encoding="UTF-16"?>
 <!DOCTYPE project [<!ENTITY group "markets.alpaca">]>
-<project><groupId>&group;</groupId><artifactId>alpaca-java-client</artifactId>
+<project><groupId>&group;</groupId><artifactId>alpaca-java</artifactId>
 <version>1.2.3</version></project>
 """
         self.pom.write_bytes(document.encode("utf-16"))
@@ -139,7 +139,7 @@ class RecoveryPomTest(unittest.TestCase):
     def test_utf32_entity_bypass_is_rejected_before_elementtree(self):
         document = """<?xml version="1.0" encoding="UTF-32"?>
 <!DOCTYPE project [<!ENTITY group "markets.alpaca">]>
-<project><groupId>&group;</groupId><artifactId>alpaca-java-client</artifactId>
+<project><groupId>&group;</groupId><artifactId>alpaca-java</artifactId>
 <version>1.2.3</version></project>
 """
         self.pom.write_bytes(document.encode("utf-32"))
@@ -159,7 +159,7 @@ class RecoveryPomTest(unittest.TestCase):
                 self.pom.write_text(
                     declaration
                     + "<project><groupId>markets.alpaca</groupId>"
-                    "<artifactId>alpaca-java-client</artifactId>"
+                    "<artifactId>alpaca-java</artifactId>"
                     "<version>1.2.3</version></project>",
                     encoding="utf-8",
                 )
@@ -172,7 +172,7 @@ class RecoveryPomTest(unittest.TestCase):
         self.pom.write_text(
             '<!DOCTYPE project [<!ENTITY group "markets.alpaca">]>'
             "<project><groupId>&group;</groupId>"
-            "<artifactId>alpaca-java-client</artifactId>"
+            "<artifactId>alpaca-java</artifactId>"
             "<version>1.2.3</version></project>",
             encoding="utf-8",
         )
@@ -190,7 +190,7 @@ class RecoveryPomTest(unittest.TestCase):
         self.pom.write_text(
             '<?xml version="1.0" encoding="ISO-8859-1"?>'
             "<project><groupId>markets.alpaca</groupId>"
-            "<artifactId>alpaca-java-client</artifactId>"
+            "<artifactId>alpaca-java</artifactId>"
             "<version>1.2.3</version></project>",
             encoding="utf-8",
         )
@@ -216,7 +216,7 @@ class RecoveryPomTest(unittest.TestCase):
         self.pom.write_text(
             "<project><groupId>markets.alpaca</groupId>"
             "<groupId>markets.alpaca</groupId>"
-            "<artifactId>alpaca-java-client</artifactId>"
+            "<artifactId>alpaca-java</artifactId>"
             "<version>1.2.3</version></project>",
             encoding="utf-8",
         )
@@ -401,7 +401,7 @@ class ReleaseToolsCliTest(unittest.TestCase):
         pom = self.root / "release.pom"
         pom.write_text(
             "<project><groupId>markets.alpaca</groupId>"
-            "<artifactId>alpaca-java-client</artifactId>"
+            "<artifactId>alpaca-java</artifactId>"
             "<version>1.2.3</version></project>",
             encoding="utf-8",
         )
@@ -412,7 +412,7 @@ class ReleaseToolsCliTest(unittest.TestCase):
             "--group",
             "markets.alpaca",
             "--artifact",
-            "alpaca-java-client",
+            "alpaca-java",
             "--version",
             "1.2.3",
         )

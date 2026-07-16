@@ -1,6 +1,6 @@
-# LLMS.md — using alpaca-java-client
+# LLMS.md — using alpaca-java
 
-This file is for LLMs and coding bots that need to write Java application code using `alpaca-java-client`.
+This file is for LLMs and coding bots that need to write Java application code using `alpaca-java`.
 If you are modifying this repository, read `AGENTS.md` instead.
 
 ## Core rule

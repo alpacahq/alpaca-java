@@ -104,8 +104,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          pom_file="$RUNNER_TEMP/alpaca-java-client-$RELEASE_VERSION.pom"
-          pom_url="https://repo.maven.apache.org/maven2/markets/alpaca/alpaca-java-client/$RELEASE_VERSION/alpaca-java-client-$RELEASE_VERSION.pom"
+          pom_file="$RUNNER_TEMP/alpaca-java-$RELEASE_VERSION.pom"
+          pom_url="https://repo.maven.apache.org/maven2/markets/alpaca/alpaca-java/$RELEASE_VERSION/alpaca-java-$RELEASE_VERSION.pom"
 
           if ! http_status="$(
             curl \
@@ -139,7 +139,7 @@ jobs:
             if ! python3 scripts/release_tools.py validate-pom \
               --pom "$pom_file" \
               --group markets.alpaca \
-              --artifact alpaca-java-client \
+              --artifact alpaca-java \
               --version "$RELEASE_VERSION"; then
               echo "::error::The public recovery POM failed exact coordinate validation"
               exit 1
@@ -148,7 +148,7 @@ jobs:
             echo "publish_required=false" >> "$GITHUB_OUTPUT"
             cat >> "$GITHUB_STEP_SUMMARY" <<EOF
           ### Maven Central recovery verified
-          Confirmed the public POM for \`markets.alpaca:alpaca-java-client:$RELEASE_VERSION\`
+          Confirmed the public POM for \`markets.alpaca:alpaca-java:$RELEASE_VERSION\`
           and matched its XML coordinates. Build, signing, and upload were skipped; downstream
           GitHub Release creation and the main version bump may proceed.
           EOF
@@ -156,7 +156,7 @@ jobs:
           fi
 
           if [[ "$http_status" == "200" ]]; then
-            echo "::error::The immutable release markets.alpaca:alpaca-java-client:$RELEASE_VERSION already exists on Maven Central. Confirm it, then dispatch this workflow with recover_existing_release enabled."
+            echo "::error::The immutable release markets.alpaca:alpaca-java:$RELEASE_VERSION already exists on Maven Central. Confirm it, then dispatch this workflow with recover_existing_release enabled."
             exit 1
           fi
           if [[ "$http_status" != "404" ]]; then

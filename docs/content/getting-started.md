@@ -11,7 +11,7 @@ title: Getting Started
 
 ## About
 
-`alpaca-java-client` provides Java clients for Alpaca's Trading, Market Data, Broker, WebSocket,
+`alpaca-java` provides Java clients for Alpaca's Trading, Market Data, Broker, WebSocket,
 and Broker Events SSE APIs. Use it when you want to build trading applications, read historical or
 live market data, or build broker-backed investing experiences from a Java application.
 
@@ -23,7 +23,7 @@ You can learn about the API products Alpaca offers at [alpaca.markets](https://a
 ## Usage
 
 Alpaca’s APIs allow you to do everything from building algorithmic trading strategies to building a full brokerage experience for your own end users.
-Here are some things you can do with alpaca-java-client.
+Here are some things you can do with alpaca-java.
 
 * Market Data API: Access live and historical market data for 5000+ stocks, 20+ crypto, and options.
 * Trading API: Trade stock, crypto, and options with lightning fast execution speeds.
@@ -34,7 +34,7 @@ Here are some things you can do with alpaca-java-client.
 The library artifact coordinates are:
 
 ```text
-markets.alpaca:alpaca-java-client:VERSION
+markets.alpaca:alpaca-java:VERSION
 ```
 
 Replace `VERSION` with the release you want to use.
@@ -45,7 +45,7 @@ Replace `VERSION` with the release you want to use.
 repositories {
     mavenCentral()
     maven {
-        url = uri("https://maven.pkg.github.com/alpacahq/alpaca-java-client")
+        url = uri("https://maven.pkg.github.com/alpacahq/alpaca-java")
         credentials {
             username = System.getenv("GITHUB_ACTOR")
             password = System.getenv("GITHUB_TOKEN")
@@ -54,7 +54,7 @@ repositories {
 }
 
 dependencies {
-    implementation("markets.alpaca:alpaca-java-client:VERSION")
+    implementation("markets.alpaca:alpaca-java:VERSION")
 }
 ```
 
@@ -64,14 +64,14 @@ dependencies {
 <repositories>
   <repository>
     <id>github</id>
-    <url>https://maven.pkg.github.com/alpacahq/alpaca-java-client</url>
+    <url>https://maven.pkg.github.com/alpacahq/alpaca-java</url>
   </repository>
 </repositories>
 
 <dependencies>
   <dependency>
     <groupId>markets.alpaca</groupId>
-    <artifactId>alpaca-java-client</artifactId>
+    <artifactId>alpaca-java</artifactId>
     <version>VERSION</version>
   </dependency>
 </dependencies>

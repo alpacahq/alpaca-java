@@ -8,7 +8,7 @@ java {
 }
 
 dependencies {
-    implementation 'markets.alpaca:alpaca-java-client:0.1.0-SNAPSHOT'
+    implementation 'markets.alpaca:alpaca-java:0.1.0-SNAPSHOT'
 }
 
 def rootLocalProps = new Properties()
