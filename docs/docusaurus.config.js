@@ -4,7 +4,7 @@ const lightCodeTheme = require('prism-react-renderer').themes.github;
 const darkCodeTheme = require('prism-react-renderer').themes.dracula;
 
 const siteUrl = process.env.DOCUSAURUS_URL || 'https://alpaca.markets';
-const siteBaseUrl = process.env.DOCUSAURUS_BASE_URL || '/';
+const siteBaseUrl = process.env.DOCUSAURUS_BASE_URL || '/alpaca-java/';
 
 function footerProjectLink(label, href, iconClassName) {
   return {
