@@ -377,16 +377,14 @@ jobs:
             --title "$RELEASE_TAG"
 
   bump_main:
-    name: Start next patch development
+    name: Open next patch development pull request
     needs:
       - central_publish
       - github_release
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    outputs:
-      snapshot_commit: ${{ steps.bump.outputs.commit || steps.recovered-bump.outputs.commit }}
-      snapshot_required: ${{ steps.bump.outputs.snapshot_required || steps.recovered-bump.outputs.snapshot_required }}
+      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -438,17 +436,32 @@ jobs:
               ;;
           esac
 
-      - name: Commit and push next development version
-        id: bump
+      - name: Create next development version pull request
         if: steps.next-version.outputs.should_push == 'true'
         shell: bash
         env:
           NEXT_VERSION: ${{ steps.next-version.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
+          branch="release/start-$NEXT_VERSION"
+          existing_pr="$(
+            gh pr list \
+              --base main \
+              --head "$branch" \
+              --state open \
+              --json url \
+              --jq '.[0].url'
+          )"
+          if [[ -n "$existing_pr" ]]; then
+            echo "::notice::Version-bump pull request already exists: $existing_pr"
+            exit 0
+          fi
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
           git add -- gradle.properties
 
           mapfile -t staged_files < <(git diff --cached --name-only)
@@ -458,49 +471,13 @@ jobs:
           fi
 
           git commit -m "chore: start $NEXT_VERSION development"
-          bump_commit="$(git rev-parse HEAD)"
-          if ! git push origin HEAD:main; then
-            if ! remote_ref="$(git ls-remote --exit-code origin refs/heads/main)"; then
-              echo "::error::Version-bump push failed and remote main could not be resolved"
-              exit 1
-            fi
-            remote_main_sha="$(awk '$2 == "refs/heads/main" { print $1; exit }' <<< "$remote_ref")"
-            if [[ "$remote_main_sha" != "$bump_commit" ]]; then
-              echo "::error::Unable to push the version bump to main. Main may have advanced, or branch protection may reject github-actions[bot]."
-              exit 1
-            fi
-            echo "::notice::Push reported failure, but remote main contains the exact version-bump commit; continuing recovery"
-          fi
-          echo "commit=$bump_commit" >> "$GITHUB_OUTPUT"
-          echo "snapshot_required=true" >> "$GITHUB_OUTPUT"
+          git push origin "HEAD:refs/heads/$branch"
 
-      - name: Recover an already-completed version bump
-        id: recovered-bump
-        if: steps.next-version.outputs.status == 'equal'
-        shell: bash
-        run: |
-          set -euo pipefail
-          bump_commit="$(git rev-parse HEAD)"
-          if ! remote_ref="$(git ls-remote --exit-code origin refs/heads/main)"; then
-            echo "::error::Unable to resolve remote main while recovering the version bump"
-            exit 1
-          fi
-          remote_main_sha="$(awk '$2 == "refs/heads/main" { print $1; exit }' <<< "$remote_ref")"
-          if [[ "$remote_main_sha" != "$bump_commit" ]]; then
-            echo "::error::Checked-out main changed while recovering the version bump"
-            exit 1
-          fi
-          echo "commit=$bump_commit" >> "$GITHUB_OUTPUT"
-          echo "snapshot_required=true" >> "$GITHUB_OUTPUT"
-
-  publish_next_snapshot:
-    name: Publish next development snapshot
-    needs: bump_main
-    if: needs.bump_main.outputs.snapshot_required == 'true'
-    uses: ./.github/workflows/publish-snapshot.yml
-    with:
-      commit: ${{ needs.bump_main.outputs.snapshot_commit }}
-      fail_if_stale: true
-    secrets:
-      MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-      MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          pr_url="$(
+            gh pr create \
+              --base main \
+              --head "$branch" \
+              --title "chore: start $NEXT_VERSION development" \
+              --body "Automated post-release version bump. This PR changes only \`gradle.properties\`."
+          )"
+          echo "::notice::Opened version-bump pull request: $pr_url"
