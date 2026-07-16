@@ -24,6 +24,67 @@ being closed for missing information.)
 
 This repo uses merge commits, so there is no need to squash commits before opening a PR.
 
+## Maintainer releases
+
+Stable releases are performed through GitHub. Create the tag and GitHub Release in the GitHub UI,
+then use the GitHub Actions **Release** workflow to publish the artifacts to Maven Central.
+
+Before starting, ensure the intended release commit and the current Release workflow are on
+`main`. You must also be allowed to create release tags by the repository ruleset. If GitHub
+rejects tag creation with `GH013` and “creations being restricted,” ask a repository administrator
+to allow release-tag creation or add you to the ruleset bypass list.
+
+### 1. Create the tag and GitHub Release
+
+In GitHub, open **Releases → Draft a new release**:
+
+1. In **Choose a tag**, enter a stable version in the exact form `vMAJOR.MINOR.PATCH`, such as
+   `v1.2.3`, then select **Create new tag**.
+2. Set the target branch to `main`.
+3. Enter the release title and notes.
+4. Select **Publish release**.
+
+Publishing the GitHub Release creates the remote tag. The tag must point to a commit reachable
+from `main`.
+
+### 2. Run the GitHub Release workflow
+
+In GitHub, open **Actions → Release → Run workflow**:
+
+1. Select the `main` branch.
+2. Set `tag` to the tag created with the GitHub Release, such as `v1.2.3`.
+3. Leave `recover_existing_release` disabled for a normal release.
+4. Run the workflow.
+
+### 3. Approve Maven Central publication
+
+Approve the protected `maven-central` environment deployment when GitHub requests approval.
+
+The workflow validates the tag, builds and signs the artifacts, publishes to Maven Central,
+leaves the already-published GitHub Release unchanged, and opens a pull request for the next
+patch `-SNAPSHOT` version.
+
+### 4. Merge the next-development-version pull request
+
+After the release workflow opens its version-bump pull request, approve and merge it through the
+normal `main` branch-protection process. The Build workflow then runs for the resulting `main`
+commit and publishes the next development snapshot.
+
+### 5. Verify the release
+
+Confirm that the GitHub Actions workflow completed successfully and that the release POM is
+available from Maven Central:
+
+```text
+https://repo.maven.apache.org/maven2/markets/alpaca/alpaca-java/1.2.3/alpaca-java-1.2.3.pom
+```
+
+### Recovery after an ambiguous Maven Central result
+
+Enable `recover_existing_release` only after confirming the exact release POM is publicly
+available from Maven Central following an ambiguous publication failure. Never use recovery for a
+new release or merely because a workflow run failed.
+
 ## Coding Guidelines
 
 ### Generated vs handwritten code

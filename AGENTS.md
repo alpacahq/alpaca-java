@@ -313,8 +313,7 @@ rechecks remote `main`, and publishes using the same files:
 
 It reads `MAVEN_CENTRAL_USERNAME` and `MAVEN_CENTRAL_PASSWORD` from repository or organization
 secrets. Pull requests, pushes to other branches, failed builds, and stale `main` pushes do not
-publish. The Release workflow also calls this reusable workflow with the exact version-bump commit,
-because pushes made with `GITHUB_TOKEN` do not start another Build workflow.
+publish.
 
 ### Release spec inputs
 
@@ -355,22 +354,21 @@ protected `maven-central` environment, the workflow runs in this order:
 7. Create the tag's GitHub Release with generated notes. If a published release exists, leave it
    unchanged; if a draft exists, publish that draft without replacing its title, notes, or assets.
 8. Read the latest `main`, calculate the next patch version (for example,
-   `1.2.3` → `1.2.4-SNAPSHOT`), and commit only `gradle.properties` directly to `main`.
-9. Pass the exact version-bump commit to the reusable Publish Snapshot workflow, which builds and
-   publishes the new development snapshot from frozen OpenAPI inputs.
+   `1.2.3` → `1.2.4-SNAPSHOT`), then create a pull request containing only
+   `gradle.properties`.
+9. A maintainer merges that pull request through normal branch protection. The Build workflow runs
+   for the resulting `main` push and publishes the new development snapshot.
 
-If a version-bump push reports an ambiguous failure, the workflow checks whether remote `main`
-contains the exact local commit before failing. A rerun that finds the expected next version already
-on `main` recovers that commit and requests snapshot publication again.
+The version-bump branch name is derived from the target snapshot version. A rerun reuses an
+existing open pull request instead of creating a duplicate.
 
 Do not queue multiple release dispatches. With `cancel-in-progress: false`, GitHub retains at most
 one running and one pending run in the release concurrency group; a newer dispatch can replace an
 older pending run.
 
-The workflow defaults to `contents: read`; only the GitHub Release and version-bump jobs receive
-`contents: write`. Branch protection or repository rulesets must allow `github-actions[bot]` to
-push the direct version-bump commit to `main`; otherwise Central and the GitHub Release can succeed
-while the final bump fails.
+The workflow defaults to `contents: read`; the GitHub Release job receives `contents: write`, and
+the version-bump job receives `contents: write` plus `pull-requests: write` to create its
+non-protected branch and pull request. Branch protection remains enforced for the merge to `main`.
 
 ### Recovery and partial failures
 
@@ -389,7 +387,8 @@ ambiguous NMCP failure:
 - If only the GitHub Release or version-bump job failed after Central publication succeeded, use
   GitHub Actions' **Re-run failed jobs**. This does not rerun the successful Central publication
   job. GitHub Release creation and the version bump are designed to tolerate an already-completed
-  result; an existing draft release is published in place.
+  result; an existing draft release is published in place, and an existing open version-bump pull
+  request is reused.
 
 Never enable recovery merely because a run failed. First verify that the exact release is public on
 Maven Central; recovery refuses missing, unexpected, or mismatched POMs.
