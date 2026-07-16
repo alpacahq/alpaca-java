@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import stat
 import subprocess
 import sys
 import tempfile
@@ -493,6 +494,144 @@ class ReleaseToolsCliTest(unittest.TestCase):
         self.assertEqual(failure.returncode, 2)
         self.assertEqual(failure.stdout, "")
         self.assertIn("not a semantic SNAPSHOT", failure.stderr)
+
+    def test_check_main_freshness_github_output_and_fail_closed(self):
+        commit = "a" * 40
+        github_output = self.root / "github-output"
+        success = self.run_cli(
+            "check-main-freshness",
+            "--commit",
+            commit,
+            "--remote-main",
+            commit,
+            "--github-output",
+            str(github_output),
+        )
+        self.assertEqual(success.returncode, 0)
+        self.assertEqual(success.stdout, "")
+        self.assertEqual(success.stderr, "")
+        self.assertEqual(
+            github_output.read_text(encoding="utf-8"),
+            "should_publish=true\n",
+        )
+
+        stale = self.run_cli(
+            "check-main-freshness",
+            "--commit",
+            commit,
+            "--remote-main",
+            "b" * 40,
+        )
+        self.assertEqual(stale.returncode, 0)
+        self.assertEqual(stale.stdout, "should_publish=false\n")
+
+        failure = self.run_cli(
+            "check-main-freshness",
+            "--commit",
+            commit,
+            "--remote-main",
+            "b" * 40,
+            "--fail-if-stale",
+        )
+        self.assertEqual(failure.returncode, 2)
+        self.assertEqual(failure.stdout, "")
+        self.assertIn("release tool error:", failure.stderr)
+        self.assertIn("stale", failure.stderr)
+
+    def test_prepare_frozen_specs_cli(self):
+        source = self.root / "build" / "specs"
+        for api in ("broker", "data", "trading"):
+            directory = source / api
+            directory.mkdir(parents=True)
+            (directory / "openapi.yaml").write_text(f"{api}\n", encoding="utf-8")
+
+        output = self.root / "frozen"
+        success = self.run_cli(
+            "prepare-frozen-specs",
+            "--source-root",
+            str(source),
+            "--output-dir",
+            str(output),
+        )
+        self.assertEqual(success.returncode, 0)
+        self.assertEqual(success.stdout, f"{output}\n")
+        self.assertEqual(success.stderr, "")
+        for api in ("broker", "data", "trading"):
+            spec = output / api / "openapi.yaml"
+            self.assertEqual(spec.read_text(encoding="utf-8"), f"{api}\n")
+            self.assertFalse(os.access(spec, os.W_OK))
+
+
+class MainFreshnessTest(unittest.TestCase):
+    def test_current_commit_publishes(self):
+        commit = "a" * 40
+        self.assertEqual(
+            release_tools.evaluate_main_freshness(commit, commit, fail_if_stale=False),
+            "publish",
+        )
+
+    def test_stale_commit_skips_by_default(self):
+        self.assertEqual(
+            release_tools.evaluate_main_freshness(
+                "a" * 40, "b" * 40, fail_if_stale=False
+            ),
+            "skip",
+        )
+
+    def test_stale_commit_fails_when_required(self):
+        with self.assertRaises(release_tools.ReleaseToolError):
+            release_tools.evaluate_main_freshness(
+                "a" * 40, "b" * 40, fail_if_stale=True
+            )
+
+    def test_invalid_shas_are_rejected(self):
+        for commit, remote in (
+            ("short", "a" * 40),
+            ("a" * 40, "short"),
+            ("g" * 40, "a" * 40),
+            ("A" * 39 + "g", "a" * 40),
+        ):
+            with self.subTest(commit=commit, remote=remote):
+                with self.assertRaises(release_tools.ReleaseToolError):
+                    release_tools.evaluate_main_freshness(
+                        commit, remote, fail_if_stale=False
+                    )
+
+
+class PrepareFrozenSpecsTest(unittest.TestCase):
+    def setUp(self):
+        self.temporary_directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary_directory.cleanup)
+        self.root = Path(self.temporary_directory.name)
+        self.source = self.root / "build" / "specs"
+        for api in ("broker", "data", "trading"):
+            directory = self.source / api
+            directory.mkdir(parents=True)
+            (directory / "openapi.yaml").write_text(f"{api}-spec\n", encoding="utf-8")
+
+    def test_copies_specs_read_only(self):
+        output = self.root / "frozen"
+        result = release_tools.prepare_frozen_specs(self.source, output)
+        self.assertEqual(result, output)
+        for api in ("broker", "data", "trading"):
+            spec = output / api / "openapi.yaml"
+            self.assertEqual(spec.read_text(encoding="utf-8"), f"{api}-spec\n")
+            self.assertEqual(stat.S_IMODE(spec.stat().st_mode), 0o444)
+            self.assertEqual(
+                stat.S_IMODE((output / api).stat().st_mode),
+                0o555,
+            )
+        self.assertEqual(stat.S_IMODE(output.stat().st_mode), 0o555)
+
+    def test_empty_spec_is_rejected(self):
+        (self.source / "data" / "openapi.yaml").write_text("", encoding="utf-8")
+        with self.assertRaises(release_tools.ReleaseToolError):
+            release_tools.prepare_frozen_specs(self.source, self.root / "frozen")
+
+    def test_missing_spec_is_rejected(self):
+        (self.source / "trading" / "openapi.yaml").unlink()
+        with self.assertRaises(release_tools.ReleaseToolError):
+            release_tools.prepare_frozen_specs(self.source, self.root / "frozen")
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 import os
 from pathlib import Path
 import re
+import shutil
 import stat
 import sys
 import tempfile
@@ -40,6 +41,8 @@ _UNSUPPORTED_UNICODE_BOMS = (
     b"\xfe\xff",
     b"\xff\xfe",
 )
+_GIT_SHA_PATTERN = re.compile(r"^[0-9a-fA-F]{40}$")
+_FROZEN_SPEC_APIS = ("broker", "data", "trading")
 
 
 class ReleaseToolError(ValueError):
@@ -217,6 +220,69 @@ def _read_utf8_document(path: Path) -> tuple[str, bool]:
         raise ReleaseToolError(f"{path} is not valid UTF-8") from exc
 
 
+def parse_git_sha(value: str, *, label: str) -> str:
+    """Validate a full 40-character Git object SHA."""
+    if _GIT_SHA_PATTERN.fullmatch(value) is None:
+        raise ReleaseToolError(f"{label} must be a full 40-character Git SHA")
+    return value
+
+
+def evaluate_main_freshness(
+    expected_commit: str, remote_main: str, *, fail_if_stale: bool
+) -> str:
+    """Return ``publish`` or ``skip`` for a requested main commit."""
+    expected = parse_git_sha(expected_commit, label="Snapshot commit")
+    remote = parse_git_sha(remote_main, label="Remote main SHA")
+    if expected == remote:
+        return "publish"
+    if fail_if_stale:
+        raise ReleaseToolError(
+            "Snapshot publication requires current main, but commit "
+            f"{expected} is stale; current main is {remote}"
+        )
+    return "skip"
+
+
+def _make_tree_writable(path: Path) -> None:
+    if not path.exists():
+        return
+    for child in sorted(path.rglob("*"), reverse=True):
+        mode = 0o755 if child.is_dir() else 0o644
+        child.chmod(mode)
+    path.chmod(0o755)
+
+
+def prepare_frozen_specs(source_root: Path, output_dir: Path) -> Path:
+    """Copy preprocessed OpenAPI specs into a read-only directory tree."""
+    _make_tree_writable(output_dir)
+    if output_dir.exists():
+        shutil.rmtree(output_dir)
+
+    for api in _FROZEN_SPEC_APIS:
+        source = source_root / api / "openapi.yaml"
+        if not source.is_file() or source.stat().st_size == 0:
+            raise ReleaseToolError(
+                f"Prepared snapshot input '{source}' is missing or empty"
+            )
+        destination_dir = output_dir / api
+        destination_dir.mkdir(parents=True, exist_ok=True)
+        destination = destination_dir / "openapi.yaml"
+        shutil.copyfile(source, destination)
+        destination.chmod(0o444)
+        destination_dir.chmod(0o555)
+
+    output_dir.chmod(0o555)
+    return output_dir
+
+
+def _write_github_output(path: Path | None, values: str) -> None:
+    if path is None:
+        print(values, end="")
+        return
+    with path.open("a", encoding="utf-8", newline="") as output:
+        output.write(values)
+
+
 def read_snapshot_version(properties_path: Path) -> str:
     """Return the effective semantic SNAPSHOT version from a properties file."""
     text, _ = _read_utf8_document(properties_path)
@@ -308,6 +374,16 @@ def build_parser() -> argparse.ArgumentParser:
 
     read_version = subparsers.add_parser("read-version")
     read_version.add_argument("--properties", required=True)
+
+    check_freshness = subparsers.add_parser("check-main-freshness")
+    check_freshness.add_argument("--commit", required=True)
+    check_freshness.add_argument("--remote-main", required=True)
+    check_freshness.add_argument("--fail-if-stale", action="store_true")
+    check_freshness.add_argument("--github-output")
+
+    prepare_specs = subparsers.add_parser("prepare-frozen-specs")
+    prepare_specs.add_argument("--source-root", required=True)
+    prepare_specs.add_argument("--output-dir", required=True)
     return parser
 
 
@@ -332,15 +408,28 @@ def main(argv: list[str] | None = None) -> int:
                 f"should_push={str(update.changed).lower()}\n"
                 f"status={update.status}\n"
             )
-            if arguments.github_output:
-                with Path(arguments.github_output).open(
-                    "a", encoding="utf-8", newline=""
-                ) as output:
-                    output.write(values)
-            else:
-                print(values, end="")
+            _write_github_output(
+                Path(arguments.github_output) if arguments.github_output else None,
+                values,
+            )
         elif arguments.command == "read-version":
             print(read_snapshot_version(Path(arguments.properties)))
+        elif arguments.command == "check-main-freshness":
+            decision = evaluate_main_freshness(
+                arguments.commit,
+                arguments.remote_main,
+                fail_if_stale=arguments.fail_if_stale,
+            )
+            values = f"should_publish={'true' if decision == 'publish' else 'false'}\n"
+            _write_github_output(
+                Path(arguments.github_output) if arguments.github_output else None,
+                values,
+            )
+        elif arguments.command == "prepare-frozen-specs":
+            output = prepare_frozen_specs(
+                Path(arguments.source_root), Path(arguments.output_dir)
+            )
+            print(output)
         else:
             raise AssertionError(f"unsupported command: {arguments.command}")
     except (OSError, ReleaseToolError) as exc:
