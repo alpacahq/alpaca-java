@@ -141,7 +141,7 @@ public final class BrokerApiExample {
     var order = trading.createOrderForAccount(accountId, request);
     System.out.printf("submitted order=%s status=%s%n", order.getId(), order.getStatus());
 
-    trading.deleteOrderForAccount(accountId, order.getId().toString());
+    trading.deleteOrderForAccount(accountId, order.getId());
     System.out.printf("cancel requested for order=%s%n", order.getId());
   }
 
