@@ -187,44 +187,16 @@ jobs:
         if: steps.central-check.outputs.publish_required == 'true'
         id: specs
         shell: bash
-        env:
-          RELEASE_VERSION: ${{ steps.release.outputs.version }}
         run: |
           set -euo pipefail
+          # Releases publish the committed pins under specs/ (not a live OAS fetch).
           spec_dir="$RUNNER_TEMP/alpaca-release-specs"
-
-          # This is the only invocation allowed to resolve configured/default
-          # OpenAPI sources. All later Gradle invocations use these local copies.
-          ./gradlew \
-            preprocessBrokerSpec \
-            preprocessDataSpec \
-            preprocessTradingSpec \
-            -Pversion="$RELEASE_VERSION"
-
-          rm -rf "$spec_dir"
-          mkdir -p \
-            "$spec_dir/broker" \
-            "$spec_dir/data" \
-            "$spec_dir/trading"
-          cp build/specs/broker/openapi.yaml "$spec_dir/broker/openapi.yaml"
-          cp build/specs/data/openapi.yaml "$spec_dir/data/openapi.yaml"
-          cp build/specs/trading/openapi.yaml "$spec_dir/trading/openapi.yaml"
-
-          for spec in \
-            "$spec_dir/broker/openapi.yaml" \
-            "$spec_dir/data/openapi.yaml" \
-            "$spec_dir/trading/openapi.yaml"; do
-            if [[ ! -s "$spec" ]]; then
-              echo "::error::Prepared release input '$spec' is missing or empty"
-              exit 1
-            fi
-            chmod 0444 "$spec"
-          done
-          chmod 0555 \
-            "$spec_dir/broker" \
-            "$spec_dir/data" \
-            "$spec_dir/trading" \
-            "$spec_dir"
+          if ! python3 scripts/release_tools.py prepare-frozen-specs \
+            --source-root specs \
+            --output-dir "$spec_dir"; then
+            echo "::error::Unable to prepare immutable OpenAPI release inputs from committed specs/"
+            exit 1
+          fi
           echo "directory=$spec_dir" >> "$GITHUB_OUTPUT"
 
       - name: Upload verified release inputs

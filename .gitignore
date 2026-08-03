@@ -1,11 +1,16 @@
-# Gradle build outputs — compiled classes, raw generator output, merged sources, preprocessed specs.
-# Generated sources are NOT committed; run ALPACA_OAS_ROOT=... ./gradlew build to regenerate.
+# Committed OpenAPI pins live under specs/; committed generated clients under
+# src/main/java/markets/alpaca/client/openapi/.
+# Regenerate with ./gradlew generateApis (from pins) or scripts/adopt_openapi.py (from upstream).
 build/
 .gradle/
+
+# Local agent design/plan scratch — never commit
+docs/superpowers/
 
 # Python
 __pycache__/
 *.py[cod]
+.venv-openapi/
 
 # IDE
 .idea/

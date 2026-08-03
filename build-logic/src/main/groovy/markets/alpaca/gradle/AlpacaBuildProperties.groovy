@@ -25,27 +25,46 @@ final class AlpacaBuildProperties {
         values.find { it != null && !it.isBlank() }
     }
 
-    static Map<String, String> resolveSpecSources(Project project, Properties localProperties) {
+    static String pinnedSpecRelativePath(String api) {
+        "specs/${api}/openapi.yaml"
+    }
+
+    static String resolveOne(
+        Project project,
+        Properties localProperties,
+        String api,
+        String propName,
+        String envName,
+        String urlDefault) {
         def oasRoot = (project.findProperty('oasRoot') ?:
             System.getenv('APCA_OAS_ROOT') ?:
             localProperties.getProperty('oasRoot')) as String
+        def pinned = project.rootProject.file(pinnedSpecRelativePath(api))
+        return (project.findProperty(propName) ?:
+            System.getenv(envName) ?:
+            localProperties.getProperty(propName) ?:
+            (oasRoot ? "${oasRoot}/${api}/openapi.yaml" : null) ?:
+            (pinned.exists() ? pinned.absolutePath : null) ?:
+            urlDefault) as String
+    }
 
+    static Map<String, String> resolveSpecSources(Project project, Properties localProperties) {
         [
-            broker: (project.findProperty('brokerSpec') ?:
-                System.getenv('APCA_BROKER_SPEC') ?:
-                localProperties.getProperty('brokerSpec') ?:
-                (oasRoot ? "${oasRoot}/broker/openapi.yaml" : null) ?:
-                BROKER_SPEC_DEFAULT) as String,
-            data: (project.findProperty('dataSpec') ?:
-                System.getenv('APCA_DATA_SPEC') ?:
-                localProperties.getProperty('dataSpec') ?:
-                (oasRoot ? "${oasRoot}/data/openapi.yaml" : null) ?:
-                DATA_SPEC_DEFAULT) as String,
-            trading: (project.findProperty('tradingSpec') ?:
-                System.getenv('APCA_TRADING_SPEC') ?:
-                localProperties.getProperty('tradingSpec') ?:
-                (oasRoot ? "${oasRoot}/trading/openapi.yaml" : null) ?:
-                TRADING_SPEC_DEFAULT) as String,
+            broker: resolveOne(
+                project, localProperties, 'broker', 'brokerSpec', 'APCA_BROKER_SPEC', BROKER_SPEC_DEFAULT),
+            data: resolveOne(
+                project, localProperties, 'data', 'dataSpec', 'APCA_DATA_SPEC', DATA_SPEC_DEFAULT),
+            trading: resolveOne(
+                project, localProperties, 'trading', 'tradingSpec', 'APCA_TRADING_SPEC', TRADING_SPEC_DEFAULT),
         ]
+    }
+
+    static boolean isCommittedPin(Project project, String api, String source) {
+        if (OpenApiSpecSupport.isUrl(source)) {
+            return false
+        }
+        def pinned = project.rootProject.file(pinnedSpecRelativePath(api))
+        def sourceFile = project.rootProject.file(source)
+        pinned.exists() && sourceFile.canonicalFile == pinned.canonicalFile
     }
 }

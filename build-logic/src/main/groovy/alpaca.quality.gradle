@@ -10,6 +10,7 @@ plugins {
 spotless {
     java {
         target 'src/**/*.java', 'examples/src/**/*.java'
+        targetExclude 'src/main/java/markets/alpaca/client/openapi/**/*.java'
         importOrder()
         removeUnusedImports()
         googleJavaFormat()
@@ -37,6 +38,7 @@ pluginManager.withPlugin('java') {
     tasks.named('checkstyleMain').configure {
         source = fileTree('src/main/java') {
             include '**/*.java'
+            exclude 'markets/alpaca/client/openapi/**'
         }
     }
 

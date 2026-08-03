@@ -23,6 +23,8 @@ def preprocessedSpecInputs = providers
 def generatedBrokerDir = layout.buildDirectory.dir('generated/broker')
 def generatedDataDir = layout.buildDirectory.dir('generated/data')
 def generatedTradingDir = layout.buildDirectory.dir('generated/trading')
+def committedMainJavaDir = layout.projectDirectory.dir('src/main/java')
+def committedOpenApiJavaDir = committedMainJavaDir.dir('markets/alpaca/client/openapi')
 def openApiTemplateDir = layout.projectDirectory.dir('src/main/openapi-templates/Java')
 
 def preprocessedBrokerSpec = layout.buildDirectory.file('specs/broker/openapi.yaml')
@@ -48,6 +50,21 @@ def commonTypeMappings = [
     'string+decimal': 'BigDecimal',
 ]
 
+def syncGeneratedApi = { outputDir, String api ->
+    def relativePackage = "markets/alpaca/client/openapi/${api}"
+    def sourcePackage = new File(outputDir, "src/main/java/${relativePackage}")
+    def targetPackage = committedMainJavaDir.dir(relativePackage).asFile
+    delete(targetPackage)
+    copy {
+        from sourcePackage
+        into targetPackage
+    }
+}
+
+def usePinnedInput = { String api, String source ->
+    preprocessedSpecInputs || AlpacaBuildProperties.isCommittedPin(project, api, source)
+}
+
 tasks.register('preprocessBrokerSpec') {
     group = 'openapi tools'
     description = 'Sanitises the broker OpenAPI spec before code generation'
@@ -58,15 +75,16 @@ tasks.register('preprocessBrokerSpec') {
         inputs.files(file(brokerSpecSource))
     }
     inputs.property('preprocessedSpecInputs', preprocessedSpecInputs)
+    inputs.property('usePinnedInput', usePinnedInput('broker', brokerSpecSource))
     outputs.file(preprocessedBrokerSpec)
 
     doLast {
         def outputFile = preprocessedBrokerSpec.get().asFile
         outputFile.parentFile.mkdirs()
-        if (preprocessedSpecInputs) {
+        if (usePinnedInput('broker', brokerSpecSource)) {
             if (OpenApiSpecSupport.isUrl(brokerSpecSource)) {
                 throw new GradleException(
-                    'alpaca.preprocessedSpecInputs requires local spec files')
+                    'Pinned/preprocessed spec inputs require local spec files')
             }
             outputFile.bytes = file(brokerSpecSource).bytes
             return
@@ -89,15 +107,16 @@ tasks.register('preprocessDataSpec') {
         inputs.files(file(dataSpecSource))
     }
     inputs.property('preprocessedSpecInputs', preprocessedSpecInputs)
+    inputs.property('usePinnedInput', usePinnedInput('data', dataSpecSource))
     outputs.file(preprocessedDataSpec)
 
     doLast {
         def outputFile = preprocessedDataSpec.get().asFile
         outputFile.parentFile.mkdirs()
-        if (preprocessedSpecInputs) {
+        if (usePinnedInput('data', dataSpecSource)) {
             if (OpenApiSpecSupport.isUrl(dataSpecSource)) {
                 throw new GradleException(
-                    'alpaca.preprocessedSpecInputs requires local spec files')
+                    'Pinned/preprocessed spec inputs require local spec files')
             }
             outputFile.bytes = file(dataSpecSource).bytes
             return
@@ -118,15 +137,16 @@ tasks.register('preprocessTradingSpec') {
         inputs.files(file(tradingSpecSource))
     }
     inputs.property('preprocessedSpecInputs', preprocessedSpecInputs)
+    inputs.property('usePinnedInput', usePinnedInput('trading', tradingSpecSource))
     outputs.file(preprocessedTradingSpec)
 
     doLast {
         def outputFile = preprocessedTradingSpec.get().asFile
         outputFile.parentFile.mkdirs()
-        if (preprocessedSpecInputs) {
+        if (usePinnedInput('trading', tradingSpecSource)) {
             if (OpenApiSpecSupport.isUrl(tradingSpecSource)) {
                 throw new GradleException(
-                    'alpaca.preprocessedSpecInputs requires local spec files')
+                    'Pinned/preprocessed spec inputs require local spec files')
             }
             outputFile.bytes = file(tradingSpecSource).bytes
             return
@@ -153,16 +173,19 @@ tasks.register('generateBrokerApi', GenerateTask) {
     templateDir = openApiTemplateDir.asFile.absolutePath
     cleanupOutput = true
     skipValidateSpec = false
+    outputs.dir(committedOpenApiJavaDir.dir('broker'))
 
     doLast {
+        def output = generatedBrokerDir.get().asFile
         OpenApiSpecSupport.writeOpenApiPackageInfo(
-            generatedBrokerDir.get().asFile,
+            output,
             'Broker API',
             preprocessedBrokerSpec.get().asFile.absolutePath,
             'markets.alpaca.client.openapi.broker',
             apiPackage.get(),
             modelPackage.get(),
             invokerPackage.get())
+        syncGeneratedApi(output, 'broker')
     }
 }
 
@@ -181,16 +204,19 @@ tasks.register('generateDataApi', GenerateTask) {
     templateDir = openApiTemplateDir.asFile.absolutePath
     cleanupOutput = true
     skipValidateSpec = false
+    outputs.dir(committedOpenApiJavaDir.dir('data'))
 
     doLast {
+        def output = generatedDataDir.get().asFile
         OpenApiSpecSupport.writeOpenApiPackageInfo(
-            generatedDataDir.get().asFile,
+            output,
             'Market Data API',
             preprocessedDataSpec.get().asFile.absolutePath,
             'markets.alpaca.client.openapi.data',
             apiPackage.get(),
             modelPackage.get(),
             invokerPackage.get())
+        syncGeneratedApi(output, 'data')
     }
 }
 
@@ -209,16 +235,19 @@ tasks.register('generateTradingApi', GenerateTask) {
     templateDir = openApiTemplateDir.asFile.absolutePath
     cleanupOutput = true
     skipValidateSpec = false
+    outputs.dir(committedOpenApiJavaDir.dir('trading'))
 
     doLast {
+        def output = generatedTradingDir.get().asFile
         OpenApiSpecSupport.writeOpenApiPackageInfo(
-            generatedTradingDir.get().asFile,
+            output,
             'Trading API',
             preprocessedTradingSpec.get().asFile.absolutePath,
             'markets.alpaca.client.openapi.trading',
             apiPackage.get(),
             modelPackage.get(),
             invokerPackage.get())
+        syncGeneratedApi(output, 'trading')
     }
 }
 
@@ -226,6 +255,34 @@ tasks.register('generateApis') {
     group = 'openapi tools'
     description = 'Generates all three Alpaca API clients (Broker, Data, Trading)'
     dependsOn 'generateBrokerApi', 'generateDataApi', 'generateTradingApi'
+    doLast {
+        OpenApiSpecSupport.writeOpenApiRootPackageInfo(committedMainJavaDir.asFile)
+    }
+}
+
+tasks.register('checkGenerated') {
+    group = 'verification'
+    description = 'Regenerates from pinned specs and fails if specs/ or generated OpenAPI sources drift'
+    dependsOn 'generateApis'
+    doLast {
+        def proc = new ProcessBuilder(
+            'git', 'status', '--porcelain', '--',
+            'specs', 'src/main/java/markets/alpaca/client/openapi')
+            .directory(rootProject.projectDir)
+            .redirectErrorStream(true)
+            .start()
+        def out = new String(proc.inputStream.readAllBytes()).trim()
+        def exit = proc.waitFor()
+        if (exit != 0) {
+            throw new GradleException("git status failed while checking generated outputs:\n${out}")
+        }
+        if (out) {
+            throw new GradleException(
+                "Generated OpenAPI outputs are out of date:\n${out}\n" +
+                    'Run ./gradlew generateApis and commit specs/ + ' +
+                    'src/main/java/markets/alpaca/client/openapi/.')
+        }
+    }
 }
 
 def printSpecVersionsEnabled = !providers
@@ -305,13 +362,7 @@ pluginManager.withPlugin('java') {
         dependsOn 'generateApis'
     }
 
-    sourceSets {
-        main {
-            java {
-                srcDir generatedBrokerDir.map { it.dir('src/main/java') }
-                srcDir generatedDataDir.map { it.dir('src/main/java') }
-                srcDir generatedTradingDir.map { it.dir('src/main/java') }
-            }
-        }
+    tasks.matching { it.name == 'check' }.configureEach {
+        dependsOn 'checkGenerated'
     }
 }

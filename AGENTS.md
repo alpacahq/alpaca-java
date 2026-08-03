@@ -6,16 +6,22 @@ this SDK, read `LLMS.md` instead.
 ## Commands
 
 ```bash
-./gradlew build                    # generate, compile, and test
-./gradlew generateApis             # generate all REST clients
+./gradlew build                    # generateApis (from pins) then compile and test
+./gradlew generateApis             # generate all REST clients from specs/
 ./gradlew generateBrokerApi        # generate Broker only
 ./gradlew generateDataApi          # generate Market Data only
 ./gradlew generateTradingApi       # generate Trading only
+./gradlew checkGenerated           # fail if specs/ or generated OpenAPI sources are stale
 ./gradlew test                     # unit tests
 ./gradlew integrationTest          # live read-only integration tests
 ./gradlew compileExamples          # compile examples without packaging
 ./gradlew generateJavadocs         # generate the API reference
+python3 scripts/adopt_openapi.py --dry-run   # semantic diff vs upstream OAS
 ```
+
+`compileJava` depends on `generateApis`, so a normal build always regenerates from
+committed pins into `src/main/java/markets/alpaca/client/openapi/` before compiling.
+See [`GENERATION.md`](GENERATION.md).
 
 Do not routinely run `clean`; use `./gradlew clean generateApis build` only after a preprocessing
 fix, generator-version change, or corrupted/stale generated output.
@@ -24,8 +30,10 @@ fix, generator-version change, or corrupted/stale generated output.
 
 - Handwritten, committed SDK code lives in `src/main/java/markets/alpaca/client/`, including
   `data/`, `http/`, `rest/`, `trading/`, `broker/sse/`, and `ws/`.
-- REST clients, models, and HTTP classes are generated into `build/generated/` under
-  `markets.alpaca.client.openapi.{broker,data,trading}`. Never edit or add handwritten code there.
+- Pinned OpenAPI documents live in `specs/{broker,data,trading}/openapi.yaml` (post-preprocess).
+- Generated REST clients live in `src/main/java/markets/alpaca/client/openapi/{broker,data,trading}`
+  under packages `markets.alpaca.client.openapi.*`. Never hand-edit those trees; regenerate with
+  `./gradlew generateApis` or `scripts/adopt_openapi.py`.
 - Generated Broker, Data, and Trading `ApiClient` classes are distinct and non-interchangeable.
   Always construct them through `AlpacaClientFactory`; it sets the API-specific authentication and
   base URL.
@@ -35,13 +43,15 @@ fix, generator-version change, or corrupted/stale generated output.
 
 ## Generation and OpenAPI specs
 
+See [`GENERATION.md`](GENERATION.md) for the pin / adopt / drift workflow.
+
 `build-logic/src/main/groovy/alpaca.openapi-generation.gradle` configures generation.
 `build-logic/src/main/groovy/markets/alpaca/gradle/OpenApiSpecSupport.groovy` contains parsed-YAML
-SnakeYAML fixes. The source specs are never modified: add a helper there, call it from the relevant
-preprocessing task, and serialize the result. Never patch OAS YAML with regex or string
-replacement.
+SnakeYAML fixes. Upstream source specs are never modified in place: add a helper there, call it from
+the relevant preprocessing task (during adopt), and serialize into `specs/`. Never patch OAS YAML
+with regex or string replacement.
 
-Default sources:
+Upstream defaults (used by adopt/drift only):
 
 | API | URL |
 |---|---|
@@ -49,13 +59,10 @@ Default sources:
 | Market Data | `https://docs.alpaca.markets/openapi/market-data-api.json` |
 | Trading | `https://docs.alpaca.markets/openapi/trading-api.json` |
 
-Per API, resolution is: Gradle property (`brokerSpec`, `dataSpec`, `tradingSpec`), environment
-variable (`APCA_BROKER_SPEC`, `APCA_DATA_SPEC`, `APCA_TRADING_SPEC`), `local.properties`, legacy
-`oasRoot`, then the default URL. `oasRoot` points to `<root>/{broker,data,trading}/openapi.yaml`;
-use it for a local checkout of the private specs, normally `~/source/alpacah/alpaca-docs-private/oas`.
-
-Local-file inputs are tracked incrementally. Remote inputs are always reprocessed. Preprocessed
-copies are written to `build/specs/`.
+Per API, resolution is: Gradle property (`brokerSpec` / `dataSpec` / `tradingSpec`), environment
+variable (`APCA_*_SPEC`), `local.properties`, legacy `oasRoot`, **committed `specs/{api}/openapi.yaml`**,
+then the public URL. `oasRoot` points to `<root>/{broker,data,trading}/openapi.yaml` for a local
+checkout of private specs (normally `~/source/alpacah/alpaca-docs-private/oas`).
 
 ## Runbooks
 
@@ -66,7 +73,8 @@ copies are written to `build/specs/`.
 
 ## Do not
 
-- Do not edit generated output or instantiate `ApiClient` directly.
-- Do not modify source OAS documents from this repository.
+- Do not edit generated output under `src/main/java/markets/alpaca/client/openapi` or instantiate
+  `ApiClient` directly.
+- Do not modify upstream OAS documents from this repository.
 - Do not use string substitution to patch OAS YAML.
 - Do not add handwritten code under `markets.alpaca.client.openapi/**`.

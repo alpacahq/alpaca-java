@@ -20,7 +20,13 @@ the policy below applies strictly.
 
 ## [Unreleased]
 
-## [0.1.0] - YYYY-MM-DD
+### Added
+- Committed OpenAPI pins under `specs/` and generated clients under
+  `src/main/java/markets/alpaca/client/openapi/`, with
+  `checkGenerated` CI verification, semantic adopt reports (`scripts/adopt_openapi.py`), and a
+  weekly drift workflow (additive adopt PRs; breaking changes open an issue).
+
+## [0.1.1] - 2026-07-16
 
 ### Added
 - Initial release of the Alpaca Java client SDK.
