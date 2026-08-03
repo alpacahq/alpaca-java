@@ -10,7 +10,7 @@
     "sync:javadocs": "node scripts/sync-javadocs.mjs"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.10.1",
+    "@docusaurus/core": "^3.10.2",
     "@docusaurus/preset-classic": "^3.10.1",
     "@easyops-cn/docusaurus-search-local": "^0.55.2",
     "@fortawesome/fontawesome-free": "^7.2.0",
