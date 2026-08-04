@@ -34,7 +34,8 @@ recovering from a failed publication.
 ### Generated vs handwritten code
 
 **Never hand-edit files under `src/main/java/markets/alpaca/client/openapi/`** — regenerate with
-`./gradlew generateApis` or `python3 scripts/adopt_openapi.py`. See [`GENERATION.md`](GENERATION.md).
+`./gradlew generateApis` or adopt upstream via `./gradlew adoptOpenApi` /
+`./gradlew adoptOpenApiBreaking`. See [`GENERATION.md`](GENERATION.md).
 
 Pinned OpenAPI documents live under `specs/`. Handwritten code belongs in:
 

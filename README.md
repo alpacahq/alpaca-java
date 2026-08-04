@@ -21,8 +21,8 @@ Broker Events SSE helpers are handwritten and committed in `src/main/java/market
 
 ## Build from source
 
-Java 17+ is required. OpenAPI specs are fetched by default, so a normal build does not need local
-spec files. Generated REST sources are committed under
+Java 17+ is required. Normal builds use the committed OpenAPI pins under `specs/`
+(no live fetch). Generated REST sources are committed under
 `src/main/java/markets/alpaca/client/openapi/`
 (see [`GENERATION.md`](GENERATION.md)).
 

@@ -12,11 +12,13 @@ this SDK, read `LLMS.md` instead.
 ./gradlew generateDataApi          # generate Market Data only
 ./gradlew generateTradingApi       # generate Trading only
 ./gradlew checkGenerated           # fail if specs/ or generated OpenAPI sources are stale
+./gradlew adoptOpenApiDryRun       # semantic diff vs upstream OAS (no writes)
+./gradlew adoptOpenApi             # adopt additive upstream changes + regenerate
+./gradlew adoptOpenApiBreaking     # adopt including breaking changes + regenerate
 ./gradlew test                     # unit tests
 ./gradlew integrationTest          # live read-only integration tests
 ./gradlew compileExamples          # compile examples without packaging
 ./gradlew generateJavadocs         # generate the API reference
-python3 scripts/adopt_openapi.py --dry-run   # semantic diff vs upstream OAS
 ```
 
 `compileJava` depends on `generateApis`, so a normal build always regenerates from
@@ -33,7 +35,7 @@ fix, generator-version change, or corrupted/stale generated output.
 - Pinned OpenAPI documents live in `specs/{broker,data,trading}/openapi.yaml` (post-preprocess).
 - Generated REST clients live in `src/main/java/markets/alpaca/client/openapi/{broker,data,trading}`
   under packages `markets.alpaca.client.openapi.*`. Never hand-edit those trees; regenerate with
-  `./gradlew generateApis` or `scripts/adopt_openapi.py`.
+  `./gradlew generateApis` or adopt via `./gradlew adoptOpenApi` / `adoptOpenApiBreaking`.
 - Generated Broker, Data, and Trading `ApiClient` classes are distinct and non-interchangeable.
   Always construct them through `AlpacaClientFactory`; it sets the API-specific authentication and
   base URL.
@@ -51,7 +53,8 @@ SnakeYAML fixes. Upstream source specs are never modified in place: add a helper
 the relevant preprocessing task (during adopt), and serialize into `specs/`. Never patch OAS YAML
 with regex or string replacement.
 
-Upstream defaults (used by adopt/drift only):
+Upstream defaults (used by adopt/drift only; single source
+`scripts/upstream_openapi_urls.json`):
 
 | API | URL |
 |---|---|
@@ -59,10 +62,12 @@ Upstream defaults (used by adopt/drift only):
 | Market Data | `https://docs.alpaca.markets/openapi/market-data-api.json` |
 | Trading | `https://docs.alpaca.markets/openapi/trading-api.json` |
 
-Per API, resolution is: Gradle property (`brokerSpec` / `dataSpec` / `tradingSpec`), environment
-variable (`APCA_*_SPEC`), `local.properties`, legacy `oasRoot`, **committed `specs/{api}/openapi.yaml`**,
-then the public URL. `oasRoot` points to `<root>/{broker,data,trading}/openapi.yaml` for a local
-checkout of private specs (normally `~/source/alpacah/alpaca-docs-private/oas`).
+Per API, **Gradle generate/preprocess** resolution is: property (`brokerSpec` / `dataSpec` /
+`tradingSpec`), environment variable (`APCA_*_SPEC`), `local.properties`, legacy `oasRoot`,
+**committed `specs/{api}/openapi.yaml`**, then the public URL. `oasRoot` points to
+`<root>/{broker,data,trading}/openapi.yaml` for a local checkout of private specs (normally
+`~/source/alpacah/alpaca-docs-private/oas`). **Adopt/drift always use the public docs URLs** above
+(`oasRoot` does not redirect `./gradlew adoptOpenApi*`).
 
 ## Runbooks
 

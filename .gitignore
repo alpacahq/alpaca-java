@@ -1,6 +1,6 @@
 # Committed OpenAPI pins live under specs/; committed generated clients under
 # src/main/java/markets/alpaca/client/openapi/.
-# Regenerate with ./gradlew generateApis (from pins) or scripts/adopt_openapi.py (from upstream).
+# Regenerate with ./gradlew generateApis (from pins) or ./gradlew adoptOpenApi* (from upstream).
 build/
 .gradle/
 

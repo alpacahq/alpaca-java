@@ -80,8 +80,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install PyYAML
-        run: python3 -m pip install --user pyyaml
+      - name: Install OpenAPI script dependencies
+        run: python3 -m pip install --user -r scripts/requirements.txt
 
       - name: Test release tooling
         env:
@@ -108,9 +108,6 @@ jobs:
 
       - name: Code checks
         run: ./gradlew spotlessCheck checkstyleMain checkstyleTest spotbugsMain
-
-      - name: Verify generated OpenAPI sources
-        run: ./gradlew checkGenerated
 
       - name: Build
         run: ./gradlew build

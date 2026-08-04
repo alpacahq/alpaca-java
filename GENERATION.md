@@ -9,11 +9,17 @@ not shared code with JS/Python.
 
 | Role | Artifact |
 |---|---|
-| Upstream source of trust | Live OAS at docs.alpaca.markets (or a local `oasRoot`) |
+| Upstream source of trust | Live OAS at docs.alpaca.markets (URLs in `scripts/upstream_openapi_urls.json`) |
 | SDK source of trust | Committed pins under `specs/{broker,data,trading}/openapi.yaml` |
 
 Normal builds and publishes use **pins only**. Live OAS is fetched only by adopt
 / drift flows.
+
+`oasRoot` / `-P*Spec` / `APCA_*_SPEC` affect **Gradle preprocess/generate** (local
+experimentation). They do **not** change `adoptOpenApi*` / `scripts/adopt_openapi.py`,
+which always compare against the public docs URLs above. To pin from a private
+checkout, preprocess that tree into candidates yourself or temporarily point the
+public URLs at a mirror—do not expect `oasRoot` to drive adopt.
 
 ## Layout
 
@@ -32,7 +38,7 @@ preprocessing (`OpenApiSpecSupport`) or Mustache templates under
 ```bash
 ./gradlew generateApis      # regenerate from committed pins into src/main/java
 ./gradlew checkGenerated    # regenerate + fail if specs/ or openapi sources drift
-./gradlew build             # compileJava depends on generateApis, then tests
+./gradlew build             # compileJava depends on generateApis; check → checkGenerated
 ```
 
 `compileJava` (and therefore `build`) depends on `generateApis`. That is intentional:
@@ -43,50 +49,72 @@ under `src/main/java/markets/alpaca/client/openapi/` are synced into the source
 tree. If regeneration changes tracked files, commit them (or run `checkGenerated`
 in CI to catch drift).
 
-Requires PyYAML for adopt/diff against YAML pins:
-
-```bash
-python3 -m venv .venv-openapi
-source .venv-openapi/bin/activate
-pip install pyyaml
-PYTHONPATH=. python3 scripts/adopt_openapi.py --dry-run
-```
-
-Or on CI images that allow user installs: `pip install --user pyyaml`.
-
 ## Adopting upstream changes
 
+Preferred entrypoints (Gradle owns download + **isolated** upstream preprocess into
+`build/specs-adopt/` + generate from pins after apply; Python only diffs/applies —
+**no nested `./gradlew`**, and pin-based `preprocess*` is never rewired, so
+`./gradlew build adoptOpenApi` is safe):
+
 ```bash
-# Report only (writes build/openapi-adopt-report.md)
-python3 scripts/adopt_openapi.py --dry-run
+# 1. Report only → build/openapi-adopt-report.md (exit 0 even if breaking)
+./gradlew adoptOpenApiDryRun
 
-# Apply additive adopts
-python3 scripts/adopt_openapi.py --yes
+# 2a. Apply additive-only adopts (new ops/schemas/enum values)
+./gradlew adoptOpenApi
 
-# Apply after reviewing breaking changes (modified/moved ops, schema edits, removals)
-python3 scripts/adopt_openapi.py --yes --allow-breaking
+# 2b. Apply after reviewing breaking changes (removals, renames, schema edits, …)
+./gradlew adoptOpenApiBreaking
+```
+
+Equivalent shell (bootstraps `.venv-openapi`, then runs the full Python path which
+*does* invoke `./gradlew` for preprocess/generate—safe because nothing holds the
+Gradle project lock):
+
+```bash
+scripts/run_adopt_openapi.sh --dry-run
+scripts/run_adopt_openapi.sh --yes
+scripts/run_adopt_openapi.sh --yes --allow-breaking
 ```
 
 Then edit `CHANGELOG.md`, commit `specs/` + `src/main/java/markets/alpaca/client/openapi/`
 (+ changelog).
 
+`./gradlew adoptOpenApi` refuses to write and exits with code 2 when the
+semantic diff is breaking. Re-run `./gradlew adoptOpenApiBreaking` after review.
+Adopt is all-or-nothing across broker/data/trading: if any API is breaking,
+additive changes on the others are not applied until `--allow-breaking`.
+
 Semantic categories: operations added/removed/modified/renamed/moved; schemas
 added/removed/modified; enum values added/removed.
 
-**Breaking** (requires `--allow-breaking` to apply): removals, renames, moves,
+**Breaking** (requires `adoptOpenApiBreaking`): removals, renames, moves,
 operation/schema modifications, and enum value removals. **Additive-only**
-adopts (new operations/schemas/enum values) may use `--yes` alone.
+adopts may use `adoptOpenApi` alone.
+
+### Manual venv (optional)
+
+```bash
+python3 -m venv .venv-openapi
+source .venv-openapi/bin/activate
+pip install -r scripts/requirements.txt
+PYTHONPATH=. python3 scripts/adopt_openapi.py --dry-run
+```
+
+Or on CI images that allow user installs:
+`pip install --user -r scripts/requirements.txt`.
 
 ## CI
 
-- PR/`main` builds run `./gradlew checkGenerated`.
+- PR/`main` builds run `./gradlew build` (`check` → `checkGenerated`).
 - Snapshot and release freeze committed `specs/` (no live fetch at publish time).
 - Weekly `openapi-drift.yml`:
   - Additive drift → bot PR on `bot/openapi-adopt` (human merge).
   - Breaking drift → GitHub issue with the report; pins are **not** updated until
-    someone runs `--yes --allow-breaking` and opens a normal PR.
+    someone runs `./gradlew adoptOpenApiBreaking` and opens a normal PR.
 
 ## Spec resolution order
 
-Per API: Gradle `-P*Spec` → env `APCA_*_SPEC` → `local.properties` → `oasRoot` →
-committed `specs/{api}/openapi.yaml` if present → public docs URL.
+Per API (Gradle generate/preprocess only): `-P*Spec` → env `APCA_*_SPEC` →
+`local.properties` → `oasRoot` → committed `specs/{api}/openapi.yaml` if present →
+public docs URL.

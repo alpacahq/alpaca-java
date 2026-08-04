@@ -29,8 +29,8 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
-      - name: Install PyYAML
-        run: python3 -m pip install --user pyyaml
+      - name: Install OpenAPI script dependencies
+        run: python3 -m pip install --user -r scripts/requirements.txt
 
       - name: Adopt additive upstream changes
         id: adopt
@@ -46,13 +46,6 @@ jobs:
           status=$?
           set -e
           echo "status=$status" >> "$GITHUB_OUTPUT"
-          if [[ -f build/openapi-adopt-report.md ]]; then
-            {
-              echo "report<<EOF"
-              cat build/openapi-adopt-report.md
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
-          fi
 
           if [[ "$status" == "2" ]]; then
             echo "breaking=true" >> "$GITHUB_OUTPUT"
@@ -85,7 +78,7 @@ jobs:
             echo "Review the report, then run locally:"
             echo
             echo '```bash'
-            echo 'PYTHONPATH=. python3 scripts/adopt_openapi.py --yes --allow-breaking'
+            echo './gradlew adoptOpenApiBreaking'
             echo '```'
             echo
             echo "Commit \`specs/\`, \`src/main/java/markets/alpaca/client/openapi/\`, and \`CHANGELOG.md\`."

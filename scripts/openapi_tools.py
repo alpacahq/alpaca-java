@@ -16,7 +16,10 @@ def _require_yaml():
         import yaml  # type: ignore
     except ImportError as exc:  # pragma: no cover
         raise SystemExit(
-            "PyYAML is required for OpenAPI tools. Install with: pip install pyyaml"
+            "PyYAML is required for OpenAPI tools. Install with:\n"
+            "  python3 -m venv .venv-openapi && "
+            "source .venv-openapi/bin/activate && "
+            "pip install -r scripts/requirements.txt"
         ) from exc
     return yaml
 
