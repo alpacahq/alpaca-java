@@ -47,7 +47,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.trading.http.JSON;
 
 /**
- * AddAssetToWatchlistRequest
+ * Request format used for appending an asset to an existing watchlist.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class AddAssetToWatchlistRequest implements Serializable {

@@ -4,7 +4,8 @@
  * <p><b>Do not edit any type in this package tree by hand.</b> Sources under
  * {@code markets.alpaca.client.openapi} are produced by OpenAPI Generator from the
  * pinned specs in {@code specs/}. Hand edits are overwritten on the next
- * {@code ./gradlew generateApis} or {@code scripts/adopt_openapi.py} run.</p>
+ * {@code ./gradlew generateApis} or {@code ./gradlew adoptOpenApi} /
+ * {@code ./gradlew adoptOpenApiBreaking} run.</p>
  *
  * <p>Fix generation defects in preprocessing
  * ({@code OpenApiSpecSupport} / {@code alpaca.openapi-generation.gradle}) or Mustache

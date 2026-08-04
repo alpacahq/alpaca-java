@@ -20,11 +20,9 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import markets.alpaca.client.openapi.data.model.IndexValue;
+import java.util.UUID;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -51,68 +49,156 @@ import java.util.Set;
 import markets.alpaca.client.openapi.data.http.JSON;
 
 /**
- * IndexValuesResp
+ * Worthless removal payload delivered when &#x60;event_type &#x3D;&#x3D; worthless_removal_corporateaction_event&#x60;. Corresponds to &#x60;worthless_removals&#x60; on the REST [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions) response. 
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
-public class IndexValuesResp implements Serializable {
+public class CaEventWorthlessRemoval implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  public static final String SERIALIZED_NAME_NEXT_PAGE_TOKEN = "next_page_token";
-  @SerializedName(SERIALIZED_NAME_NEXT_PAGE_TOKEN)
-  @javax.annotation.Nullable
-  private String nextPageToken;
-
-  public static final String SERIALIZED_NAME_VALUES = "values";
-  @SerializedName(SERIALIZED_NAME_VALUES)
+  public static final String SERIALIZED_NAME_ID = "id";
+  @SerializedName(SERIALIZED_NAME_ID)
   @javax.annotation.Nonnull
-  private Map<String, List<IndexValue>> values = new HashMap<>();
+  private UUID id;
 
-  public IndexValuesResp() {
+  public static final String SERIALIZED_NAME_PROCESS_DATE = "process_date";
+  @SerializedName(SERIALIZED_NAME_PROCESS_DATE)
+  @javax.annotation.Nonnull
+  private LocalDate processDate;
+
+  public static final String SERIALIZED_NAME_CURRENCY = "currency";
+  @SerializedName(SERIALIZED_NAME_CURRENCY)
+  @javax.annotation.Nullable
+  private String currency;
+
+  public static final String SERIALIZED_NAME_CUSIP = "cusip";
+  @SerializedName(SERIALIZED_NAME_CUSIP)
+  @javax.annotation.Nonnull
+  private String cusip;
+
+  public static final String SERIALIZED_NAME_ISIN = "isin";
+  @SerializedName(SERIALIZED_NAME_ISIN)
+  @javax.annotation.Nullable
+  private String isin;
+
+  public static final String SERIALIZED_NAME_SYMBOL = "symbol";
+  @SerializedName(SERIALIZED_NAME_SYMBOL)
+  @javax.annotation.Nonnull
+  private String symbol;
+
+  public CaEventWorthlessRemoval() {
   }
 
-  public IndexValuesResp nextPageToken(@javax.annotation.Nullable String nextPageToken) {
-    this.nextPageToken = nextPageToken;
+  public CaEventWorthlessRemoval id(@javax.annotation.Nonnull UUID id) {
+    this.id = id;
     return this;
   }
 
   /**
-   * Pagination token for the next page.
-   * @return nextPageToken
+   * The internal Alpaca identifier of the corporate action.
+   * @return id
    */
-  @javax.annotation.Nullable
-  public String getNextPageToken() {
-    return nextPageToken;
+  @javax.annotation.Nonnull
+  public UUID getId() {
+    return id;
   }
 
-  public void setNextPageToken(@javax.annotation.Nullable String nextPageToken) {
-    this.nextPageToken = nextPageToken;
+  public void setId(@javax.annotation.Nonnull UUID id) {
+    this.id = id;
   }
 
 
-  public IndexValuesResp values(@javax.annotation.Nonnull Map<String, List<IndexValue>> values) {
-    this.values = values;
-    return this;
-  }
-
-  public IndexValuesResp putValuesItem(String key, List<IndexValue> valuesItem) {
-    if (this.values == null) {
-      this.values = new HashMap<>();
-    }
-    this.values.put(key, valuesItem);
+  public CaEventWorthlessRemoval processDate(@javax.annotation.Nonnull LocalDate processDate) {
+    this.processDate = processDate;
     return this;
   }
 
   /**
-   * Get values
-   * @return values
+   * The date when the corporate action is processed by Alpaca.
+   * @return processDate
    */
   @javax.annotation.Nonnull
-  public Map<String, List<IndexValue>> getValues() {
-    return values;
+  public LocalDate getProcessDate() {
+    return processDate;
   }
 
-  public void setValues(@javax.annotation.Nonnull Map<String, List<IndexValue>> values) {
-    this.values = values;
+  public void setProcessDate(@javax.annotation.Nonnull LocalDate processDate) {
+    this.processDate = processDate;
+  }
+
+
+  public CaEventWorthlessRemoval currency(@javax.annotation.Nullable String currency) {
+    this.currency = currency;
+    return this;
+  }
+
+  /**
+   * The ISO 4217 currency code associated with the corporate action. Empty value can mean USD, non-applicable (e.g. for name changes) or unknown (can change later to a valid currency). 
+   * @return currency
+   */
+  @javax.annotation.Nullable
+  public String getCurrency() {
+    return currency;
+  }
+
+  public void setCurrency(@javax.annotation.Nullable String currency) {
+    this.currency = currency;
+  }
+
+
+  public CaEventWorthlessRemoval cusip(@javax.annotation.Nonnull String cusip) {
+    this.cusip = cusip;
+    return this;
+  }
+
+  /**
+   * CUSIP of the security.
+   * @return cusip
+   */
+  @javax.annotation.Nonnull
+  public String getCusip() {
+    return cusip;
+  }
+
+  public void setCusip(@javax.annotation.Nonnull String cusip) {
+    this.cusip = cusip;
+  }
+
+
+  public CaEventWorthlessRemoval isin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
+    return this;
+  }
+
+  /**
+   * International Securities Identification Number (ISIN) as defined by ISO 6166. May be empty for US corporate actions. 
+   * @return isin
+   */
+  @javax.annotation.Nullable
+  public String getIsin() {
+    return isin;
+  }
+
+  public void setIsin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
+  }
+
+
+  public CaEventWorthlessRemoval symbol(@javax.annotation.Nonnull String symbol) {
+    this.symbol = symbol;
+    return this;
+  }
+
+  /**
+   * Ticker being removed.
+   * @return symbol
+   */
+  @javax.annotation.Nonnull
+  public String getSymbol() {
+    return symbol;
+  }
+
+  public void setSymbol(@javax.annotation.Nonnull String symbol) {
+    this.symbol = symbol;
   }
 
   /**
@@ -128,9 +214,9 @@ public class IndexValuesResp implements Serializable {
    *
    * @param key name of the property
    * @param value value of the property
-   * @return the IndexValuesResp instance itself
+   * @return the CaEventWorthlessRemoval instance itself
    */
-  public IndexValuesResp putAdditionalProperty(String key, Object value) {
+  public CaEventWorthlessRemoval putAdditionalProperty(String key, Object value) {
     if (this.additionalProperties == null) {
         this.additionalProperties = new HashMap<String, Object>();
     }
@@ -169,23 +255,31 @@ public class IndexValuesResp implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    IndexValuesResp indexValuesResp = (IndexValuesResp) o;
-    return Objects.equals(this.nextPageToken, indexValuesResp.nextPageToken) &&
-        Objects.equals(this.values, indexValuesResp.values)&&
-        Objects.equals(this.additionalProperties, indexValuesResp.additionalProperties);
+    CaEventWorthlessRemoval caEventWorthlessRemoval = (CaEventWorthlessRemoval) o;
+    return Objects.equals(this.id, caEventWorthlessRemoval.id) &&
+        Objects.equals(this.processDate, caEventWorthlessRemoval.processDate) &&
+        Objects.equals(this.currency, caEventWorthlessRemoval.currency) &&
+        Objects.equals(this.cusip, caEventWorthlessRemoval.cusip) &&
+        Objects.equals(this.isin, caEventWorthlessRemoval.isin) &&
+        Objects.equals(this.symbol, caEventWorthlessRemoval.symbol)&&
+        Objects.equals(this.additionalProperties, caEventWorthlessRemoval.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(nextPageToken, values, additionalProperties);
+    return Objects.hash(id, processDate, currency, cusip, isin, symbol, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class IndexValuesResp {\n");
-    sb.append("    nextPageToken: ").append(toIndentedString(nextPageToken)).append("\n");
-    sb.append("    values: ").append(toIndentedString(values)).append("\n");
+    sb.append("class CaEventWorthlessRemoval {\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    processDate: ").append(toIndentedString(processDate)).append("\n");
+    sb.append("    currency: ").append(toIndentedString(currency)).append("\n");
+    sb.append("    cusip: ").append(toIndentedString(cusip)).append("\n");
+    sb.append("    isin: ").append(toIndentedString(isin)).append("\n");
+    sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -205,34 +299,46 @@ public class IndexValuesResp implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("next_page_token", "values"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "process_date", "currency", "cusip", "isin", "symbol"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("next_page_token", "values"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "process_date", "cusip", "symbol"));
   }
 
   /**
    * Validates the JSON Element and throws an exception if issues found
    *
    * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to IndexValuesResp
+   * @throws IOException if the JSON Element is invalid with respect to CaEventWorthlessRemoval
    */
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
       if (jsonElement == null) {
-        if (!IndexValuesResp.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in IndexValuesResp is not found in the empty JSON string", IndexValuesResp.openapiRequiredFields.toString()));
+        if (!CaEventWorthlessRemoval.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in CaEventWorthlessRemoval is not found in the empty JSON string", CaEventWorthlessRemoval.openapiRequiredFields.toString()));
         }
       }
 
       // check to make sure all required properties/fields are present in the JSON string
-      for (String requiredField : IndexValuesResp.openapiRequiredFields) {
+      for (String requiredField : CaEventWorthlessRemoval.openapiRequiredFields) {
         if (jsonElement.getAsJsonObject().get(requiredField) == null) {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("next_page_token") != null && !jsonObj.get("next_page_token").isJsonNull()) && !jsonObj.get("next_page_token").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `next_page_token` to be a primitive type in the JSON string but got `%s`", jsonObj.get("next_page_token").toString()));
+      if (!jsonObj.get("id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
+      }
+      if ((jsonObj.get("currency") != null && !jsonObj.get("currency").isJsonNull()) && !jsonObj.get("currency").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `currency` to be a primitive type in the JSON string but got `%s`", jsonObj.get("currency").toString()));
+      }
+      if (!jsonObj.get("cusip").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cusip").toString()));
+      }
+      if ((jsonObj.get("isin") != null && !jsonObj.get("isin").isJsonNull()) && !jsonObj.get("isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("isin").toString()));
+      }
+      if (!jsonObj.get("symbol").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
       }
   }
 
@@ -240,16 +346,16 @@ public class IndexValuesResp implements Serializable {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!IndexValuesResp.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'IndexValuesResp' and its subtypes
+       if (!CaEventWorthlessRemoval.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'CaEventWorthlessRemoval' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<IndexValuesResp> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(IndexValuesResp.class));
+       final TypeAdapter<CaEventWorthlessRemoval> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(CaEventWorthlessRemoval.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<IndexValuesResp>() {
+       return (TypeAdapter<T>) new TypeAdapter<CaEventWorthlessRemoval>() {
            @Override
-           public void write(JsonWriter out, IndexValuesResp value) throws IOException {
+           public void write(JsonWriter out, CaEventWorthlessRemoval value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              obj.remove("additionalProperties");
              // serialize additional properties
@@ -277,12 +383,12 @@ public class IndexValuesResp implements Serializable {
            }
 
            @Override
-           public IndexValuesResp read(JsonReader in) throws IOException {
+           public CaEventWorthlessRemoval read(JsonReader in) throws IOException {
              JsonElement jsonElement = elementAdapter.read(in);
              validateJsonElement(jsonElement);
              JsonObject jsonObj = jsonElement.getAsJsonObject();
              // store additional fields in the deserialized instance
-             IndexValuesResp instance = thisAdapter.fromJsonTree(jsonObj);
+             CaEventWorthlessRemoval instance = thisAdapter.fromJsonTree(jsonObj);
              for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
                if (!openapiFields.contains(entry.getKey())) {
                  if (entry.getValue().isJsonPrimitive()) { // primitive type
@@ -309,18 +415,18 @@ public class IndexValuesResp implements Serializable {
   }
 
   /**
-   * Create an instance of IndexValuesResp given an JSON string
+   * Create an instance of CaEventWorthlessRemoval given an JSON string
    *
    * @param jsonString JSON string
-   * @return An instance of IndexValuesResp
-   * @throws IOException if the JSON string is invalid with respect to IndexValuesResp
+   * @return An instance of CaEventWorthlessRemoval
+   * @throws IOException if the JSON string is invalid with respect to CaEventWorthlessRemoval
    */
-  public static IndexValuesResp fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, IndexValuesResp.class);
+  public static CaEventWorthlessRemoval fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, CaEventWorthlessRemoval.class);
   }
 
   /**
-   * Convert an instance of IndexValuesResp to an JSON string
+   * Convert an instance of CaEventWorthlessRemoval to an JSON string
    *
    * @return JSON string
    */

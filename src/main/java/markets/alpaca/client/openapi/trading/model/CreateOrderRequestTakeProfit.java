@@ -20,10 +20,8 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.List;
-import markets.alpaca.client.openapi.trading.model.OptionContract;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -50,68 +48,36 @@ import java.util.Set;
 import markets.alpaca.client.openapi.trading.http.JSON;
 
 /**
- * GetOptionsContracts200Response
+ * Takes in a string/number value for limit_price
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
-public class GetOptionsContracts200Response implements Serializable {
+public class CreateOrderRequestTakeProfit implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  public static final String SERIALIZED_NAME_NEXT_PAGE_TOKEN = "next_page_token";
-  @SerializedName(SERIALIZED_NAME_NEXT_PAGE_TOKEN)
+  public static final String SERIALIZED_NAME_LIMIT_PRICE = "limit_price";
+  @SerializedName(SERIALIZED_NAME_LIMIT_PRICE)
   @javax.annotation.Nullable
-  private String nextPageToken;
+  private BigDecimal limitPrice;
 
-  public static final String SERIALIZED_NAME_OPTION_CONTRACTS = "option_contracts";
-  @SerializedName(SERIALIZED_NAME_OPTION_CONTRACTS)
-  @javax.annotation.Nonnull
-  private List<OptionContract> optionContracts = new ArrayList<>();
-
-  public GetOptionsContracts200Response() {
+  public CreateOrderRequestTakeProfit() {
   }
 
-  public GetOptionsContracts200Response nextPageToken(@javax.annotation.Nullable String nextPageToken) {
-    this.nextPageToken = nextPageToken;
+  public CreateOrderRequestTakeProfit limitPrice(@javax.annotation.Nullable BigDecimal limitPrice) {
+    this.limitPrice = limitPrice;
     return this;
   }
 
   /**
-   * Use this token in your next API call to paginate through the dataset and retrieve the next page of results. A null token indicates there are no more data to fetch. 
-   * @return nextPageToken
+   * Get limitPrice
+   * @return limitPrice
    */
   @javax.annotation.Nullable
-  public String getNextPageToken() {
-    return nextPageToken;
+  public BigDecimal getLimitPrice() {
+    return limitPrice;
   }
 
-  public void setNextPageToken(@javax.annotation.Nullable String nextPageToken) {
-    this.nextPageToken = nextPageToken;
-  }
-
-
-  public GetOptionsContracts200Response optionContracts(@javax.annotation.Nonnull List<OptionContract> optionContracts) {
-    this.optionContracts = optionContracts;
-    return this;
-  }
-
-  public GetOptionsContracts200Response addOptionContractsItem(OptionContract optionContractsItem) {
-    if (this.optionContracts == null) {
-      this.optionContracts = new ArrayList<>();
-    }
-    this.optionContracts.add(optionContractsItem);
-    return this;
-  }
-
-  /**
-   * Get optionContracts
-   * @return optionContracts
-   */
-  @javax.annotation.Nonnull
-  public List<OptionContract> getOptionContracts() {
-    return optionContracts;
-  }
-
-  public void setOptionContracts(@javax.annotation.Nonnull List<OptionContract> optionContracts) {
-    this.optionContracts = optionContracts;
+  public void setLimitPrice(@javax.annotation.Nullable BigDecimal limitPrice) {
+    this.limitPrice = limitPrice;
   }
 
   /**
@@ -127,9 +93,9 @@ public class GetOptionsContracts200Response implements Serializable {
    *
    * @param key name of the property
    * @param value value of the property
-   * @return the GetOptionsContracts200Response instance itself
+   * @return the CreateOrderRequestTakeProfit instance itself
    */
-  public GetOptionsContracts200Response putAdditionalProperty(String key, Object value) {
+  public CreateOrderRequestTakeProfit putAdditionalProperty(String key, Object value) {
     if (this.additionalProperties == null) {
         this.additionalProperties = new HashMap<String, Object>();
     }
@@ -168,23 +134,21 @@ public class GetOptionsContracts200Response implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    GetOptionsContracts200Response getOptionsContracts200Response = (GetOptionsContracts200Response) o;
-    return Objects.equals(this.nextPageToken, getOptionsContracts200Response.nextPageToken) &&
-        Objects.equals(this.optionContracts, getOptionsContracts200Response.optionContracts)&&
-        Objects.equals(this.additionalProperties, getOptionsContracts200Response.additionalProperties);
+    CreateOrderRequestTakeProfit createOrderRequestTakeProfit = (CreateOrderRequestTakeProfit) o;
+    return Objects.equals(this.limitPrice, createOrderRequestTakeProfit.limitPrice)&&
+        Objects.equals(this.additionalProperties, createOrderRequestTakeProfit.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(nextPageToken, optionContracts, additionalProperties);
+    return Objects.hash(limitPrice, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class GetOptionsContracts200Response {\n");
-    sb.append("    nextPageToken: ").append(toIndentedString(nextPageToken)).append("\n");
-    sb.append("    optionContracts: ").append(toIndentedString(optionContracts)).append("\n");
+    sb.append("class CreateOrderRequestTakeProfit {\n");
+    sb.append("    limitPrice: ").append(toIndentedString(limitPrice)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -204,44 +168,27 @@ public class GetOptionsContracts200Response implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("next_page_token", "option_contracts"));
+    openapiFields = new HashSet<String>(Arrays.asList("limit_price"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("option_contracts"));
+    openapiRequiredFields = new HashSet<String>(0);
   }
 
   /**
    * Validates the JSON Element and throws an exception if issues found
    *
    * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to GetOptionsContracts200Response
+   * @throws IOException if the JSON Element is invalid with respect to CreateOrderRequestTakeProfit
    */
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
       if (jsonElement == null) {
-        if (!GetOptionsContracts200Response.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in GetOptionsContracts200Response is not found in the empty JSON string", GetOptionsContracts200Response.openapiRequiredFields.toString()));
-        }
-      }
-
-      // check to make sure all required properties/fields are present in the JSON string
-      for (String requiredField : GetOptionsContracts200Response.openapiRequiredFields) {
-        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        if (!CreateOrderRequestTakeProfit.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in CreateOrderRequestTakeProfit is not found in the empty JSON string", CreateOrderRequestTakeProfit.openapiRequiredFields.toString()));
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("next_page_token") != null && !jsonObj.get("next_page_token").isJsonNull()) && !jsonObj.get("next_page_token").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `next_page_token` to be a primitive type in the JSON string but got `%s`", jsonObj.get("next_page_token").toString()));
-      }
-      if (jsonObj.get("option_contracts") != null) {
-        if (!jsonObj.get("option_contracts").isJsonArray()) {
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `option_contracts` to be an array in the JSON string but got `%s`", jsonObj.get("option_contracts").toString()));
-        }
-        JsonArray jsonArrayoptionContracts = jsonObj.getAsJsonArray("option_contracts");
-        // validate the required field `option_contracts` (array)
-        for (int i = 0; i < jsonArrayoptionContracts.size(); i++) {
-          OptionContract.validateJsonElement(jsonArrayoptionContracts.get(i));
-        }
+      if ((jsonObj.get("limit_price") != null && !jsonObj.get("limit_price").isJsonNull()) && !jsonObj.get("limit_price").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `limit_price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("limit_price").toString()));
       }
   }
 
@@ -249,16 +196,16 @@ public class GetOptionsContracts200Response implements Serializable {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!GetOptionsContracts200Response.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'GetOptionsContracts200Response' and its subtypes
+       if (!CreateOrderRequestTakeProfit.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'CreateOrderRequestTakeProfit' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<GetOptionsContracts200Response> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(GetOptionsContracts200Response.class));
+       final TypeAdapter<CreateOrderRequestTakeProfit> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(CreateOrderRequestTakeProfit.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<GetOptionsContracts200Response>() {
+       return (TypeAdapter<T>) new TypeAdapter<CreateOrderRequestTakeProfit>() {
            @Override
-           public void write(JsonWriter out, GetOptionsContracts200Response value) throws IOException {
+           public void write(JsonWriter out, CreateOrderRequestTakeProfit value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              obj.remove("additionalProperties");
              // serialize additional properties
@@ -286,12 +233,12 @@ public class GetOptionsContracts200Response implements Serializable {
            }
 
            @Override
-           public GetOptionsContracts200Response read(JsonReader in) throws IOException {
+           public CreateOrderRequestTakeProfit read(JsonReader in) throws IOException {
              JsonElement jsonElement = elementAdapter.read(in);
              validateJsonElement(jsonElement);
              JsonObject jsonObj = jsonElement.getAsJsonObject();
              // store additional fields in the deserialized instance
-             GetOptionsContracts200Response instance = thisAdapter.fromJsonTree(jsonObj);
+             CreateOrderRequestTakeProfit instance = thisAdapter.fromJsonTree(jsonObj);
              for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
                if (!openapiFields.contains(entry.getKey())) {
                  if (entry.getValue().isJsonPrimitive()) { // primitive type
@@ -318,18 +265,18 @@ public class GetOptionsContracts200Response implements Serializable {
   }
 
   /**
-   * Create an instance of GetOptionsContracts200Response given an JSON string
+   * Create an instance of CreateOrderRequestTakeProfit given an JSON string
    *
    * @param jsonString JSON string
-   * @return An instance of GetOptionsContracts200Response
-   * @throws IOException if the JSON string is invalid with respect to GetOptionsContracts200Response
+   * @return An instance of CreateOrderRequestTakeProfit
+   * @throws IOException if the JSON string is invalid with respect to CreateOrderRequestTakeProfit
    */
-  public static GetOptionsContracts200Response fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, GetOptionsContracts200Response.class);
+  public static CreateOrderRequestTakeProfit fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, CreateOrderRequestTakeProfit.class);
   }
 
   /**
-   * Convert an instance of GetOptionsContracts200Response to an JSON string
+   * Convert an instance of CreateOrderRequestTakeProfit to an JSON string
    *
    * @return JSON string
    */

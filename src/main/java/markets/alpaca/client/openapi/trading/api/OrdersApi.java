@@ -28,9 +28,9 @@ import java.io.IOException;
 
 
 import markets.alpaca.client.openapi.trading.model.CanceledOrderResponse;
+import markets.alpaca.client.openapi.trading.model.CreateOrderRequest;
 import markets.alpaca.client.openapi.trading.model.Order;
 import markets.alpaca.client.openapi.trading.model.PatchOrderRequest;
-import markets.alpaca.client.openapi.trading.model.PostOrderRequest;
 import java.util.UUID;
 
 import java.lang.reflect.Type;
@@ -959,7 +959,7 @@ public class OrdersApi {
     }
     /**
      * Build call for postOrder
-     * @param postOrderRequest  (required)
+     * @param createOrderRequest  (required)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -972,7 +972,7 @@ public class OrdersApi {
         <tr><td> 422 </td><td> Unprocessable  Input parameters are not recognized. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call postOrderCall(@javax.annotation.Nonnull PostOrderRequest postOrderRequest, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call postOrderCall(@javax.annotation.Nonnull CreateOrderRequest createOrderRequest, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -986,7 +986,7 @@ public class OrdersApi {
             basePath = null;
         }
 
-        Object localVarPostBody = postOrderRequest;
+        Object localVarPostBody = createOrderRequest;
 
         // create path and map variables
         String localVarPath = "/v2/orders";
@@ -1018,20 +1018,20 @@ public class OrdersApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call postOrderValidateBeforeCall(@javax.annotation.Nonnull PostOrderRequest postOrderRequest, final ApiCallback _callback) throws ApiException {
-        // verify the required parameter 'postOrderRequest' is set
-        if (postOrderRequest == null) {
-            throw new ApiException("Missing the required parameter 'postOrderRequest' when calling postOrder(Async)");
+    private okhttp3.Call postOrderValidateBeforeCall(@javax.annotation.Nonnull CreateOrderRequest createOrderRequest, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'createOrderRequest' is set
+        if (createOrderRequest == null) {
+            throw new ApiException("Missing the required parameter 'createOrderRequest' when calling postOrder(Async)");
         }
 
-        return postOrderCall(postOrderRequest, _callback);
+        return postOrderCall(createOrderRequest, _callback);
 
     }
 
     /**
      * Create an Order
      * Places a new order for the given account. An order request may be rejected if the account is not authorized for trading, or if the tradable balance is insufficient to fill the order.
-     * @param postOrderRequest  (required)
+     * @param createOrderRequest  (required)
      * @return Order
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1043,15 +1043,15 @@ public class OrdersApi {
         <tr><td> 422 </td><td> Unprocessable  Input parameters are not recognized. </td><td>  -  </td></tr>
      </table>
      */
-    public Order postOrder(@javax.annotation.Nonnull PostOrderRequest postOrderRequest) throws ApiException {
-        ApiResponse<Order> localVarResp = postOrderWithHttpInfo(postOrderRequest);
+    public Order postOrder(@javax.annotation.Nonnull CreateOrderRequest createOrderRequest) throws ApiException {
+        ApiResponse<Order> localVarResp = postOrderWithHttpInfo(createOrderRequest);
         return localVarResp.getData();
     }
 
     /**
      * Create an Order
      * Places a new order for the given account. An order request may be rejected if the account is not authorized for trading, or if the tradable balance is insufficient to fill the order.
-     * @param postOrderRequest  (required)
+     * @param createOrderRequest  (required)
      * @return ApiResponse&lt;Order&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1063,8 +1063,8 @@ public class OrdersApi {
         <tr><td> 422 </td><td> Unprocessable  Input parameters are not recognized. </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<Order> postOrderWithHttpInfo(@javax.annotation.Nonnull PostOrderRequest postOrderRequest) throws ApiException {
-        okhttp3.Call localVarCall = postOrderValidateBeforeCall(postOrderRequest, null);
+    public ApiResponse<Order> postOrderWithHttpInfo(@javax.annotation.Nonnull CreateOrderRequest createOrderRequest) throws ApiException {
+        okhttp3.Call localVarCall = postOrderValidateBeforeCall(createOrderRequest, null);
         Type localVarReturnType = new TypeToken<Order>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
@@ -1072,7 +1072,7 @@ public class OrdersApi {
     /**
      * Create an Order (asynchronously)
      * Places a new order for the given account. An order request may be rejected if the account is not authorized for trading, or if the tradable balance is insufficient to fill the order.
-     * @param postOrderRequest  (required)
+     * @param createOrderRequest  (required)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -1085,9 +1085,9 @@ public class OrdersApi {
         <tr><td> 422 </td><td> Unprocessable  Input parameters are not recognized. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call postOrderAsync(@javax.annotation.Nonnull PostOrderRequest postOrderRequest, final ApiCallback<Order> _callback) throws ApiException {
+    public okhttp3.Call postOrderAsync(@javax.annotation.Nonnull CreateOrderRequest createOrderRequest, final ApiCallback<Order> _callback) throws ApiException {
 
-        okhttp3.Call localVarCall = postOrderValidateBeforeCall(postOrderRequest, _callback);
+        okhttp3.Call localVarCall = postOrderValidateBeforeCall(createOrderRequest, _callback);
         Type localVarReturnType = new TypeToken<Order>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;

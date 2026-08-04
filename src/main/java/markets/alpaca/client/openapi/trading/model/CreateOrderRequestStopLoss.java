@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
  * Takes in string/number values for stop_price and limit_price
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
-public class PostOrderRequestStopLoss implements Serializable {
+public class CreateOrderRequestStopLoss implements Serializable {
   private static final long serialVersionUID = 1L;
 
   public static final String SERIALIZED_NAME_LIMIT_PRICE = "limit_price";
@@ -64,10 +64,10 @@ public class PostOrderRequestStopLoss implements Serializable {
   @javax.annotation.Nullable
   private BigDecimal stopPrice;
 
-  public PostOrderRequestStopLoss() {
+  public CreateOrderRequestStopLoss() {
   }
 
-  public PostOrderRequestStopLoss limitPrice(@javax.annotation.Nullable BigDecimal limitPrice) {
+  public CreateOrderRequestStopLoss limitPrice(@javax.annotation.Nullable BigDecimal limitPrice) {
     this.limitPrice = limitPrice;
     return this;
   }
@@ -86,7 +86,7 @@ public class PostOrderRequestStopLoss implements Serializable {
   }
 
 
-  public PostOrderRequestStopLoss stopPrice(@javax.annotation.Nullable BigDecimal stopPrice) {
+  public CreateOrderRequestStopLoss stopPrice(@javax.annotation.Nullable BigDecimal stopPrice) {
     this.stopPrice = stopPrice;
     return this;
   }
@@ -117,9 +117,9 @@ public class PostOrderRequestStopLoss implements Serializable {
    *
    * @param key name of the property
    * @param value value of the property
-   * @return the PostOrderRequestStopLoss instance itself
+   * @return the CreateOrderRequestStopLoss instance itself
    */
-  public PostOrderRequestStopLoss putAdditionalProperty(String key, Object value) {
+  public CreateOrderRequestStopLoss putAdditionalProperty(String key, Object value) {
     if (this.additionalProperties == null) {
         this.additionalProperties = new HashMap<String, Object>();
     }
@@ -158,10 +158,10 @@ public class PostOrderRequestStopLoss implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PostOrderRequestStopLoss postOrderRequestStopLoss = (PostOrderRequestStopLoss) o;
-    return Objects.equals(this.limitPrice, postOrderRequestStopLoss.limitPrice) &&
-        Objects.equals(this.stopPrice, postOrderRequestStopLoss.stopPrice)&&
-        Objects.equals(this.additionalProperties, postOrderRequestStopLoss.additionalProperties);
+    CreateOrderRequestStopLoss createOrderRequestStopLoss = (CreateOrderRequestStopLoss) o;
+    return Objects.equals(this.limitPrice, createOrderRequestStopLoss.limitPrice) &&
+        Objects.equals(this.stopPrice, createOrderRequestStopLoss.stopPrice)&&
+        Objects.equals(this.additionalProperties, createOrderRequestStopLoss.additionalProperties);
   }
 
   @Override
@@ -172,7 +172,7 @@ public class PostOrderRequestStopLoss implements Serializable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PostOrderRequestStopLoss {\n");
+    sb.append("class CreateOrderRequestStopLoss {\n");
     sb.append("    limitPrice: ").append(toIndentedString(limitPrice)).append("\n");
     sb.append("    stopPrice: ").append(toIndentedString(stopPrice)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
@@ -204,12 +204,12 @@ public class PostOrderRequestStopLoss implements Serializable {
    * Validates the JSON Element and throws an exception if issues found
    *
    * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to PostOrderRequestStopLoss
+   * @throws IOException if the JSON Element is invalid with respect to CreateOrderRequestStopLoss
    */
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
       if (jsonElement == null) {
-        if (!PostOrderRequestStopLoss.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PostOrderRequestStopLoss is not found in the empty JSON string", PostOrderRequestStopLoss.openapiRequiredFields.toString()));
+        if (!CreateOrderRequestStopLoss.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in CreateOrderRequestStopLoss is not found in the empty JSON string", CreateOrderRequestStopLoss.openapiRequiredFields.toString()));
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
@@ -225,16 +225,16 @@ public class PostOrderRequestStopLoss implements Serializable {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!PostOrderRequestStopLoss.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'PostOrderRequestStopLoss' and its subtypes
+       if (!CreateOrderRequestStopLoss.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'CreateOrderRequestStopLoss' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<PostOrderRequestStopLoss> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(PostOrderRequestStopLoss.class));
+       final TypeAdapter<CreateOrderRequestStopLoss> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(CreateOrderRequestStopLoss.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<PostOrderRequestStopLoss>() {
+       return (TypeAdapter<T>) new TypeAdapter<CreateOrderRequestStopLoss>() {
            @Override
-           public void write(JsonWriter out, PostOrderRequestStopLoss value) throws IOException {
+           public void write(JsonWriter out, CreateOrderRequestStopLoss value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              obj.remove("additionalProperties");
              // serialize additional properties
@@ -262,12 +262,12 @@ public class PostOrderRequestStopLoss implements Serializable {
            }
 
            @Override
-           public PostOrderRequestStopLoss read(JsonReader in) throws IOException {
+           public CreateOrderRequestStopLoss read(JsonReader in) throws IOException {
              JsonElement jsonElement = elementAdapter.read(in);
              validateJsonElement(jsonElement);
              JsonObject jsonObj = jsonElement.getAsJsonObject();
              // store additional fields in the deserialized instance
-             PostOrderRequestStopLoss instance = thisAdapter.fromJsonTree(jsonObj);
+             CreateOrderRequestStopLoss instance = thisAdapter.fromJsonTree(jsonObj);
              for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
                if (!openapiFields.contains(entry.getKey())) {
                  if (entry.getValue().isJsonPrimitive()) { // primitive type
@@ -294,18 +294,18 @@ public class PostOrderRequestStopLoss implements Serializable {
   }
 
   /**
-   * Create an instance of PostOrderRequestStopLoss given an JSON string
+   * Create an instance of CreateOrderRequestStopLoss given an JSON string
    *
    * @param jsonString JSON string
-   * @return An instance of PostOrderRequestStopLoss
-   * @throws IOException if the JSON string is invalid with respect to PostOrderRequestStopLoss
+   * @return An instance of CreateOrderRequestStopLoss
+   * @throws IOException if the JSON string is invalid with respect to CreateOrderRequestStopLoss
    */
-  public static PostOrderRequestStopLoss fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, PostOrderRequestStopLoss.class);
+  public static CreateOrderRequestStopLoss fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, CreateOrderRequestStopLoss.class);
   }
 
   /**
-   * Convert an instance of PostOrderRequestStopLoss to an JSON string
+   * Convert an instance of CreateOrderRequestStopLoss to an JSON string
    *
    * @return JSON string
    */

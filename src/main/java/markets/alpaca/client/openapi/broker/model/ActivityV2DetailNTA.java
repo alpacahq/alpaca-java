@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.UUID;
@@ -83,7 +84,7 @@ public class ActivityV2DetailNTA implements Serializable {
   public static final String SERIALIZED_NAME_CASH_PAYOUT = "cash_payout";
   @SerializedName(SERIALIZED_NAME_CASH_PAYOUT)
   @javax.annotation.Nonnull
-  private String cashPayout;
+  private BigDecimal cashPayout;
 
   public static final String SERIALIZED_NAME_CUSIP = "cusip";
   @SerializedName(SERIALIZED_NAME_CUSIP)
@@ -114,6 +115,11 @@ public class ActivityV2DetailNTA implements Serializable {
   @SerializedName(SERIALIZED_NAME_FOREIGN)
   @javax.annotation.Nonnull
   private Boolean foreign;
+
+  public static final String SERIALIZED_NAME_ISIN = "isin";
+  @SerializedName(SERIALIZED_NAME_ISIN)
+  @javax.annotation.Nullable
+  private String isin;
 
   public static final String SERIALIZED_NAME_PAYABLE_DATE = "payable_date";
   @SerializedName(SERIALIZED_NAME_PAYABLE_DATE)
@@ -155,6 +161,11 @@ public class ActivityV2DetailNTA implements Serializable {
   @javax.annotation.Nonnull
   private String newCusip;
 
+  public static final String SERIALIZED_NAME_NEW_ISIN = "new_isin";
+  @SerializedName(SERIALIZED_NAME_NEW_ISIN)
+  @javax.annotation.Nullable
+  private String newIsin;
+
   public static final String SERIALIZED_NAME_NEW_RATE = "new_rate";
   @SerializedName(SERIALIZED_NAME_NEW_RATE)
   @javax.annotation.Nonnull
@@ -164,6 +175,11 @@ public class ActivityV2DetailNTA implements Serializable {
   @SerializedName(SERIALIZED_NAME_OLD_CUSIP)
   @javax.annotation.Nonnull
   private String oldCusip;
+
+  public static final String SERIALIZED_NAME_OLD_ISIN = "old_isin";
+  @SerializedName(SERIALIZED_NAME_OLD_ISIN)
+  @javax.annotation.Nullable
+  private String oldIsin;
 
   public static final String SERIALIZED_NAME_OLD_RATE = "old_rate";
   @SerializedName(SERIALIZED_NAME_OLD_RATE)
@@ -189,6 +205,11 @@ public class ActivityV2DetailNTA implements Serializable {
   @SerializedName(SERIALIZED_NAME_ALTERNATE_CUSIP)
   @javax.annotation.Nonnull
   private String alternateCusip;
+
+  public static final String SERIALIZED_NAME_ALTERNATE_ISIN = "alternate_isin";
+  @SerializedName(SERIALIZED_NAME_ALTERNATE_ISIN)
+  @javax.annotation.Nullable
+  private String alternateIsin;
 
   public static final String SERIALIZED_NAME_ALTERNATE_QTY = "alternate_qty";
   @SerializedName(SERIALIZED_NAME_ALTERNATE_QTY)
@@ -225,6 +246,11 @@ public class ActivityV2DetailNTA implements Serializable {
   @javax.annotation.Nonnull
   private String sourceCusip;
 
+  public static final String SERIALIZED_NAME_SOURCE_ISIN = "source_isin";
+  @SerializedName(SERIALIZED_NAME_SOURCE_ISIN)
+  @javax.annotation.Nullable
+  private String sourceIsin;
+
   public static final String SERIALIZED_NAME_SOURCE_PRICE = "source_price";
   @SerializedName(SERIALIZED_NAME_SOURCE_PRICE)
   @javax.annotation.Nonnull
@@ -250,6 +276,11 @@ public class ActivityV2DetailNTA implements Serializable {
   @javax.annotation.Nonnull
   private String acquireeCusip;
 
+  public static final String SERIALIZED_NAME_ACQUIREE_ISIN = "acquiree_isin";
+  @SerializedName(SERIALIZED_NAME_ACQUIREE_ISIN)
+  @javax.annotation.Nullable
+  private String acquireeIsin;
+
   public static final String SERIALIZED_NAME_ACQUIREE_RATE = "acquiree_rate";
   @SerializedName(SERIALIZED_NAME_ACQUIREE_RATE)
   @javax.annotation.Nullable
@@ -264,6 +295,11 @@ public class ActivityV2DetailNTA implements Serializable {
   @SerializedName(SERIALIZED_NAME_ACQUIRER_CUSIP)
   @javax.annotation.Nullable
   private String acquirerCusip;
+
+  public static final String SERIALIZED_NAME_ACQUIRER_ISIN = "acquirer_isin";
+  @SerializedName(SERIALIZED_NAME_ACQUIRER_ISIN)
+  @javax.annotation.Nullable
+  private String acquirerIsin;
 
   public static final String SERIALIZED_NAME_ACQUIRER_RATE = "acquirer_rate";
   @SerializedName(SERIALIZED_NAME_ACQUIRER_RATE)
@@ -304,6 +340,16 @@ public class ActivityV2DetailNTA implements Serializable {
   @SerializedName(SERIALIZED_NAME_QTY)
   @javax.annotation.Nonnull
   private String qty;
+
+  public static final String SERIALIZED_NAME_ACCRUED_INTEREST_RATE = "accrued_interest_rate";
+  @SerializedName(SERIALIZED_NAME_ACCRUED_INTEREST_RATE)
+  @javax.annotation.Nullable
+  private BigDecimal accruedInterestRate;
+
+  public static final String SERIALIZED_NAME_PRICE = "price";
+  @SerializedName(SERIALIZED_NAME_PRICE)
+  @javax.annotation.Nullable
+  private BigDecimal price;
 
   public static final String SERIALIZED_NAME_EXPIRATION_DATE = "expiration_date";
   @SerializedName(SERIALIZED_NAME_EXPIRATION_DATE)
@@ -359,6 +405,11 @@ public class ActivityV2DetailNTA implements Serializable {
   @SerializedName(SERIALIZED_NAME_BANK_TRANSACTION_ID)
   @javax.annotation.Nullable
   private UUID bankTransactionId;
+
+  public static final String SERIALIZED_NAME_TRANSFER_ID = "transfer_id";
+  @SerializedName(SERIALIZED_NAME_TRANSFER_ID)
+  @javax.annotation.Nonnull
+  private UUID transferId;
 
   public ActivityV2DetailNTA() {
   }
@@ -458,21 +509,21 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
 
-  public ActivityV2DetailNTA cashPayout(@javax.annotation.Nonnull String cashPayout) {
+  public ActivityV2DetailNTA cashPayout(@javax.annotation.Nonnull BigDecimal cashPayout) {
     this.cashPayout = cashPayout;
     return this;
   }
 
   /**
-   * The cash payout
+   * The cash payout for this interest activity
    * @return cashPayout
    */
   @javax.annotation.Nonnull
-  public String getCashPayout() {
+  public BigDecimal getCashPayout() {
     return cashPayout;
   }
 
-  public void setCashPayout(@javax.annotation.Nonnull String cashPayout) {
+  public void setCashPayout(@javax.annotation.Nonnull BigDecimal cashPayout) {
     this.cashPayout = cashPayout;
   }
 
@@ -540,7 +591,7 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
   /**
-   * Quantity of shares entitled to receive the dividend
+   * The entitled quantity (principal / face amount)
    * @return entitledQty
    */
   @javax.annotation.Nonnull
@@ -588,6 +639,25 @@ public class ActivityV2DetailNTA implements Serializable {
 
   public void setForeign(@javax.annotation.Nonnull Boolean foreign) {
     this.foreign = foreign;
+  }
+
+
+  public ActivityV2DetailNTA isin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
+    return this;
+  }
+
+  /**
+   * The ISIN of the security involved with the activity
+   * @return isin
+   */
+  @javax.annotation.Nullable
+  public String getIsin() {
+    return isin;
+  }
+
+  public void setIsin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
   }
 
 
@@ -673,7 +743,7 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
   /**
-   * The symbol of the security involved with the activity
+   * The symbol of the asset involved with the on chain transaction
    * @return symbol
    */
   @javax.annotation.Nonnull
@@ -743,6 +813,25 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
 
+  public ActivityV2DetailNTA newIsin(@javax.annotation.Nullable String newIsin) {
+    this.newIsin = newIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the new security
+   * @return newIsin
+   */
+  @javax.annotation.Nullable
+  public String getNewIsin() {
+    return newIsin;
+  }
+
+  public void setNewIsin(@javax.annotation.Nullable String newIsin) {
+    this.newIsin = newIsin;
+  }
+
+
   public ActivityV2DetailNTA newRate(@javax.annotation.Nonnull String newRate) {
     this.newRate = newRate;
     return this;
@@ -778,6 +867,25 @@ public class ActivityV2DetailNTA implements Serializable {
 
   public void setOldCusip(@javax.annotation.Nonnull String oldCusip) {
     this.oldCusip = oldCusip;
+  }
+
+
+  public ActivityV2DetailNTA oldIsin(@javax.annotation.Nullable String oldIsin) {
+    this.oldIsin = oldIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the old security before the split
+   * @return oldIsin
+   */
+  @javax.annotation.Nullable
+  public String getOldIsin() {
+    return oldIsin;
+  }
+
+  public void setOldIsin(@javax.annotation.Nullable String oldIsin) {
+    this.oldIsin = oldIsin;
   }
 
 
@@ -873,6 +981,25 @@ public class ActivityV2DetailNTA implements Serializable {
 
   public void setAlternateCusip(@javax.annotation.Nonnull String alternateCusip) {
     this.alternateCusip = alternateCusip;
+  }
+
+
+  public ActivityV2DetailNTA alternateIsin(@javax.annotation.Nullable String alternateIsin) {
+    this.alternateIsin = alternateIsin;
+    return this;
+  }
+
+  /**
+   * ISIN for the alternate security after the split
+   * @return alternateIsin
+   */
+  @javax.annotation.Nullable
+  public String getAlternateIsin() {
+    return alternateIsin;
+  }
+
+  public void setAlternateIsin(@javax.annotation.Nullable String alternateIsin) {
+    this.alternateIsin = alternateIsin;
   }
 
 
@@ -1009,6 +1136,25 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
 
+  public ActivityV2DetailNTA sourceIsin(@javax.annotation.Nullable String sourceIsin) {
+    this.sourceIsin = sourceIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the parent security
+   * @return sourceIsin
+   */
+  @javax.annotation.Nullable
+  public String getSourceIsin() {
+    return sourceIsin;
+  }
+
+  public void setSourceIsin(@javax.annotation.Nullable String sourceIsin) {
+    this.sourceIsin = sourceIsin;
+  }
+
+
   public ActivityV2DetailNTA sourcePrice(@javax.annotation.Nonnull String sourcePrice) {
     this.sourcePrice = sourcePrice;
     return this;
@@ -1104,6 +1250,25 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
 
+  public ActivityV2DetailNTA acquireeIsin(@javax.annotation.Nullable String acquireeIsin) {
+    this.acquireeIsin = acquireeIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the acquiree
+   * @return acquireeIsin
+   */
+  @javax.annotation.Nullable
+  public String getAcquireeIsin() {
+    return acquireeIsin;
+  }
+
+  public void setAcquireeIsin(@javax.annotation.Nullable String acquireeIsin) {
+    this.acquireeIsin = acquireeIsin;
+  }
+
+
   public ActivityV2DetailNTA acquireeRate(@javax.annotation.Nullable String acquireeRate) {
     this.acquireeRate = acquireeRate;
     return this;
@@ -1158,6 +1323,25 @@ public class ActivityV2DetailNTA implements Serializable {
 
   public void setAcquirerCusip(@javax.annotation.Nullable String acquirerCusip) {
     this.acquirerCusip = acquirerCusip;
+  }
+
+
+  public ActivityV2DetailNTA acquirerIsin(@javax.annotation.Nullable String acquirerIsin) {
+    this.acquirerIsin = acquirerIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the acquirer
+   * @return acquirerIsin
+   */
+  @javax.annotation.Nullable
+  public String getAcquirerIsin() {
+    return acquirerIsin;
+  }
+
+  public void setAcquirerIsin(@javax.annotation.Nullable String acquirerIsin) {
+    this.acquirerIsin = acquirerIsin;
   }
 
 
@@ -1310,6 +1494,44 @@ public class ActivityV2DetailNTA implements Serializable {
 
   public void setQty(@javax.annotation.Nonnull String qty) {
     this.qty = qty;
+  }
+
+
+  public ActivityV2DetailNTA accruedInterestRate(@javax.annotation.Nullable BigDecimal accruedInterestRate) {
+    this.accruedInterestRate = accruedInterestRate;
+    return this;
+  }
+
+  /**
+   * Accrued interest rate (present for accrued-interest-on-call variants)
+   * @return accruedInterestRate
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getAccruedInterestRate() {
+    return accruedInterestRate;
+  }
+
+  public void setAccruedInterestRate(@javax.annotation.Nullable BigDecimal accruedInterestRate) {
+    this.accruedInterestRate = accruedInterestRate;
+  }
+
+
+  public ActivityV2DetailNTA price(@javax.annotation.Nullable BigDecimal price) {
+    this.price = price;
+    return this;
+  }
+
+  /**
+   * Call price used for accrued-interest-on-call variants
+   * @return price
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getPrice() {
+    return price;
+  }
+
+  public void setPrice(@javax.annotation.Nullable BigDecimal price) {
+    this.price = price;
   }
 
 
@@ -1521,6 +1743,25 @@ public class ActivityV2DetailNTA implements Serializable {
     this.bankTransactionId = bankTransactionId;
   }
 
+
+  public ActivityV2DetailNTA transferId(@javax.annotation.Nonnull UUID transferId) {
+    this.transferId = transferId;
+    return this;
+  }
+
+  /**
+   * The transfer ID of the associated deposit or withdrawal
+   * @return transferId
+   */
+  @javax.annotation.Nonnull
+  public UUID getTransferId() {
+    return transferId;
+  }
+
+  public void setTransferId(@javax.annotation.Nonnull UUID transferId) {
+    this.transferId = transferId;
+  }
+
   /**
    * A container for additional, undeclared properties.
    * This is a holder for any undeclared properties as specified with
@@ -1588,6 +1829,7 @@ public class ActivityV2DetailNTA implements Serializable {
         Objects.equals(this.entitledQty, activityV2DetailNTA.entitledQty) &&
         Objects.equals(this.exDate, activityV2DetailNTA.exDate) &&
         Objects.equals(this.foreign, activityV2DetailNTA.foreign) &&
+        Objects.equals(this.isin, activityV2DetailNTA.isin) &&
         Objects.equals(this.payableDate, activityV2DetailNTA.payableDate) &&
         Objects.equals(this.rate, activityV2DetailNTA.rate) &&
         Objects.equals(this.recordDate, activityV2DetailNTA.recordDate) &&
@@ -1596,13 +1838,16 @@ public class ActivityV2DetailNTA implements Serializable {
         Objects.equals(this.newQty, activityV2DetailNTA.newQty) &&
         Objects.equals(this.paidQty, activityV2DetailNTA.paidQty) &&
         Objects.equals(this.newCusip, activityV2DetailNTA.newCusip) &&
+        Objects.equals(this.newIsin, activityV2DetailNTA.newIsin) &&
         Objects.equals(this.newRate, activityV2DetailNTA.newRate) &&
         Objects.equals(this.oldCusip, activityV2DetailNTA.oldCusip) &&
+        Objects.equals(this.oldIsin, activityV2DetailNTA.oldIsin) &&
         Objects.equals(this.oldRate, activityV2DetailNTA.oldRate) &&
         Objects.equals(this.oldQty, activityV2DetailNTA.oldQty) &&
         Objects.equals(this.dueBillRedemptionDate, activityV2DetailNTA.dueBillRedemptionDate) &&
         Objects.equals(this.newSymbol, activityV2DetailNTA.newSymbol) &&
         Objects.equals(this.alternateCusip, activityV2DetailNTA.alternateCusip) &&
+        Objects.equals(this.alternateIsin, activityV2DetailNTA.alternateIsin) &&
         Objects.equals(this.alternateQty, activityV2DetailNTA.alternateQty) &&
         Objects.equals(this.alternateRate, activityV2DetailNTA.alternateRate) &&
         Objects.equals(this.alternateSymbol, activityV2DetailNTA.alternateSymbol) &&
@@ -1610,14 +1855,17 @@ public class ActivityV2DetailNTA implements Serializable {
         Objects.equals(this.oldSymbol, activityV2DetailNTA.oldSymbol) &&
         Objects.equals(this.newPrice, activityV2DetailNTA.newPrice) &&
         Objects.equals(this.sourceCusip, activityV2DetailNTA.sourceCusip) &&
+        Objects.equals(this.sourceIsin, activityV2DetailNTA.sourceIsin) &&
         Objects.equals(this.sourcePrice, activityV2DetailNTA.sourcePrice) &&
         Objects.equals(this.sourceRate, activityV2DetailNTA.sourceRate) &&
         Objects.equals(this.sourceSymbol, activityV2DetailNTA.sourceSymbol) &&
         Objects.equals(this.sourceQty, activityV2DetailNTA.sourceQty) &&
         Objects.equals(this.acquireeCusip, activityV2DetailNTA.acquireeCusip) &&
+        Objects.equals(this.acquireeIsin, activityV2DetailNTA.acquireeIsin) &&
         Objects.equals(this.acquireeRate, activityV2DetailNTA.acquireeRate) &&
         Objects.equals(this.acquireeSymbol, activityV2DetailNTA.acquireeSymbol) &&
         Objects.equals(this.acquirerCusip, activityV2DetailNTA.acquirerCusip) &&
+        Objects.equals(this.acquirerIsin, activityV2DetailNTA.acquirerIsin) &&
         Objects.equals(this.acquirerRate, activityV2DetailNTA.acquirerRate) &&
         Objects.equals(this.acquirerSymbol, activityV2DetailNTA.acquirerSymbol) &&
         Objects.equals(this.acquireeQty, activityV2DetailNTA.acquireeQty) &&
@@ -1626,6 +1874,8 @@ public class ActivityV2DetailNTA implements Serializable {
         Objects.equals(this.positionQty, activityV2DetailNTA.positionQty) &&
         Objects.equals(this.paymentDate, activityV2DetailNTA.paymentDate) &&
         Objects.equals(this.qty, activityV2DetailNTA.qty) &&
+        Objects.equals(this.accruedInterestRate, activityV2DetailNTA.accruedInterestRate) &&
+        Objects.equals(this.price, activityV2DetailNTA.price) &&
         Objects.equals(this.expirationDate, activityV2DetailNTA.expirationDate) &&
         Objects.equals(this.removedQty, activityV2DetailNTA.removedQty) &&
         Objects.equals(this.newContractSymbol, activityV2DetailNTA.newContractSymbol) &&
@@ -1636,13 +1886,14 @@ public class ActivityV2DetailNTA implements Serializable {
         Objects.equals(this.contra, activityV2DetailNTA.contra) &&
         Objects.equals(this.parentId, activityV2DetailNTA.parentId) &&
         Objects.equals(this.journalId, activityV2DetailNTA.journalId) &&
-        Objects.equals(this.bankTransactionId, activityV2DetailNTA.bankTransactionId)&&
+        Objects.equals(this.bankTransactionId, activityV2DetailNTA.bankTransactionId) &&
+        Objects.equals(this.transferId, activityV2DetailNTA.transferId)&&
         Objects.equals(this.additionalProperties, activityV2DetailNTA.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, cashPayout, cusip, dueBillOffDate, dueBillOnDate, entitledQty, exDate, foreign, payableDate, rate, recordDate, special, symbol, newQty, paidQty, newCusip, newRate, oldCusip, oldRate, oldQty, dueBillRedemptionDate, newSymbol, alternateCusip, alternateQty, alternateRate, alternateSymbol, effectiveDate, oldSymbol, newPrice, sourceCusip, sourcePrice, sourceRate, sourceSymbol, sourceQty, acquireeCusip, acquireeRate, acquireeSymbol, acquirerCusip, acquirerRate, acquirerSymbol, acquireeQty, acquirerQty, cashRate, positionQty, paymentDate, qty, expirationDate, removedQty, newContractSymbol, oldContractSymbol, externalId, holdDate, requestId, contra, parentId, journalId, bankTransactionId, additionalProperties);
+    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, cashPayout, cusip, dueBillOffDate, dueBillOnDate, entitledQty, exDate, foreign, isin, payableDate, rate, recordDate, special, symbol, newQty, paidQty, newCusip, newIsin, newRate, oldCusip, oldIsin, oldRate, oldQty, dueBillRedemptionDate, newSymbol, alternateCusip, alternateIsin, alternateQty, alternateRate, alternateSymbol, effectiveDate, oldSymbol, newPrice, sourceCusip, sourceIsin, sourcePrice, sourceRate, sourceSymbol, sourceQty, acquireeCusip, acquireeIsin, acquireeRate, acquireeSymbol, acquirerCusip, acquirerIsin, acquirerRate, acquirerSymbol, acquireeQty, acquirerQty, cashRate, positionQty, paymentDate, qty, accruedInterestRate, price, expirationDate, removedQty, newContractSymbol, oldContractSymbol, externalId, holdDate, requestId, contra, parentId, journalId, bankTransactionId, transferId, additionalProperties);
   }
 
   @Override
@@ -1661,6 +1912,7 @@ public class ActivityV2DetailNTA implements Serializable {
     sb.append("    entitledQty: ").append(toIndentedString(entitledQty)).append("\n");
     sb.append("    exDate: ").append(toIndentedString(exDate)).append("\n");
     sb.append("    foreign: ").append(toIndentedString(foreign)).append("\n");
+    sb.append("    isin: ").append(toIndentedString(isin)).append("\n");
     sb.append("    payableDate: ").append(toIndentedString(payableDate)).append("\n");
     sb.append("    rate: ").append(toIndentedString(rate)).append("\n");
     sb.append("    recordDate: ").append(toIndentedString(recordDate)).append("\n");
@@ -1669,13 +1921,16 @@ public class ActivityV2DetailNTA implements Serializable {
     sb.append("    newQty: ").append(toIndentedString(newQty)).append("\n");
     sb.append("    paidQty: ").append(toIndentedString(paidQty)).append("\n");
     sb.append("    newCusip: ").append(toIndentedString(newCusip)).append("\n");
+    sb.append("    newIsin: ").append(toIndentedString(newIsin)).append("\n");
     sb.append("    newRate: ").append(toIndentedString(newRate)).append("\n");
     sb.append("    oldCusip: ").append(toIndentedString(oldCusip)).append("\n");
+    sb.append("    oldIsin: ").append(toIndentedString(oldIsin)).append("\n");
     sb.append("    oldRate: ").append(toIndentedString(oldRate)).append("\n");
     sb.append("    oldQty: ").append(toIndentedString(oldQty)).append("\n");
     sb.append("    dueBillRedemptionDate: ").append(toIndentedString(dueBillRedemptionDate)).append("\n");
     sb.append("    newSymbol: ").append(toIndentedString(newSymbol)).append("\n");
     sb.append("    alternateCusip: ").append(toIndentedString(alternateCusip)).append("\n");
+    sb.append("    alternateIsin: ").append(toIndentedString(alternateIsin)).append("\n");
     sb.append("    alternateQty: ").append(toIndentedString(alternateQty)).append("\n");
     sb.append("    alternateRate: ").append(toIndentedString(alternateRate)).append("\n");
     sb.append("    alternateSymbol: ").append(toIndentedString(alternateSymbol)).append("\n");
@@ -1683,14 +1938,17 @@ public class ActivityV2DetailNTA implements Serializable {
     sb.append("    oldSymbol: ").append(toIndentedString(oldSymbol)).append("\n");
     sb.append("    newPrice: ").append(toIndentedString(newPrice)).append("\n");
     sb.append("    sourceCusip: ").append(toIndentedString(sourceCusip)).append("\n");
+    sb.append("    sourceIsin: ").append(toIndentedString(sourceIsin)).append("\n");
     sb.append("    sourcePrice: ").append(toIndentedString(sourcePrice)).append("\n");
     sb.append("    sourceRate: ").append(toIndentedString(sourceRate)).append("\n");
     sb.append("    sourceSymbol: ").append(toIndentedString(sourceSymbol)).append("\n");
     sb.append("    sourceQty: ").append(toIndentedString(sourceQty)).append("\n");
     sb.append("    acquireeCusip: ").append(toIndentedString(acquireeCusip)).append("\n");
+    sb.append("    acquireeIsin: ").append(toIndentedString(acquireeIsin)).append("\n");
     sb.append("    acquireeRate: ").append(toIndentedString(acquireeRate)).append("\n");
     sb.append("    acquireeSymbol: ").append(toIndentedString(acquireeSymbol)).append("\n");
     sb.append("    acquirerCusip: ").append(toIndentedString(acquirerCusip)).append("\n");
+    sb.append("    acquirerIsin: ").append(toIndentedString(acquirerIsin)).append("\n");
     sb.append("    acquirerRate: ").append(toIndentedString(acquirerRate)).append("\n");
     sb.append("    acquirerSymbol: ").append(toIndentedString(acquirerSymbol)).append("\n");
     sb.append("    acquireeQty: ").append(toIndentedString(acquireeQty)).append("\n");
@@ -1699,6 +1957,8 @@ public class ActivityV2DetailNTA implements Serializable {
     sb.append("    positionQty: ").append(toIndentedString(positionQty)).append("\n");
     sb.append("    paymentDate: ").append(toIndentedString(paymentDate)).append("\n");
     sb.append("    qty: ").append(toIndentedString(qty)).append("\n");
+    sb.append("    accruedInterestRate: ").append(toIndentedString(accruedInterestRate)).append("\n");
+    sb.append("    price: ").append(toIndentedString(price)).append("\n");
     sb.append("    expirationDate: ").append(toIndentedString(expirationDate)).append("\n");
     sb.append("    removedQty: ").append(toIndentedString(removedQty)).append("\n");
     sb.append("    newContractSymbol: ").append(toIndentedString(newContractSymbol)).append("\n");
@@ -1710,6 +1970,7 @@ public class ActivityV2DetailNTA implements Serializable {
     sb.append("    parentId: ").append(toIndentedString(parentId)).append("\n");
     sb.append("    journalId: ").append(toIndentedString(journalId)).append("\n");
     sb.append("    bankTransactionId: ").append(toIndentedString(bankTransactionId)).append("\n");
+    sb.append("    transferId: ").append(toIndentedString(transferId)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -1729,10 +1990,10 @@ public class ActivityV2DetailNTA implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "cash_payout", "cusip", "due_bill_off_date", "due_bill_on_date", "entitled_qty", "ex_date", "foreign", "payable_date", "rate", "record_date", "special", "symbol", "new_qty", "paid_qty", "new_cusip", "new_rate", "old_cusip", "old_rate", "old_qty", "due_bill_redemption_date", "new_symbol", "alternate_cusip", "alternate_qty", "alternate_rate", "alternate_symbol", "effective_date", "old_symbol", "new_price", "source_cusip", "source_price", "source_rate", "source_symbol", "source_qty", "acquiree_cusip", "acquiree_rate", "acquiree_symbol", "acquirer_cusip", "acquirer_rate", "acquirer_symbol", "acquiree_qty", "acquirer_qty", "cash_rate", "position_qty", "payment_date", "qty", "expiration_date", "removed_qty", "new_contract_symbol", "old_contract_symbol", "external_id", "hold_date", "request_id", "contra", "parent_id", "journal_id", "bank_transaction_id"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "cash_payout", "cusip", "due_bill_off_date", "due_bill_on_date", "entitled_qty", "ex_date", "foreign", "isin", "payable_date", "rate", "record_date", "special", "symbol", "new_qty", "paid_qty", "new_cusip", "new_isin", "new_rate", "old_cusip", "old_isin", "old_rate", "old_qty", "due_bill_redemption_date", "new_symbol", "alternate_cusip", "alternate_isin", "alternate_qty", "alternate_rate", "alternate_symbol", "effective_date", "old_symbol", "new_price", "source_cusip", "source_isin", "source_price", "source_rate", "source_symbol", "source_qty", "acquiree_cusip", "acquiree_isin", "acquiree_rate", "acquiree_symbol", "acquirer_cusip", "acquirer_isin", "acquirer_rate", "acquirer_symbol", "acquiree_qty", "acquirer_qty", "cash_rate", "position_qty", "payment_date", "qty", "accrued_interest_rate", "price", "expiration_date", "removed_qty", "new_contract_symbol", "old_contract_symbol", "external_id", "hold_date", "request_id", "contra", "parent_id", "journal_id", "bank_transaction_id", "transfer_id"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "cash_payout", "cusip", "entitled_qty", "foreign", "payable_date", "rate", "special", "symbol", "new_qty", "paid_qty", "new_cusip", "new_rate", "old_cusip", "old_rate", "old_qty", "new_symbol", "alternate_cusip", "alternate_qty", "alternate_rate", "alternate_symbol", "effective_date", "old_symbol", "new_price", "source_cusip", "source_price", "source_rate", "source_symbol", "source_qty", "acquiree_cusip", "acquiree_symbol", "acquiree_qty", "position_qty", "payment_date", "qty", "removed_qty", "new_contract_symbol", "old_contract_symbol", "external_id", "request_id", "contra", "parent_id"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "cash_payout", "cusip", "entitled_qty", "foreign", "payable_date", "rate", "special", "symbol", "new_qty", "paid_qty", "new_cusip", "new_rate", "old_cusip", "old_rate", "old_qty", "new_symbol", "alternate_cusip", "alternate_qty", "alternate_rate", "alternate_symbol", "effective_date", "old_symbol", "new_price", "source_cusip", "source_price", "source_rate", "source_symbol", "source_qty", "acquiree_cusip", "acquiree_symbol", "acquiree_qty", "position_qty", "payment_date", "qty", "removed_qty", "new_contract_symbol", "old_contract_symbol", "external_id", "request_id", "contra", "parent_id", "transfer_id"));
   }
 
   /**
@@ -1773,6 +2034,9 @@ public class ActivityV2DetailNTA implements Serializable {
       if (!jsonObj.get("entitled_qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `entitled_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("entitled_qty").toString()));
       }
+      if ((jsonObj.get("isin") != null && !jsonObj.get("isin").isJsonNull()) && !jsonObj.get("isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("isin").toString()));
+      }
       if (!jsonObj.get("rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("rate").toString()));
       }
@@ -1788,11 +2052,17 @@ public class ActivityV2DetailNTA implements Serializable {
       if (!jsonObj.get("new_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_cusip").toString()));
       }
+      if ((jsonObj.get("new_isin") != null && !jsonObj.get("new_isin").isJsonNull()) && !jsonObj.get("new_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_isin").toString()));
+      }
       if (!jsonObj.get("new_rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_rate").toString()));
       }
       if (!jsonObj.get("old_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_cusip").toString()));
+      }
+      if ((jsonObj.get("old_isin") != null && !jsonObj.get("old_isin").isJsonNull()) && !jsonObj.get("old_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_isin").toString()));
       }
       if (!jsonObj.get("old_rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_rate").toString()));
@@ -1805,6 +2075,9 @@ public class ActivityV2DetailNTA implements Serializable {
       }
       if (!jsonObj.get("alternate_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `alternate_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("alternate_cusip").toString()));
+      }
+      if ((jsonObj.get("alternate_isin") != null && !jsonObj.get("alternate_isin").isJsonNull()) && !jsonObj.get("alternate_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `alternate_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("alternate_isin").toString()));
       }
       if (!jsonObj.get("alternate_qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `alternate_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("alternate_qty").toString()));
@@ -1824,6 +2097,9 @@ public class ActivityV2DetailNTA implements Serializable {
       if (!jsonObj.get("source_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `source_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("source_cusip").toString()));
       }
+      if ((jsonObj.get("source_isin") != null && !jsonObj.get("source_isin").isJsonNull()) && !jsonObj.get("source_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `source_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("source_isin").toString()));
+      }
       if (!jsonObj.get("source_price").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `source_price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("source_price").toString()));
       }
@@ -1839,6 +2115,9 @@ public class ActivityV2DetailNTA implements Serializable {
       if (!jsonObj.get("acquiree_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquiree_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquiree_cusip").toString()));
       }
+      if ((jsonObj.get("acquiree_isin") != null && !jsonObj.get("acquiree_isin").isJsonNull()) && !jsonObj.get("acquiree_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquiree_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquiree_isin").toString()));
+      }
       if ((jsonObj.get("acquiree_rate") != null && !jsonObj.get("acquiree_rate").isJsonNull()) && !jsonObj.get("acquiree_rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquiree_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquiree_rate").toString()));
       }
@@ -1847,6 +2126,9 @@ public class ActivityV2DetailNTA implements Serializable {
       }
       if ((jsonObj.get("acquirer_cusip") != null && !jsonObj.get("acquirer_cusip").isJsonNull()) && !jsonObj.get("acquirer_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquirer_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquirer_cusip").toString()));
+      }
+      if ((jsonObj.get("acquirer_isin") != null && !jsonObj.get("acquirer_isin").isJsonNull()) && !jsonObj.get("acquirer_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquirer_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquirer_isin").toString()));
       }
       if ((jsonObj.get("acquirer_rate") != null && !jsonObj.get("acquirer_rate").isJsonNull()) && !jsonObj.get("acquirer_rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquirer_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquirer_rate").toString()));
@@ -1868,6 +2150,12 @@ public class ActivityV2DetailNTA implements Serializable {
       }
       if (!jsonObj.get("qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("qty").toString()));
+      }
+      if ((jsonObj.get("accrued_interest_rate") != null && !jsonObj.get("accrued_interest_rate").isJsonNull()) && !jsonObj.get("accrued_interest_rate").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `accrued_interest_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("accrued_interest_rate").toString()));
+      }
+      if ((jsonObj.get("price") != null && !jsonObj.get("price").isJsonNull()) && !jsonObj.get("price").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("price").toString()));
       }
       if (!jsonObj.get("removed_qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `removed_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("removed_qty").toString()));
@@ -1895,6 +2183,9 @@ public class ActivityV2DetailNTA implements Serializable {
       }
       if ((jsonObj.get("bank_transaction_id") != null && !jsonObj.get("bank_transaction_id").isJsonNull()) && !jsonObj.get("bank_transaction_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `bank_transaction_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("bank_transaction_id").toString()));
+      }
+      if (!jsonObj.get("transfer_id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `transfer_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("transfer_id").toString()));
       }
   }
 

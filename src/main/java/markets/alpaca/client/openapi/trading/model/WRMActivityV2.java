@@ -85,6 +85,11 @@ public class WRMActivityV2 implements Serializable {
   @javax.annotation.Nonnull
   private String cusip;
 
+  public static final String SERIALIZED_NAME_ISIN = "isin";
+  @SerializedName(SERIALIZED_NAME_ISIN)
+  @javax.annotation.Nullable
+  private String isin;
+
   public static final String SERIALIZED_NAME_REMOVED_QTY = "removed_qty";
   @SerializedName(SERIALIZED_NAME_REMOVED_QTY)
   @javax.annotation.Nonnull
@@ -212,6 +217,25 @@ public class WRMActivityV2 implements Serializable {
   }
 
 
+  public WRMActivityV2 isin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
+    return this;
+  }
+
+  /**
+   * The ISIN of the security involved with the activity
+   * @return isin
+   */
+  @javax.annotation.Nullable
+  public String getIsin() {
+    return isin;
+  }
+
+  public void setIsin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
+  }
+
+
   public WRMActivityV2 removedQty(@javax.annotation.Nonnull String removedQty) {
     this.removedQty = removedQty;
     return this;
@@ -310,6 +334,7 @@ public class WRMActivityV2 implements Serializable {
         Objects.equals(this.positionDate, wrMActivityV2.positionDate) &&
         Objects.equals(this.reorgId, wrMActivityV2.reorgId) &&
         Objects.equals(this.cusip, wrMActivityV2.cusip) &&
+        Objects.equals(this.isin, wrMActivityV2.isin) &&
         Objects.equals(this.removedQty, wrMActivityV2.removedQty) &&
         Objects.equals(this.symbol, wrMActivityV2.symbol)&&
         Objects.equals(this.additionalProperties, wrMActivityV2.additionalProperties);
@@ -317,7 +342,7 @@ public class WRMActivityV2 implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, cusip, removedQty, symbol, additionalProperties);
+    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, cusip, isin, removedQty, symbol, additionalProperties);
   }
 
   @Override
@@ -330,6 +355,7 @@ public class WRMActivityV2 implements Serializable {
     sb.append("    positionDate: ").append(toIndentedString(positionDate)).append("\n");
     sb.append("    reorgId: ").append(toIndentedString(reorgId)).append("\n");
     sb.append("    cusip: ").append(toIndentedString(cusip)).append("\n");
+    sb.append("    isin: ").append(toIndentedString(isin)).append("\n");
     sb.append("    removedQty: ").append(toIndentedString(removedQty)).append("\n");
     sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
@@ -351,7 +377,7 @@ public class WRMActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "cusip", "removed_qty", "symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "cusip", "isin", "removed_qty", "symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date", "position_date", "cusip", "removed_qty", "symbol"));
@@ -388,6 +414,9 @@ public class WRMActivityV2 implements Serializable {
       }
       if (!jsonObj.get("cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cusip").toString()));
+      }
+      if ((jsonObj.get("isin") != null && !jsonObj.get("isin").isJsonNull()) && !jsonObj.get("isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("isin").toString()));
       }
       if (!jsonObj.get("removed_qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `removed_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("removed_qty").toString()));

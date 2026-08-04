@@ -73,7 +73,7 @@ public class DIVNRAActivityV2 implements Serializable {
   public static final String SERIALIZED_NAME_PARENT_ID = "parent_id";
   @SerializedName(SERIALIZED_NAME_PARENT_ID)
   @javax.annotation.Nonnull
-  private String parentId;
+  private UUID parentId;
 
   public static final String SERIALIZED_NAME_SYMBOL = "symbol";
   @SerializedName(SERIALIZED_NAME_SYMBOL)
@@ -140,7 +140,7 @@ public class DIVNRAActivityV2 implements Serializable {
   }
 
 
-  public DIVNRAActivityV2 parentId(@javax.annotation.Nonnull String parentId) {
+  public DIVNRAActivityV2 parentId(@javax.annotation.Nonnull UUID parentId) {
     this.parentId = parentId;
     return this;
   }
@@ -150,11 +150,11 @@ public class DIVNRAActivityV2 implements Serializable {
    * @return parentId
    */
   @javax.annotation.Nonnull
-  public String getParentId() {
+  public UUID getParentId() {
     return parentId;
   }
 
-  public void setParentId(@javax.annotation.Nonnull String parentId) {
+  public void setParentId(@javax.annotation.Nonnull UUID parentId) {
     this.parentId = parentId;
   }
 

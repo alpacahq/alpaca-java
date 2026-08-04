@@ -115,6 +115,11 @@ public class OpcaSDIVActivityV2 implements Serializable {
   @javax.annotation.Nullable
   private LocalDate exDate;
 
+  public static final String SERIALIZED_NAME_ISIN = "isin";
+  @SerializedName(SERIALIZED_NAME_ISIN)
+  @javax.annotation.Nullable
+  private String isin;
+
   public static final String SERIALIZED_NAME_PAYABLE_DATE = "payable_date";
   @SerializedName(SERIALIZED_NAME_PAYABLE_DATE)
   @javax.annotation.Nullable
@@ -366,6 +371,25 @@ public class OpcaSDIVActivityV2 implements Serializable {
   }
 
 
+  public OpcaSDIVActivityV2 isin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
+    return this;
+  }
+
+  /**
+   * The ISIN of the security involved with the activity
+   * @return isin
+   */
+  @javax.annotation.Nullable
+  public String getIsin() {
+    return isin;
+  }
+
+  public void setIsin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
+  }
+
+
   public OpcaSDIVActivityV2 payableDate(@javax.annotation.Nullable LocalDate payableDate) {
     this.payableDate = payableDate;
     return this;
@@ -508,6 +532,7 @@ public class OpcaSDIVActivityV2 implements Serializable {
         Objects.equals(this.qty, opcaSDIVActivityV2.qty) &&
         Objects.equals(this.cusip, opcaSDIVActivityV2.cusip) &&
         Objects.equals(this.exDate, opcaSDIVActivityV2.exDate) &&
+        Objects.equals(this.isin, opcaSDIVActivityV2.isin) &&
         Objects.equals(this.payableDate, opcaSDIVActivityV2.payableDate) &&
         Objects.equals(this.rate, opcaSDIVActivityV2.rate) &&
         Objects.equals(this.recordDate, opcaSDIVActivityV2.recordDate) &&
@@ -517,7 +542,7 @@ public class OpcaSDIVActivityV2 implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, newContractSymbol, newQty, oldContractSymbol, oldQty, qty, cusip, exDate, payableDate, rate, recordDate, symbol, additionalProperties);
+    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, newContractSymbol, newQty, oldContractSymbol, oldQty, qty, cusip, exDate, isin, payableDate, rate, recordDate, symbol, additionalProperties);
   }
 
   @Override
@@ -536,6 +561,7 @@ public class OpcaSDIVActivityV2 implements Serializable {
     sb.append("    qty: ").append(toIndentedString(qty)).append("\n");
     sb.append("    cusip: ").append(toIndentedString(cusip)).append("\n");
     sb.append("    exDate: ").append(toIndentedString(exDate)).append("\n");
+    sb.append("    isin: ").append(toIndentedString(isin)).append("\n");
     sb.append("    payableDate: ").append(toIndentedString(payableDate)).append("\n");
     sb.append("    rate: ").append(toIndentedString(rate)).append("\n");
     sb.append("    recordDate: ").append(toIndentedString(recordDate)).append("\n");
@@ -559,7 +585,7 @@ public class OpcaSDIVActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "new_contract_symbol", "new_qty", "old_contract_symbol", "old_qty", "qty", "cusip", "ex_date", "payable_date", "rate", "record_date", "symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "new_contract_symbol", "new_qty", "old_contract_symbol", "old_qty", "qty", "cusip", "ex_date", "isin", "payable_date", "rate", "record_date", "symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date", "position_date", "new_contract_symbol", "old_contract_symbol", "cusip", "rate", "symbol"));
@@ -611,6 +637,9 @@ public class OpcaSDIVActivityV2 implements Serializable {
       }
       if (!jsonObj.get("cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cusip").toString()));
+      }
+      if ((jsonObj.get("isin") != null && !jsonObj.get("isin").isJsonNull()) && !jsonObj.get("isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("isin").toString()));
       }
       if (!jsonObj.get("rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("rate").toString()));

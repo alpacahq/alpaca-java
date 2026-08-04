@@ -696,6 +696,7 @@ public class AccountsApi {
      * @param accountId id of a single account to filter by (optional)
      * @param activityTypes A comma-separated list of activity types used to filter the results. (optional)
      * @param category The activity category. Cannot be used with \&quot;activity_types\&quot; parameter. (optional)
+     * @param orderId Filter activities associated with a specific order. Useful for retrieving the fills that make up a completely filled order. (optional)
      * @param date Filter activities by their creation date (created_at), not the activity&#39;s settlement date. For non-trade activities such as fees, the creation date is typically the day after the trade date (in UTC). Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param until Get activities created before this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param after Get activities created after this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
@@ -712,7 +713,7 @@ public class AccountsApi {
         <tr><td> 200 </td><td> Success </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getAccountActivitiesCall(@javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable List<ActivityType> activityTypes, @javax.annotation.Nullable String category, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call getAccountActivitiesCall(@javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable List<ActivityType> activityTypes, @javax.annotation.Nullable String category, @javax.annotation.Nullable UUID orderId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -749,6 +750,10 @@ public class AccountsApi {
             localVarQueryParams.addAll(localVarApiClient.parameterToPair("category", category));
         }
 
+        if (orderId != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("order_id", orderId));
+        }
+
         if (date != null) {
             localVarQueryParams.addAll(localVarApiClient.parameterToPair("date", date));
         }
@@ -793,8 +798,8 @@ public class AccountsApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call getAccountActivitiesValidateBeforeCall(@javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable List<ActivityType> activityTypes, @javax.annotation.Nullable String category, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken, final ApiCallback _callback) throws ApiException {
-        return getAccountActivitiesCall(accountId, activityTypes, category, date, until, after, direction, pageSize, pageToken, _callback);
+    private okhttp3.Call getAccountActivitiesValidateBeforeCall(@javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable List<ActivityType> activityTypes, @javax.annotation.Nullable String category, @javax.annotation.Nullable UUID orderId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken, final ApiCallback _callback) throws ApiException {
+        return getAccountActivitiesCall(accountId, activityTypes, category, orderId, date, until, after, direction, pageSize, pageToken, _callback);
 
     }
 
@@ -804,6 +809,7 @@ public class AccountsApi {
      * @param accountId id of a single account to filter by (optional)
      * @param activityTypes A comma-separated list of activity types used to filter the results. (optional)
      * @param category The activity category. Cannot be used with \&quot;activity_types\&quot; parameter. (optional)
+     * @param orderId Filter activities associated with a specific order. Useful for retrieving the fills that make up a completely filled order. (optional)
      * @param date Filter activities by their creation date (created_at), not the activity&#39;s settlement date. For non-trade activities such as fees, the creation date is typically the day after the trade date (in UTC). Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param until Get activities created before this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param after Get activities created after this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
@@ -819,8 +825,8 @@ public class AccountsApi {
         <tr><td> 200 </td><td> Success </td><td>  -  </td></tr>
      </table>
      */
-    public List<Activity> getAccountActivities(@javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable List<ActivityType> activityTypes, @javax.annotation.Nullable String category, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken) throws ApiException {
-        ApiResponse<List<Activity>> localVarResp = getAccountActivitiesWithHttpInfo(accountId, activityTypes, category, date, until, after, direction, pageSize, pageToken);
+    public List<Activity> getAccountActivities(@javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable List<ActivityType> activityTypes, @javax.annotation.Nullable String category, @javax.annotation.Nullable UUID orderId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken) throws ApiException {
+        ApiResponse<List<Activity>> localVarResp = getAccountActivitiesWithHttpInfo(accountId, activityTypes, category, orderId, date, until, after, direction, pageSize, pageToken);
         return localVarResp.getData();
     }
 
@@ -830,6 +836,7 @@ public class AccountsApi {
      * @param accountId id of a single account to filter by (optional)
      * @param activityTypes A comma-separated list of activity types used to filter the results. (optional)
      * @param category The activity category. Cannot be used with \&quot;activity_types\&quot; parameter. (optional)
+     * @param orderId Filter activities associated with a specific order. Useful for retrieving the fills that make up a completely filled order. (optional)
      * @param date Filter activities by their creation date (created_at), not the activity&#39;s settlement date. For non-trade activities such as fees, the creation date is typically the day after the trade date (in UTC). Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param until Get activities created before this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param after Get activities created after this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
@@ -845,8 +852,8 @@ public class AccountsApi {
         <tr><td> 200 </td><td> Success </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<List<Activity>> getAccountActivitiesWithHttpInfo(@javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable List<ActivityType> activityTypes, @javax.annotation.Nullable String category, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken) throws ApiException {
-        okhttp3.Call localVarCall = getAccountActivitiesValidateBeforeCall(accountId, activityTypes, category, date, until, after, direction, pageSize, pageToken, null);
+    public ApiResponse<List<Activity>> getAccountActivitiesWithHttpInfo(@javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable List<ActivityType> activityTypes, @javax.annotation.Nullable String category, @javax.annotation.Nullable UUID orderId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken) throws ApiException {
+        okhttp3.Call localVarCall = getAccountActivitiesValidateBeforeCall(accountId, activityTypes, category, orderId, date, until, after, direction, pageSize, pageToken, null);
         Type localVarReturnType = new TypeToken<List<Activity>>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
@@ -857,6 +864,7 @@ public class AccountsApi {
      * @param accountId id of a single account to filter by (optional)
      * @param activityTypes A comma-separated list of activity types used to filter the results. (optional)
      * @param category The activity category. Cannot be used with \&quot;activity_types\&quot; parameter. (optional)
+     * @param orderId Filter activities associated with a specific order. Useful for retrieving the fills that make up a completely filled order. (optional)
      * @param date Filter activities by their creation date (created_at), not the activity&#39;s settlement date. For non-trade activities such as fees, the creation date is typically the day after the trade date (in UTC). Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param until Get activities created before this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param after Get activities created after this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
@@ -873,9 +881,9 @@ public class AccountsApi {
         <tr><td> 200 </td><td> Success </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getAccountActivitiesAsync(@javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable List<ActivityType> activityTypes, @javax.annotation.Nullable String category, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken, final ApiCallback<List<Activity>> _callback) throws ApiException {
+    public okhttp3.Call getAccountActivitiesAsync(@javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable List<ActivityType> activityTypes, @javax.annotation.Nullable String category, @javax.annotation.Nullable UUID orderId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken, final ApiCallback<List<Activity>> _callback) throws ApiException {
 
-        okhttp3.Call localVarCall = getAccountActivitiesValidateBeforeCall(accountId, activityTypes, category, date, until, after, direction, pageSize, pageToken, _callback);
+        okhttp3.Call localVarCall = getAccountActivitiesValidateBeforeCall(accountId, activityTypes, category, orderId, date, until, after, direction, pageSize, pageToken, _callback);
         Type localVarReturnType = new TypeToken<List<Activity>>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
@@ -884,6 +892,7 @@ public class AccountsApi {
      * Build call for getAccountActivitiesByType
      * @param activityType see ActivityType model for details about what the different types mean (required)
      * @param accountId id of a single account to filter by (optional)
+     * @param orderId Filter activities associated with a specific order. Useful for retrieving the fills that make up a completely filled order. (optional)
      * @param date Filter activities by their creation date (created_at), not the activity&#39;s settlement date. For non-trade activities such as fees, the creation date is typically the day after the trade date (in UTC). Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param until Get activities created before this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param after Get activities created after this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
@@ -900,7 +909,7 @@ public class AccountsApi {
         <tr><td> 200 </td><td> Success </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getAccountActivitiesByTypeCall(@javax.annotation.Nonnull String activityType, @javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call getAccountActivitiesByTypeCall(@javax.annotation.Nonnull String activityType, @javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable UUID orderId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -930,6 +939,10 @@ public class AccountsApi {
             localVarQueryParams.addAll(localVarApiClient.parameterToPair("account_id", accountId));
         }
 
+        if (orderId != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("order_id", orderId));
+        }
+
         if (date != null) {
             localVarQueryParams.addAll(localVarApiClient.parameterToPair("date", date));
         }
@@ -974,13 +987,13 @@ public class AccountsApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call getAccountActivitiesByTypeValidateBeforeCall(@javax.annotation.Nonnull String activityType, @javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call getAccountActivitiesByTypeValidateBeforeCall(@javax.annotation.Nonnull String activityType, @javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable UUID orderId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'activityType' is set
         if (activityType == null) {
             throw new ApiException("Missing the required parameter 'activityType' when calling getAccountActivitiesByType(Async)");
         }
 
-        return getAccountActivitiesByTypeCall(activityType, accountId, date, until, after, direction, pageSize, pageToken, _callback);
+        return getAccountActivitiesByTypeCall(activityType, accountId, orderId, date, until, after, direction, pageSize, pageToken, _callback);
 
     }
 
@@ -989,6 +1002,7 @@ public class AccountsApi {
      * Retrieves an array of Activity by type.  If {activity_type} is provided as part of the URL, category cannot be provided as query parameter. They are mutually exclusive.  Notes: * Pagination is handled using the &#x60;page_token&#x60; and &#x60;page_size&#x60; parameters. * &#x60;page_token&#x60; represents the ID of the end of your current page of results.   for example if in your first response the id of the last Activiy item returned in the array was &#x60;20220203000000000::045b3b8d-c566-4bef-b741-2bf598dd6ae7&#x60;, you&#39;d pass that value as &#x60;page_token&#x60; to get the next page of results  * If specified with a &#x60;direction&#x60; of &#x60;desc&#x60;, for example, the results will end before the activity with the specified ID. * If specified with a &#x60;direction&#x60; of &#x60;asc&#x60;, results will begin with the activity immediately after the one specified. * &#x60;page_size&#x60; is the maximum number of entries to return in the response. * If &#x60;date&#x60; is not specified, the default and maximum value is 100. * If &#x60;date&#x60; is specified, the default behavior is to return all results, and there is no maximum page size.
      * @param activityType see ActivityType model for details about what the different types mean (required)
      * @param accountId id of a single account to filter by (optional)
+     * @param orderId Filter activities associated with a specific order. Useful for retrieving the fills that make up a completely filled order. (optional)
      * @param date Filter activities by their creation date (created_at), not the activity&#39;s settlement date. For non-trade activities such as fees, the creation date is typically the day after the trade date (in UTC). Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param until Get activities created before this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param after Get activities created after this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
@@ -1004,8 +1018,8 @@ public class AccountsApi {
         <tr><td> 200 </td><td> Success </td><td>  -  </td></tr>
      </table>
      */
-    public List<Activity> getAccountActivitiesByType(@javax.annotation.Nonnull String activityType, @javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken) throws ApiException {
-        ApiResponse<List<Activity>> localVarResp = getAccountActivitiesByTypeWithHttpInfo(activityType, accountId, date, until, after, direction, pageSize, pageToken);
+    public List<Activity> getAccountActivitiesByType(@javax.annotation.Nonnull String activityType, @javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable UUID orderId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken) throws ApiException {
+        ApiResponse<List<Activity>> localVarResp = getAccountActivitiesByTypeWithHttpInfo(activityType, accountId, orderId, date, until, after, direction, pageSize, pageToken);
         return localVarResp.getData();
     }
 
@@ -1014,6 +1028,7 @@ public class AccountsApi {
      * Retrieves an array of Activity by type.  If {activity_type} is provided as part of the URL, category cannot be provided as query parameter. They are mutually exclusive.  Notes: * Pagination is handled using the &#x60;page_token&#x60; and &#x60;page_size&#x60; parameters. * &#x60;page_token&#x60; represents the ID of the end of your current page of results.   for example if in your first response the id of the last Activiy item returned in the array was &#x60;20220203000000000::045b3b8d-c566-4bef-b741-2bf598dd6ae7&#x60;, you&#39;d pass that value as &#x60;page_token&#x60; to get the next page of results  * If specified with a &#x60;direction&#x60; of &#x60;desc&#x60;, for example, the results will end before the activity with the specified ID. * If specified with a &#x60;direction&#x60; of &#x60;asc&#x60;, results will begin with the activity immediately after the one specified. * &#x60;page_size&#x60; is the maximum number of entries to return in the response. * If &#x60;date&#x60; is not specified, the default and maximum value is 100. * If &#x60;date&#x60; is specified, the default behavior is to return all results, and there is no maximum page size.
      * @param activityType see ActivityType model for details about what the different types mean (required)
      * @param accountId id of a single account to filter by (optional)
+     * @param orderId Filter activities associated with a specific order. Useful for retrieving the fills that make up a completely filled order. (optional)
      * @param date Filter activities by their creation date (created_at), not the activity&#39;s settlement date. For non-trade activities such as fees, the creation date is typically the day after the trade date (in UTC). Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param until Get activities created before this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param after Get activities created after this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
@@ -1029,8 +1044,8 @@ public class AccountsApi {
         <tr><td> 200 </td><td> Success </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<List<Activity>> getAccountActivitiesByTypeWithHttpInfo(@javax.annotation.Nonnull String activityType, @javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken) throws ApiException {
-        okhttp3.Call localVarCall = getAccountActivitiesByTypeValidateBeforeCall(activityType, accountId, date, until, after, direction, pageSize, pageToken, null);
+    public ApiResponse<List<Activity>> getAccountActivitiesByTypeWithHttpInfo(@javax.annotation.Nonnull String activityType, @javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable UUID orderId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken) throws ApiException {
+        okhttp3.Call localVarCall = getAccountActivitiesByTypeValidateBeforeCall(activityType, accountId, orderId, date, until, after, direction, pageSize, pageToken, null);
         Type localVarReturnType = new TypeToken<List<Activity>>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
@@ -1040,6 +1055,7 @@ public class AccountsApi {
      * Retrieves an array of Activity by type.  If {activity_type} is provided as part of the URL, category cannot be provided as query parameter. They are mutually exclusive.  Notes: * Pagination is handled using the &#x60;page_token&#x60; and &#x60;page_size&#x60; parameters. * &#x60;page_token&#x60; represents the ID of the end of your current page of results.   for example if in your first response the id of the last Activiy item returned in the array was &#x60;20220203000000000::045b3b8d-c566-4bef-b741-2bf598dd6ae7&#x60;, you&#39;d pass that value as &#x60;page_token&#x60; to get the next page of results  * If specified with a &#x60;direction&#x60; of &#x60;desc&#x60;, for example, the results will end before the activity with the specified ID. * If specified with a &#x60;direction&#x60; of &#x60;asc&#x60;, results will begin with the activity immediately after the one specified. * &#x60;page_size&#x60; is the maximum number of entries to return in the response. * If &#x60;date&#x60; is not specified, the default and maximum value is 100. * If &#x60;date&#x60; is specified, the default behavior is to return all results, and there is no maximum page size.
      * @param activityType see ActivityType model for details about what the different types mean (required)
      * @param accountId id of a single account to filter by (optional)
+     * @param orderId Filter activities associated with a specific order. Useful for retrieving the fills that make up a completely filled order. (optional)
      * @param date Filter activities by their creation date (created_at), not the activity&#39;s settlement date. For non-trade activities such as fees, the creation date is typically the day after the trade date (in UTC). Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param until Get activities created before this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
      * @param after Get activities created after this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are supported. (optional)
@@ -1056,9 +1072,9 @@ public class AccountsApi {
         <tr><td> 200 </td><td> Success </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getAccountActivitiesByTypeAsync(@javax.annotation.Nonnull String activityType, @javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken, final ApiCallback<List<Activity>> _callback) throws ApiException {
+    public okhttp3.Call getAccountActivitiesByTypeAsync(@javax.annotation.Nonnull String activityType, @javax.annotation.Nullable UUID accountId, @javax.annotation.Nullable UUID orderId, @javax.annotation.Nullable OffsetDateTime date, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable String direction, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String pageToken, final ApiCallback<List<Activity>> _callback) throws ApiException {
 
-        okhttp3.Call localVarCall = getAccountActivitiesByTypeValidateBeforeCall(activityType, accountId, date, until, after, direction, pageSize, pageToken, _callback);
+        okhttp3.Call localVarCall = getAccountActivitiesByTypeValidateBeforeCall(activityType, accountId, orderId, date, until, after, direction, pageSize, pageToken, _callback);
         Type localVarReturnType = new TypeToken<List<Activity>>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;

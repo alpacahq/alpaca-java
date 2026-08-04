@@ -79,6 +79,11 @@ public class CommonCDIVActivityV2 implements Serializable {
   @javax.annotation.Nonnull
   private Boolean foreign;
 
+  public static final String SERIALIZED_NAME_ISIN = "isin";
+  @SerializedName(SERIALIZED_NAME_ISIN)
+  @javax.annotation.Nullable
+  private String isin;
+
   public static final String SERIALIZED_NAME_PAYABLE_DATE = "payable_date";
   @SerializedName(SERIALIZED_NAME_PAYABLE_DATE)
   @javax.annotation.Nullable
@@ -199,6 +204,25 @@ public class CommonCDIVActivityV2 implements Serializable {
 
   public void setForeign(@javax.annotation.Nonnull Boolean foreign) {
     this.foreign = foreign;
+  }
+
+
+  public CommonCDIVActivityV2 isin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
+    return this;
+  }
+
+  /**
+   * The ISIN of the security involved with the activity
+   * @return isin
+   */
+  @javax.annotation.Nullable
+  public String getIsin() {
+    return isin;
+  }
+
+  public void setIsin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
   }
 
 
@@ -356,6 +380,7 @@ public class CommonCDIVActivityV2 implements Serializable {
         Objects.equals(this.dueBillOnDate, commonCDIVActivityV2.dueBillOnDate) &&
         Objects.equals(this.exDate, commonCDIVActivityV2.exDate) &&
         Objects.equals(this.foreign, commonCDIVActivityV2.foreign) &&
+        Objects.equals(this.isin, commonCDIVActivityV2.isin) &&
         Objects.equals(this.payableDate, commonCDIVActivityV2.payableDate) &&
         Objects.equals(this.rate, commonCDIVActivityV2.rate) &&
         Objects.equals(this.recordDate, commonCDIVActivityV2.recordDate) &&
@@ -366,7 +391,7 @@ public class CommonCDIVActivityV2 implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(cusip, dueBillOffDate, dueBillOnDate, exDate, foreign, payableDate, rate, recordDate, special, symbol, additionalProperties);
+    return Objects.hash(cusip, dueBillOffDate, dueBillOnDate, exDate, foreign, isin, payableDate, rate, recordDate, special, symbol, additionalProperties);
   }
 
   @Override
@@ -378,6 +403,7 @@ public class CommonCDIVActivityV2 implements Serializable {
     sb.append("    dueBillOnDate: ").append(toIndentedString(dueBillOnDate)).append("\n");
     sb.append("    exDate: ").append(toIndentedString(exDate)).append("\n");
     sb.append("    foreign: ").append(toIndentedString(foreign)).append("\n");
+    sb.append("    isin: ").append(toIndentedString(isin)).append("\n");
     sb.append("    payableDate: ").append(toIndentedString(payableDate)).append("\n");
     sb.append("    rate: ").append(toIndentedString(rate)).append("\n");
     sb.append("    recordDate: ").append(toIndentedString(recordDate)).append("\n");
@@ -402,7 +428,7 @@ public class CommonCDIVActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("cusip", "due_bill_off_date", "due_bill_on_date", "ex_date", "foreign", "payable_date", "rate", "record_date", "special", "symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("cusip", "due_bill_off_date", "due_bill_on_date", "ex_date", "foreign", "isin", "payable_date", "rate", "record_date", "special", "symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("cusip", "foreign", "rate", "special", "symbol"));
@@ -430,6 +456,9 @@ public class CommonCDIVActivityV2 implements Serializable {
         JsonObject jsonObj = jsonElement.getAsJsonObject();
       if (!jsonObj.get("cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cusip").toString()));
+      }
+      if ((jsonObj.get("isin") != null && !jsonObj.get("isin").isJsonNull()) && !jsonObj.get("isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("isin").toString()));
       }
       if (!jsonObj.get("rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("rate").toString()));

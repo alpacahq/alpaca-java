@@ -31,11 +31,11 @@ import markets.alpaca.client.openapi.trading.model.AssetAttribute;
 import markets.alpaca.client.openapi.trading.model.Assets;
 import java.math.BigDecimal;
 import markets.alpaca.client.openapi.trading.model.Error;
-import markets.alpaca.client.openapi.trading.model.GetOptionsContracts200Response;
 import java.time.LocalDate;
 import markets.alpaca.client.openapi.trading.model.OptionContract;
 import markets.alpaca.client.openapi.trading.model.OptionContractStyle;
 import markets.alpaca.client.openapi.trading.model.OptionContractType;
+import markets.alpaca.client.openapi.trading.model.OptionContractsResponse;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -381,7 +381,7 @@ public class AssetsApi {
      * @param pageToken Used for pagination, this token retrieves the next page of results. It is obtained from the response of the preceding page when additional pages are available. (optional)
      * @param limit The number of contracts to limit per page (default&#x3D;100, max&#x3D;10000). (optional)
      * @param ppind The ppind(Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments, with &#x60;true&#x60; meaning it is part of the Penny Program and &#x60;false&#x60; meaning it is not. (optional)
-     * @return GetOptionsContracts200Response
+     * @return OptionContractsResponse
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -390,8 +390,8 @@ public class AssetsApi {
         <tr><td> 200 </td><td> Successful Response. </td><td>  -  </td></tr>
      </table>
      */
-    public GetOptionsContracts200Response getOptionsContracts(@javax.annotation.Nullable String underlyingSymbols, @javax.annotation.Nullable Boolean showDeliverables, @javax.annotation.Nullable String status, @javax.annotation.Nullable LocalDate expirationDate, @javax.annotation.Nullable LocalDate expirationDateGte, @javax.annotation.Nullable LocalDate expirationDateLte, @javax.annotation.Nullable String rootSymbol, @javax.annotation.Nullable OptionContractType type, @javax.annotation.Nullable OptionContractStyle style, @javax.annotation.Nullable BigDecimal strikePriceGte, @javax.annotation.Nullable BigDecimal strikePriceLte, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable Boolean ppind) throws ApiException {
-        ApiResponse<GetOptionsContracts200Response> localVarResp = getOptionsContractsWithHttpInfo(underlyingSymbols, showDeliverables, status, expirationDate, expirationDateGte, expirationDateLte, rootSymbol, type, style, strikePriceGte, strikePriceLte, pageToken, limit, ppind);
+    public OptionContractsResponse getOptionsContracts(@javax.annotation.Nullable String underlyingSymbols, @javax.annotation.Nullable Boolean showDeliverables, @javax.annotation.Nullable String status, @javax.annotation.Nullable LocalDate expirationDate, @javax.annotation.Nullable LocalDate expirationDateGte, @javax.annotation.Nullable LocalDate expirationDateLte, @javax.annotation.Nullable String rootSymbol, @javax.annotation.Nullable OptionContractType type, @javax.annotation.Nullable OptionContractStyle style, @javax.annotation.Nullable BigDecimal strikePriceGte, @javax.annotation.Nullable BigDecimal strikePriceLte, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable Boolean ppind) throws ApiException {
+        ApiResponse<OptionContractsResponse> localVarResp = getOptionsContractsWithHttpInfo(underlyingSymbols, showDeliverables, status, expirationDate, expirationDateGte, expirationDateLte, rootSymbol, type, style, strikePriceGte, strikePriceLte, pageToken, limit, ppind);
         return localVarResp.getData();
     }
 
@@ -412,7 +412,7 @@ public class AssetsApi {
      * @param pageToken Used for pagination, this token retrieves the next page of results. It is obtained from the response of the preceding page when additional pages are available. (optional)
      * @param limit The number of contracts to limit per page (default&#x3D;100, max&#x3D;10000). (optional)
      * @param ppind The ppind(Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments, with &#x60;true&#x60; meaning it is part of the Penny Program and &#x60;false&#x60; meaning it is not. (optional)
-     * @return ApiResponse&lt;GetOptionsContracts200Response&gt;
+     * @return ApiResponse&lt;OptionContractsResponse&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -421,9 +421,9 @@ public class AssetsApi {
         <tr><td> 200 </td><td> Successful Response. </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<GetOptionsContracts200Response> getOptionsContractsWithHttpInfo(@javax.annotation.Nullable String underlyingSymbols, @javax.annotation.Nullable Boolean showDeliverables, @javax.annotation.Nullable String status, @javax.annotation.Nullable LocalDate expirationDate, @javax.annotation.Nullable LocalDate expirationDateGte, @javax.annotation.Nullable LocalDate expirationDateLte, @javax.annotation.Nullable String rootSymbol, @javax.annotation.Nullable OptionContractType type, @javax.annotation.Nullable OptionContractStyle style, @javax.annotation.Nullable BigDecimal strikePriceGte, @javax.annotation.Nullable BigDecimal strikePriceLte, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable Boolean ppind) throws ApiException {
+    public ApiResponse<OptionContractsResponse> getOptionsContractsWithHttpInfo(@javax.annotation.Nullable String underlyingSymbols, @javax.annotation.Nullable Boolean showDeliverables, @javax.annotation.Nullable String status, @javax.annotation.Nullable LocalDate expirationDate, @javax.annotation.Nullable LocalDate expirationDateGte, @javax.annotation.Nullable LocalDate expirationDateLte, @javax.annotation.Nullable String rootSymbol, @javax.annotation.Nullable OptionContractType type, @javax.annotation.Nullable OptionContractStyle style, @javax.annotation.Nullable BigDecimal strikePriceGte, @javax.annotation.Nullable BigDecimal strikePriceLte, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable Boolean ppind) throws ApiException {
         okhttp3.Call localVarCall = getOptionsContractsValidateBeforeCall(underlyingSymbols, showDeliverables, status, expirationDate, expirationDateGte, expirationDateLte, rootSymbol, type, style, strikePriceGte, strikePriceLte, pageToken, limit, ppind, null);
-        Type localVarReturnType = new TypeToken<GetOptionsContracts200Response>(){}.getType();
+        Type localVarReturnType = new TypeToken<OptionContractsResponse>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
 
@@ -454,10 +454,10 @@ public class AssetsApi {
         <tr><td> 200 </td><td> Successful Response. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getOptionsContractsAsync(@javax.annotation.Nullable String underlyingSymbols, @javax.annotation.Nullable Boolean showDeliverables, @javax.annotation.Nullable String status, @javax.annotation.Nullable LocalDate expirationDate, @javax.annotation.Nullable LocalDate expirationDateGte, @javax.annotation.Nullable LocalDate expirationDateLte, @javax.annotation.Nullable String rootSymbol, @javax.annotation.Nullable OptionContractType type, @javax.annotation.Nullable OptionContractStyle style, @javax.annotation.Nullable BigDecimal strikePriceGte, @javax.annotation.Nullable BigDecimal strikePriceLte, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable Boolean ppind, final ApiCallback<GetOptionsContracts200Response> _callback) throws ApiException {
+    public okhttp3.Call getOptionsContractsAsync(@javax.annotation.Nullable String underlyingSymbols, @javax.annotation.Nullable Boolean showDeliverables, @javax.annotation.Nullable String status, @javax.annotation.Nullable LocalDate expirationDate, @javax.annotation.Nullable LocalDate expirationDateGte, @javax.annotation.Nullable LocalDate expirationDateLte, @javax.annotation.Nullable String rootSymbol, @javax.annotation.Nullable OptionContractType type, @javax.annotation.Nullable OptionContractStyle style, @javax.annotation.Nullable BigDecimal strikePriceGte, @javax.annotation.Nullable BigDecimal strikePriceLte, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable Boolean ppind, final ApiCallback<OptionContractsResponse> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = getOptionsContractsValidateBeforeCall(underlyingSymbols, showDeliverables, status, expirationDate, expirationDateGte, expirationDateLte, rootSymbol, type, style, strikePriceGte, strikePriceLte, pageToken, limit, ppind, _callback);
-        Type localVarReturnType = new TypeToken<GetOptionsContracts200Response>(){}.getType();
+        Type localVarReturnType = new TypeToken<OptionContractsResponse>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
     }

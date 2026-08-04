@@ -64,7 +64,9 @@ public class LocateQuoteError implements Serializable {
     
     THRESHOLD_SECURITY("threshold_security"),
     
-    CORPORATE_ACTION("corporate_action");
+    CORPORATE_ACTION("corporate_action"),
+    
+    QUOTE_UNAVAILABLE("quote_unavailable");
 
     private String value;
 

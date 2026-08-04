@@ -85,6 +85,11 @@ public class ForwardSplitActivityV2 implements Serializable {
   @javax.annotation.Nonnull
   private String newCusip;
 
+  public static final String SERIALIZED_NAME_NEW_ISIN = "new_isin";
+  @SerializedName(SERIALIZED_NAME_NEW_ISIN)
+  @javax.annotation.Nullable
+  private String newIsin;
+
   public static final String SERIALIZED_NAME_NEW_RATE = "new_rate";
   @SerializedName(SERIALIZED_NAME_NEW_RATE)
   @javax.annotation.Nonnull
@@ -94,6 +99,11 @@ public class ForwardSplitActivityV2 implements Serializable {
   @SerializedName(SERIALIZED_NAME_OLD_CUSIP)
   @javax.annotation.Nonnull
   private String oldCusip;
+
+  public static final String SERIALIZED_NAME_OLD_ISIN = "old_isin";
+  @SerializedName(SERIALIZED_NAME_OLD_ISIN)
+  @javax.annotation.Nullable
+  private String oldIsin;
 
   public static final String SERIALIZED_NAME_OLD_RATE = "old_rate";
   @SerializedName(SERIALIZED_NAME_OLD_RATE)
@@ -252,6 +262,25 @@ public class ForwardSplitActivityV2 implements Serializable {
   }
 
 
+  public ForwardSplitActivityV2 newIsin(@javax.annotation.Nullable String newIsin) {
+    this.newIsin = newIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the new security after the split
+   * @return newIsin
+   */
+  @javax.annotation.Nullable
+  public String getNewIsin() {
+    return newIsin;
+  }
+
+  public void setNewIsin(@javax.annotation.Nullable String newIsin) {
+    this.newIsin = newIsin;
+  }
+
+
   public ForwardSplitActivityV2 newRate(@javax.annotation.Nonnull String newRate) {
     this.newRate = newRate;
     return this;
@@ -287,6 +316,25 @@ public class ForwardSplitActivityV2 implements Serializable {
 
   public void setOldCusip(@javax.annotation.Nonnull String oldCusip) {
     this.oldCusip = oldCusip;
+  }
+
+
+  public ForwardSplitActivityV2 oldIsin(@javax.annotation.Nullable String oldIsin) {
+    this.oldIsin = oldIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the old security before the split
+   * @return oldIsin
+   */
+  @javax.annotation.Nullable
+  public String getOldIsin() {
+    return oldIsin;
+  }
+
+  public void setOldIsin(@javax.annotation.Nullable String oldIsin) {
+    this.oldIsin = oldIsin;
   }
 
 
@@ -502,8 +550,10 @@ public class ForwardSplitActivityV2 implements Serializable {
         Objects.equals(this.positionDate, forwardSplitActivityV2.positionDate) &&
         Objects.equals(this.reorgId, forwardSplitActivityV2.reorgId) &&
         Objects.equals(this.newCusip, forwardSplitActivityV2.newCusip) &&
+        Objects.equals(this.newIsin, forwardSplitActivityV2.newIsin) &&
         Objects.equals(this.newRate, forwardSplitActivityV2.newRate) &&
         Objects.equals(this.oldCusip, forwardSplitActivityV2.oldCusip) &&
+        Objects.equals(this.oldIsin, forwardSplitActivityV2.oldIsin) &&
         Objects.equals(this.oldRate, forwardSplitActivityV2.oldRate) &&
         Objects.equals(this.payableDate, forwardSplitActivityV2.payableDate) &&
         Objects.equals(this.newQty, forwardSplitActivityV2.newQty) &&
@@ -517,7 +567,7 @@ public class ForwardSplitActivityV2 implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, newCusip, newRate, oldCusip, oldRate, payableDate, newQty, oldQty, dueBillRedemptionDate, exDate, recordDate, symbol, additionalProperties);
+    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, newCusip, newIsin, newRate, oldCusip, oldIsin, oldRate, payableDate, newQty, oldQty, dueBillRedemptionDate, exDate, recordDate, symbol, additionalProperties);
   }
 
   @Override
@@ -530,8 +580,10 @@ public class ForwardSplitActivityV2 implements Serializable {
     sb.append("    positionDate: ").append(toIndentedString(positionDate)).append("\n");
     sb.append("    reorgId: ").append(toIndentedString(reorgId)).append("\n");
     sb.append("    newCusip: ").append(toIndentedString(newCusip)).append("\n");
+    sb.append("    newIsin: ").append(toIndentedString(newIsin)).append("\n");
     sb.append("    newRate: ").append(toIndentedString(newRate)).append("\n");
     sb.append("    oldCusip: ").append(toIndentedString(oldCusip)).append("\n");
+    sb.append("    oldIsin: ").append(toIndentedString(oldIsin)).append("\n");
     sb.append("    oldRate: ").append(toIndentedString(oldRate)).append("\n");
     sb.append("    payableDate: ").append(toIndentedString(payableDate)).append("\n");
     sb.append("    newQty: ").append(toIndentedString(newQty)).append("\n");
@@ -559,7 +611,7 @@ public class ForwardSplitActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "new_cusip", "new_rate", "old_cusip", "old_rate", "payable_date", "new_qty", "old_qty", "due_bill_redemption_date", "ex_date", "record_date", "symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "new_cusip", "new_isin", "new_rate", "old_cusip", "old_isin", "old_rate", "payable_date", "new_qty", "old_qty", "due_bill_redemption_date", "ex_date", "record_date", "symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date", "position_date", "new_cusip", "new_rate", "old_cusip", "old_rate", "new_qty", "old_qty", "symbol"));
@@ -597,11 +649,17 @@ public class ForwardSplitActivityV2 implements Serializable {
       if (!jsonObj.get("new_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_cusip").toString()));
       }
+      if ((jsonObj.get("new_isin") != null && !jsonObj.get("new_isin").isJsonNull()) && !jsonObj.get("new_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_isin").toString()));
+      }
       if (!jsonObj.get("new_rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_rate").toString()));
       }
       if (!jsonObj.get("old_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_cusip").toString()));
+      }
+      if ((jsonObj.get("old_isin") != null && !jsonObj.get("old_isin").isJsonNull()) && !jsonObj.get("old_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_isin").toString()));
       }
       if (!jsonObj.get("old_rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_rate").toString()));

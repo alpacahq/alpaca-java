@@ -61,6 +61,30 @@ public class JSON {
     @SuppressWarnings("unchecked")
     public static GsonBuilder createGson() {
         GsonFireBuilder fireBuilder = new GsonFireBuilder()
+                .registerTypeSelector(markets.alpaca.client.openapi.data.model.CorporateActionEvent.class, new TypeSelector<markets.alpaca.client.openapi.data.model.CorporateActionEvent>() {
+                    @Override
+                    public Class<? extends markets.alpaca.client.openapi.data.model.CorporateActionEvent> getClassForElement(JsonElement readElement) {
+                        Map<String, Class> classByDiscriminatorValue = new HashMap<String, Class>();
+                        classByDiscriminatorValue.put("cash_dividend_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventCashDividend.class);
+                        classByDiscriminatorValue.put("cash_merger_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventCashMerger.class);
+                        classByDiscriminatorValue.put("equity_partial_call_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventEquityPartialCall.class);
+                        classByDiscriminatorValue.put("forward_split_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventForwardSplit.class);
+                        classByDiscriminatorValue.put("name_change_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventNameChange.class);
+                        classByDiscriminatorValue.put("redemption_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventRedemption.class);
+                        classByDiscriminatorValue.put("reorganization_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventReorganization.class);
+                        classByDiscriminatorValue.put("reverse_split_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventReverseSplit.class);
+                        classByDiscriminatorValue.put("rights_distribution_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventRightsDistribution.class);
+                        classByDiscriminatorValue.put("spin_off_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventSpinOff.class);
+                        classByDiscriminatorValue.put("stock_and_cash_merger_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventStockAndCashMerger.class);
+                        classByDiscriminatorValue.put("stock_dividend_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventStockDividend.class);
+                        classByDiscriminatorValue.put("stock_merger_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventStockMerger.class);
+                        classByDiscriminatorValue.put("unit_split_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventUnitSplit.class);
+                        classByDiscriminatorValue.put("worthless_removal_corporateaction_event", markets.alpaca.client.openapi.data.model.CorporateActionEventWorthlessRemoval.class);
+                        classByDiscriminatorValue.put("corporate_action_event", markets.alpaca.client.openapi.data.model.CorporateActionEvent.class);
+                        return getClassByDiscriminator(classByDiscriminatorValue,
+                                getDiscriminatorValue(readElement, "event_type"));
+                    }
+          })
         ;
         GsonBuilder builder = fireBuilder.createGsonBuilder();
         return builder;
@@ -96,8 +120,42 @@ public class JSON {
         gsonBuilder.registerTypeAdapter(OffsetDateTime.class, offsetDateTimeTypeAdapter);
         gsonBuilder.registerTypeAdapter(LocalDate.class, localDateTypeAdapter);
         gsonBuilder.registerTypeAdapter(byte[].class, byteArrayAdapter);
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventBase.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventCashDividend.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventCashMerger.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventEquityPartialCall.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventForwardSplit.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventNameChange.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventRedemption.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventReorganization.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventReorganizationStockMovement.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventReverseSplit.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventRightsDistribution.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventSpinOff.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventStockAndCashMerger.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventStockDividend.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventStockMerger.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventUnitSplit.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CaEventWorthlessRemoval.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CashDividend.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CashMerger.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEvent.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventBase.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventCashDividend.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventCashMerger.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventEquityPartialCall.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventForwardSplit.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventNameChange.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventRedemption.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventReorganization.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventReverseSplit.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventRightsDistribution.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventSpinOff.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventStockAndCashMerger.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventStockDividend.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventStockMerger.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventUnitSplit.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionEventWorthlessRemoval.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActions.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CorporateActionsResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CryptoBar.CustomTypeAdapterFactory());
@@ -108,8 +166,6 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CryptoLatestTradesResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CryptoOrderbook.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CryptoOrderbookEntry.CustomTypeAdapterFactory());
-        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CryptoPerpFuturesPricing.CustomTypeAdapterFactory());
-        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CryptoPerpLatestFuturesPricingResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CryptoQuote.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CryptoQuotesResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.CryptoSnapshot.CustomTypeAdapterFactory());
@@ -124,9 +180,6 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.ForexRate.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.ForexRatesResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.ForwardSplit.CustomTypeAdapterFactory());
-        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.IndexLatestValuesResp.CustomTypeAdapterFactory());
-        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.IndexValue.CustomTypeAdapterFactory());
-        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.IndexValuesResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.MostActive.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.MostActivesResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.Mover.CustomTypeAdapterFactory());

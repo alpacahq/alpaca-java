@@ -64,6 +64,11 @@ public class CommonSDIVActivityV2 implements Serializable {
   @javax.annotation.Nullable
   private LocalDate exDate;
 
+  public static final String SERIALIZED_NAME_ISIN = "isin";
+  @SerializedName(SERIALIZED_NAME_ISIN)
+  @javax.annotation.Nullable
+  private String isin;
+
   public static final String SERIALIZED_NAME_PAYABLE_DATE = "payable_date";
   @SerializedName(SERIALIZED_NAME_PAYABLE_DATE)
   @javax.annotation.Nullable
@@ -122,6 +127,25 @@ public class CommonSDIVActivityV2 implements Serializable {
 
   public void setExDate(@javax.annotation.Nullable LocalDate exDate) {
     this.exDate = exDate;
+  }
+
+
+  public CommonSDIVActivityV2 isin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
+    return this;
+  }
+
+  /**
+   * The ISIN of the security involved with the activity
+   * @return isin
+   */
+  @javax.annotation.Nullable
+  public String getIsin() {
+    return isin;
+  }
+
+  public void setIsin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
   }
 
 
@@ -257,6 +281,7 @@ public class CommonSDIVActivityV2 implements Serializable {
     CommonSDIVActivityV2 commonSDIVActivityV2 = (CommonSDIVActivityV2) o;
     return Objects.equals(this.cusip, commonSDIVActivityV2.cusip) &&
         Objects.equals(this.exDate, commonSDIVActivityV2.exDate) &&
+        Objects.equals(this.isin, commonSDIVActivityV2.isin) &&
         Objects.equals(this.payableDate, commonSDIVActivityV2.payableDate) &&
         Objects.equals(this.rate, commonSDIVActivityV2.rate) &&
         Objects.equals(this.recordDate, commonSDIVActivityV2.recordDate) &&
@@ -266,7 +291,7 @@ public class CommonSDIVActivityV2 implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(cusip, exDate, payableDate, rate, recordDate, symbol, additionalProperties);
+    return Objects.hash(cusip, exDate, isin, payableDate, rate, recordDate, symbol, additionalProperties);
   }
 
   @Override
@@ -275,6 +300,7 @@ public class CommonSDIVActivityV2 implements Serializable {
     sb.append("class CommonSDIVActivityV2 {\n");
     sb.append("    cusip: ").append(toIndentedString(cusip)).append("\n");
     sb.append("    exDate: ").append(toIndentedString(exDate)).append("\n");
+    sb.append("    isin: ").append(toIndentedString(isin)).append("\n");
     sb.append("    payableDate: ").append(toIndentedString(payableDate)).append("\n");
     sb.append("    rate: ").append(toIndentedString(rate)).append("\n");
     sb.append("    recordDate: ").append(toIndentedString(recordDate)).append("\n");
@@ -298,7 +324,7 @@ public class CommonSDIVActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("cusip", "ex_date", "payable_date", "rate", "record_date", "symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("cusip", "ex_date", "isin", "payable_date", "rate", "record_date", "symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("cusip", "rate", "symbol"));
@@ -326,6 +352,9 @@ public class CommonSDIVActivityV2 implements Serializable {
         JsonObject jsonObj = jsonElement.getAsJsonObject();
       if (!jsonObj.get("cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cusip").toString()));
+      }
+      if ((jsonObj.get("isin") != null && !jsonObj.get("isin").isJsonNull()) && !jsonObj.get("isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("isin").toString()));
       }
       if (!jsonObj.get("rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("rate").toString()));

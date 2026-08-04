@@ -171,6 +171,11 @@ public class NonTradeActivity implements Serializable {
   @javax.annotation.Nullable
   private String symbol;
 
+  public static final String SERIALIZED_NAME_TRANSFER_ID = "transfer_id";
+  @SerializedName(SERIALIZED_NAME_TRANSFER_ID)
+  @javax.annotation.Nullable
+  private UUID transferId;
+
   public NonTradeActivity() {
   }
 
@@ -180,7 +185,7 @@ public class NonTradeActivity implements Serializable {
   }
 
   /**
-   * Represents a more specific classification to the &#x60;activity_type&#x60;. This field is optional and may not always be populated, depending on the activity type and the available data. Each &#x60;activity_type&#x60; has a set of valid &#x60;activity_sub_type&#x60; values.  Full mapping of &#x60;activity_type&#x60; to &#x60;activity_sub_type&#x60;:  - **DIV**: Dividend activity sub-types:   - **CDIV**: Cash Dividend   - **SDIV**: Stock Dividend   - **SPD**: Substitute Payment In Lieu Of Dividend  - **FEE**: Fee-related activity sub-types:   - **REG**: Regulatory Fee   - **TAF**: Trading Activity Fee   - **LCT**: Local Currency Trading Fee   - **ORF**: Options Regulatory Fee   - **OCC**: Options Clearing Corporation Fee   - **NRC**: Non-Retail Commission Fee   - **NRV**: Non-Retail Venue Fee   - **COM**: Commission   - **CAT**: Consolidated Audit Trail Fee  - **INT**: Interest-related activity sub-types:   - **MGN**: Margin Interest   - **CDT**: Credit Interest   - **SWP**: Sweep Interest   - **QII**: Qualified Interest  - **MA**: Merger and Acquisition activity sub-types:   - **CMA**: Cash Merger   - **SMA**: Stock Merger   - **SCMA**: Stock &amp; Cash Merger  - **NC**: Name Change activity sub types   - **SNC**: Symbol Name Change   - **CNC**: CUSIP Name Change   - **SCNC**: Symbol &amp; CUSIP Name Change  - **OPCA**: Option Corporate Action activity sub-types:   - **DIV.CDIV**: Cash Dividend   - **DIV.SDIV**: Stock Dividend   - **MA.CMA**: Cash Merger   - **MA.SMA**: Stock Merger   - **MA.SCMA**: Stock &amp; Cash Merger   - **NC.CNC**: CUSIP Name Change   - **NC.SNC**: Symbol Name Change   - **NC.SCNC**: Symbol &amp; CUSIP Name Change   - **SPIN**: Spin-off   - **SPLIT.FSPLIT**: Forward Stock Split   - **SPLIT.RSPLIT**: Reverse Stock Split   - **SPLIT.USPLIT**: Unit Split  - **REORG**: Reorganization activity sub-types:   - **WRM**: Worthless Removal  - **SPLIT**: Stock Split activity sub-types:   - **FSPLIT**: Forward Stock Split   - **RSPLIT**: Reverse Stock Split   - **USPLIT**: Unit Split  - **VOF**: Voluntary Offering activity sub-types:   - **VTND**: Tender Offer   - **VWRT**: Warrant Exercise   - **VRGT**: Rights Offer   - **VEXH**: Exchange Offer  - **WH**: Withholding activity sub-types:   - **SWH**: State Withholding   - **FWH**: Federal Withholding   - **SLWH**: Sales Withholding
+   * Represents a more specific classification to the &#x60;activity_type&#x60;. This field is optional and may not always be populated, depending on the activity type and the available data. Each &#x60;activity_type&#x60; has a set of valid &#x60;activity_sub_type&#x60; values.  Full mapping of &#x60;activity_type&#x60; to &#x60;activity_sub_type&#x60;:  - **DIV**: Dividend activity sub-types:   - **CDIV**: Cash Dividend   - **SDIV**: Stock Dividend   - **SPD**: Substitute Payment In Lieu Of Dividend  - **FEE**: Fee-related activity sub-types:   - **REG**: Regulatory Fee   - **TAF**: Trading Activity Fee   - **LCT**: Local Currency Trading Fee   - **ORF**: Options Regulatory Fee   - **OCC**: Options Clearing Corporation Fee   - **NRC**: Non-Retail Commission Fee   - **NRV**: Non-Retail Venue Fee   - **COM**: Commission   - **CAT**: Consolidated Audit Trail Fee  - **INT**: Interest-related activity sub-types:   - **MGN**: Margin Interest   - **CDT**: Credit Interest   - **SWP**: Sweep Interest   - **QII**: Qualified Interest   - **FI**: Fixed Income Interest (coupon payment or accrued interest on call)  - **MA**: Merger and Acquisition activity sub-types:   - **CMA**: Cash Merger   - **SMA**: Stock Merger   - **SCMA**: Stock &amp; Cash Merger  - **NC**: Name Change activity sub types   - **SNC**: Symbol Name Change   - **CNC**: CUSIP Name Change   - **SCNC**: Symbol &amp; CUSIP Name Change  - **OPCA**: Option Corporate Action activity sub-types:   - **DIV.CDIV**: Cash Dividend   - **DIV.SDIV**: Stock Dividend   - **MA.CMA**: Cash Merger   - **MA.SMA**: Stock Merger   - **MA.SCMA**: Stock &amp; Cash Merger   - **NC.CNC**: CUSIP Name Change   - **NC.SNC**: Symbol Name Change   - **NC.SCNC**: Symbol &amp; CUSIP Name Change   - **SPIN**: Spin-off   - **SPLIT.FSPLIT**: Forward Stock Split   - **SPLIT.RSPLIT**: Reverse Stock Split   - **SPLIT.USPLIT**: Unit Split  - **REORG**: Reorganization activity sub-types:   - **WRM**: Worthless Removal  - **SPLIT**: Stock Split activity sub-types:   - **FSPLIT**: Forward Stock Split   - **RSPLIT**: Reverse Stock Split   - **USPLIT**: Unit Split  - **VOF**: Voluntary Offering activity sub-types:   - **VTND**: Tender Offer   - **VWRT**: Warrant Exercise   - **VRGT**: Rights Offer   - **VEXH**: Exchange Offer  - **WH**: Withholding activity sub-types:   - **SWH**: State Withholding   - **FWH**: Federal Withholding   - **SLWH**: Sales Withholding
    * @return activitySubType
    */
   @javax.annotation.Nullable
@@ -401,6 +406,25 @@ public class NonTradeActivity implements Serializable {
     this.symbol = symbol;
   }
 
+
+  public NonTradeActivity transferId(@javax.annotation.Nullable UUID transferId) {
+    this.transferId = transferId;
+    return this;
+  }
+
+  /**
+   * The transfer ID of the associated deposit or withdrawal. Populated for &#x60;OCT&#x60; (On Chain Transactions) activities.
+   * @return transferId
+   */
+  @javax.annotation.Nullable
+  public UUID getTransferId() {
+    return transferId;
+  }
+
+  public void setTransferId(@javax.annotation.Nullable UUID transferId) {
+    this.transferId = transferId;
+  }
+
   /**
    * A container for additional, undeclared properties.
    * This is a holder for any undeclared properties as specified with
@@ -467,13 +491,14 @@ public class NonTradeActivity implements Serializable {
         Objects.equals(this.perShareAmount, nonTradeActivity.perShareAmount) &&
         Objects.equals(this.qty, nonTradeActivity.qty) &&
         Objects.equals(this.status, nonTradeActivity.status) &&
-        Objects.equals(this.symbol, nonTradeActivity.symbol)&&
+        Objects.equals(this.symbol, nonTradeActivity.symbol) &&
+        Objects.equals(this.transferId, nonTradeActivity.transferId)&&
         Objects.equals(this.additionalProperties, nonTradeActivity.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(activitySubType, createdAt, currency, cusip, date, description, groupId, netAmount, perShareAmount, qty, status, symbol, additionalProperties);
+    return Objects.hash(activitySubType, createdAt, currency, cusip, date, description, groupId, netAmount, perShareAmount, qty, status, symbol, transferId, additionalProperties);
   }
 
   @Override
@@ -492,6 +517,7 @@ public class NonTradeActivity implements Serializable {
     sb.append("    qty: ").append(toIndentedString(qty)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
+    sb.append("    transferId: ").append(toIndentedString(transferId)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -511,7 +537,7 @@ public class NonTradeActivity implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("activity_sub_type", "created_at", "currency", "cusip", "date", "description", "group_id", "net_amount", "per_share_amount", "qty", "status", "symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("activity_sub_type", "created_at", "currency", "cusip", "date", "description", "group_id", "net_amount", "per_share_amount", "qty", "status", "symbol", "transfer_id"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -563,6 +589,9 @@ public class NonTradeActivity implements Serializable {
       }
       if ((jsonObj.get("symbol") != null && !jsonObj.get("symbol").isJsonNull()) && !jsonObj.get("symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
+      }
+      if ((jsonObj.get("transfer_id") != null && !jsonObj.get("transfer_id").isJsonNull()) && !jsonObj.get("transfer_id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `transfer_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("transfer_id").toString()));
       }
   }
 

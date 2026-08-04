@@ -85,6 +85,11 @@ public class UnitSplitActivityV2 implements Serializable {
   @javax.annotation.Nonnull
   private String newCusip;
 
+  public static final String SERIALIZED_NAME_NEW_ISIN = "new_isin";
+  @SerializedName(SERIALIZED_NAME_NEW_ISIN)
+  @javax.annotation.Nullable
+  private String newIsin;
+
   public static final String SERIALIZED_NAME_NEW_RATE = "new_rate";
   @SerializedName(SERIALIZED_NAME_NEW_RATE)
   @javax.annotation.Nonnull
@@ -94,6 +99,11 @@ public class UnitSplitActivityV2 implements Serializable {
   @SerializedName(SERIALIZED_NAME_OLD_CUSIP)
   @javax.annotation.Nonnull
   private String oldCusip;
+
+  public static final String SERIALIZED_NAME_OLD_ISIN = "old_isin";
+  @SerializedName(SERIALIZED_NAME_OLD_ISIN)
+  @javax.annotation.Nullable
+  private String oldIsin;
 
   public static final String SERIALIZED_NAME_OLD_RATE = "old_rate";
   @SerializedName(SERIALIZED_NAME_OLD_RATE)
@@ -119,6 +129,11 @@ public class UnitSplitActivityV2 implements Serializable {
   @SerializedName(SERIALIZED_NAME_ALTERNATE_CUSIP)
   @javax.annotation.Nonnull
   private String alternateCusip;
+
+  public static final String SERIALIZED_NAME_ALTERNATE_ISIN = "alternate_isin";
+  @SerializedName(SERIALIZED_NAME_ALTERNATE_ISIN)
+  @javax.annotation.Nullable
+  private String alternateIsin;
 
   public static final String SERIALIZED_NAME_ALTERNATE_QTY = "alternate_qty";
   @SerializedName(SERIALIZED_NAME_ALTERNATE_QTY)
@@ -267,6 +282,25 @@ public class UnitSplitActivityV2 implements Serializable {
   }
 
 
+  public UnitSplitActivityV2 newIsin(@javax.annotation.Nullable String newIsin) {
+    this.newIsin = newIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the new security after the split
+   * @return newIsin
+   */
+  @javax.annotation.Nullable
+  public String getNewIsin() {
+    return newIsin;
+  }
+
+  public void setNewIsin(@javax.annotation.Nullable String newIsin) {
+    this.newIsin = newIsin;
+  }
+
+
   public UnitSplitActivityV2 newRate(@javax.annotation.Nonnull String newRate) {
     this.newRate = newRate;
     return this;
@@ -302,6 +336,25 @@ public class UnitSplitActivityV2 implements Serializable {
 
   public void setOldCusip(@javax.annotation.Nonnull String oldCusip) {
     this.oldCusip = oldCusip;
+  }
+
+
+  public UnitSplitActivityV2 oldIsin(@javax.annotation.Nullable String oldIsin) {
+    this.oldIsin = oldIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the old security before the split
+   * @return oldIsin
+   */
+  @javax.annotation.Nullable
+  public String getOldIsin() {
+    return oldIsin;
+  }
+
+  public void setOldIsin(@javax.annotation.Nullable String oldIsin) {
+    this.oldIsin = oldIsin;
   }
 
 
@@ -397,6 +450,25 @@ public class UnitSplitActivityV2 implements Serializable {
 
   public void setAlternateCusip(@javax.annotation.Nonnull String alternateCusip) {
     this.alternateCusip = alternateCusip;
+  }
+
+
+  public UnitSplitActivityV2 alternateIsin(@javax.annotation.Nullable String alternateIsin) {
+    this.alternateIsin = alternateIsin;
+    return this;
+  }
+
+  /**
+   * ISIN for the alternate security after the split
+   * @return alternateIsin
+   */
+  @javax.annotation.Nullable
+  public String getAlternateIsin() {
+    return alternateIsin;
+  }
+
+  public void setAlternateIsin(@javax.annotation.Nullable String alternateIsin) {
+    this.alternateIsin = alternateIsin;
   }
 
 
@@ -574,13 +646,16 @@ public class UnitSplitActivityV2 implements Serializable {
         Objects.equals(this.positionDate, unitSplitActivityV2.positionDate) &&
         Objects.equals(this.reorgId, unitSplitActivityV2.reorgId) &&
         Objects.equals(this.newCusip, unitSplitActivityV2.newCusip) &&
+        Objects.equals(this.newIsin, unitSplitActivityV2.newIsin) &&
         Objects.equals(this.newRate, unitSplitActivityV2.newRate) &&
         Objects.equals(this.oldCusip, unitSplitActivityV2.oldCusip) &&
+        Objects.equals(this.oldIsin, unitSplitActivityV2.oldIsin) &&
         Objects.equals(this.oldRate, unitSplitActivityV2.oldRate) &&
         Objects.equals(this.payableDate, unitSplitActivityV2.payableDate) &&
         Objects.equals(this.newQty, unitSplitActivityV2.newQty) &&
         Objects.equals(this.oldQty, unitSplitActivityV2.oldQty) &&
         Objects.equals(this.alternateCusip, unitSplitActivityV2.alternateCusip) &&
+        Objects.equals(this.alternateIsin, unitSplitActivityV2.alternateIsin) &&
         Objects.equals(this.alternateQty, unitSplitActivityV2.alternateQty) &&
         Objects.equals(this.alternateRate, unitSplitActivityV2.alternateRate) &&
         Objects.equals(this.alternateSymbol, unitSplitActivityV2.alternateSymbol) &&
@@ -592,7 +667,7 @@ public class UnitSplitActivityV2 implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, newCusip, newRate, oldCusip, oldRate, payableDate, newQty, oldQty, alternateCusip, alternateQty, alternateRate, alternateSymbol, effectiveDate, newSymbol, oldSymbol, additionalProperties);
+    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, newCusip, newIsin, newRate, oldCusip, oldIsin, oldRate, payableDate, newQty, oldQty, alternateCusip, alternateIsin, alternateQty, alternateRate, alternateSymbol, effectiveDate, newSymbol, oldSymbol, additionalProperties);
   }
 
   @Override
@@ -605,13 +680,16 @@ public class UnitSplitActivityV2 implements Serializable {
     sb.append("    positionDate: ").append(toIndentedString(positionDate)).append("\n");
     sb.append("    reorgId: ").append(toIndentedString(reorgId)).append("\n");
     sb.append("    newCusip: ").append(toIndentedString(newCusip)).append("\n");
+    sb.append("    newIsin: ").append(toIndentedString(newIsin)).append("\n");
     sb.append("    newRate: ").append(toIndentedString(newRate)).append("\n");
     sb.append("    oldCusip: ").append(toIndentedString(oldCusip)).append("\n");
+    sb.append("    oldIsin: ").append(toIndentedString(oldIsin)).append("\n");
     sb.append("    oldRate: ").append(toIndentedString(oldRate)).append("\n");
     sb.append("    payableDate: ").append(toIndentedString(payableDate)).append("\n");
     sb.append("    newQty: ").append(toIndentedString(newQty)).append("\n");
     sb.append("    oldQty: ").append(toIndentedString(oldQty)).append("\n");
     sb.append("    alternateCusip: ").append(toIndentedString(alternateCusip)).append("\n");
+    sb.append("    alternateIsin: ").append(toIndentedString(alternateIsin)).append("\n");
     sb.append("    alternateQty: ").append(toIndentedString(alternateQty)).append("\n");
     sb.append("    alternateRate: ").append(toIndentedString(alternateRate)).append("\n");
     sb.append("    alternateSymbol: ").append(toIndentedString(alternateSymbol)).append("\n");
@@ -637,7 +715,7 @@ public class UnitSplitActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "new_cusip", "new_rate", "old_cusip", "old_rate", "payable_date", "new_qty", "old_qty", "alternate_cusip", "alternate_qty", "alternate_rate", "alternate_symbol", "effective_date", "new_symbol", "old_symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "new_cusip", "new_isin", "new_rate", "old_cusip", "old_isin", "old_rate", "payable_date", "new_qty", "old_qty", "alternate_cusip", "alternate_isin", "alternate_qty", "alternate_rate", "alternate_symbol", "effective_date", "new_symbol", "old_symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date", "position_date", "new_cusip", "new_rate", "old_cusip", "old_rate", "new_qty", "old_qty", "alternate_cusip", "alternate_qty", "alternate_rate", "alternate_symbol", "effective_date", "new_symbol", "old_symbol"));
@@ -675,11 +753,17 @@ public class UnitSplitActivityV2 implements Serializable {
       if (!jsonObj.get("new_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_cusip").toString()));
       }
+      if ((jsonObj.get("new_isin") != null && !jsonObj.get("new_isin").isJsonNull()) && !jsonObj.get("new_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_isin").toString()));
+      }
       if (!jsonObj.get("new_rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_rate").toString()));
       }
       if (!jsonObj.get("old_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_cusip").toString()));
+      }
+      if ((jsonObj.get("old_isin") != null && !jsonObj.get("old_isin").isJsonNull()) && !jsonObj.get("old_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_isin").toString()));
       }
       if (!jsonObj.get("old_rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_rate").toString()));
@@ -692,6 +776,9 @@ public class UnitSplitActivityV2 implements Serializable {
       }
       if (!jsonObj.get("alternate_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `alternate_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("alternate_cusip").toString()));
+      }
+      if ((jsonObj.get("alternate_isin") != null && !jsonObj.get("alternate_isin").isJsonNull()) && !jsonObj.get("alternate_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `alternate_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("alternate_isin").toString()));
       }
       if (!jsonObj.get("alternate_qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `alternate_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("alternate_qty").toString()));

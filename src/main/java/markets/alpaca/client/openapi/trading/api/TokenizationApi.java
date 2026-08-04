@@ -578,6 +578,7 @@ public class TokenizationApi {
     /**
      * Build call for postTokenizationMint
      * @param tokenizationMintRequest  (required)
+     * @param idempotencyKey Unique key for idempotent create. When supplied, duplicate requests (same key and body) return the original mint request instead of creating a new one. Use a client-generated value (e.g. UUID) per logical request. Strongly recommended for production to prevent duplicate requests on retries.  (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -586,13 +587,13 @@ public class TokenizationApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Successfully requested minting of a tokenized asset. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> Bad request (e.g. malformed input, insufficient position, or account not authorized to mint). </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request (e.g. malformed input, insufficient position, or account not authorized to mint). Also returned when the &#x60;Idempotency-Key&#x60; header is malformed, or when replaying a request that was originally rejected. </td><td>  -  </td></tr>
         <tr><td> 401 </td><td> Authentication credentials are missing or invalid. </td><td>  -  </td></tr>
         <tr><td> 403 </td><td> Caller is not authorized to perform this operation. </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> One or more request parameters are missing or invalid. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> One or more request parameters are missing or invalid, or the same &#x60;Idempotency-Key&#x60; was reused with a different request body. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call postTokenizationMintCall(@javax.annotation.Nonnull TokenizationMintRequest tokenizationMintRequest, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call postTokenizationMintCall(@javax.annotation.Nonnull TokenizationMintRequest tokenizationMintRequest, @javax.annotation.Nullable String idempotencyKey, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -633,25 +634,31 @@ public class TokenizationApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
+        if (idempotencyKey != null) {
+            localVarHeaderParams.put("Idempotency-Key", localVarApiClient.parameterToString(idempotencyKey));
+        }
+
+
         String[] localVarAuthNames = new String[] { "API_Key", "API_Secret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call postTokenizationMintValidateBeforeCall(@javax.annotation.Nonnull TokenizationMintRequest tokenizationMintRequest, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call postTokenizationMintValidateBeforeCall(@javax.annotation.Nonnull TokenizationMintRequest tokenizationMintRequest, @javax.annotation.Nullable String idempotencyKey, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'tokenizationMintRequest' is set
         if (tokenizationMintRequest == null) {
             throw new ApiException("Missing the required parameter 'tokenizationMintRequest' when calling postTokenizationMint(Async)");
         }
 
-        return postTokenizationMintCall(tokenizationMintRequest, _callback);
+        return postTokenizationMintCall(tokenizationMintRequest, idempotencyKey, _callback);
 
     }
 
     /**
      * Mint a Tokenized Asset
-     * This endpoint is used by an Authorized Participant to request the minting of a tokenized asset.
+     * This endpoint is used by an Authorized Participant to request the minting of a tokenized asset.  **Idempotency**: When the &#x60;Idempotency-Key&#x60; header is supplied, this endpoint is idempotent. Multiple requests with the same key and identical request body will create only one mint request. A subsequent request returns the previously created request with the same response (no duplicate is created). If the same key is used with a different request body, the API returns &#x60;422 Unprocessable Entity&#x60;.  **Recommended for production**: Always supply &#x60;Idempotency-Key&#x60; when requesting a mint. This allows safe retries on timeouts, network errors, or 5xx responses without risking duplicate requests. Use a client-generated unique value (e.g. UUID).
      * @param tokenizationMintRequest  (required)
+     * @param idempotencyKey Unique key for idempotent create. When supplied, duplicate requests (same key and body) return the original mint request instead of creating a new one. Use a client-generated value (e.g. UUID) per logical request. Strongly recommended for production to prevent duplicate requests on retries.  (optional)
      * @return TokenizationMintResponse
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -659,21 +666,22 @@ public class TokenizationApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Successfully requested minting of a tokenized asset. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> Bad request (e.g. malformed input, insufficient position, or account not authorized to mint). </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request (e.g. malformed input, insufficient position, or account not authorized to mint). Also returned when the &#x60;Idempotency-Key&#x60; header is malformed, or when replaying a request that was originally rejected. </td><td>  -  </td></tr>
         <tr><td> 401 </td><td> Authentication credentials are missing or invalid. </td><td>  -  </td></tr>
         <tr><td> 403 </td><td> Caller is not authorized to perform this operation. </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> One or more request parameters are missing or invalid. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> One or more request parameters are missing or invalid, or the same &#x60;Idempotency-Key&#x60; was reused with a different request body. </td><td>  -  </td></tr>
      </table>
      */
-    public TokenizationMintResponse postTokenizationMint(@javax.annotation.Nonnull TokenizationMintRequest tokenizationMintRequest) throws ApiException {
-        ApiResponse<TokenizationMintResponse> localVarResp = postTokenizationMintWithHttpInfo(tokenizationMintRequest);
+    public TokenizationMintResponse postTokenizationMint(@javax.annotation.Nonnull TokenizationMintRequest tokenizationMintRequest, @javax.annotation.Nullable String idempotencyKey) throws ApiException {
+        ApiResponse<TokenizationMintResponse> localVarResp = postTokenizationMintWithHttpInfo(tokenizationMintRequest, idempotencyKey);
         return localVarResp.getData();
     }
 
     /**
      * Mint a Tokenized Asset
-     * This endpoint is used by an Authorized Participant to request the minting of a tokenized asset.
+     * This endpoint is used by an Authorized Participant to request the minting of a tokenized asset.  **Idempotency**: When the &#x60;Idempotency-Key&#x60; header is supplied, this endpoint is idempotent. Multiple requests with the same key and identical request body will create only one mint request. A subsequent request returns the previously created request with the same response (no duplicate is created). If the same key is used with a different request body, the API returns &#x60;422 Unprocessable Entity&#x60;.  **Recommended for production**: Always supply &#x60;Idempotency-Key&#x60; when requesting a mint. This allows safe retries on timeouts, network errors, or 5xx responses without risking duplicate requests. Use a client-generated unique value (e.g. UUID).
      * @param tokenizationMintRequest  (required)
+     * @param idempotencyKey Unique key for idempotent create. When supplied, duplicate requests (same key and body) return the original mint request instead of creating a new one. Use a client-generated value (e.g. UUID) per logical request. Strongly recommended for production to prevent duplicate requests on retries.  (optional)
      * @return ApiResponse&lt;TokenizationMintResponse&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -681,22 +689,23 @@ public class TokenizationApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Successfully requested minting of a tokenized asset. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> Bad request (e.g. malformed input, insufficient position, or account not authorized to mint). </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request (e.g. malformed input, insufficient position, or account not authorized to mint). Also returned when the &#x60;Idempotency-Key&#x60; header is malformed, or when replaying a request that was originally rejected. </td><td>  -  </td></tr>
         <tr><td> 401 </td><td> Authentication credentials are missing or invalid. </td><td>  -  </td></tr>
         <tr><td> 403 </td><td> Caller is not authorized to perform this operation. </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> One or more request parameters are missing or invalid. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> One or more request parameters are missing or invalid, or the same &#x60;Idempotency-Key&#x60; was reused with a different request body. </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<TokenizationMintResponse> postTokenizationMintWithHttpInfo(@javax.annotation.Nonnull TokenizationMintRequest tokenizationMintRequest) throws ApiException {
-        okhttp3.Call localVarCall = postTokenizationMintValidateBeforeCall(tokenizationMintRequest, null);
+    public ApiResponse<TokenizationMintResponse> postTokenizationMintWithHttpInfo(@javax.annotation.Nonnull TokenizationMintRequest tokenizationMintRequest, @javax.annotation.Nullable String idempotencyKey) throws ApiException {
+        okhttp3.Call localVarCall = postTokenizationMintValidateBeforeCall(tokenizationMintRequest, idempotencyKey, null);
         Type localVarReturnType = new TypeToken<TokenizationMintResponse>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
 
     /**
      * Mint a Tokenized Asset (asynchronously)
-     * This endpoint is used by an Authorized Participant to request the minting of a tokenized asset.
+     * This endpoint is used by an Authorized Participant to request the minting of a tokenized asset.  **Idempotency**: When the &#x60;Idempotency-Key&#x60; header is supplied, this endpoint is idempotent. Multiple requests with the same key and identical request body will create only one mint request. A subsequent request returns the previously created request with the same response (no duplicate is created). If the same key is used with a different request body, the API returns &#x60;422 Unprocessable Entity&#x60;.  **Recommended for production**: Always supply &#x60;Idempotency-Key&#x60; when requesting a mint. This allows safe retries on timeouts, network errors, or 5xx responses without risking duplicate requests. Use a client-generated unique value (e.g. UUID).
      * @param tokenizationMintRequest  (required)
+     * @param idempotencyKey Unique key for idempotent create. When supplied, duplicate requests (same key and body) return the original mint request instead of creating a new one. Use a client-generated value (e.g. UUID) per logical request. Strongly recommended for production to prevent duplicate requests on retries.  (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -705,15 +714,15 @@ public class TokenizationApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Successfully requested minting of a tokenized asset. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> Bad request (e.g. malformed input, insufficient position, or account not authorized to mint). </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Bad request (e.g. malformed input, insufficient position, or account not authorized to mint). Also returned when the &#x60;Idempotency-Key&#x60; header is malformed, or when replaying a request that was originally rejected. </td><td>  -  </td></tr>
         <tr><td> 401 </td><td> Authentication credentials are missing or invalid. </td><td>  -  </td></tr>
         <tr><td> 403 </td><td> Caller is not authorized to perform this operation. </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> One or more request parameters are missing or invalid. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> One or more request parameters are missing or invalid, or the same &#x60;Idempotency-Key&#x60; was reused with a different request body. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call postTokenizationMintAsync(@javax.annotation.Nonnull TokenizationMintRequest tokenizationMintRequest, final ApiCallback<TokenizationMintResponse> _callback) throws ApiException {
+    public okhttp3.Call postTokenizationMintAsync(@javax.annotation.Nonnull TokenizationMintRequest tokenizationMintRequest, @javax.annotation.Nullable String idempotencyKey, final ApiCallback<TokenizationMintResponse> _callback) throws ApiException {
 
-        okhttp3.Call localVarCall = postTokenizationMintValidateBeforeCall(tokenizationMintRequest, _callback);
+        okhttp3.Call localVarCall = postTokenizationMintValidateBeforeCall(tokenizationMintRequest, idempotencyKey, _callback);
         Type localVarReturnType = new TypeToken<TokenizationMintResponse>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;

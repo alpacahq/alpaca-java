@@ -123,7 +123,7 @@ public class NonTradeActivityEvent implements Serializable {
   private LocalDate settleDate;
 
   /**
-   * Status of the event
+   * Status of the event. &#x60;pending&#x60; is an internal/preprocessing status for journal-type NTAs and is only emitted when the subscriber opts in with &#x60;include_preprocessing&#x3D;true&#x60;. 
    */
   @JsonAdapter(StatusEnum.Adapter.class)
   public enum StatusEnum {
@@ -131,7 +131,9 @@ public class NonTradeActivityEvent implements Serializable {
     
     CORRECT("correct"),
     
-    CANCELED("canceled");
+    CANCELED("canceled"),
+    
+    PENDING("pending");
 
     private String value;
 
@@ -447,7 +449,7 @@ public class NonTradeActivityEvent implements Serializable {
   }
 
   /**
-   * Status of the event
+   * Status of the event. &#x60;pending&#x60; is an internal/preprocessing status for journal-type NTAs and is only emitted when the subscriber opts in with &#x60;include_preprocessing&#x3D;true&#x60;. 
    * @return status
    */
   @javax.annotation.Nullable

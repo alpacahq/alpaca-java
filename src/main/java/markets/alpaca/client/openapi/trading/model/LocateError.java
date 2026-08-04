@@ -76,7 +76,9 @@ public class LocateError implements Serializable {
     
     THRESHOLD_SECURITY("threshold_security"),
     
-    IDEMPOTENCY_KEY_CONFLICT("idempotency_key_conflict");
+    IDEMPOTENCY_KEY_CONFLICT("idempotency_key_conflict"),
+    
+    QUOTE_UNAVAILABLE("quote_unavailable");
 
     private String value;
 

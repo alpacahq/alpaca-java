@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import markets.alpaca.client.openapi.broker.model.JournalEntryType;
 import markets.alpaca.client.openapi.broker.model.JournalStatus;
+import markets.alpaca.client.openapi.broker.model.JournalStatusFrom;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -152,7 +153,7 @@ public class JournalStatusEventV2 implements Serializable {
   public static final String SERIALIZED_NAME_STATUS_FROM = "status_from";
   @SerializedName(SERIALIZED_NAME_STATUS_FROM)
   @javax.annotation.Nonnull
-  private JournalStatus statusFrom;
+  private JournalStatusFrom statusFrom;
 
   public static final String SERIALIZED_NAME_STATUS_TO = "status_to";
   @SerializedName(SERIALIZED_NAME_STATUS_TO)
@@ -314,7 +315,7 @@ public class JournalStatusEventV2 implements Serializable {
   }
 
 
-  public JournalStatusEventV2 statusFrom(@javax.annotation.Nonnull JournalStatus statusFrom) {
+  public JournalStatusEventV2 statusFrom(@javax.annotation.Nonnull JournalStatusFrom statusFrom) {
     this.statusFrom = statusFrom;
     return this;
   }
@@ -324,11 +325,11 @@ public class JournalStatusEventV2 implements Serializable {
    * @return statusFrom
    */
   @javax.annotation.Nonnull
-  public JournalStatus getStatusFrom() {
+  public JournalStatusFrom getStatusFrom() {
     return statusFrom;
   }
 
-  public void setStatusFrom(@javax.annotation.Nonnull JournalStatus statusFrom) {
+  public void setStatusFrom(@javax.annotation.Nonnull JournalStatusFrom statusFrom) {
     this.statusFrom = statusFrom;
   }
 
@@ -508,7 +509,9 @@ public class JournalStatusEventV2 implements Serializable {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `journal_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("journal_id").toString()));
       }
       // validate the required field `status_from`
-      JournalStatus.validateJsonElement(jsonObj.get("status_from"));
+      JournalStatusFrom.validateJsonElement(jsonObj.get("status_from"));
+      // validate the required field `status_from`
+      JournalStatusFrom.validateJsonElement(jsonObj.get("status_from"));
       // validate the required field `status_to`
       JournalStatus.validateJsonElement(jsonObj.get("status_to"));
   }

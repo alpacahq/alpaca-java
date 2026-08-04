@@ -118,6 +118,11 @@ public class UsTreasury implements Serializable {
   @javax.annotation.Nullable
   private LocalDate firstCouponDate;
 
+  public static final String SERIALIZED_NAME_FRACTIONABLE = "fractionable";
+  @SerializedName(SERIALIZED_NAME_FRACTIONABLE)
+  @javax.annotation.Nonnull
+  private Boolean fractionable;
+
   public static final String SERIALIZED_NAME_ISIN = "isin";
   @SerializedName(SERIALIZED_NAME_ISIN)
   @javax.annotation.Nonnull
@@ -384,6 +389,25 @@ public class UsTreasury implements Serializable {
   }
 
 
+  public UsTreasury fractionable(@javax.annotation.Nonnull Boolean fractionable) {
+    this.fractionable = fractionable;
+    return this;
+  }
+
+  /**
+   * Whether the treasury can be traded in fractional amounts
+   * @return fractionable
+   */
+  @javax.annotation.Nonnull
+  public Boolean getFractionable() {
+    return fractionable;
+  }
+
+  public void setFractionable(@javax.annotation.Nonnull Boolean fractionable) {
+    this.fractionable = fractionable;
+  }
+
+
   public UsTreasury isin(@javax.annotation.Nonnull String isin) {
     this.isin = isin;
     return this;
@@ -583,6 +607,7 @@ public class UsTreasury implements Serializable {
         Objects.equals(this.description, usTreasury.description) &&
         Objects.equals(this.descriptionShort, usTreasury.descriptionShort) &&
         Objects.equals(this.firstCouponDate, usTreasury.firstCouponDate) &&
+        Objects.equals(this.fractionable, usTreasury.fractionable) &&
         Objects.equals(this.isin, usTreasury.isin) &&
         Objects.equals(this.issueDate, usTreasury.issueDate) &&
         Objects.equals(this.lastCouponDate, usTreasury.lastCouponDate) &&
@@ -595,7 +620,7 @@ public class UsTreasury implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(bondStatus, closePrice, closePriceDate, closeYieldToMaturity, closeYieldToWorst, coupon, couponFrequency, couponType, cusip, description, descriptionShort, firstCouponDate, isin, issueDate, lastCouponDate, maturityDate, nextCouponDate, subtype, tradable, additionalProperties);
+    return Objects.hash(bondStatus, closePrice, closePriceDate, closeYieldToMaturity, closeYieldToWorst, coupon, couponFrequency, couponType, cusip, description, descriptionShort, firstCouponDate, fractionable, isin, issueDate, lastCouponDate, maturityDate, nextCouponDate, subtype, tradable, additionalProperties);
   }
 
   @Override
@@ -614,6 +639,7 @@ public class UsTreasury implements Serializable {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    descriptionShort: ").append(toIndentedString(descriptionShort)).append("\n");
     sb.append("    firstCouponDate: ").append(toIndentedString(firstCouponDate)).append("\n");
+    sb.append("    fractionable: ").append(toIndentedString(fractionable)).append("\n");
     sb.append("    isin: ").append(toIndentedString(isin)).append("\n");
     sb.append("    issueDate: ").append(toIndentedString(issueDate)).append("\n");
     sb.append("    lastCouponDate: ").append(toIndentedString(lastCouponDate)).append("\n");
@@ -640,10 +666,10 @@ public class UsTreasury implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("bond_status", "close_price", "close_price_date", "close_yield_to_maturity", "close_yield_to_worst", "coupon", "coupon_frequency", "coupon_type", "cusip", "description", "description_short", "first_coupon_date", "isin", "issue_date", "last_coupon_date", "maturity_date", "next_coupon_date", "subtype", "tradable"));
+    openapiFields = new HashSet<String>(Arrays.asList("bond_status", "close_price", "close_price_date", "close_yield_to_maturity", "close_yield_to_worst", "coupon", "coupon_frequency", "coupon_type", "cusip", "description", "description_short", "first_coupon_date", "fractionable", "isin", "issue_date", "last_coupon_date", "maturity_date", "next_coupon_date", "subtype", "tradable"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("bond_status", "coupon", "coupon_frequency", "coupon_type", "cusip", "description", "description_short", "isin", "issue_date", "maturity_date", "subtype", "tradable"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("bond_status", "coupon", "coupon_frequency", "coupon_type", "cusip", "description", "description_short", "fractionable", "isin", "issue_date", "maturity_date", "subtype", "tradable"));
   }
 
   /**

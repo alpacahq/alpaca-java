@@ -156,6 +156,11 @@ public class UsCorporate implements Serializable {
   @javax.annotation.Nullable
   private LocalDate firstCouponDate;
 
+  public static final String SERIALIZED_NAME_FRACTIONABLE = "fractionable";
+  @SerializedName(SERIALIZED_NAME_FRACTIONABLE)
+  @javax.annotation.Nonnull
+  private Boolean fractionable;
+
   public static final String SERIALIZED_NAME_ISIN = "isin";
   @SerializedName(SERIALIZED_NAME_ISIN)
   @javax.annotation.Nonnull
@@ -707,6 +712,25 @@ public class UsCorporate implements Serializable {
 
   public void setFirstCouponDate(@javax.annotation.Nullable LocalDate firstCouponDate) {
     this.firstCouponDate = firstCouponDate;
+  }
+
+
+  public UsCorporate fractionable(@javax.annotation.Nonnull Boolean fractionable) {
+    this.fractionable = fractionable;
+    return this;
+  }
+
+  /**
+   * Whether the corporate can be traded in fractional amounts
+   * @return fractionable
+   */
+  @javax.annotation.Nonnull
+  public Boolean getFractionable() {
+    return fractionable;
+  }
+
+  public void setFractionable(@javax.annotation.Nonnull Boolean fractionable) {
+    this.fractionable = fractionable;
   }
 
 
@@ -1505,6 +1529,7 @@ public class UsCorporate implements Serializable {
         Objects.equals(this.description, usCorporate.description) &&
         Objects.equals(this.descriptionShort, usCorporate.descriptionShort) &&
         Objects.equals(this.firstCouponDate, usCorporate.firstCouponDate) &&
+        Objects.equals(this.fractionable, usCorporate.fractionable) &&
         Objects.equals(this.isin, usCorporate.isin) &&
         Objects.equals(this.issueDate, usCorporate.issueDate) &&
         Objects.equals(this.issueMinimumDenomination, usCorporate.issueMinimumDenomination) &&
@@ -1548,7 +1573,7 @@ public class UsCorporate implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(accruedInterest, bondStatus, callType, callable, closePrice, closePriceDate, closeYieldToMaturity, closeYieldToWorst, convertible, countryDomicile, coupon, couponFrequency, couponType, cusip, datedDate, dayCount, description, descriptionShort, firstCouponDate, isin, issueDate, issueMinimumDenomination, issuePrice, issueSize, issuer, lastCouponDate, liquidityInstitutionalAggregate, liquidityInstitutionalBuy, liquidityInstitutionalSell, liquidityMicroAggregate, liquidityMicroBuy, liquidityMicroSell, liquidityRetailAggregate, liquidityRetailBuy, liquidityRetailSell, marginable, maturityDate, nextCallDate, nextCallPrice, nextCouponDate, parValue, perpetual, puttable, regS, reissueDate, reissuePrice, reissueSize, sector, seniority, spCreditwatch, spCreditwatchDate, spOutlook, spOutlookDate, spRating, spRatingDate, ticker, tradable, additionalProperties);
+    return Objects.hash(accruedInterest, bondStatus, callType, callable, closePrice, closePriceDate, closeYieldToMaturity, closeYieldToWorst, convertible, countryDomicile, coupon, couponFrequency, couponType, cusip, datedDate, dayCount, description, descriptionShort, firstCouponDate, fractionable, isin, issueDate, issueMinimumDenomination, issuePrice, issueSize, issuer, lastCouponDate, liquidityInstitutionalAggregate, liquidityInstitutionalBuy, liquidityInstitutionalSell, liquidityMicroAggregate, liquidityMicroBuy, liquidityMicroSell, liquidityRetailAggregate, liquidityRetailBuy, liquidityRetailSell, marginable, maturityDate, nextCallDate, nextCallPrice, nextCouponDate, parValue, perpetual, puttable, regS, reissueDate, reissuePrice, reissueSize, sector, seniority, spCreditwatch, spCreditwatchDate, spOutlook, spOutlookDate, spRating, spRatingDate, ticker, tradable, additionalProperties);
   }
 
   @Override
@@ -1574,6 +1599,7 @@ public class UsCorporate implements Serializable {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    descriptionShort: ").append(toIndentedString(descriptionShort)).append("\n");
     sb.append("    firstCouponDate: ").append(toIndentedString(firstCouponDate)).append("\n");
+    sb.append("    fractionable: ").append(toIndentedString(fractionable)).append("\n");
     sb.append("    isin: ").append(toIndentedString(isin)).append("\n");
     sb.append("    issueDate: ").append(toIndentedString(issueDate)).append("\n");
     sb.append("    issueMinimumDenomination: ").append(toIndentedString(issueMinimumDenomination)).append("\n");
@@ -1631,10 +1657,10 @@ public class UsCorporate implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("accrued_interest", "bond_status", "call_type", "callable", "close_price", "close_price_date", "close_yield_to_maturity", "close_yield_to_worst", "convertible", "country_domicile", "coupon", "coupon_frequency", "coupon_type", "cusip", "dated_date", "day_count", "description", "description_short", "first_coupon_date", "isin", "issue_date", "issue_minimum_denomination", "issue_price", "issue_size", "issuer", "last_coupon_date", "liquidity_institutional_aggregate", "liquidity_institutional_buy", "liquidity_institutional_sell", "liquidity_micro_aggregate", "liquidity_micro_buy", "liquidity_micro_sell", "liquidity_retail_aggregate", "liquidity_retail_buy", "liquidity_retail_sell", "marginable", "maturity_date", "next_call_date", "next_call_price", "next_coupon_date", "par_value", "perpetual", "puttable", "reg_s", "reissue_date", "reissue_price", "reissue_size", "sector", "seniority", "sp_creditwatch", "sp_creditwatch_date", "sp_outlook", "sp_outlook_date", "sp_rating", "sp_rating_date", "ticker", "tradable"));
+    openapiFields = new HashSet<String>(Arrays.asList("accrued_interest", "bond_status", "call_type", "callable", "close_price", "close_price_date", "close_yield_to_maturity", "close_yield_to_worst", "convertible", "country_domicile", "coupon", "coupon_frequency", "coupon_type", "cusip", "dated_date", "day_count", "description", "description_short", "first_coupon_date", "fractionable", "isin", "issue_date", "issue_minimum_denomination", "issue_price", "issue_size", "issuer", "last_coupon_date", "liquidity_institutional_aggregate", "liquidity_institutional_buy", "liquidity_institutional_sell", "liquidity_micro_aggregate", "liquidity_micro_buy", "liquidity_micro_sell", "liquidity_retail_aggregate", "liquidity_retail_buy", "liquidity_retail_sell", "marginable", "maturity_date", "next_call_date", "next_call_price", "next_coupon_date", "par_value", "perpetual", "puttable", "reg_s", "reissue_date", "reissue_price", "reissue_size", "sector", "seniority", "sp_creditwatch", "sp_creditwatch_date", "sp_outlook", "sp_outlook_date", "sp_rating", "sp_rating_date", "ticker", "tradable"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("bond_status", "callable", "convertible", "country_domicile", "coupon", "coupon_frequency", "coupon_type", "cusip", "dated_date", "day_count", "description", "description_short", "isin", "issue_date", "issue_minimum_denomination", "issue_price", "issue_size", "issuer", "marginable", "par_value", "perpetual", "puttable", "reg_s", "sector", "seniority", "ticker", "tradable"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("bond_status", "callable", "convertible", "country_domicile", "coupon", "coupon_frequency", "coupon_type", "cusip", "dated_date", "day_count", "description", "description_short", "fractionable", "isin", "issue_date", "issue_minimum_denomination", "issue_price", "issue_size", "issuer", "marginable", "par_value", "perpetual", "puttable", "reg_s", "sector", "seniority", "ticker", "tradable"));
   }
 
   /**

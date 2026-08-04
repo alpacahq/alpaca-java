@@ -25,16 +25,18 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * Crypto perpetual location.
+ * Envelope-level classification derived from &#x60;metadata.global&#x60; on the upstream corporate-action record. This is the only field the SSE &#x60;region&#x60; filter inspects on each event.  - &#x60;us&#x60;: US-listed / US-regulated corporate action. - &#x60;non_us&#x60;: everything else. 
  */
-@JsonAdapter(CryptoPerpLoc.Adapter.class)
-public enum CryptoPerpLoc implements Serializable {
+@JsonAdapter(CorporateActionEventRegion.Adapter.class)
+public enum CorporateActionEventRegion implements Serializable {
   
-  GLOBAL("global");
+  US("us"),
+  
+  NON_US("non_us");
 
   private String value;
 
-  CryptoPerpLoc(String value) {
+  CorporateActionEventRegion(String value) {
     this.value = value;
   }
 
@@ -47,8 +49,8 @@ public enum CryptoPerpLoc implements Serializable {
     return String.valueOf(value);
   }
 
-  public static CryptoPerpLoc fromValue(String value) {
-    for (CryptoPerpLoc b : CryptoPerpLoc.values()) {
+  public static CorporateActionEventRegion fromValue(String value) {
+    for (CorporateActionEventRegion b : CorporateActionEventRegion.values()) {
       if (b.value.equals(value)) {
         return b;
       }
@@ -56,22 +58,22 @@ public enum CryptoPerpLoc implements Serializable {
     throw new IllegalArgumentException("Unexpected value '" + value + "'");
   }
 
-  public static class Adapter extends TypeAdapter<CryptoPerpLoc> {
+  public static class Adapter extends TypeAdapter<CorporateActionEventRegion> {
     @Override
-    public void write(final JsonWriter jsonWriter, final CryptoPerpLoc enumeration) throws IOException {
+    public void write(final JsonWriter jsonWriter, final CorporateActionEventRegion enumeration) throws IOException {
       jsonWriter.value(enumeration.getValue());
     }
 
     @Override
-    public CryptoPerpLoc read(final JsonReader jsonReader) throws IOException {
+    public CorporateActionEventRegion read(final JsonReader jsonReader) throws IOException {
       String value = jsonReader.nextString();
-      return CryptoPerpLoc.fromValue(value);
+      return CorporateActionEventRegion.fromValue(value);
     }
   }
 
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
     String value = jsonElement.getAsString();
-    CryptoPerpLoc.fromValue(value);
+    CorporateActionEventRegion.fromValue(value);
   }
 }
 

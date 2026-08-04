@@ -191,7 +191,7 @@ public class RebalancingApi {
 
     /**
      * Inactivate Portfolio By ID
-     * Sets a portfolio to \&quot;inactive\&quot;, so it can be filtered out of the list request. Only permitted if there are no active subscriptions to this portfolio and this portfolio is not a listed in the weights of any active portfolios.  Inactive portfolios cannot be linked in new subscriptions or added as weights to new portfolios.
+     * Archives a portfolio (soft delete). Only permitted when the portfolio has no active subscriptions. Archived portfolios are hidden from the default list response and cannot be used for new subscriptions.
      * @param portfolioId The Portfolio ID (required)
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -209,7 +209,7 @@ public class RebalancingApi {
 
     /**
      * Inactivate Portfolio By ID
-     * Sets a portfolio to \&quot;inactive\&quot;, so it can be filtered out of the list request. Only permitted if there are no active subscriptions to this portfolio and this portfolio is not a listed in the weights of any active portfolios.  Inactive portfolios cannot be linked in new subscriptions or added as weights to new portfolios.
+     * Archives a portfolio (soft delete). Only permitted when the portfolio has no active subscriptions. Archived portfolios are hidden from the default list response and cannot be used for new subscriptions.
      * @param portfolioId The Portfolio ID (required)
      * @return ApiResponse&lt;Void&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -229,7 +229,7 @@ public class RebalancingApi {
 
     /**
      * Inactivate Portfolio By ID (asynchronously)
-     * Sets a portfolio to \&quot;inactive\&quot;, so it can be filtered out of the list request. Only permitted if there are no active subscriptions to this portfolio and this portfolio is not a listed in the weights of any active portfolios.  Inactive portfolios cannot be linked in new subscriptions or added as weights to new portfolios.
+     * Archives a portfolio (soft delete). Only permitted when the portfolio has no active subscriptions. Archived portfolios are hidden from the default list response and cannot be used for new subscriptions.
      * @param portfolioId The Portfolio ID (required)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call

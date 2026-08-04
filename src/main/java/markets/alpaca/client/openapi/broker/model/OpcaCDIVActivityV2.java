@@ -130,6 +130,11 @@ public class OpcaCDIVActivityV2 implements Serializable {
   @javax.annotation.Nonnull
   private Boolean foreign;
 
+  public static final String SERIALIZED_NAME_ISIN = "isin";
+  @SerializedName(SERIALIZED_NAME_ISIN)
+  @javax.annotation.Nullable
+  private String isin;
+
   public static final String SERIALIZED_NAME_PAYABLE_DATE = "payable_date";
   @SerializedName(SERIALIZED_NAME_PAYABLE_DATE)
   @javax.annotation.Nullable
@@ -443,6 +448,25 @@ public class OpcaCDIVActivityV2 implements Serializable {
   }
 
 
+  public OpcaCDIVActivityV2 isin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
+    return this;
+  }
+
+  /**
+   * The ISIN of the security involved with the activity
+   * @return isin
+   */
+  @javax.annotation.Nullable
+  public String getIsin() {
+    return isin;
+  }
+
+  public void setIsin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
+  }
+
+
   public OpcaCDIVActivityV2 payableDate(@javax.annotation.Nullable LocalDate payableDate) {
     this.payableDate = payableDate;
     return this;
@@ -607,6 +631,7 @@ public class OpcaCDIVActivityV2 implements Serializable {
         Objects.equals(this.dueBillOnDate, opcaCDIVActivityV2.dueBillOnDate) &&
         Objects.equals(this.exDate, opcaCDIVActivityV2.exDate) &&
         Objects.equals(this.foreign, opcaCDIVActivityV2.foreign) &&
+        Objects.equals(this.isin, opcaCDIVActivityV2.isin) &&
         Objects.equals(this.payableDate, opcaCDIVActivityV2.payableDate) &&
         Objects.equals(this.rate, opcaCDIVActivityV2.rate) &&
         Objects.equals(this.recordDate, opcaCDIVActivityV2.recordDate) &&
@@ -617,7 +642,7 @@ public class OpcaCDIVActivityV2 implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, newContractSymbol, newQty, oldContractSymbol, oldQty, qty, cusip, dueBillOffDate, dueBillOnDate, exDate, foreign, payableDate, rate, recordDate, special, symbol, additionalProperties);
+    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, newContractSymbol, newQty, oldContractSymbol, oldQty, qty, cusip, dueBillOffDate, dueBillOnDate, exDate, foreign, isin, payableDate, rate, recordDate, special, symbol, additionalProperties);
   }
 
   @Override
@@ -639,6 +664,7 @@ public class OpcaCDIVActivityV2 implements Serializable {
     sb.append("    dueBillOnDate: ").append(toIndentedString(dueBillOnDate)).append("\n");
     sb.append("    exDate: ").append(toIndentedString(exDate)).append("\n");
     sb.append("    foreign: ").append(toIndentedString(foreign)).append("\n");
+    sb.append("    isin: ").append(toIndentedString(isin)).append("\n");
     sb.append("    payableDate: ").append(toIndentedString(payableDate)).append("\n");
     sb.append("    rate: ").append(toIndentedString(rate)).append("\n");
     sb.append("    recordDate: ").append(toIndentedString(recordDate)).append("\n");
@@ -663,7 +689,7 @@ public class OpcaCDIVActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "new_contract_symbol", "new_qty", "old_contract_symbol", "old_qty", "qty", "cusip", "due_bill_off_date", "due_bill_on_date", "ex_date", "foreign", "payable_date", "rate", "record_date", "special", "symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "new_contract_symbol", "new_qty", "old_contract_symbol", "old_qty", "qty", "cusip", "due_bill_off_date", "due_bill_on_date", "ex_date", "foreign", "isin", "payable_date", "rate", "record_date", "special", "symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date", "position_date", "new_contract_symbol", "old_contract_symbol", "cusip", "foreign", "rate", "special", "symbol"));
@@ -715,6 +741,9 @@ public class OpcaCDIVActivityV2 implements Serializable {
       }
       if (!jsonObj.get("cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cusip").toString()));
+      }
+      if ((jsonObj.get("isin") != null && !jsonObj.get("isin").isJsonNull()) && !jsonObj.get("isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("isin").toString()));
       }
       if (!jsonObj.get("rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("rate").toString()));

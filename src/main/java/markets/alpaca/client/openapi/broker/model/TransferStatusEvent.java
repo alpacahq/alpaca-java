@@ -24,6 +24,7 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.UUID;
 import markets.alpaca.client.openapi.broker.model.TransferStatus;
+import markets.alpaca.client.openapi.broker.model.TransferStatusFrom;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -79,7 +80,7 @@ public class TransferStatusEvent implements Serializable {
   public static final String SERIALIZED_NAME_STATUS_FROM = "status_from";
   @SerializedName(SERIALIZED_NAME_STATUS_FROM)
   @javax.annotation.Nonnull
-  private TransferStatus statusFrom;
+  private TransferStatusFrom statusFrom;
 
   public static final String SERIALIZED_NAME_STATUS_TO = "status_to";
   @SerializedName(SERIALIZED_NAME_STATUS_TO)
@@ -170,7 +171,7 @@ public class TransferStatusEvent implements Serializable {
   }
 
 
-  public TransferStatusEvent statusFrom(@javax.annotation.Nonnull TransferStatus statusFrom) {
+  public TransferStatusEvent statusFrom(@javax.annotation.Nonnull TransferStatusFrom statusFrom) {
     this.statusFrom = statusFrom;
     return this;
   }
@@ -180,11 +181,11 @@ public class TransferStatusEvent implements Serializable {
    * @return statusFrom
    */
   @javax.annotation.Nonnull
-  public TransferStatus getStatusFrom() {
+  public TransferStatusFrom getStatusFrom() {
     return statusFrom;
   }
 
-  public void setStatusFrom(@javax.annotation.Nonnull TransferStatus statusFrom) {
+  public void setStatusFrom(@javax.annotation.Nonnull TransferStatusFrom statusFrom) {
     this.statusFrom = statusFrom;
   }
 
@@ -359,7 +360,9 @@ public class TransferStatusEvent implements Serializable {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `event_ulid` to be a primitive type in the JSON string but got `%s`", jsonObj.get("event_ulid").toString()));
       }
       // validate the required field `status_from`
-      TransferStatus.validateJsonElement(jsonObj.get("status_from"));
+      TransferStatusFrom.validateJsonElement(jsonObj.get("status_from"));
+      // validate the required field `status_from`
+      TransferStatusFrom.validateJsonElement(jsonObj.get("status_from"));
       // validate the required field `status_to`
       TransferStatus.validateJsonElement(jsonObj.get("status_to"));
       if (!jsonObj.get("transfer_id").isJsonPrimitive()) {

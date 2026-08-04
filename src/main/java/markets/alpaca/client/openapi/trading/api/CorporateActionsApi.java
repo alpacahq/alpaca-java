@@ -27,8 +27,8 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 
 
-import markets.alpaca.client.openapi.trading.model.GetV2CorporateActionsAnnouncements200ResponseInner;
-import markets.alpaca.client.openapi.trading.model.GetV2CorporateActionsAnnouncementsId200Response;
+import markets.alpaca.client.openapi.trading.model.CorporateActionCaType;
+import markets.alpaca.client.openapi.trading.model.CorporateAnnouncement;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -92,7 +92,7 @@ public class CorporateActionsApi {
 
     /**
      * Build call for getV2CorporateActionsAnnouncements
-     * @param caTypes A comma-delimited list of Dividend, Merger, Spinoff, or Split. (required)
+     * @param caTypes A comma-delimited list of corporate action types. (required)
      * @param since The start (inclusive) of the date range when searching corporate action announcements. This should follow the YYYY-MM-DD format. The date range is limited to 90 days. (required)
      * @param until The end (inclusive) of the date range when searching corporate action announcements. This should follow the YYYY-MM-DD format. The date range is limited to 90 days. (required)
      * @param symbol The symbol of the company initiating the announcement. (optional)
@@ -110,7 +110,7 @@ public class CorporateActionsApi {
      * @deprecated
      */
     @Deprecated
-    public okhttp3.Call getV2CorporateActionsAnnouncementsCall(@javax.annotation.Nonnull String caTypes, @javax.annotation.Nonnull String since, @javax.annotation.Nonnull String until, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String cusip, @javax.annotation.Nullable String dateType, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call getV2CorporateActionsAnnouncementsCall(@javax.annotation.Nonnull List<CorporateActionCaType> caTypes, @javax.annotation.Nonnull String since, @javax.annotation.Nonnull String until, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String cusip, @javax.annotation.Nullable String dateType, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -136,7 +136,7 @@ public class CorporateActionsApi {
         Map<String, Object> localVarFormParams = new HashMap<String, Object>();
 
         if (caTypes != null) {
-            localVarQueryParams.addAll(localVarApiClient.parameterToPair("ca_types", caTypes));
+            localVarCollectionQueryParams.addAll(localVarApiClient.parameterToPairs("csv", "ca_types", caTypes));
         }
 
         if (since != null) {
@@ -180,7 +180,7 @@ public class CorporateActionsApi {
 
     @Deprecated
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call getV2CorporateActionsAnnouncementsValidateBeforeCall(@javax.annotation.Nonnull String caTypes, @javax.annotation.Nonnull String since, @javax.annotation.Nonnull String until, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String cusip, @javax.annotation.Nullable String dateType, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call getV2CorporateActionsAnnouncementsValidateBeforeCall(@javax.annotation.Nonnull List<CorporateActionCaType> caTypes, @javax.annotation.Nonnull String since, @javax.annotation.Nonnull String until, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String cusip, @javax.annotation.Nullable String dateType, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'caTypes' is set
         if (caTypes == null) {
             throw new ApiException("Missing the required parameter 'caTypes' when calling getV2CorporateActionsAnnouncements(Async)");
@@ -203,13 +203,13 @@ public class CorporateActionsApi {
     /**
      * Retrieve Announcements
      * This endpoint is deprecated, please use [the new corporate actions endpoint](https://docs.alpaca.markets/reference/corporateactions-1) instead.
-     * @param caTypes A comma-delimited list of Dividend, Merger, Spinoff, or Split. (required)
+     * @param caTypes A comma-delimited list of corporate action types. (required)
      * @param since The start (inclusive) of the date range when searching corporate action announcements. This should follow the YYYY-MM-DD format. The date range is limited to 90 days. (required)
      * @param until The end (inclusive) of the date range when searching corporate action announcements. This should follow the YYYY-MM-DD format. The date range is limited to 90 days. (required)
      * @param symbol The symbol of the company initiating the announcement. (optional)
      * @param cusip The CUSIP of the company initiating the announcement. (optional)
      * @param dateType declaration_date, ex_date, record_date, or payable_date (optional)
-     * @return List&lt;GetV2CorporateActionsAnnouncements200ResponseInner&gt;
+     * @return List&lt;CorporateAnnouncement&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -220,21 +220,21 @@ public class CorporateActionsApi {
      * @deprecated
      */
     @Deprecated
-    public List<GetV2CorporateActionsAnnouncements200ResponseInner> getV2CorporateActionsAnnouncements(@javax.annotation.Nonnull String caTypes, @javax.annotation.Nonnull String since, @javax.annotation.Nonnull String until, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String cusip, @javax.annotation.Nullable String dateType) throws ApiException {
-        ApiResponse<List<GetV2CorporateActionsAnnouncements200ResponseInner>> localVarResp = getV2CorporateActionsAnnouncementsWithHttpInfo(caTypes, since, until, symbol, cusip, dateType);
+    public List<CorporateAnnouncement> getV2CorporateActionsAnnouncements(@javax.annotation.Nonnull List<CorporateActionCaType> caTypes, @javax.annotation.Nonnull String since, @javax.annotation.Nonnull String until, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String cusip, @javax.annotation.Nullable String dateType) throws ApiException {
+        ApiResponse<List<CorporateAnnouncement>> localVarResp = getV2CorporateActionsAnnouncementsWithHttpInfo(caTypes, since, until, symbol, cusip, dateType);
         return localVarResp.getData();
     }
 
     /**
      * Retrieve Announcements
      * This endpoint is deprecated, please use [the new corporate actions endpoint](https://docs.alpaca.markets/reference/corporateactions-1) instead.
-     * @param caTypes A comma-delimited list of Dividend, Merger, Spinoff, or Split. (required)
+     * @param caTypes A comma-delimited list of corporate action types. (required)
      * @param since The start (inclusive) of the date range when searching corporate action announcements. This should follow the YYYY-MM-DD format. The date range is limited to 90 days. (required)
      * @param until The end (inclusive) of the date range when searching corporate action announcements. This should follow the YYYY-MM-DD format. The date range is limited to 90 days. (required)
      * @param symbol The symbol of the company initiating the announcement. (optional)
      * @param cusip The CUSIP of the company initiating the announcement. (optional)
      * @param dateType declaration_date, ex_date, record_date, or payable_date (optional)
-     * @return ApiResponse&lt;List&lt;GetV2CorporateActionsAnnouncements200ResponseInner&gt;&gt;
+     * @return ApiResponse&lt;List&lt;CorporateAnnouncement&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -245,16 +245,16 @@ public class CorporateActionsApi {
      * @deprecated
      */
     @Deprecated
-    public ApiResponse<List<GetV2CorporateActionsAnnouncements200ResponseInner>> getV2CorporateActionsAnnouncementsWithHttpInfo(@javax.annotation.Nonnull String caTypes, @javax.annotation.Nonnull String since, @javax.annotation.Nonnull String until, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String cusip, @javax.annotation.Nullable String dateType) throws ApiException {
+    public ApiResponse<List<CorporateAnnouncement>> getV2CorporateActionsAnnouncementsWithHttpInfo(@javax.annotation.Nonnull List<CorporateActionCaType> caTypes, @javax.annotation.Nonnull String since, @javax.annotation.Nonnull String until, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String cusip, @javax.annotation.Nullable String dateType) throws ApiException {
         okhttp3.Call localVarCall = getV2CorporateActionsAnnouncementsValidateBeforeCall(caTypes, since, until, symbol, cusip, dateType, null);
-        Type localVarReturnType = new TypeToken<List<GetV2CorporateActionsAnnouncements200ResponseInner>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<CorporateAnnouncement>>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
 
     /**
      * Retrieve Announcements (asynchronously)
      * This endpoint is deprecated, please use [the new corporate actions endpoint](https://docs.alpaca.markets/reference/corporateactions-1) instead.
-     * @param caTypes A comma-delimited list of Dividend, Merger, Spinoff, or Split. (required)
+     * @param caTypes A comma-delimited list of corporate action types. (required)
      * @param since The start (inclusive) of the date range when searching corporate action announcements. This should follow the YYYY-MM-DD format. The date range is limited to 90 days. (required)
      * @param until The end (inclusive) of the date range when searching corporate action announcements. This should follow the YYYY-MM-DD format. The date range is limited to 90 days. (required)
      * @param symbol The symbol of the company initiating the announcement. (optional)
@@ -272,10 +272,10 @@ public class CorporateActionsApi {
      * @deprecated
      */
     @Deprecated
-    public okhttp3.Call getV2CorporateActionsAnnouncementsAsync(@javax.annotation.Nonnull String caTypes, @javax.annotation.Nonnull String since, @javax.annotation.Nonnull String until, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String cusip, @javax.annotation.Nullable String dateType, final ApiCallback<List<GetV2CorporateActionsAnnouncements200ResponseInner>> _callback) throws ApiException {
+    public okhttp3.Call getV2CorporateActionsAnnouncementsAsync(@javax.annotation.Nonnull List<CorporateActionCaType> caTypes, @javax.annotation.Nonnull String since, @javax.annotation.Nonnull String until, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String cusip, @javax.annotation.Nullable String dateType, final ApiCallback<List<CorporateAnnouncement>> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = getV2CorporateActionsAnnouncementsValidateBeforeCall(caTypes, since, until, symbol, cusip, dateType, _callback);
-        Type localVarReturnType = new TypeToken<List<GetV2CorporateActionsAnnouncements200ResponseInner>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<CorporateAnnouncement>>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
     }
@@ -355,7 +355,7 @@ public class CorporateActionsApi {
      * Retrieve a Specific Announcement
      * This endpoint is deprecated, please use [the new corporate actions endpoint](https://docs.alpaca.markets/reference/corporateactions-1) instead.
      * @param id The corporate announcement&#39;s id (required)
-     * @return GetV2CorporateActionsAnnouncementsId200Response
+     * @return CorporateAnnouncement
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -366,8 +366,8 @@ public class CorporateActionsApi {
      * @deprecated
      */
     @Deprecated
-    public GetV2CorporateActionsAnnouncementsId200Response getV2CorporateActionsAnnouncementsId(@javax.annotation.Nonnull String id) throws ApiException {
-        ApiResponse<GetV2CorporateActionsAnnouncementsId200Response> localVarResp = getV2CorporateActionsAnnouncementsIdWithHttpInfo(id);
+    public CorporateAnnouncement getV2CorporateActionsAnnouncementsId(@javax.annotation.Nonnull String id) throws ApiException {
+        ApiResponse<CorporateAnnouncement> localVarResp = getV2CorporateActionsAnnouncementsIdWithHttpInfo(id);
         return localVarResp.getData();
     }
 
@@ -375,7 +375,7 @@ public class CorporateActionsApi {
      * Retrieve a Specific Announcement
      * This endpoint is deprecated, please use [the new corporate actions endpoint](https://docs.alpaca.markets/reference/corporateactions-1) instead.
      * @param id The corporate announcement&#39;s id (required)
-     * @return ApiResponse&lt;GetV2CorporateActionsAnnouncementsId200Response&gt;
+     * @return ApiResponse&lt;CorporateAnnouncement&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -386,9 +386,9 @@ public class CorporateActionsApi {
      * @deprecated
      */
     @Deprecated
-    public ApiResponse<GetV2CorporateActionsAnnouncementsId200Response> getV2CorporateActionsAnnouncementsIdWithHttpInfo(@javax.annotation.Nonnull String id) throws ApiException {
+    public ApiResponse<CorporateAnnouncement> getV2CorporateActionsAnnouncementsIdWithHttpInfo(@javax.annotation.Nonnull String id) throws ApiException {
         okhttp3.Call localVarCall = getV2CorporateActionsAnnouncementsIdValidateBeforeCall(id, null);
-        Type localVarReturnType = new TypeToken<GetV2CorporateActionsAnnouncementsId200Response>(){}.getType();
+        Type localVarReturnType = new TypeToken<CorporateAnnouncement>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
 
@@ -408,10 +408,10 @@ public class CorporateActionsApi {
      * @deprecated
      */
     @Deprecated
-    public okhttp3.Call getV2CorporateActionsAnnouncementsIdAsync(@javax.annotation.Nonnull String id, final ApiCallback<GetV2CorporateActionsAnnouncementsId200Response> _callback) throws ApiException {
+    public okhttp3.Call getV2CorporateActionsAnnouncementsIdAsync(@javax.annotation.Nonnull String id, final ApiCallback<CorporateAnnouncement> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = getV2CorporateActionsAnnouncementsIdValidateBeforeCall(id, _callback);
-        Type localVarReturnType = new TypeToken<GetV2CorporateActionsAnnouncementsId200Response>(){}.getType();
+        Type localVarReturnType = new TypeToken<CorporateAnnouncement>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
     }

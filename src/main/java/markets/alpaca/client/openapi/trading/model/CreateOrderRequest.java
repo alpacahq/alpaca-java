@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import markets.alpaca.client.openapi.trading.model.AdvancedInstructions;
+import markets.alpaca.client.openapi.trading.model.CreateOrderRequestStopLoss;
+import markets.alpaca.client.openapi.trading.model.CreateOrderRequestTakeProfit;
 import markets.alpaca.client.openapi.trading.model.MLegOrderLeg;
 import markets.alpaca.client.openapi.trading.model.OrderClass;
 import markets.alpaca.client.openapi.trading.model.OrderSide;
 import markets.alpaca.client.openapi.trading.model.OrderType;
 import markets.alpaca.client.openapi.trading.model.PositionIntent;
-import markets.alpaca.client.openapi.trading.model.PostOrderRequestStopLoss;
-import markets.alpaca.client.openapi.trading.model.PostOrderRequestTakeProfit;
 import markets.alpaca.client.openapi.trading.model.TimeInForce;
 import java.io.Serializable;
 
@@ -58,10 +58,10 @@ import java.util.Set;
 import markets.alpaca.client.openapi.trading.http.JSON;
 
 /**
- * PostOrderRequest
+ * Represents a request to create an order.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
-public class PostOrderRequest implements Serializable {
+public class CreateOrderRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 
   public static final String SERIALIZED_NAME_ADVANCED_INSTRUCTIONS = "advanced_instructions";
@@ -117,7 +117,7 @@ public class PostOrderRequest implements Serializable {
   public static final String SERIALIZED_NAME_STOP_LOSS = "stop_loss";
   @SerializedName(SERIALIZED_NAME_STOP_LOSS)
   @javax.annotation.Nullable
-  private PostOrderRequestStopLoss stopLoss;
+  private CreateOrderRequestStopLoss stopLoss;
 
   public static final String SERIALIZED_NAME_STOP_PRICE = "stop_price";
   @SerializedName(SERIALIZED_NAME_STOP_PRICE)
@@ -132,7 +132,7 @@ public class PostOrderRequest implements Serializable {
   public static final String SERIALIZED_NAME_TAKE_PROFIT = "take_profit";
   @SerializedName(SERIALIZED_NAME_TAKE_PROFIT)
   @javax.annotation.Nullable
-  private PostOrderRequestTakeProfit takeProfit;
+  private CreateOrderRequestTakeProfit takeProfit;
 
   public static final String SERIALIZED_NAME_TIME_IN_FORCE = "time_in_force";
   @SerializedName(SERIALIZED_NAME_TIME_IN_FORCE)
@@ -154,10 +154,10 @@ public class PostOrderRequest implements Serializable {
   @javax.annotation.Nonnull
   private OrderType type;
 
-  public PostOrderRequest() {
+  public CreateOrderRequest() {
   }
 
-  public PostOrderRequest advancedInstructions(@javax.annotation.Nullable AdvancedInstructions advancedInstructions) {
+  public CreateOrderRequest advancedInstructions(@javax.annotation.Nullable AdvancedInstructions advancedInstructions) {
     this.advancedInstructions = advancedInstructions;
     return this;
   }
@@ -176,7 +176,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest clientOrderId(@javax.annotation.Nullable String clientOrderId) {
+  public CreateOrderRequest clientOrderId(@javax.annotation.Nullable String clientOrderId) {
     this.clientOrderId = clientOrderId;
     return this;
   }
@@ -195,7 +195,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest extendedHours(@javax.annotation.Nullable Boolean extendedHours) {
+  public CreateOrderRequest extendedHours(@javax.annotation.Nullable Boolean extendedHours) {
     this.extendedHours = extendedHours;
     return this;
   }
@@ -214,12 +214,12 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest legs(@javax.annotation.Nullable List<MLegOrderLeg> legs) {
+  public CreateOrderRequest legs(@javax.annotation.Nullable List<MLegOrderLeg> legs) {
     this.legs = legs;
     return this;
   }
 
-  public PostOrderRequest addLegsItem(MLegOrderLeg legsItem) {
+  public CreateOrderRequest addLegsItem(MLegOrderLeg legsItem) {
     if (this.legs == null) {
       this.legs = new ArrayList<>();
     }
@@ -241,7 +241,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest limitPrice(@javax.annotation.Nullable String limitPrice) {
+  public CreateOrderRequest limitPrice(@javax.annotation.Nullable String limitPrice) {
     this.limitPrice = limitPrice;
     return this;
   }
@@ -260,7 +260,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest notional(@javax.annotation.Nullable String notional) {
+  public CreateOrderRequest notional(@javax.annotation.Nullable String notional) {
     this.notional = notional;
     return this;
   }
@@ -279,7 +279,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest orderClass(@javax.annotation.Nullable OrderClass orderClass) {
+  public CreateOrderRequest orderClass(@javax.annotation.Nullable OrderClass orderClass) {
     this.orderClass = orderClass;
     return this;
   }
@@ -298,7 +298,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest positionIntent(@javax.annotation.Nullable PositionIntent positionIntent) {
+  public CreateOrderRequest positionIntent(@javax.annotation.Nullable PositionIntent positionIntent) {
     this.positionIntent = positionIntent;
     return this;
   }
@@ -317,7 +317,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest qty(@javax.annotation.Nullable String qty) {
+  public CreateOrderRequest qty(@javax.annotation.Nullable String qty) {
     this.qty = qty;
     return this;
   }
@@ -336,7 +336,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest side(@javax.annotation.Nullable OrderSide side) {
+  public CreateOrderRequest side(@javax.annotation.Nullable OrderSide side) {
     this.side = side;
     return this;
   }
@@ -355,7 +355,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest stopLoss(@javax.annotation.Nullable PostOrderRequestStopLoss stopLoss) {
+  public CreateOrderRequest stopLoss(@javax.annotation.Nullable CreateOrderRequestStopLoss stopLoss) {
     this.stopLoss = stopLoss;
     return this;
   }
@@ -365,16 +365,16 @@ public class PostOrderRequest implements Serializable {
    * @return stopLoss
    */
   @javax.annotation.Nullable
-  public PostOrderRequestStopLoss getStopLoss() {
+  public CreateOrderRequestStopLoss getStopLoss() {
     return stopLoss;
   }
 
-  public void setStopLoss(@javax.annotation.Nullable PostOrderRequestStopLoss stopLoss) {
+  public void setStopLoss(@javax.annotation.Nullable CreateOrderRequestStopLoss stopLoss) {
     this.stopLoss = stopLoss;
   }
 
 
-  public PostOrderRequest stopPrice(@javax.annotation.Nullable String stopPrice) {
+  public CreateOrderRequest stopPrice(@javax.annotation.Nullable String stopPrice) {
     this.stopPrice = stopPrice;
     return this;
   }
@@ -393,7 +393,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest symbol(@javax.annotation.Nullable String symbol) {
+  public CreateOrderRequest symbol(@javax.annotation.Nullable String symbol) {
     this.symbol = symbol;
     return this;
   }
@@ -412,7 +412,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest takeProfit(@javax.annotation.Nullable PostOrderRequestTakeProfit takeProfit) {
+  public CreateOrderRequest takeProfit(@javax.annotation.Nullable CreateOrderRequestTakeProfit takeProfit) {
     this.takeProfit = takeProfit;
     return this;
   }
@@ -422,16 +422,16 @@ public class PostOrderRequest implements Serializable {
    * @return takeProfit
    */
   @javax.annotation.Nullable
-  public PostOrderRequestTakeProfit getTakeProfit() {
+  public CreateOrderRequestTakeProfit getTakeProfit() {
     return takeProfit;
   }
 
-  public void setTakeProfit(@javax.annotation.Nullable PostOrderRequestTakeProfit takeProfit) {
+  public void setTakeProfit(@javax.annotation.Nullable CreateOrderRequestTakeProfit takeProfit) {
     this.takeProfit = takeProfit;
   }
 
 
-  public PostOrderRequest timeInForce(@javax.annotation.Nonnull TimeInForce timeInForce) {
+  public CreateOrderRequest timeInForce(@javax.annotation.Nonnull TimeInForce timeInForce) {
     this.timeInForce = timeInForce;
     return this;
   }
@@ -450,7 +450,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest trailPercent(@javax.annotation.Nullable String trailPercent) {
+  public CreateOrderRequest trailPercent(@javax.annotation.Nullable String trailPercent) {
     this.trailPercent = trailPercent;
     return this;
   }
@@ -469,7 +469,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest trailPrice(@javax.annotation.Nullable String trailPrice) {
+  public CreateOrderRequest trailPrice(@javax.annotation.Nullable String trailPrice) {
     this.trailPrice = trailPrice;
     return this;
   }
@@ -488,7 +488,7 @@ public class PostOrderRequest implements Serializable {
   }
 
 
-  public PostOrderRequest type(@javax.annotation.Nonnull OrderType type) {
+  public CreateOrderRequest type(@javax.annotation.Nonnull OrderType type) {
     this.type = type;
     return this;
   }
@@ -519,9 +519,9 @@ public class PostOrderRequest implements Serializable {
    *
    * @param key name of the property
    * @param value value of the property
-   * @return the PostOrderRequest instance itself
+   * @return the CreateOrderRequest instance itself
    */
-  public PostOrderRequest putAdditionalProperty(String key, Object value) {
+  public CreateOrderRequest putAdditionalProperty(String key, Object value) {
     if (this.additionalProperties == null) {
         this.additionalProperties = new HashMap<String, Object>();
     }
@@ -560,26 +560,26 @@ public class PostOrderRequest implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PostOrderRequest postOrderRequest = (PostOrderRequest) o;
-    return Objects.equals(this.advancedInstructions, postOrderRequest.advancedInstructions) &&
-        Objects.equals(this.clientOrderId, postOrderRequest.clientOrderId) &&
-        Objects.equals(this.extendedHours, postOrderRequest.extendedHours) &&
-        Objects.equals(this.legs, postOrderRequest.legs) &&
-        Objects.equals(this.limitPrice, postOrderRequest.limitPrice) &&
-        Objects.equals(this.notional, postOrderRequest.notional) &&
-        Objects.equals(this.orderClass, postOrderRequest.orderClass) &&
-        Objects.equals(this.positionIntent, postOrderRequest.positionIntent) &&
-        Objects.equals(this.qty, postOrderRequest.qty) &&
-        Objects.equals(this.side, postOrderRequest.side) &&
-        Objects.equals(this.stopLoss, postOrderRequest.stopLoss) &&
-        Objects.equals(this.stopPrice, postOrderRequest.stopPrice) &&
-        Objects.equals(this.symbol, postOrderRequest.symbol) &&
-        Objects.equals(this.takeProfit, postOrderRequest.takeProfit) &&
-        Objects.equals(this.timeInForce, postOrderRequest.timeInForce) &&
-        Objects.equals(this.trailPercent, postOrderRequest.trailPercent) &&
-        Objects.equals(this.trailPrice, postOrderRequest.trailPrice) &&
-        Objects.equals(this.type, postOrderRequest.type)&&
-        Objects.equals(this.additionalProperties, postOrderRequest.additionalProperties);
+    CreateOrderRequest createOrderRequest = (CreateOrderRequest) o;
+    return Objects.equals(this.advancedInstructions, createOrderRequest.advancedInstructions) &&
+        Objects.equals(this.clientOrderId, createOrderRequest.clientOrderId) &&
+        Objects.equals(this.extendedHours, createOrderRequest.extendedHours) &&
+        Objects.equals(this.legs, createOrderRequest.legs) &&
+        Objects.equals(this.limitPrice, createOrderRequest.limitPrice) &&
+        Objects.equals(this.notional, createOrderRequest.notional) &&
+        Objects.equals(this.orderClass, createOrderRequest.orderClass) &&
+        Objects.equals(this.positionIntent, createOrderRequest.positionIntent) &&
+        Objects.equals(this.qty, createOrderRequest.qty) &&
+        Objects.equals(this.side, createOrderRequest.side) &&
+        Objects.equals(this.stopLoss, createOrderRequest.stopLoss) &&
+        Objects.equals(this.stopPrice, createOrderRequest.stopPrice) &&
+        Objects.equals(this.symbol, createOrderRequest.symbol) &&
+        Objects.equals(this.takeProfit, createOrderRequest.takeProfit) &&
+        Objects.equals(this.timeInForce, createOrderRequest.timeInForce) &&
+        Objects.equals(this.trailPercent, createOrderRequest.trailPercent) &&
+        Objects.equals(this.trailPrice, createOrderRequest.trailPrice) &&
+        Objects.equals(this.type, createOrderRequest.type)&&
+        Objects.equals(this.additionalProperties, createOrderRequest.additionalProperties);
   }
 
   @Override
@@ -590,7 +590,7 @@ public class PostOrderRequest implements Serializable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PostOrderRequest {\n");
+    sb.append("class CreateOrderRequest {\n");
     sb.append("    advancedInstructions: ").append(toIndentedString(advancedInstructions)).append("\n");
     sb.append("    clientOrderId: ").append(toIndentedString(clientOrderId)).append("\n");
     sb.append("    extendedHours: ").append(toIndentedString(extendedHours)).append("\n");
@@ -638,17 +638,17 @@ public class PostOrderRequest implements Serializable {
    * Validates the JSON Element and throws an exception if issues found
    *
    * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to PostOrderRequest
+   * @throws IOException if the JSON Element is invalid with respect to CreateOrderRequest
    */
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
       if (jsonElement == null) {
-        if (!PostOrderRequest.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PostOrderRequest is not found in the empty JSON string", PostOrderRequest.openapiRequiredFields.toString()));
+        if (!CreateOrderRequest.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in CreateOrderRequest is not found in the empty JSON string", CreateOrderRequest.openapiRequiredFields.toString()));
         }
       }
 
       // check to make sure all required properties/fields are present in the JSON string
-      for (String requiredField : PostOrderRequest.openapiRequiredFields) {
+      for (String requiredField : CreateOrderRequest.openapiRequiredFields) {
         if (jsonElement.getAsJsonObject().get(requiredField) == null) {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
         }
@@ -698,7 +698,7 @@ public class PostOrderRequest implements Serializable {
       }
       // validate the optional field `stop_loss`
       if (jsonObj.get("stop_loss") != null && !jsonObj.get("stop_loss").isJsonNull()) {
-        PostOrderRequestStopLoss.validateJsonElement(jsonObj.get("stop_loss"));
+        CreateOrderRequestStopLoss.validateJsonElement(jsonObj.get("stop_loss"));
       }
       if ((jsonObj.get("stop_price") != null && !jsonObj.get("stop_price").isJsonNull()) && !jsonObj.get("stop_price").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `stop_price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("stop_price").toString()));
@@ -708,7 +708,7 @@ public class PostOrderRequest implements Serializable {
       }
       // validate the optional field `take_profit`
       if (jsonObj.get("take_profit") != null && !jsonObj.get("take_profit").isJsonNull()) {
-        PostOrderRequestTakeProfit.validateJsonElement(jsonObj.get("take_profit"));
+        CreateOrderRequestTakeProfit.validateJsonElement(jsonObj.get("take_profit"));
       }
       // validate the required field `time_in_force`
       TimeInForce.validateJsonElement(jsonObj.get("time_in_force"));
@@ -726,16 +726,16 @@ public class PostOrderRequest implements Serializable {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!PostOrderRequest.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'PostOrderRequest' and its subtypes
+       if (!CreateOrderRequest.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'CreateOrderRequest' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<PostOrderRequest> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(PostOrderRequest.class));
+       final TypeAdapter<CreateOrderRequest> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(CreateOrderRequest.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<PostOrderRequest>() {
+       return (TypeAdapter<T>) new TypeAdapter<CreateOrderRequest>() {
            @Override
-           public void write(JsonWriter out, PostOrderRequest value) throws IOException {
+           public void write(JsonWriter out, CreateOrderRequest value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              obj.remove("additionalProperties");
              // serialize additional properties
@@ -763,12 +763,12 @@ public class PostOrderRequest implements Serializable {
            }
 
            @Override
-           public PostOrderRequest read(JsonReader in) throws IOException {
+           public CreateOrderRequest read(JsonReader in) throws IOException {
              JsonElement jsonElement = elementAdapter.read(in);
              validateJsonElement(jsonElement);
              JsonObject jsonObj = jsonElement.getAsJsonObject();
              // store additional fields in the deserialized instance
-             PostOrderRequest instance = thisAdapter.fromJsonTree(jsonObj);
+             CreateOrderRequest instance = thisAdapter.fromJsonTree(jsonObj);
              for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
                if (!openapiFields.contains(entry.getKey())) {
                  if (entry.getValue().isJsonPrimitive()) { // primitive type
@@ -795,18 +795,18 @@ public class PostOrderRequest implements Serializable {
   }
 
   /**
-   * Create an instance of PostOrderRequest given an JSON string
+   * Create an instance of CreateOrderRequest given an JSON string
    *
    * @param jsonString JSON string
-   * @return An instance of PostOrderRequest
-   * @throws IOException if the JSON string is invalid with respect to PostOrderRequest
+   * @return An instance of CreateOrderRequest
+   * @throws IOException if the JSON string is invalid with respect to CreateOrderRequest
    */
-  public static PostOrderRequest fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, PostOrderRequest.class);
+  public static CreateOrderRequest fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, CreateOrderRequest.class);
   }
 
   /**
-   * Convert an instance of PostOrderRequest to an JSON string
+   * Convert an instance of CreateOrderRequest to an JSON string
    *
    * @return JSON string
    */

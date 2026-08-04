@@ -120,6 +120,11 @@ public class OpcaSPINActivityV2 implements Serializable {
   @javax.annotation.Nonnull
   private String newCusip;
 
+  public static final String SERIALIZED_NAME_NEW_ISIN = "new_isin";
+  @SerializedName(SERIALIZED_NAME_NEW_ISIN)
+  @javax.annotation.Nullable
+  private String newIsin;
+
   public static final String SERIALIZED_NAME_NEW_PRICE = "new_price";
   @SerializedName(SERIALIZED_NAME_NEW_PRICE)
   @javax.annotation.Nonnull
@@ -149,6 +154,11 @@ public class OpcaSPINActivityV2 implements Serializable {
   @SerializedName(SERIALIZED_NAME_SOURCE_CUSIP)
   @javax.annotation.Nonnull
   private String sourceCusip;
+
+  public static final String SERIALIZED_NAME_SOURCE_ISIN = "source_isin";
+  @SerializedName(SERIALIZED_NAME_SOURCE_ISIN)
+  @javax.annotation.Nullable
+  private String sourceIsin;
 
   public static final String SERIALIZED_NAME_SOURCE_PRICE = "source_price";
   @SerializedName(SERIALIZED_NAME_SOURCE_PRICE)
@@ -415,6 +425,25 @@ public class OpcaSPINActivityV2 implements Serializable {
   }
 
 
+  public OpcaSPINActivityV2 newIsin(@javax.annotation.Nullable String newIsin) {
+    this.newIsin = newIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the new security
+   * @return newIsin
+   */
+  @javax.annotation.Nullable
+  public String getNewIsin() {
+    return newIsin;
+  }
+
+  public void setNewIsin(@javax.annotation.Nullable String newIsin) {
+    this.newIsin = newIsin;
+  }
+
+
   public OpcaSPINActivityV2 newPrice(@javax.annotation.Nonnull String newPrice) {
     this.newPrice = newPrice;
     return this;
@@ -526,6 +555,25 @@ public class OpcaSPINActivityV2 implements Serializable {
 
   public void setSourceCusip(@javax.annotation.Nonnull String sourceCusip) {
     this.sourceCusip = sourceCusip;
+  }
+
+
+  public OpcaSPINActivityV2 sourceIsin(@javax.annotation.Nullable String sourceIsin) {
+    this.sourceIsin = sourceIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the parent security
+   * @return sourceIsin
+   */
+  @javax.annotation.Nullable
+  public String getSourceIsin() {
+    return sourceIsin;
+  }
+
+  public void setSourceIsin(@javax.annotation.Nullable String sourceIsin) {
+    this.sourceIsin = sourceIsin;
   }
 
 
@@ -653,12 +701,14 @@ public class OpcaSPINActivityV2 implements Serializable {
         Objects.equals(this.dueBillRedemptionDate, opcaSPINActivityV2.dueBillRedemptionDate) &&
         Objects.equals(this.exDate, opcaSPINActivityV2.exDate) &&
         Objects.equals(this.newCusip, opcaSPINActivityV2.newCusip) &&
+        Objects.equals(this.newIsin, opcaSPINActivityV2.newIsin) &&
         Objects.equals(this.newPrice, opcaSPINActivityV2.newPrice) &&
         Objects.equals(this.newRate, opcaSPINActivityV2.newRate) &&
         Objects.equals(this.newSymbol, opcaSPINActivityV2.newSymbol) &&
         Objects.equals(this.payableDate, opcaSPINActivityV2.payableDate) &&
         Objects.equals(this.recordDate, opcaSPINActivityV2.recordDate) &&
         Objects.equals(this.sourceCusip, opcaSPINActivityV2.sourceCusip) &&
+        Objects.equals(this.sourceIsin, opcaSPINActivityV2.sourceIsin) &&
         Objects.equals(this.sourcePrice, opcaSPINActivityV2.sourcePrice) &&
         Objects.equals(this.sourceRate, opcaSPINActivityV2.sourceRate) &&
         Objects.equals(this.sourceSymbol, opcaSPINActivityV2.sourceSymbol)&&
@@ -667,7 +717,7 @@ public class OpcaSPINActivityV2 implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, newContractSymbol, newQty, oldContractSymbol, oldQty, qty, dueBillRedemptionDate, exDate, newCusip, newPrice, newRate, newSymbol, payableDate, recordDate, sourceCusip, sourcePrice, sourceRate, sourceSymbol, additionalProperties);
+    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, newContractSymbol, newQty, oldContractSymbol, oldQty, qty, dueBillRedemptionDate, exDate, newCusip, newIsin, newPrice, newRate, newSymbol, payableDate, recordDate, sourceCusip, sourceIsin, sourcePrice, sourceRate, sourceSymbol, additionalProperties);
   }
 
   @Override
@@ -687,12 +737,14 @@ public class OpcaSPINActivityV2 implements Serializable {
     sb.append("    dueBillRedemptionDate: ").append(toIndentedString(dueBillRedemptionDate)).append("\n");
     sb.append("    exDate: ").append(toIndentedString(exDate)).append("\n");
     sb.append("    newCusip: ").append(toIndentedString(newCusip)).append("\n");
+    sb.append("    newIsin: ").append(toIndentedString(newIsin)).append("\n");
     sb.append("    newPrice: ").append(toIndentedString(newPrice)).append("\n");
     sb.append("    newRate: ").append(toIndentedString(newRate)).append("\n");
     sb.append("    newSymbol: ").append(toIndentedString(newSymbol)).append("\n");
     sb.append("    payableDate: ").append(toIndentedString(payableDate)).append("\n");
     sb.append("    recordDate: ").append(toIndentedString(recordDate)).append("\n");
     sb.append("    sourceCusip: ").append(toIndentedString(sourceCusip)).append("\n");
+    sb.append("    sourceIsin: ").append(toIndentedString(sourceIsin)).append("\n");
     sb.append("    sourcePrice: ").append(toIndentedString(sourcePrice)).append("\n");
     sb.append("    sourceRate: ").append(toIndentedString(sourceRate)).append("\n");
     sb.append("    sourceSymbol: ").append(toIndentedString(sourceSymbol)).append("\n");
@@ -715,7 +767,7 @@ public class OpcaSPINActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "new_contract_symbol", "new_qty", "old_contract_symbol", "old_qty", "qty", "due_bill_redemption_date", "ex_date", "new_cusip", "new_price", "new_rate", "new_symbol", "payable_date", "record_date", "source_cusip", "source_price", "source_rate", "source_symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "new_contract_symbol", "new_qty", "old_contract_symbol", "old_qty", "qty", "due_bill_redemption_date", "ex_date", "new_cusip", "new_isin", "new_price", "new_rate", "new_symbol", "payable_date", "record_date", "source_cusip", "source_isin", "source_price", "source_rate", "source_symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date", "position_date", "new_contract_symbol", "old_contract_symbol", "new_cusip", "new_price", "new_rate", "new_symbol", "source_cusip", "source_price", "source_rate", "source_symbol"));
@@ -768,6 +820,9 @@ public class OpcaSPINActivityV2 implements Serializable {
       if (!jsonObj.get("new_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_cusip").toString()));
       }
+      if ((jsonObj.get("new_isin") != null && !jsonObj.get("new_isin").isJsonNull()) && !jsonObj.get("new_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_isin").toString()));
+      }
       if (!jsonObj.get("new_price").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_price").toString()));
       }
@@ -779,6 +834,9 @@ public class OpcaSPINActivityV2 implements Serializable {
       }
       if (!jsonObj.get("source_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `source_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("source_cusip").toString()));
+      }
+      if ((jsonObj.get("source_isin") != null && !jsonObj.get("source_isin").isJsonNull()) && !jsonObj.get("source_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `source_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("source_isin").toString()));
       }
       if (!jsonObj.get("source_price").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `source_price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("source_price").toString()));

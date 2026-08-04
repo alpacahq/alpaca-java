@@ -24,7 +24,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -59,7 +61,7 @@ public class PortfolioHistory implements Serializable {
 
   public static final String SERIALIZED_NAME_BASE_VALUE = "base_value";
   @SerializedName(SERIALIZED_NAME_BASE_VALUE)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private BigDecimal baseValue;
 
   public static final String SERIALIZED_NAME_BASE_VALUE_ASOF = "base_value_asof";
@@ -70,7 +72,7 @@ public class PortfolioHistory implements Serializable {
   public static final String SERIALIZED_NAME_CASHFLOW = "cashflow";
   @SerializedName(SERIALIZED_NAME_CASHFLOW)
   @javax.annotation.Nullable
-  private Object cashflow;
+  private Map<String, List<BigDecimal>> cashflow = new HashMap<>();
 
   public static final String SERIALIZED_NAME_EQUITY = "equity";
   @SerializedName(SERIALIZED_NAME_EQUITY)
@@ -100,7 +102,7 @@ public class PortfolioHistory implements Serializable {
   public PortfolioHistory() {
   }
 
-  public PortfolioHistory baseValue(@javax.annotation.Nonnull BigDecimal baseValue) {
+  public PortfolioHistory baseValue(@javax.annotation.Nullable BigDecimal baseValue) {
     this.baseValue = baseValue;
     return this;
   }
@@ -109,12 +111,12 @@ public class PortfolioHistory implements Serializable {
    * basis in dollar of the profit loss calculation
    * @return baseValue
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public BigDecimal getBaseValue() {
     return baseValue;
   }
 
-  public void setBaseValue(@javax.annotation.Nonnull BigDecimal baseValue) {
+  public void setBaseValue(@javax.annotation.Nullable BigDecimal baseValue) {
     this.baseValue = baseValue;
   }
 
@@ -138,8 +140,16 @@ public class PortfolioHistory implements Serializable {
   }
 
 
-  public PortfolioHistory cashflow(@javax.annotation.Nullable Object cashflow) {
+  public PortfolioHistory cashflow(@javax.annotation.Nullable Map<String, List<BigDecimal>> cashflow) {
     this.cashflow = cashflow;
+    return this;
+  }
+
+  public PortfolioHistory putCashflowItem(String key, List<BigDecimal> cashflowItem) {
+    if (this.cashflow == null) {
+      this.cashflow = new HashMap<>();
+    }
+    this.cashflow.put(key, cashflowItem);
     return this;
   }
 
@@ -148,11 +158,11 @@ public class PortfolioHistory implements Serializable {
    * @return cashflow
    */
   @javax.annotation.Nullable
-  public Object getCashflow() {
+  public Map<String, List<BigDecimal>> getCashflow() {
     return cashflow;
   }
 
-  public void setCashflow(@javax.annotation.Nullable Object cashflow) {
+  public void setCashflow(@javax.annotation.Nullable Map<String, List<BigDecimal>> cashflow) {
     this.cashflow = cashflow;
   }
 

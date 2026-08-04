@@ -59,6 +59,11 @@ public class CommonMAActivityV2 implements Serializable {
   @javax.annotation.Nonnull
   private String acquireeCusip;
 
+  public static final String SERIALIZED_NAME_ACQUIREE_ISIN = "acquiree_isin";
+  @SerializedName(SERIALIZED_NAME_ACQUIREE_ISIN)
+  @javax.annotation.Nullable
+  private String acquireeIsin;
+
   public static final String SERIALIZED_NAME_ACQUIREE_RATE = "acquiree_rate";
   @SerializedName(SERIALIZED_NAME_ACQUIREE_RATE)
   @javax.annotation.Nullable
@@ -73,6 +78,11 @@ public class CommonMAActivityV2 implements Serializable {
   @SerializedName(SERIALIZED_NAME_ACQUIRER_CUSIP)
   @javax.annotation.Nullable
   private String acquirerCusip;
+
+  public static final String SERIALIZED_NAME_ACQUIRER_ISIN = "acquirer_isin";
+  @SerializedName(SERIALIZED_NAME_ACQUIRER_ISIN)
+  @javax.annotation.Nullable
+  private String acquirerIsin;
 
   public static final String SERIALIZED_NAME_ACQUIRER_RATE = "acquirer_rate";
   @SerializedName(SERIALIZED_NAME_ACQUIRER_RATE)
@@ -113,6 +123,25 @@ public class CommonMAActivityV2 implements Serializable {
 
   public void setAcquireeCusip(@javax.annotation.Nonnull String acquireeCusip) {
     this.acquireeCusip = acquireeCusip;
+  }
+
+
+  public CommonMAActivityV2 acquireeIsin(@javax.annotation.Nullable String acquireeIsin) {
+    this.acquireeIsin = acquireeIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the acquiree
+   * @return acquireeIsin
+   */
+  @javax.annotation.Nullable
+  public String getAcquireeIsin() {
+    return acquireeIsin;
+  }
+
+  public void setAcquireeIsin(@javax.annotation.Nullable String acquireeIsin) {
+    this.acquireeIsin = acquireeIsin;
   }
 
 
@@ -170,6 +199,25 @@ public class CommonMAActivityV2 implements Serializable {
 
   public void setAcquirerCusip(@javax.annotation.Nullable String acquirerCusip) {
     this.acquirerCusip = acquirerCusip;
+  }
+
+
+  public CommonMAActivityV2 acquirerIsin(@javax.annotation.Nullable String acquirerIsin) {
+    this.acquirerIsin = acquirerIsin;
+    return this;
+  }
+
+  /**
+   * ISIN of the acquirer
+   * @return acquirerIsin
+   */
+  @javax.annotation.Nullable
+  public String getAcquirerIsin() {
+    return acquirerIsin;
+  }
+
+  public void setAcquirerIsin(@javax.annotation.Nullable String acquirerIsin) {
+    this.acquirerIsin = acquirerIsin;
   }
 
 
@@ -304,9 +352,11 @@ public class CommonMAActivityV2 implements Serializable {
     }
     CommonMAActivityV2 commonMAActivityV2 = (CommonMAActivityV2) o;
     return Objects.equals(this.acquireeCusip, commonMAActivityV2.acquireeCusip) &&
+        Objects.equals(this.acquireeIsin, commonMAActivityV2.acquireeIsin) &&
         Objects.equals(this.acquireeRate, commonMAActivityV2.acquireeRate) &&
         Objects.equals(this.acquireeSymbol, commonMAActivityV2.acquireeSymbol) &&
         Objects.equals(this.acquirerCusip, commonMAActivityV2.acquirerCusip) &&
+        Objects.equals(this.acquirerIsin, commonMAActivityV2.acquirerIsin) &&
         Objects.equals(this.acquirerRate, commonMAActivityV2.acquirerRate) &&
         Objects.equals(this.acquirerSymbol, commonMAActivityV2.acquirerSymbol) &&
         Objects.equals(this.effectiveDate, commonMAActivityV2.effectiveDate) &&
@@ -316,7 +366,7 @@ public class CommonMAActivityV2 implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(acquireeCusip, acquireeRate, acquireeSymbol, acquirerCusip, acquirerRate, acquirerSymbol, effectiveDate, payableDate, additionalProperties);
+    return Objects.hash(acquireeCusip, acquireeIsin, acquireeRate, acquireeSymbol, acquirerCusip, acquirerIsin, acquirerRate, acquirerSymbol, effectiveDate, payableDate, additionalProperties);
   }
 
   @Override
@@ -324,9 +374,11 @@ public class CommonMAActivityV2 implements Serializable {
     StringBuilder sb = new StringBuilder();
     sb.append("class CommonMAActivityV2 {\n");
     sb.append("    acquireeCusip: ").append(toIndentedString(acquireeCusip)).append("\n");
+    sb.append("    acquireeIsin: ").append(toIndentedString(acquireeIsin)).append("\n");
     sb.append("    acquireeRate: ").append(toIndentedString(acquireeRate)).append("\n");
     sb.append("    acquireeSymbol: ").append(toIndentedString(acquireeSymbol)).append("\n");
     sb.append("    acquirerCusip: ").append(toIndentedString(acquirerCusip)).append("\n");
+    sb.append("    acquirerIsin: ").append(toIndentedString(acquirerIsin)).append("\n");
     sb.append("    acquirerRate: ").append(toIndentedString(acquirerRate)).append("\n");
     sb.append("    acquirerSymbol: ").append(toIndentedString(acquirerSymbol)).append("\n");
     sb.append("    effectiveDate: ").append(toIndentedString(effectiveDate)).append("\n");
@@ -350,7 +402,7 @@ public class CommonMAActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("acquiree_cusip", "acquiree_rate", "acquiree_symbol", "acquirer_cusip", "acquirer_rate", "acquirer_symbol", "effective_date", "payable_date"));
+    openapiFields = new HashSet<String>(Arrays.asList("acquiree_cusip", "acquiree_isin", "acquiree_rate", "acquiree_symbol", "acquirer_cusip", "acquirer_isin", "acquirer_rate", "acquirer_symbol", "effective_date", "payable_date"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("acquiree_cusip", "acquiree_symbol", "effective_date", "payable_date"));
@@ -379,6 +431,9 @@ public class CommonMAActivityV2 implements Serializable {
       if (!jsonObj.get("acquiree_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquiree_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquiree_cusip").toString()));
       }
+      if ((jsonObj.get("acquiree_isin") != null && !jsonObj.get("acquiree_isin").isJsonNull()) && !jsonObj.get("acquiree_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquiree_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquiree_isin").toString()));
+      }
       if ((jsonObj.get("acquiree_rate") != null && !jsonObj.get("acquiree_rate").isJsonNull()) && !jsonObj.get("acquiree_rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquiree_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquiree_rate").toString()));
       }
@@ -387,6 +442,9 @@ public class CommonMAActivityV2 implements Serializable {
       }
       if ((jsonObj.get("acquirer_cusip") != null && !jsonObj.get("acquirer_cusip").isJsonNull()) && !jsonObj.get("acquirer_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquirer_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquirer_cusip").toString()));
+      }
+      if ((jsonObj.get("acquirer_isin") != null && !jsonObj.get("acquirer_isin").isJsonNull()) && !jsonObj.get("acquirer_isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquirer_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquirer_isin").toString()));
       }
       if ((jsonObj.get("acquirer_rate") != null && !jsonObj.get("acquirer_rate").isJsonNull()) && !jsonObj.get("acquirer_rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquirer_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquirer_rate").toString()));

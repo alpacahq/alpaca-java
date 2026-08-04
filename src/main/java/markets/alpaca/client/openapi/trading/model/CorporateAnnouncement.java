@@ -20,7 +20,10 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Arrays;
+import markets.alpaca.client.openapi.trading.model.CorporateActionCaType;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -47,10 +50,10 @@ import java.util.Set;
 import markets.alpaca.client.openapi.trading.http.JSON;
 
 /**
- * GetV2CorporateActionsAnnouncementsId200Response
+ * A corporate action announcement.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
-public class GetV2CorporateActionsAnnouncementsId200Response implements Serializable {
+public class CorporateAnnouncement implements Serializable {
   private static final long serialVersionUID = 1L;
 
   public static final String SERIALIZED_NAME_CA_SUB_TYPE = "ca_sub_type";
@@ -61,27 +64,32 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
   public static final String SERIALIZED_NAME_CA_TYPE = "ca_type";
   @SerializedName(SERIALIZED_NAME_CA_TYPE)
   @javax.annotation.Nullable
-  private String caType;
+  private CorporateActionCaType caType;
 
   public static final String SERIALIZED_NAME_CASH = "cash";
   @SerializedName(SERIALIZED_NAME_CASH)
   @javax.annotation.Nullable
-  private String cash;
+  private BigDecimal cash;
 
-  public static final String SERIALIZED_NAME_CORPORATE_ACTIONS_ID = "corporate_actions_id";
-  @SerializedName(SERIALIZED_NAME_CORPORATE_ACTIONS_ID)
+  public static final String SERIALIZED_NAME_CORPORATE_ACTION_ID = "corporate_action_id";
+  @SerializedName(SERIALIZED_NAME_CORPORATE_ACTION_ID)
   @javax.annotation.Nullable
-  private String corporateActionsId;
+  private String corporateActionId;
 
   public static final String SERIALIZED_NAME_DECLARATION_DATE = "declaration_date";
   @SerializedName(SERIALIZED_NAME_DECLARATION_DATE)
   @javax.annotation.Nullable
-  private String declarationDate;
+  private LocalDate declarationDate;
 
-  public static final String SERIALIZED_NAME_EXPIRATION_DATE = "expiration_date";
-  @SerializedName(SERIALIZED_NAME_EXPIRATION_DATE)
+  public static final String SERIALIZED_NAME_EFFECTIVE_DATE = "effective_date";
+  @SerializedName(SERIALIZED_NAME_EFFECTIVE_DATE)
   @javax.annotation.Nullable
-  private String expirationDate;
+  private LocalDate effectiveDate;
+
+  public static final String SERIALIZED_NAME_EX_DATE = "ex_date";
+  @SerializedName(SERIALIZED_NAME_EX_DATE)
+  @javax.annotation.Nullable
+  private LocalDate exDate;
 
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
@@ -101,22 +109,22 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
   public static final String SERIALIZED_NAME_NEW_RATE = "new_rate";
   @SerializedName(SERIALIZED_NAME_NEW_RATE)
   @javax.annotation.Nullable
-  private String newRate;
+  private BigDecimal newRate;
 
   public static final String SERIALIZED_NAME_OLD_RATE = "old_rate";
   @SerializedName(SERIALIZED_NAME_OLD_RATE)
   @javax.annotation.Nullable
-  private String oldRate;
+  private BigDecimal oldRate;
 
   public static final String SERIALIZED_NAME_PAYABLE_DATE = "payable_date";
   @SerializedName(SERIALIZED_NAME_PAYABLE_DATE)
   @javax.annotation.Nullable
-  private String payableDate;
+  private LocalDate payableDate;
 
   public static final String SERIALIZED_NAME_RECORD_DATE = "record_date";
   @SerializedName(SERIALIZED_NAME_RECORD_DATE)
   @javax.annotation.Nullable
-  private String recordDate;
+  private LocalDate recordDate;
 
   public static final String SERIALIZED_NAME_TARGET_ORIGINAL_CUSIP = "target_original_cusip";
   @SerializedName(SERIALIZED_NAME_TARGET_ORIGINAL_CUSIP)
@@ -128,10 +136,10 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
   @javax.annotation.Nullable
   private String targetSymbol;
 
-  public GetV2CorporateActionsAnnouncementsId200Response() {
+  public CorporateAnnouncement() {
   }
 
-  public GetV2CorporateActionsAnnouncementsId200Response caSubType(@javax.annotation.Nullable String caSubType) {
+  public CorporateAnnouncement caSubType(@javax.annotation.Nullable String caSubType) {
     this.caSubType = caSubType;
     return this;
   }
@@ -150,26 +158,26 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response caType(@javax.annotation.Nullable String caType) {
+  public CorporateAnnouncement caType(@javax.annotation.Nullable CorporateActionCaType caType) {
     this.caType = caType;
     return this;
   }
 
   /**
-   * A comma-delimited list of Dividend, Merger, Spinoff, or Split.
+   * Get caType
    * @return caType
    */
   @javax.annotation.Nullable
-  public String getCaType() {
+  public CorporateActionCaType getCaType() {
     return caType;
   }
 
-  public void setCaType(@javax.annotation.Nullable String caType) {
+  public void setCaType(@javax.annotation.Nullable CorporateActionCaType caType) {
     this.caType = caType;
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response cash(@javax.annotation.Nullable String cash) {
+  public CorporateAnnouncement cash(@javax.annotation.Nullable BigDecimal cash) {
     this.cash = cash;
     return this;
   }
@@ -179,35 +187,35 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
    * @return cash
    */
   @javax.annotation.Nullable
-  public String getCash() {
+  public BigDecimal getCash() {
     return cash;
   }
 
-  public void setCash(@javax.annotation.Nullable String cash) {
+  public void setCash(@javax.annotation.Nullable BigDecimal cash) {
     this.cash = cash;
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response corporateActionsId(@javax.annotation.Nullable String corporateActionsId) {
-    this.corporateActionsId = corporateActionsId;
+  public CorporateAnnouncement corporateActionId(@javax.annotation.Nullable String corporateActionId) {
+    this.corporateActionId = corporateActionId;
     return this;
   }
 
   /**
-   * Get corporateActionsId
-   * @return corporateActionsId
+   * Get corporateActionId
+   * @return corporateActionId
    */
   @javax.annotation.Nullable
-  public String getCorporateActionsId() {
-    return corporateActionsId;
+  public String getCorporateActionId() {
+    return corporateActionId;
   }
 
-  public void setCorporateActionsId(@javax.annotation.Nullable String corporateActionsId) {
-    this.corporateActionsId = corporateActionsId;
+  public void setCorporateActionId(@javax.annotation.Nullable String corporateActionId) {
+    this.corporateActionId = corporateActionId;
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response declarationDate(@javax.annotation.Nullable String declarationDate) {
+  public CorporateAnnouncement declarationDate(@javax.annotation.Nullable LocalDate declarationDate) {
     this.declarationDate = declarationDate;
     return this;
   }
@@ -217,35 +225,54 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
    * @return declarationDate
    */
   @javax.annotation.Nullable
-  public String getDeclarationDate() {
+  public LocalDate getDeclarationDate() {
     return declarationDate;
   }
 
-  public void setDeclarationDate(@javax.annotation.Nullable String declarationDate) {
+  public void setDeclarationDate(@javax.annotation.Nullable LocalDate declarationDate) {
     this.declarationDate = declarationDate;
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response expirationDate(@javax.annotation.Nullable String expirationDate) {
-    this.expirationDate = expirationDate;
+  public CorporateAnnouncement effectiveDate(@javax.annotation.Nullable LocalDate effectiveDate) {
+    this.effectiveDate = effectiveDate;
     return this;
   }
 
   /**
-   * Get expirationDate
-   * @return expirationDate
+   * Get effectiveDate
+   * @return effectiveDate
    */
   @javax.annotation.Nullable
-  public String getExpirationDate() {
-    return expirationDate;
+  public LocalDate getEffectiveDate() {
+    return effectiveDate;
   }
 
-  public void setExpirationDate(@javax.annotation.Nullable String expirationDate) {
-    this.expirationDate = expirationDate;
+  public void setEffectiveDate(@javax.annotation.Nullable LocalDate effectiveDate) {
+    this.effectiveDate = effectiveDate;
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response id(@javax.annotation.Nullable String id) {
+  public CorporateAnnouncement exDate(@javax.annotation.Nullable LocalDate exDate) {
+    this.exDate = exDate;
+    return this;
+  }
+
+  /**
+   * Get exDate
+   * @return exDate
+   */
+  @javax.annotation.Nullable
+  public LocalDate getExDate() {
+    return exDate;
+  }
+
+  public void setExDate(@javax.annotation.Nullable LocalDate exDate) {
+    this.exDate = exDate;
+  }
+
+
+  public CorporateAnnouncement id(@javax.annotation.Nullable String id) {
     this.id = id;
     return this;
   }
@@ -264,7 +291,7 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response initiatingOriginalCusip(@javax.annotation.Nullable String initiatingOriginalCusip) {
+  public CorporateAnnouncement initiatingOriginalCusip(@javax.annotation.Nullable String initiatingOriginalCusip) {
     this.initiatingOriginalCusip = initiatingOriginalCusip;
     return this;
   }
@@ -283,7 +310,7 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response initiatingSymbol(@javax.annotation.Nullable String initiatingSymbol) {
+  public CorporateAnnouncement initiatingSymbol(@javax.annotation.Nullable String initiatingSymbol) {
     this.initiatingSymbol = initiatingSymbol;
     return this;
   }
@@ -302,7 +329,7 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response newRate(@javax.annotation.Nullable String newRate) {
+  public CorporateAnnouncement newRate(@javax.annotation.Nullable BigDecimal newRate) {
     this.newRate = newRate;
     return this;
   }
@@ -312,16 +339,16 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
    * @return newRate
    */
   @javax.annotation.Nullable
-  public String getNewRate() {
+  public BigDecimal getNewRate() {
     return newRate;
   }
 
-  public void setNewRate(@javax.annotation.Nullable String newRate) {
+  public void setNewRate(@javax.annotation.Nullable BigDecimal newRate) {
     this.newRate = newRate;
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response oldRate(@javax.annotation.Nullable String oldRate) {
+  public CorporateAnnouncement oldRate(@javax.annotation.Nullable BigDecimal oldRate) {
     this.oldRate = oldRate;
     return this;
   }
@@ -331,16 +358,16 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
    * @return oldRate
    */
   @javax.annotation.Nullable
-  public String getOldRate() {
+  public BigDecimal getOldRate() {
     return oldRate;
   }
 
-  public void setOldRate(@javax.annotation.Nullable String oldRate) {
+  public void setOldRate(@javax.annotation.Nullable BigDecimal oldRate) {
     this.oldRate = oldRate;
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response payableDate(@javax.annotation.Nullable String payableDate) {
+  public CorporateAnnouncement payableDate(@javax.annotation.Nullable LocalDate payableDate) {
     this.payableDate = payableDate;
     return this;
   }
@@ -350,16 +377,16 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
    * @return payableDate
    */
   @javax.annotation.Nullable
-  public String getPayableDate() {
+  public LocalDate getPayableDate() {
     return payableDate;
   }
 
-  public void setPayableDate(@javax.annotation.Nullable String payableDate) {
+  public void setPayableDate(@javax.annotation.Nullable LocalDate payableDate) {
     this.payableDate = payableDate;
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response recordDate(@javax.annotation.Nullable String recordDate) {
+  public CorporateAnnouncement recordDate(@javax.annotation.Nullable LocalDate recordDate) {
     this.recordDate = recordDate;
     return this;
   }
@@ -369,16 +396,16 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
    * @return recordDate
    */
   @javax.annotation.Nullable
-  public String getRecordDate() {
+  public LocalDate getRecordDate() {
     return recordDate;
   }
 
-  public void setRecordDate(@javax.annotation.Nullable String recordDate) {
+  public void setRecordDate(@javax.annotation.Nullable LocalDate recordDate) {
     this.recordDate = recordDate;
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response targetOriginalCusip(@javax.annotation.Nullable String targetOriginalCusip) {
+  public CorporateAnnouncement targetOriginalCusip(@javax.annotation.Nullable String targetOriginalCusip) {
     this.targetOriginalCusip = targetOriginalCusip;
     return this;
   }
@@ -397,7 +424,7 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
   }
 
 
-  public GetV2CorporateActionsAnnouncementsId200Response targetSymbol(@javax.annotation.Nullable String targetSymbol) {
+  public CorporateAnnouncement targetSymbol(@javax.annotation.Nullable String targetSymbol) {
     this.targetSymbol = targetSymbol;
     return this;
   }
@@ -428,9 +455,9 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
    *
    * @param key name of the property
    * @param value value of the property
-   * @return the GetV2CorporateActionsAnnouncementsId200Response instance itself
+   * @return the CorporateAnnouncement instance itself
    */
-  public GetV2CorporateActionsAnnouncementsId200Response putAdditionalProperty(String key, Object value) {
+  public CorporateAnnouncement putAdditionalProperty(String key, Object value) {
     if (this.additionalProperties == null) {
         this.additionalProperties = new HashMap<String, Object>();
     }
@@ -469,40 +496,42 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    GetV2CorporateActionsAnnouncementsId200Response getV2CorporateActionsAnnouncementsId200Response = (GetV2CorporateActionsAnnouncementsId200Response) o;
-    return Objects.equals(this.caSubType, getV2CorporateActionsAnnouncementsId200Response.caSubType) &&
-        Objects.equals(this.caType, getV2CorporateActionsAnnouncementsId200Response.caType) &&
-        Objects.equals(this.cash, getV2CorporateActionsAnnouncementsId200Response.cash) &&
-        Objects.equals(this.corporateActionsId, getV2CorporateActionsAnnouncementsId200Response.corporateActionsId) &&
-        Objects.equals(this.declarationDate, getV2CorporateActionsAnnouncementsId200Response.declarationDate) &&
-        Objects.equals(this.expirationDate, getV2CorporateActionsAnnouncementsId200Response.expirationDate) &&
-        Objects.equals(this.id, getV2CorporateActionsAnnouncementsId200Response.id) &&
-        Objects.equals(this.initiatingOriginalCusip, getV2CorporateActionsAnnouncementsId200Response.initiatingOriginalCusip) &&
-        Objects.equals(this.initiatingSymbol, getV2CorporateActionsAnnouncementsId200Response.initiatingSymbol) &&
-        Objects.equals(this.newRate, getV2CorporateActionsAnnouncementsId200Response.newRate) &&
-        Objects.equals(this.oldRate, getV2CorporateActionsAnnouncementsId200Response.oldRate) &&
-        Objects.equals(this.payableDate, getV2CorporateActionsAnnouncementsId200Response.payableDate) &&
-        Objects.equals(this.recordDate, getV2CorporateActionsAnnouncementsId200Response.recordDate) &&
-        Objects.equals(this.targetOriginalCusip, getV2CorporateActionsAnnouncementsId200Response.targetOriginalCusip) &&
-        Objects.equals(this.targetSymbol, getV2CorporateActionsAnnouncementsId200Response.targetSymbol)&&
-        Objects.equals(this.additionalProperties, getV2CorporateActionsAnnouncementsId200Response.additionalProperties);
+    CorporateAnnouncement corporateAnnouncement = (CorporateAnnouncement) o;
+    return Objects.equals(this.caSubType, corporateAnnouncement.caSubType) &&
+        Objects.equals(this.caType, corporateAnnouncement.caType) &&
+        Objects.equals(this.cash, corporateAnnouncement.cash) &&
+        Objects.equals(this.corporateActionId, corporateAnnouncement.corporateActionId) &&
+        Objects.equals(this.declarationDate, corporateAnnouncement.declarationDate) &&
+        Objects.equals(this.effectiveDate, corporateAnnouncement.effectiveDate) &&
+        Objects.equals(this.exDate, corporateAnnouncement.exDate) &&
+        Objects.equals(this.id, corporateAnnouncement.id) &&
+        Objects.equals(this.initiatingOriginalCusip, corporateAnnouncement.initiatingOriginalCusip) &&
+        Objects.equals(this.initiatingSymbol, corporateAnnouncement.initiatingSymbol) &&
+        Objects.equals(this.newRate, corporateAnnouncement.newRate) &&
+        Objects.equals(this.oldRate, corporateAnnouncement.oldRate) &&
+        Objects.equals(this.payableDate, corporateAnnouncement.payableDate) &&
+        Objects.equals(this.recordDate, corporateAnnouncement.recordDate) &&
+        Objects.equals(this.targetOriginalCusip, corporateAnnouncement.targetOriginalCusip) &&
+        Objects.equals(this.targetSymbol, corporateAnnouncement.targetSymbol)&&
+        Objects.equals(this.additionalProperties, corporateAnnouncement.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(caSubType, caType, cash, corporateActionsId, declarationDate, expirationDate, id, initiatingOriginalCusip, initiatingSymbol, newRate, oldRate, payableDate, recordDate, targetOriginalCusip, targetSymbol, additionalProperties);
+    return Objects.hash(caSubType, caType, cash, corporateActionId, declarationDate, effectiveDate, exDate, id, initiatingOriginalCusip, initiatingSymbol, newRate, oldRate, payableDate, recordDate, targetOriginalCusip, targetSymbol, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class GetV2CorporateActionsAnnouncementsId200Response {\n");
+    sb.append("class CorporateAnnouncement {\n");
     sb.append("    caSubType: ").append(toIndentedString(caSubType)).append("\n");
     sb.append("    caType: ").append(toIndentedString(caType)).append("\n");
     sb.append("    cash: ").append(toIndentedString(cash)).append("\n");
-    sb.append("    corporateActionsId: ").append(toIndentedString(corporateActionsId)).append("\n");
+    sb.append("    corporateActionId: ").append(toIndentedString(corporateActionId)).append("\n");
     sb.append("    declarationDate: ").append(toIndentedString(declarationDate)).append("\n");
-    sb.append("    expirationDate: ").append(toIndentedString(expirationDate)).append("\n");
+    sb.append("    effectiveDate: ").append(toIndentedString(effectiveDate)).append("\n");
+    sb.append("    exDate: ").append(toIndentedString(exDate)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    initiatingOriginalCusip: ").append(toIndentedString(initiatingOriginalCusip)).append("\n");
     sb.append("    initiatingSymbol: ").append(toIndentedString(initiatingSymbol)).append("\n");
@@ -531,7 +560,7 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("ca_sub_type", "ca_type", "cash", "corporate_actions_id", "declaration_date", "expiration_date", "id", "initiating_original_cusip", "initiating_symbol", "new_rate", "old_rate", "payable_date", "record_date", "target_original_cusip", "target_symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("ca_sub_type", "ca_type", "cash", "corporate_action_id", "declaration_date", "effective_date", "ex_date", "id", "initiating_original_cusip", "initiating_symbol", "new_rate", "old_rate", "payable_date", "record_date", "target_original_cusip", "target_symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -541,32 +570,27 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
    * Validates the JSON Element and throws an exception if issues found
    *
    * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to GetV2CorporateActionsAnnouncementsId200Response
+   * @throws IOException if the JSON Element is invalid with respect to CorporateAnnouncement
    */
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
       if (jsonElement == null) {
-        if (!GetV2CorporateActionsAnnouncementsId200Response.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in GetV2CorporateActionsAnnouncementsId200Response is not found in the empty JSON string", GetV2CorporateActionsAnnouncementsId200Response.openapiRequiredFields.toString()));
+        if (!CorporateAnnouncement.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in CorporateAnnouncement is not found in the empty JSON string", CorporateAnnouncement.openapiRequiredFields.toString()));
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
       if ((jsonObj.get("ca_sub_type") != null && !jsonObj.get("ca_sub_type").isJsonNull()) && !jsonObj.get("ca_sub_type").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `ca_sub_type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("ca_sub_type").toString()));
       }
-      if ((jsonObj.get("ca_type") != null && !jsonObj.get("ca_type").isJsonNull()) && !jsonObj.get("ca_type").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `ca_type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("ca_type").toString()));
+      // validate the optional field `ca_type`
+      if (jsonObj.get("ca_type") != null && !jsonObj.get("ca_type").isJsonNull()) {
+        CorporateActionCaType.validateJsonElement(jsonObj.get("ca_type"));
       }
       if ((jsonObj.get("cash") != null && !jsonObj.get("cash").isJsonNull()) && !jsonObj.get("cash").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cash` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cash").toString()));
       }
-      if ((jsonObj.get("corporate_actions_id") != null && !jsonObj.get("corporate_actions_id").isJsonNull()) && !jsonObj.get("corporate_actions_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `corporate_actions_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("corporate_actions_id").toString()));
-      }
-      if ((jsonObj.get("declaration_date") != null && !jsonObj.get("declaration_date").isJsonNull()) && !jsonObj.get("declaration_date").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `declaration_date` to be a primitive type in the JSON string but got `%s`", jsonObj.get("declaration_date").toString()));
-      }
-      if ((jsonObj.get("expiration_date") != null && !jsonObj.get("expiration_date").isJsonNull()) && !jsonObj.get("expiration_date").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `expiration_date` to be a primitive type in the JSON string but got `%s`", jsonObj.get("expiration_date").toString()));
+      if ((jsonObj.get("corporate_action_id") != null && !jsonObj.get("corporate_action_id").isJsonNull()) && !jsonObj.get("corporate_action_id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `corporate_action_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("corporate_action_id").toString()));
       }
       if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
@@ -583,12 +607,6 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
       if ((jsonObj.get("old_rate") != null && !jsonObj.get("old_rate").isJsonNull()) && !jsonObj.get("old_rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_rate").toString()));
       }
-      if ((jsonObj.get("payable_date") != null && !jsonObj.get("payable_date").isJsonNull()) && !jsonObj.get("payable_date").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `payable_date` to be a primitive type in the JSON string but got `%s`", jsonObj.get("payable_date").toString()));
-      }
-      if ((jsonObj.get("record_date") != null && !jsonObj.get("record_date").isJsonNull()) && !jsonObj.get("record_date").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `record_date` to be a primitive type in the JSON string but got `%s`", jsonObj.get("record_date").toString()));
-      }
       if ((jsonObj.get("target_original_cusip") != null && !jsonObj.get("target_original_cusip").isJsonNull()) && !jsonObj.get("target_original_cusip").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `target_original_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("target_original_cusip").toString()));
       }
@@ -601,16 +619,16 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!GetV2CorporateActionsAnnouncementsId200Response.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'GetV2CorporateActionsAnnouncementsId200Response' and its subtypes
+       if (!CorporateAnnouncement.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'CorporateAnnouncement' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<GetV2CorporateActionsAnnouncementsId200Response> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(GetV2CorporateActionsAnnouncementsId200Response.class));
+       final TypeAdapter<CorporateAnnouncement> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(CorporateAnnouncement.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<GetV2CorporateActionsAnnouncementsId200Response>() {
+       return (TypeAdapter<T>) new TypeAdapter<CorporateAnnouncement>() {
            @Override
-           public void write(JsonWriter out, GetV2CorporateActionsAnnouncementsId200Response value) throws IOException {
+           public void write(JsonWriter out, CorporateAnnouncement value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              obj.remove("additionalProperties");
              // serialize additional properties
@@ -638,12 +656,12 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
            }
 
            @Override
-           public GetV2CorporateActionsAnnouncementsId200Response read(JsonReader in) throws IOException {
+           public CorporateAnnouncement read(JsonReader in) throws IOException {
              JsonElement jsonElement = elementAdapter.read(in);
              validateJsonElement(jsonElement);
              JsonObject jsonObj = jsonElement.getAsJsonObject();
              // store additional fields in the deserialized instance
-             GetV2CorporateActionsAnnouncementsId200Response instance = thisAdapter.fromJsonTree(jsonObj);
+             CorporateAnnouncement instance = thisAdapter.fromJsonTree(jsonObj);
              for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
                if (!openapiFields.contains(entry.getKey())) {
                  if (entry.getValue().isJsonPrimitive()) { // primitive type
@@ -670,18 +688,18 @@ public class GetV2CorporateActionsAnnouncementsId200Response implements Serializ
   }
 
   /**
-   * Create an instance of GetV2CorporateActionsAnnouncementsId200Response given an JSON string
+   * Create an instance of CorporateAnnouncement given an JSON string
    *
    * @param jsonString JSON string
-   * @return An instance of GetV2CorporateActionsAnnouncementsId200Response
-   * @throws IOException if the JSON string is invalid with respect to GetV2CorporateActionsAnnouncementsId200Response
+   * @return An instance of CorporateAnnouncement
+   * @throws IOException if the JSON string is invalid with respect to CorporateAnnouncement
    */
-  public static GetV2CorporateActionsAnnouncementsId200Response fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, GetV2CorporateActionsAnnouncementsId200Response.class);
+  public static CorporateAnnouncement fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, CorporateAnnouncement.class);
   }
 
   /**
-   * Convert an instance of GetV2CorporateActionsAnnouncementsId200Response to an JSON string
+   * Convert an instance of CorporateAnnouncement to an JSON string
    *
    * @return JSON string
    */
