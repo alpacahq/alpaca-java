@@ -54,18 +54,86 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 public class DailyTradingLimit implements Serializable {
   private static final long serialVersionUID = 1L;
 
+  public static final String SERIALIZED_NAME_CASH_HELD = "cash_held";
+  @SerializedName(SERIALIZED_NAME_CASH_HELD)
+  @javax.annotation.Nullable
+  private BigDecimal cashHeld;
+
+  public static final String SERIALIZED_NAME_CORRESPONDENT = "correspondent";
+  @SerializedName(SERIALIZED_NAME_CORRESPONDENT)
+  @javax.annotation.Nullable
+  private String correspondent;
+
   public static final String SERIALIZED_NAME_DAILY_NET_LIMIT = "daily_net_limit";
   @SerializedName(SERIALIZED_NAME_DAILY_NET_LIMIT)
   @javax.annotation.Nullable
   private BigDecimal dailyNetLimit;
 
-  public static final String SERIALIZED_NAME_DAILY_NET_LIMIT_IN_USE = "daily_net_limit_in_use";
-  @SerializedName(SERIALIZED_NAME_DAILY_NET_LIMIT_IN_USE)
+  public static final String SERIALIZED_NAME_EXECUTED_BUYS = "executed_buys";
+  @SerializedName(SERIALIZED_NAME_EXECUTED_BUYS)
   @javax.annotation.Nullable
-  private BigDecimal dailyNetLimitInUse;
+  private BigDecimal executedBuys;
+
+  public static final String SERIALIZED_NAME_EXECUTED_SELLS = "executed_sells";
+  @SerializedName(SERIALIZED_NAME_EXECUTED_SELLS)
+  @javax.annotation.Nullable
+  private BigDecimal executedSells;
+
+  public static final String SERIALIZED_NAME_IN_USE_LIMIT = "in_use_limit";
+  @SerializedName(SERIALIZED_NAME_IN_USE_LIMIT)
+  @javax.annotation.Nullable
+  private BigDecimal inUseLimit;
+
+  public static final String SERIALIZED_NAME_OPEN_BUYS = "open_buys";
+  @SerializedName(SERIALIZED_NAME_OPEN_BUYS)
+  @javax.annotation.Nullable
+  private BigDecimal openBuys;
+
+  public static final String SERIALIZED_NAME_OPEN_SELLS = "open_sells";
+  @SerializedName(SERIALIZED_NAME_OPEN_SELLS)
+  @javax.annotation.Nullable
+  private BigDecimal openSells;
 
   public DailyTradingLimit() {
   }
+
+  public DailyTradingLimit cashHeld(@javax.annotation.Nullable BigDecimal cashHeld) {
+    this.cashHeld = cashHeld;
+    return this;
+  }
+
+  /**
+   * Cash reserved for open cash-secured put positions. Only present in the response when the correspondent has at least one open cash-secured put; the field is omitted from the response otherwise (including for options-enabled correspondents with no open cash-secured puts).
+   * @return cashHeld
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getCashHeld() {
+    return cashHeld;
+  }
+
+  public void setCashHeld(@javax.annotation.Nullable BigDecimal cashHeld) {
+    this.cashHeld = cashHeld;
+  }
+
+
+  public DailyTradingLimit correspondent(@javax.annotation.Nullable String correspondent) {
+    this.correspondent = correspondent;
+    return this;
+  }
+
+  /**
+   * The correspondent code the limits apply to.
+   * @return correspondent
+   */
+  @javax.annotation.Nullable
+  public String getCorrespondent() {
+    return correspondent;
+  }
+
+  public void setCorrespondent(@javax.annotation.Nullable String correspondent) {
+    this.correspondent = correspondent;
+  }
+
 
   public DailyTradingLimit dailyNetLimit(@javax.annotation.Nullable BigDecimal dailyNetLimit) {
     this.dailyNetLimit = dailyNetLimit;
@@ -73,7 +141,7 @@ public class DailyTradingLimit implements Serializable {
   }
 
   /**
-   * The net buying limit that can be reached before further cash outflow trading activity is restricted. Please reach out to learn more about how this limit is determined.
+   * The daily net buying limit for the correspondent; further buying is halted once the in_use_limit limit reaches this value.
    * @return dailyNetLimit
    */
   @javax.annotation.Nullable
@@ -86,22 +154,98 @@ public class DailyTradingLimit implements Serializable {
   }
 
 
-  public DailyTradingLimit dailyNetLimitInUse(@javax.annotation.Nullable BigDecimal dailyNetLimitInUse) {
-    this.dailyNetLimitInUse = dailyNetLimitInUse;
+  public DailyTradingLimit executedBuys(@javax.annotation.Nullable BigDecimal executedBuys) {
+    this.executedBuys = executedBuys;
     return this;
   }
 
   /**
-   * The real time net value of cash inflows (buy trades, etc.) with cash outflows (sell trades, dividends, etc). This will be dynamic throughout the day based on user activity, with executed orders being reset at the start of the next trading day.
-   * @return dailyNetLimitInUse
+   * Cumulative cash value of executed buy activity contributing to the in-use limit since the last reset.
+   * @return executedBuys
    */
   @javax.annotation.Nullable
-  public BigDecimal getDailyNetLimitInUse() {
-    return dailyNetLimitInUse;
+  public BigDecimal getExecutedBuys() {
+    return executedBuys;
   }
 
-  public void setDailyNetLimitInUse(@javax.annotation.Nullable BigDecimal dailyNetLimitInUse) {
-    this.dailyNetLimitInUse = dailyNetLimitInUse;
+  public void setExecutedBuys(@javax.annotation.Nullable BigDecimal executedBuys) {
+    this.executedBuys = executedBuys;
+  }
+
+
+  public DailyTradingLimit executedSells(@javax.annotation.Nullable BigDecimal executedSells) {
+    this.executedSells = executedSells;
+    return this;
+  }
+
+  /**
+   * Cumulative cash value of executed sell activity offsetting the in-use limit since the last reset.
+   * @return executedSells
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getExecutedSells() {
+    return executedSells;
+  }
+
+  public void setExecutedSells(@javax.annotation.Nullable BigDecimal executedSells) {
+    this.executedSells = executedSells;
+  }
+
+
+  public DailyTradingLimit inUseLimit(@javax.annotation.Nullable BigDecimal inUseLimit) {
+    this.inUseLimit = inUseLimit;
+    return this;
+  }
+
+  /**
+   * Real-time net amount currently consuming the daily limit. Equal to &#x60;executed_buys&#x60; − &#x60;executed_sells&#x60; + &#x60;open_buys&#x60; − &#x60;open_sells&#x60; (+ &#x60;cash_held&#x60; when a cash-secured put is open). Resets at the start of the next trading day at 8.00 PM ET.
+   * @return inUseLimit
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getInUseLimit() {
+    return inUseLimit;
+  }
+
+  public void setInUseLimit(@javax.annotation.Nullable BigDecimal inUseLimit) {
+    this.inUseLimit = inUseLimit;
+  }
+
+
+  public DailyTradingLimit openBuys(@javax.annotation.Nullable BigDecimal openBuys) {
+    this.openBuys = openBuys;
+    return this;
+  }
+
+  /**
+   * Reserved cash value of currently open buy orders (limit price for limit orders, notional or estimated mid for market orders) contributing to the in-use limit.
+   * @return openBuys
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getOpenBuys() {
+    return openBuys;
+  }
+
+  public void setOpenBuys(@javax.annotation.Nullable BigDecimal openBuys) {
+    this.openBuys = openBuys;
+  }
+
+
+  public DailyTradingLimit openSells(@javax.annotation.Nullable BigDecimal openSells) {
+    this.openSells = openSells;
+    return this;
+  }
+
+  /**
+   * Reserved cash value of currently open sell orders offsetting the in-use limit.
+   * @return openSells
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getOpenSells() {
+    return openSells;
+  }
+
+  public void setOpenSells(@javax.annotation.Nullable BigDecimal openSells) {
+    this.openSells = openSells;
   }
 
   /**
@@ -159,22 +303,34 @@ public class DailyTradingLimit implements Serializable {
       return false;
     }
     DailyTradingLimit dailyTradingLimit = (DailyTradingLimit) o;
-    return Objects.equals(this.dailyNetLimit, dailyTradingLimit.dailyNetLimit) &&
-        Objects.equals(this.dailyNetLimitInUse, dailyTradingLimit.dailyNetLimitInUse)&&
+    return Objects.equals(this.cashHeld, dailyTradingLimit.cashHeld) &&
+        Objects.equals(this.correspondent, dailyTradingLimit.correspondent) &&
+        Objects.equals(this.dailyNetLimit, dailyTradingLimit.dailyNetLimit) &&
+        Objects.equals(this.executedBuys, dailyTradingLimit.executedBuys) &&
+        Objects.equals(this.executedSells, dailyTradingLimit.executedSells) &&
+        Objects.equals(this.inUseLimit, dailyTradingLimit.inUseLimit) &&
+        Objects.equals(this.openBuys, dailyTradingLimit.openBuys) &&
+        Objects.equals(this.openSells, dailyTradingLimit.openSells)&&
         Objects.equals(this.additionalProperties, dailyTradingLimit.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(dailyNetLimit, dailyNetLimitInUse, additionalProperties);
+    return Objects.hash(cashHeld, correspondent, dailyNetLimit, executedBuys, executedSells, inUseLimit, openBuys, openSells, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class DailyTradingLimit {\n");
+    sb.append("    cashHeld: ").append(toIndentedString(cashHeld)).append("\n");
+    sb.append("    correspondent: ").append(toIndentedString(correspondent)).append("\n");
     sb.append("    dailyNetLimit: ").append(toIndentedString(dailyNetLimit)).append("\n");
-    sb.append("    dailyNetLimitInUse: ").append(toIndentedString(dailyNetLimitInUse)).append("\n");
+    sb.append("    executedBuys: ").append(toIndentedString(executedBuys)).append("\n");
+    sb.append("    executedSells: ").append(toIndentedString(executedSells)).append("\n");
+    sb.append("    inUseLimit: ").append(toIndentedString(inUseLimit)).append("\n");
+    sb.append("    openBuys: ").append(toIndentedString(openBuys)).append("\n");
+    sb.append("    openSells: ").append(toIndentedString(openSells)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -194,7 +350,7 @@ public class DailyTradingLimit implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("daily_net_limit", "daily_net_limit_in_use"));
+    openapiFields = new HashSet<String>(Arrays.asList("cash_held", "correspondent", "daily_net_limit", "executed_buys", "executed_sells", "in_use_limit", "open_buys", "open_sells"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -213,11 +369,29 @@ public class DailyTradingLimit implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if ((jsonObj.get("cash_held") != null && !jsonObj.get("cash_held").isJsonNull()) && !jsonObj.get("cash_held").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cash_held` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cash_held").toString()));
+      }
+      if ((jsonObj.get("correspondent") != null && !jsonObj.get("correspondent").isJsonNull()) && !jsonObj.get("correspondent").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `correspondent` to be a primitive type in the JSON string but got `%s`", jsonObj.get("correspondent").toString()));
+      }
       if ((jsonObj.get("daily_net_limit") != null && !jsonObj.get("daily_net_limit").isJsonNull()) && !jsonObj.get("daily_net_limit").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `daily_net_limit` to be a primitive type in the JSON string but got `%s`", jsonObj.get("daily_net_limit").toString()));
       }
-      if ((jsonObj.get("daily_net_limit_in_use") != null && !jsonObj.get("daily_net_limit_in_use").isJsonNull()) && !jsonObj.get("daily_net_limit_in_use").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `daily_net_limit_in_use` to be a primitive type in the JSON string but got `%s`", jsonObj.get("daily_net_limit_in_use").toString()));
+      if ((jsonObj.get("executed_buys") != null && !jsonObj.get("executed_buys").isJsonNull()) && !jsonObj.get("executed_buys").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `executed_buys` to be a primitive type in the JSON string but got `%s`", jsonObj.get("executed_buys").toString()));
+      }
+      if ((jsonObj.get("executed_sells") != null && !jsonObj.get("executed_sells").isJsonNull()) && !jsonObj.get("executed_sells").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `executed_sells` to be a primitive type in the JSON string but got `%s`", jsonObj.get("executed_sells").toString()));
+      }
+      if ((jsonObj.get("in_use_limit") != null && !jsonObj.get("in_use_limit").isJsonNull()) && !jsonObj.get("in_use_limit").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `in_use_limit` to be a primitive type in the JSON string but got `%s`", jsonObj.get("in_use_limit").toString()));
+      }
+      if ((jsonObj.get("open_buys") != null && !jsonObj.get("open_buys").isJsonNull()) && !jsonObj.get("open_buys").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `open_buys` to be a primitive type in the JSON string but got `%s`", jsonObj.get("open_buys").toString()));
+      }
+      if ((jsonObj.get("open_sells") != null && !jsonObj.get("open_sells").isJsonNull()) && !jsonObj.get("open_sells").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `open_sells` to be a primitive type in the JSON string but got `%s`", jsonObj.get("open_sells").toString()));
       }
   }
 

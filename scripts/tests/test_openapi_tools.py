@@ -190,6 +190,181 @@ class SemanticDiffTests(unittest.TestCase):
         self.assertFalse(diff.is_breaking())
         self.assertFalse(diff.is_empty())
 
+    def test_added_optional_properties_are_additive(self):
+        old = _spec(
+            schemas={
+                "DailyTradingLimit": {
+                    "type": "object",
+                    "properties": {"daily_net_limit": {"type": "string"}},
+                }
+            }
+        )
+        new = _spec(
+            schemas={
+                "DailyTradingLimit": {
+                    "type": "object",
+                    "properties": {
+                        "daily_net_limit": {"type": "string"},
+                        "open_buys": {"type": "string"},
+                        "open_sells": {"type": "string"},
+                    },
+                }
+            }
+        )
+        diff = openapi_tools.semantic_diff(old, new)
+        self.assertEqual(diff.schemas_extended, ["DailyTradingLimit"])
+        self.assertEqual(diff.schemas_modified, [])
+        self.assertFalse(diff.is_breaking())
+        self.assertFalse(diff.is_empty())
+        self.assertIn("added properties: open_buys, open_sells", diff.detail("schema", "DailyTradingLimit"))
+        changelog = openapi_tools.format_changelog_draft(diff)
+        self.assertIn("### Added", changelog)
+        self.assertNotIn("### Breaking", changelog)
+
+    def test_renamed_property_is_breaking_with_detail(self):
+        old = _spec(
+            schemas={
+                "DailyTradingLimit": {
+                    "type": "object",
+                    "properties": {"daily_net_limit_in_use": {"type": "string"}},
+                }
+            }
+        )
+        new = _spec(
+            schemas={
+                "DailyTradingLimit": {
+                    "type": "object",
+                    "properties": {"in_use_limit": {"type": "string"}},
+                }
+            }
+        )
+        diff = openapi_tools.semantic_diff(old, new)
+        self.assertEqual(diff.schemas_modified, ["DailyTradingLimit"])
+        self.assertTrue(diff.is_breaking())
+        detail = diff.detail("schema", "DailyTradingLimit")
+        self.assertIn("removed properties: daily_net_limit_in_use", detail)
+        self.assertIn("added properties: in_use_limit", detail)
+        report = openapi_tools.format_maintainer_report(diff, api="broker")
+        self.assertIn("removed properties: daily_net_limit_in_use", report)
+
+    def test_newly_required_property_is_breaking(self):
+        old = _spec(schemas={"S": {"type": "object", "properties": {"a": {"type": "string"}}}})
+        new = _spec(
+            schemas={
+                "S": {"type": "object", "required": ["a"], "properties": {"a": {"type": "string"}}}
+            }
+        )
+        diff = openapi_tools.semantic_diff(old, new)
+        self.assertEqual(diff.schemas_modified, ["S"])
+        self.assertTrue(diff.is_breaking())
+        self.assertIn("newly required: a", diff.detail("schema", "S"))
+
+    def test_schema_documentation_only_change_is_not_breaking(self):
+        old = _spec(
+            schemas={
+                "S": {"type": "object", "properties": {"a": {"type": "string", "description": "old"}}}
+            }
+        )
+        new = _spec(
+            schemas={
+                "S": {"type": "object", "properties": {"a": {"type": "string", "description": "new"}}}
+            }
+        )
+        diff = openapi_tools.semantic_diff(old, new)
+        self.assertEqual(diff.schemas_extended, ["S"])
+        self.assertEqual(diff.schemas_modified, [])
+        self.assertFalse(diff.is_breaking())
+        self.assertEqual(diff.detail("schema", "S"), "documentation only")
+
+    def test_property_named_description_is_not_treated_as_documentation(self):
+        old = _spec(
+            schemas={
+                "BatchJournalRequest": {
+                    "type": "object",
+                    "properties": {"description": {"type": "string"}},
+                }
+            }
+        )
+        new = _spec(
+            schemas={
+                "BatchJournalRequest": {
+                    "type": "object",
+                    "properties": {"correspondent": {"type": "string"}},
+                }
+            }
+        )
+        diff = openapi_tools.semantic_diff(old, new)
+        self.assertEqual(diff.schemas_modified, ["BatchJournalRequest"])
+        self.assertTrue(diff.is_breaking())
+        self.assertIn(
+            "removed properties: description", diff.detail("schema", "BatchJournalRequest")
+        )
+
+    def test_response_examples_only_change_is_not_breaking(self):
+        def spec(with_examples: bool):
+            response: dict = {"content": {"application/json": {"schema": {"type": "object"}}}}
+            if with_examples:
+                response["content"]["application/json"]["examples"] = {
+                    "sample": {"value": {"a": 1}}
+                }
+            return _spec(
+                paths={
+                    "/v1/limits": {
+                        "get": {
+                            "operationId": "getLimits",
+                            "tags": ["Funding"],
+                            "responses": {"200": response},
+                        }
+                    }
+                }
+            )
+
+        diff = openapi_tools.semantic_diff(spec(False), spec(True))
+        self.assertEqual(diff.operations_extended, ["GET /v1/limits"])
+        self.assertEqual(diff.operations_modified, [])
+        self.assertFalse(diff.is_breaking())
+        self.assertFalse(diff.is_empty())
+        self.assertEqual(diff.detail("operation", "GET /v1/limits"), "documentation only")
+
+    def test_added_parameter_is_breaking_for_generated_signatures(self):
+        def spec(parameters):
+            return _spec(
+                paths={
+                    "/v2/account/activities": {
+                        "get": {
+                            "operationId": "getAccountActivities",
+                            "tags": ["Activities"],
+                            "parameters": parameters,
+                            "responses": {"200": {}},
+                        }
+                    }
+                }
+            )
+
+        old = spec([{"name": "category", "in": "query"}])
+        new = spec(
+            [
+                {"name": "category", "in": "query"},
+                {"name": "order_id", "in": "query"},
+            ]
+        )
+        diff = openapi_tools.semantic_diff(old, new)
+        self.assertEqual(diff.operations_modified, ["GET /v2/account/activities"])
+        self.assertTrue(diff.is_breaking())
+        self.assertIn(
+            "added parameters: query:order_id",
+            diff.detail("operation", "GET /v2/account/activities"),
+        )
+
+    def test_merge_diffs_preserves_details_and_extended_lists(self):
+        old = _spec(schemas={"S": {"type": "object", "properties": {}}})
+        new = _spec(schemas={"S": {"type": "object", "properties": {"a": {"type": "string"}}}})
+        diff = openapi_tools.semantic_diff(old, new)
+        merged = openapi_tools.merge_diffs([diff, openapi_tools.DiffResult()])
+        self.assertEqual(merged.schemas_extended, ["S"])
+        self.assertIn("added properties: a", merged.detail("schema", "S"))
+        self.assertFalse(merged.is_breaking())
+
     def test_reports_include_breaking_and_changelog_sections(self):
         old = _spec(schemas={"A": {"type": "string", "enum": ["x"]}})
         new = _spec(schemas={"B": {"type": "string", "enum": ["y"]}})

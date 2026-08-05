@@ -522,20 +522,38 @@ tasks.register('adoptOpenApiApplyPinsBreaking') {
     }
 }
 
+// Nested generate+test so pin writes are re-snapshotted. In-process generateApis as a
+// sibling of adoptOpenApiApplyPins* keeps a stale specs/ fingerprint from before the
+// pin write (mustRunAfter on the umbrella task does not order preprocess*Spec).
+tasks.register('adoptOpenApiRegenerate', Exec) {
+    group = 'openapi tools'
+    description = 'Nested generateApis + test after adopt pin writes (fresh specs/ snapshot)'
+    workingDir = rootDir
+    outputs.upToDateWhen { false }
+    def gradleWrapper = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
+        ? 'gradlew.bat'
+        : './gradlew'
+    doFirst {
+        def forwardedProperties = gradle.startParameter.projectProperties.collect {
+            key, value -> "-P${key}=${value}"
+        }
+        commandLine([gradleWrapper, 'generateApis', 'test'] + forwardedProperties)
+    }
+}
+
 tasks.register('adoptOpenApi') {
     group = 'openapi tools'
     description = 'Adopt additive upstream OAS changes into specs/ and regenerate clients'
-    dependsOn 'adoptOpenApiApplyPins', 'generateApis', 'test'
+    dependsOn 'adoptOpenApiApplyPins', 'adoptOpenApiRegenerate'
 }
 
 tasks.register('adoptOpenApiBreaking') {
     group = 'openapi tools'
     description = 'Adopt upstream OAS including breaking changes into specs/ and regenerate clients'
-    dependsOn 'adoptOpenApiApplyPinsBreaking', 'generateApis', 'test'
+    dependsOn 'adoptOpenApiApplyPinsBreaking', 'adoptOpenApiRegenerate'
 }
 
-// Ensure pin apply finishes before generate/test when running lifecycle adopt tasks.
-tasks.named('generateApis').configure {
+tasks.named('adoptOpenApiRegenerate').configure {
     mustRunAfter 'adoptOpenApiApplyPins', 'adoptOpenApiApplyPinsBreaking'
 }
 

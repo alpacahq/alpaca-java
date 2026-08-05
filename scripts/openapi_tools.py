@@ -43,13 +43,17 @@ class DiffResult:
     operations_added: list[str] = field(default_factory=list)
     operations_removed: list[str] = field(default_factory=list)
     operations_modified: list[str] = field(default_factory=list)
+    operations_extended: list[str] = field(default_factory=list)
     operations_renamed: list[str] = field(default_factory=list)
     operations_moved: list[str] = field(default_factory=list)
     schemas_added: list[str] = field(default_factory=list)
     schemas_removed: list[str] = field(default_factory=list)
     schemas_modified: list[str] = field(default_factory=list)
+    schemas_extended: list[str] = field(default_factory=list)
     enum_values_added: list[str] = field(default_factory=list)
     enum_values_removed: list[str] = field(default_factory=list)
+    # Keyed by "operation <key>" / "schema <name>"; explains why an entry was classified.
+    change_details: dict[str, str] = field(default_factory=dict)
 
     def is_empty(self) -> bool:
         return not any(
@@ -57,18 +61,21 @@ class DiffResult:
                 self.operations_added,
                 self.operations_removed,
                 self.operations_modified,
+                self.operations_extended,
                 self.operations_renamed,
                 self.operations_moved,
                 self.schemas_added,
                 self.schemas_removed,
                 self.schemas_modified,
+                self.schemas_extended,
                 self.enum_values_added,
                 self.enum_values_removed,
             ]
         )
 
     def is_breaking(self) -> bool:
-        # Any non-additive surface change can alter generated Java types/methods.
+        # operations_modified / schemas_modified hold only non-additive changes;
+        # additive ones land in operations_extended / schemas_extended.
         return bool(
             self.operations_removed
             or self.operations_renamed
@@ -78,6 +85,9 @@ class DiffResult:
             or self.schemas_modified
             or self.enum_values_removed
         )
+
+    def detail(self, kind: str, name: str) -> str | None:
+        return self.change_details.get(f"{kind} {name}")
 
 
 def _operations(spec: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -120,6 +130,154 @@ def _first_tag(operation: dict[str, Any]) -> str | None:
 
 def _schema_fingerprint(schema: Any) -> str:
     return json.dumps(schema, sort_keys=True, default=str)
+
+
+# Keywords that only feed generated Javadoc, never Java types or method signatures.
+_DOC_KEYS = frozenset({"description", "summary", "example", "examples", "externalDocs"})
+
+# Maps whose keys are author-chosen names (property names, status codes, media types)
+# rather than OpenAPI keywords. Their keys must survive doc stripping — a schema may
+# legitimately declare a property called "description".
+_NAME_KEYED_MAPS = frozenset(
+    {
+        "properties",
+        "patternProperties",
+        "responses",
+        "content",
+        "headers",
+        "encoding",
+        "schemas",
+        "requestBodies",
+        "variables",
+        "links",
+        "callbacks",
+        "securitySchemes",
+    }
+)
+
+
+def _strip_docs(node: Any, *, name_keyed: bool = False) -> Any:
+    """Drop documentation-only keywords so fingerprints reflect generated surface."""
+    if isinstance(node, dict):
+        if name_keyed:
+            return {key: _strip_docs(value) for key, value in node.items()}
+        return {
+            key: _strip_docs(value, name_keyed=key in _NAME_KEYED_MAPS)
+            for key, value in node.items()
+            if key not in _DOC_KEYS
+        }
+    if isinstance(node, list):
+        return [_strip_docs(item) for item in node]
+    return node
+
+
+def _comparable_operation(operation: dict[str, Any]) -> dict[str, Any]:
+    ignored = {"tags", "x-codegen-request-body-name"}
+    return _strip_docs({k: v for k, v in operation.items() if k not in ignored})
+
+
+def _mapping(node: Any, key: str) -> dict[str, Any]:
+    value = node.get(key) if isinstance(node, dict) else None
+    return value if isinstance(value, dict) else {}
+
+
+def _required(schema: Any) -> set[str]:
+    value = schema.get("required") if isinstance(schema, dict) else None
+    return {str(item) for item in value} if isinstance(value, list) else set()
+
+
+def _parameter_map(operation: dict[str, Any]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    parameters = operation.get("parameters")
+    if not isinstance(parameters, list):
+        return result
+    for parameter in parameters:
+        if isinstance(parameter, dict):
+            result[f"{parameter.get('in')}:{parameter.get('name')}"] = parameter
+    return result
+
+
+def _diff_keys(old: dict[str, Any], new: dict[str, Any]) -> tuple[list[str], list[str], list[str]]:
+    removed = sorted(set(old) - set(new))
+    added = sorted(set(new) - set(old))
+    changed = sorted(
+        name
+        for name in set(old) & set(new)
+        if _schema_fingerprint(old[name]) != _schema_fingerprint(new[name])
+    )
+    return removed, added, changed
+
+
+def _classify_schema_change(old_schema: Any, new_schema: Any) -> tuple[bool, str] | None:
+    """Classify a component schema change as (breaking, detail), or None when identical."""
+    old_bare = _strip_docs(old_schema)
+    new_bare = _strip_docs(new_schema)
+    if _schema_fingerprint(old_bare) == _schema_fingerprint(new_bare):
+        if _schema_fingerprint(old_schema) == _schema_fingerprint(new_schema):
+            return None
+        return False, "documentation only"
+
+    removed, added, changed = _diff_keys(_mapping(old_bare, "properties"), _mapping(new_bare, "properties"))
+    newly_required = sorted(_required(new_bare) - _required(old_bare))
+    no_longer_required = sorted(_required(old_bare) - _required(new_bare))
+    old_rest = {k: v for k, v in old_bare.items() if k != "properties"}
+    new_rest = {k: v for k, v in new_bare.items() if k != "properties"}
+    keywords_changed = _schema_fingerprint(old_rest) != _schema_fingerprint(new_rest)
+
+    parts: list[str] = []
+    if removed:
+        parts.append("removed properties: " + ", ".join(removed))
+    if changed:
+        parts.append("changed properties: " + ", ".join(changed))
+    if newly_required:
+        parts.append("newly required: " + ", ".join(newly_required))
+    if no_longer_required:
+        parts.append("no longer required: " + ", ".join(no_longer_required))
+    if keywords_changed and not (newly_required or no_longer_required):
+        parts.append("schema keywords changed")
+    if added:
+        parts.append("added properties: " + ", ".join(added))
+
+    breaking = bool(removed or changed or keywords_changed)
+    return breaking, "; ".join(parts) or "schema changed"
+
+
+def _classify_operation_change(
+    old_op: dict[str, Any], new_op: dict[str, Any]
+) -> tuple[bool, str] | None:
+    """Classify an operation change as (breaking, detail), or None when identical."""
+    old_bare = _comparable_operation(old_op)
+    new_bare = _comparable_operation(new_op)
+    if _schema_fingerprint(old_bare) == _schema_fingerprint(new_bare):
+        if _schema_fingerprint(old_op) == _schema_fingerprint(new_op):
+            return None
+        return False, "documentation only"
+
+    parts: list[str] = []
+    removed, added, changed = _diff_keys(_parameter_map(old_bare), _parameter_map(new_bare))
+    if removed:
+        parts.append("removed parameters: " + ", ".join(removed))
+    # A new parameter is breaking here: the Java generator widens every overload's
+    # signature, so existing call sites stop compiling.
+    if added:
+        parts.append("added parameters: " + ", ".join(added))
+    if changed:
+        parts.append("changed parameters: " + ", ".join(changed))
+    if _schema_fingerprint(old_bare.get("requestBody")) != _schema_fingerprint(
+        new_bare.get("requestBody")
+    ):
+        parts.append("request body changed")
+    resp_removed, resp_added, resp_changed = _diff_keys(
+        _mapping(old_bare, "responses"), _mapping(new_bare, "responses")
+    )
+    if resp_removed:
+        parts.append("removed responses: " + ", ".join(resp_removed))
+    if resp_added:
+        parts.append("added responses: " + ", ".join(resp_added))
+    if resp_changed:
+        parts.append("changed responses: " + ", ".join(resp_changed))
+
+    return True, "; ".join(parts) or "operation definition changed"
 
 
 def _collect_enums(schema: Any, path: str, out: dict[str, set[str]]) -> None:
@@ -182,18 +340,12 @@ def semantic_diff(old: dict[str, Any], new: dict[str, Any]) -> DiffResult:
             diff.operations_moved.append(
                 f"{key}: tag {old_tag!r} -> {new_tag!r}"
             )
-        comparable_old = {
-            k: v
-            for k, v in old_op.items()
-            if k not in {"tags", "summary", "description", "externalDocs", "x-codegen-request-body-name"}
-        }
-        comparable_new = {
-            k: v
-            for k, v in new_op.items()
-            if k not in {"tags", "summary", "description", "externalDocs", "x-codegen-request-body-name"}
-        }
-        if _schema_fingerprint(comparable_old) != _schema_fingerprint(comparable_new):
-            diff.operations_modified.append(key)
+        classified = _classify_operation_change(old_op, new_op)
+        if classified is not None:
+            breaking, detail = classified
+            target = diff.operations_modified if breaking else diff.operations_extended
+            target.append(key)
+            diff.change_details[f"operation {key}"] = detail
 
     old_schemas = _schemas(old)
     new_schemas = _schemas(new)
@@ -202,8 +354,12 @@ def semantic_diff(old: dict[str, Any], new: dict[str, Any]) -> DiffResult:
     diff.schemas_added = sorted(new_schema_keys - old_schema_keys)
     diff.schemas_removed = sorted(old_schema_keys - new_schema_keys)
     for name in sorted(old_schema_keys & new_schema_keys):
-        if _schema_fingerprint(old_schemas[name]) != _schema_fingerprint(new_schemas[name]):
-            diff.schemas_modified.append(name)
+        classified = _classify_schema_change(old_schemas[name], new_schemas[name])
+        if classified is not None:
+            breaking, detail = classified
+            target = diff.schemas_modified if breaking else diff.schemas_extended
+            target.append(name)
+            diff.change_details[f"schema {name}"] = detail
 
     old_enums: dict[str, set[str]] = {}
     new_enums: dict[str, set[str]] = {}
@@ -222,11 +378,19 @@ def semantic_diff(old: dict[str, Any], new: dict[str, Any]) -> DiffResult:
     return diff
 
 
-def _section(title: str, items: list[str]) -> list[str]:
+def _section(
+    title: str,
+    items: list[str],
+    *,
+    diff: DiffResult | None = None,
+    kind: str | None = None,
+) -> list[str]:
     if not items:
         return []
     lines = [f"### {title}", ""]
-    lines.extend(f"- `{item}`" for item in items)
+    for item in items:
+        detail = diff.detail(kind, item) if diff is not None and kind else None
+        lines.append(f"- `{item}`" + (f" — {detail}" if detail else ""))
     lines.append("")
     return lines
 
@@ -245,12 +409,25 @@ def format_maintainer_report(diff: DiffResult, *, api: str | None = None) -> str
         lines.append("")
     lines.extend(_section("Operations added", diff.operations_added))
     lines.extend(_section("Operations removed", diff.operations_removed))
-    lines.extend(_section("Operations modified", diff.operations_modified))
+    lines.extend(
+        _section("Operations modified", diff.operations_modified, diff=diff, kind="operation")
+    )
+    lines.extend(
+        _section(
+            "Operations extended (additive)",
+            diff.operations_extended,
+            diff=diff,
+            kind="operation",
+        )
+    )
     lines.extend(_section("Operations renamed", diff.operations_renamed))
     lines.extend(_section("Operations moved", diff.operations_moved))
     lines.extend(_section("Schemas added", diff.schemas_added))
     lines.extend(_section("Schemas removed", diff.schemas_removed))
-    lines.extend(_section("Schemas modified", diff.schemas_modified))
+    lines.extend(_section("Schemas modified", diff.schemas_modified, diff=diff, kind="schema"))
+    lines.extend(
+        _section("Schemas extended (additive)", diff.schemas_extended, diff=diff, kind="schema")
+    )
     lines.extend(_section("Enum values added", diff.enum_values_added))
     lines.extend(_section("Enum values removed", diff.enum_values_removed))
     return "\n".join(lines).rstrip() + "\n"
@@ -266,17 +443,33 @@ def format_changelog_draft(diff: DiffResult) -> str:
     breaking: list[str] = []
     added: list[str] = []
 
+    def annotate(kind: str, name: str) -> str:
+        detail = diff.detail(kind, name)
+        return f" ({detail})" if detail else ""
+
     breaking.extend(f"Remove operation `{item}`" for item in diff.operations_removed)
     breaking.extend(f"Rename operation `{item}`" for item in diff.operations_renamed)
-    breaking.extend(f"Modify operation `{item}`" for item in diff.operations_modified)
+    breaking.extend(
+        f"Modify operation `{item}`" + annotate("operation", item)
+        for item in diff.operations_modified
+    )
     breaking.extend(f"Move operation `{item}`" for item in diff.operations_moved)
     breaking.extend(f"Remove schema `{item}`" for item in diff.schemas_removed)
-    breaking.extend(f"Modify schema `{item}`" for item in diff.schemas_modified)
+    breaking.extend(
+        f"Modify schema `{item}`" + annotate("schema", item) for item in diff.schemas_modified
+    )
     breaking.extend(f"Remove enum value `{item}`" for item in diff.enum_values_removed)
 
     added.extend(f"Add operation `{item}`" for item in diff.operations_added)
     added.extend(f"Add schema `{item}`" for item in diff.schemas_added)
     added.extend(f"Add enum value `{item}`" for item in diff.enum_values_added)
+    added.extend(
+        f"Extend operation `{item}`" + annotate("operation", item)
+        for item in diff.operations_extended
+    )
+    added.extend(
+        f"Extend schema `{item}`" + annotate("schema", item) for item in diff.schemas_extended
+    )
 
     if breaking:
         lines.append("### Breaking")
@@ -297,13 +490,16 @@ def merge_diffs(diffs: list[DiffResult]) -> DiffResult:
         merged.operations_added.extend(diff.operations_added)
         merged.operations_removed.extend(diff.operations_removed)
         merged.operations_modified.extend(diff.operations_modified)
+        merged.operations_extended.extend(diff.operations_extended)
         merged.operations_renamed.extend(diff.operations_renamed)
         merged.operations_moved.extend(diff.operations_moved)
         merged.schemas_added.extend(diff.schemas_added)
         merged.schemas_removed.extend(diff.schemas_removed)
         merged.schemas_modified.extend(diff.schemas_modified)
+        merged.schemas_extended.extend(diff.schemas_extended)
         merged.enum_values_added.extend(diff.enum_values_added)
         merged.enum_values_removed.extend(diff.enum_values_removed)
+        merged.change_details.update(diff.change_details)
     return merged
 
 

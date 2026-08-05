@@ -52,9 +52,11 @@ in CI to catch drift).
 ## Adopting upstream changes
 
 Preferred entrypoints (Gradle owns download + **isolated** upstream preprocess into
-`build/specs-adopt/` + generate from pins after apply; Python only diffs/applies —
-**no nested `./gradlew`**, and pin-based `preprocess*` is never rewired, so
-`./gradlew build adoptOpenApi` is safe):
+`build/specs-adopt/` + pin apply; Python only diffs/applies. After pins are written,
+`adoptOpenApi` / `adoptOpenApiBreaking` run **nested** `./gradlew generateApis test`
+so the fresh `specs/` snapshot is used — an in-process `generateApis` sibling of the
+pin-write task can keep a stale input fingerprint. Pin-based `preprocess*` is never
+rewired by adopt, so `./gradlew build adoptOpenApi` remains safe):
 
 ```bash
 # 1. Report only → build/openapi-adopt-report.md (exit 0 even if breaking)
@@ -68,8 +70,7 @@ Preferred entrypoints (Gradle owns download + **isolated** upstream preprocess i
 ```
 
 Equivalent shell (bootstraps `.venv-openapi`, then runs the full Python path which
-*does* invoke `./gradlew` for preprocess/generate—safe because nothing holds the
-Gradle project lock):
+also nests `./gradlew` for preprocess/generate):
 
 ```bash
 scripts/run_adopt_openapi.sh --dry-run
@@ -85,12 +86,22 @@ semantic diff is breaking. Re-run `./gradlew adoptOpenApiBreaking` after review.
 Adopt is all-or-nothing across broker/data/trading: if any API is breaking,
 additive changes on the others are not applied until `--allow-breaking`.
 
-Semantic categories: operations added/removed/modified/renamed/moved; schemas
-added/removed/modified; enum values added/removed.
+Semantic categories: operations added/removed/modified/extended/renamed/moved;
+schemas added/removed/modified/extended; enum values added/removed. `modified`
+holds only changes that alter the generated Java surface; `extended` holds
+changes that do not. Modified and extended entries carry a detail note naming
+the affected properties, parameters, or responses.
 
-**Breaking** (requires `adoptOpenApiBreaking`): removals, renames, moves,
-operation/schema modifications, and enum value removals. **Additive-only**
-adopts may use `adoptOpenApi` alone.
+**Breaking** (requires `adoptOpenApiBreaking`): removals, renames, moves, enum
+value removals, and modifications — a schema whose existing properties are
+removed, retyped, or newly required, or an operation whose parameters, request
+body, or responses change. Note that *adding* an operation parameter is breaking
+for this SDK: the generator widens every overload's signature.
+
+**Additive** (`adoptOpenApi` alone): new operations, schemas, and enum values;
+schemas that only gain properties; and documentation-only edits (`description`,
+`summary`, `example`, `examples`), which are still adopted so pins stay faithful
+to upstream but never classified as breaking.
 
 ### Manual venv (optional)
 
