@@ -96,6 +96,30 @@ jobs:
             exit 1
           fi
 
+      - name: Require curated CHANGELOG notes
+        id: changelog-gate
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          curated_notes="$RUNNER_TEMP/curated-release-notes.md"
+          if ! python3 scripts/release_tools.py extract-changelog \
+            --changelog CHANGELOG.md \
+            --version "$RELEASE_VERSION" \
+            --allow-unreleased \
+            --output "$curated_notes" \
+            --github-output "$GITHUB_OUTPUT"; then
+            echo "::error::CHANGELOG.md on the tagged commit must contain a non-empty ## [$RELEASE_VERSION] section, or a non-empty ## [Unreleased] fallback when no ## [$RELEASE_VERSION] heading exists"
+            exit 1
+          fi
+          source="$(
+            awk -F= '$1 == "source" { value = $2 } END { print value }' "$GITHUB_OUTPUT"
+          )"
+          if [[ "$source" == "unreleased" ]]; then
+            echo "::notice::Curated release notes will use ## [Unreleased]; the post-release bump PR should promote it to ## [$RELEASE_VERSION] on main"
+          fi
+
       - name: Test tagged release tooling
         env:
           PYTHONDONTWRITEBYTECODE: '1'
@@ -302,6 +326,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.central_publish.outputs.tag }}
+          RELEASE_VERSION: ${{ needs.central_publish.outputs.version }}
         run: |
           set -euo pipefail
 
@@ -343,10 +368,39 @@ jobs:
             exit 0
           fi
 
+          curated_notes="$RUNNER_TEMP/curated-release-notes.md"
+          generated_notes_file="$RUNNER_TEMP/generated-release-notes.md"
+          release_notes="$RUNNER_TEMP/github-release-notes.md"
+          if ! python3 scripts/release_tools.py extract-changelog \
+            --changelog CHANGELOG.md \
+            --version "$RELEASE_VERSION" \
+            --allow-unreleased \
+            --output "$curated_notes"; then
+            echo "::error::Unable to extract curated CHANGELOG notes for GitHub Release"
+            exit 1
+          fi
+
+          if ! gh api \
+            --method POST \
+            "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+            -f tag_name="$RELEASE_TAG" \
+            --jq .body > "$generated_notes_file"; then
+            echo "::error::GitHub generate-notes failed; refusing to create a release without a compare link"
+            exit 1
+          fi
+
+          if ! python3 scripts/release_tools.py compose-github-release-notes \
+            --curated "$curated_notes" \
+            --generated "$generated_notes_file" \
+            --output "$release_notes"; then
+            echo "::error::Unable to compose GitHub Release notes"
+            exit 1
+          fi
+
           gh release create "$RELEASE_TAG" \
             --verify-tag \
-            --generate-notes \
-            --title "$RELEASE_TAG"
+            --title "$RELEASE_TAG" \
+            --notes-file "$release_notes"
 
   bump_main:
     name: Open next patch development pull request
@@ -372,10 +426,11 @@ jobs:
             refs/heads/main:refs/remotes/origin/main
           git checkout --detach refs/remotes/origin/main
 
-      - name: Prepare next development version
+      - name: Prepare next development version and CHANGELOG
         id: next-version
         shell: bash
         env:
+          RELEASE_TAG: ${{ needs.central_publish.outputs.tag }}
           RELEASE_VERSION: ${{ needs.central_publish.outputs.version }}
         run: |
           set -euo pipefail
@@ -387,20 +442,18 @@ jobs:
             exit 1
           fi
 
-          case "$(awk -F= '$1 == "status" { value = $2 } END { print value }' "$GITHUB_OUTPUT")" in
+          version_status="$(
+            awk -F= '$1 == "status" { value = $2 } END { print value }' "$GITHUB_OUTPUT"
+          )"
+          case "$version_status" in
             equal)
-              echo "::notice::Main already has the next development version; no bump is needed"
+              echo "::notice::Main already has the next development version"
               ;;
             ahead)
               echo "::error::Main is ahead of the expected next development version; refusing to continue without an explicit recovery plan"
               exit 1
               ;;
             behind)
-              mapfile -t changed_files < <(git diff --name-only)
-              if (( ${#changed_files[@]} != 1 )) || [[ "${changed_files[0]}" != "gradle.properties" ]]; then
-                echo "::error::Version bump must modify only gradle.properties"
-                exit 1
-              fi
               ;;
             *)
               echo "::error::Version comparison did not produce a recognized status"
@@ -408,16 +461,109 @@ jobs:
               ;;
           esac
 
+          # Promote only the notes that were published for this tag; main may have
+          # moved on since the release commit.
+          tagged_changelog="$RUNNER_TEMP/tagged-CHANGELOG.md"
+          published_notes="$RUNNER_TEMP/published-release-notes.md"
+          git fetch --force --tags origin
+          if ! git show "refs/tags/$RELEASE_TAG:CHANGELOG.md" > "$tagged_changelog"; then
+            echo "::error::Unable to read CHANGELOG.md from tag $RELEASE_TAG"
+            exit 1
+          fi
+          if ! python3 scripts/release_tools.py extract-changelog \
+            --changelog "$tagged_changelog" \
+            --version "$RELEASE_VERSION" \
+            --allow-unreleased \
+            --output "$published_notes"; then
+            echo "::error::Unable to re-read the curated notes published for $RELEASE_VERSION"
+            exit 1
+          fi
+
+          release_date="$(date -u +%F)"
+          if ! python3 scripts/release_tools.py promote-changelog \
+            --changelog CHANGELOG.md \
+            --version "$RELEASE_VERSION" \
+            --date "$release_date" \
+            --expected-body "$published_notes" \
+            --github-output "$GITHUB_OUTPUT"; then
+            echo "::error::Unable to promote CHANGELOG.md for $RELEASE_VERSION on main"
+            exit 1
+          fi
+
+          changelog_changed="$(
+            awk -F= '$1 == "changed" { value = $2 } END { print value }' "$GITHUB_OUTPUT"
+          )"
+          changelog_status="$(
+            awk -F= '$1 == "changelog_status" { value = $2 } END { print value }' "$GITHUB_OUTPUT"
+          )"
+          if [[ "$changelog_status" == "diverged" ]]; then
+            echo "::warning::CHANGELOG.md on main already has a [$RELEASE_VERSION] section whose content differs from the notes published for $RELEASE_TAG; reconcile them manually"
+          fi
+          mapfile -t changed_files < <(git diff --name-only)
+          properties_changed=false
+          changelog_file_changed=false
+          for path in "${changed_files[@]+"${changed_files[@]}"}"; do
+            case "$path" in
+              gradle.properties) properties_changed=true ;;
+              CHANGELOG.md) changelog_file_changed=true ;;
+              *)
+                echo "::error::Unexpected changed file during release bump: $path"
+                exit 1
+                ;;
+            esac
+          done
+
+          if [[ "$changelog_changed" == "true" && "$changelog_file_changed" != "true" ]]; then
+            echo "::error::promote-changelog reported a change but CHANGELOG.md is unmodified"
+            exit 1
+          fi
+          if [[ "$changelog_changed" != "true" && "$changelog_file_changed" == "true" ]]; then
+            echo "::error::CHANGELOG.md changed unexpectedly"
+            exit 1
+          fi
+          if [[ "$version_status" == "behind" && "$properties_changed" != "true" ]]; then
+            echo "::error::Version bump status is behind but gradle.properties is unmodified"
+            exit 1
+          fi
+          if [[ "$version_status" == "equal" && "$properties_changed" == "true" ]]; then
+            echo "::error::Version status is equal but gradle.properties changed"
+            exit 1
+          fi
+
+          if [[ "$properties_changed" == "true" || "$changelog_file_changed" == "true" ]]; then
+            echo "should_push=true" >> "$GITHUB_OUTPUT"
+            echo "changelog_changed=$changelog_file_changed" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_push=false" >> "$GITHUB_OUTPUT"
+            echo "changelog_changed=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Main already has the next development version and CHANGELOG.md; no bump PR is needed"
+          fi
+
       - name: Create next development version pull request
         if: steps.next-version.outputs.should_push == 'true'
         shell: bash
         env:
           NEXT_VERSION: ${{ steps.next-version.outputs.version }}
+          RELEASE_VERSION: ${{ needs.central_publish.outputs.version }}
+          CHANGELOG_CHANGED: ${{ steps.next-version.outputs.changelog_changed }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
           branch="release/start-$NEXT_VERSION"
+
+          paths=()
+          if git diff --name-only | grep -qx 'gradle.properties'; then
+            paths+=(gradle.properties)
+          fi
+          if git diff --name-only | grep -qx 'CHANGELOG.md'; then
+            paths+=(CHANGELOG.md)
+          fi
+          if (( ${#paths[@]} == 0 )); then
+            echo "::error::Bump PR was requested but no allowed files changed"
+            exit 1
+          fi
+
           existing_pr="$(
             gh pr list \
               --base main \
@@ -427,29 +573,67 @@ jobs:
               --jq '.[0].url'
           )"
           if [[ -n "$existing_pr" ]]; then
-            echo "::notice::Version-bump pull request already exists: $existing_pr"
+            # An open PR from an earlier run may predate a required change
+            # (for example a CHANGELOG promotion); never silently skip it.
+            if ! git fetch --force origin \
+              "refs/heads/$branch:refs/remotes/origin/$branch"; then
+              echo "::error::Unable to inspect existing pull request branch '$branch'"
+              exit 1
+            fi
+            for path in "${paths[@]}"; do
+              existing_file="$RUNNER_TEMP/existing-${path//\//_}"
+              if ! git show "refs/remotes/origin/$branch:$path" > "$existing_file"; then
+                echo "::error::Existing pull request $existing_pr does not contain $path; update it manually"
+                exit 1
+              fi
+              if ! cmp -s "$existing_file" "$path"; then
+                echo "::error::Existing pull request $existing_pr does not match the required $path content; update it manually"
+                exit 1
+              fi
+            done
+            echo "::notice::Version-bump pull request already covers these changes: $existing_pr"
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add -- gradle.properties
+          git add -- "${paths[@]}"
 
           mapfile -t staged_files < <(git diff --cached --name-only)
-          if (( ${#staged_files[@]} != 1 )) || [[ "${staged_files[0]}" != "gradle.properties" ]]; then
-            echo "::error::Refusing to commit anything except gradle.properties"
-            exit 1
+          for staged in "${staged_files[@]}"; do
+            case "$staged" in
+              gradle.properties|CHANGELOG.md) ;;
+              *)
+                echo "::error::Refusing to commit disallowed file: $staged"
+                exit 1
+                ;;
+            esac
+          done
+
+          if [[ "$CHANGELOG_CHANGED" == "true" ]]; then
+            commit_message="chore: start $NEXT_VERSION development"
+            pr_title="chore: start $NEXT_VERSION development"
+            pr_body="Automated post-release updates: next snapshot in \`gradle.properties\` and CHANGELOG promotion of \`$RELEASE_VERSION\`."
+            if ! printf '%s\n' "${staged_files[@]}" | grep -qx 'gradle.properties'; then
+              commit_message="chore: promote CHANGELOG for $RELEASE_VERSION"
+              pr_title="chore: promote CHANGELOG for $RELEASE_VERSION"
+              pr_body="Automated post-release CHANGELOG promotion for \`$RELEASE_VERSION\` (version property already current)."
+            fi
+          else
+            commit_message="chore: start $NEXT_VERSION development"
+            pr_title="chore: start $NEXT_VERSION development"
+            pr_body="Automated post-release version bump. This PR changes only \`gradle.properties\`."
           fi
 
-          git commit -m "chore: start $NEXT_VERSION development"
+          git commit -m "$commit_message"
           git push origin "HEAD:refs/heads/$branch"
 
           pr_url="$(
             gh pr create \
               --base main \
               --head "$branch" \
-              --title "chore: start $NEXT_VERSION development" \
-              --body "Automated post-release version bump. This PR changes only \`gradle.properties\`."
+              --title "$pr_title" \
+              --body "$pr_body"
           )"
           echo "::notice::Opened version-bump pull request: $pr_url"

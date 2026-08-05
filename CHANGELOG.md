@@ -20,6 +20,15 @@ the policy below applies strictly.
 
 ## [Unreleased]
 
+### Changed
+- GitHub Releases now use the curated `CHANGELOG.md` section for the tag (with a
+  non-empty `[Unreleased]` fallback), then append GitHub’s compare link for the
+  tag range. The release workflow fails before Maven Central if neither section
+  has content, and the post-release bump PR promotes `[Unreleased]` to a dated
+  version section when needed.
+
+## [0.1.2] - 2026-08-05
+
 ### Breaking
 Adopting the current upstream OpenAPI documents renamed and removed parts of the generated API
 surface relative to `0.1.1` (which generated from live specs at build time).
