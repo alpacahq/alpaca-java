@@ -15,6 +15,8 @@ def specSources = AlpacaBuildProperties.resolveSpecSources(project, localPropert
 def brokerSpecSource = specSources.broker
 def dataSpecSource = specSources.data
 def tradingSpecSource = specSources.trading
+def upstreamUrlDefaults = AlpacaBuildProperties.upstreamUrlDefaults(rootProject.projectDir)
+
 def preprocessedSpecInputs = providers
     .gradleProperty('alpaca.preprocessedSpecInputs')
     .map { it.toBoolean() }
@@ -23,6 +25,8 @@ def preprocessedSpecInputs = providers
 def generatedBrokerDir = layout.buildDirectory.dir('generated/broker')
 def generatedDataDir = layout.buildDirectory.dir('generated/data')
 def generatedTradingDir = layout.buildDirectory.dir('generated/trading')
+def committedMainJavaDir = layout.projectDirectory.dir('src/main/java')
+def committedOpenApiJavaDir = committedMainJavaDir.dir('markets/alpaca/client/openapi')
 def openApiTemplateDir = layout.projectDirectory.dir('src/main/openapi-templates/Java')
 
 def preprocessedBrokerSpec = layout.buildDirectory.file('specs/broker/openapi.yaml')
@@ -48,6 +52,21 @@ def commonTypeMappings = [
     'string+decimal': 'BigDecimal',
 ]
 
+def syncGeneratedApi = { outputDir, String api ->
+    def relativePackage = "markets/alpaca/client/openapi/${api}"
+    def sourcePackage = new File(outputDir, "src/main/java/${relativePackage}")
+    def targetPackage = committedMainJavaDir.dir(relativePackage).asFile
+    delete(targetPackage)
+    copy {
+        from sourcePackage
+        into targetPackage
+    }
+}
+
+def usePinnedInput = { String api, String source ->
+    preprocessedSpecInputs || AlpacaBuildProperties.isCommittedPin(project, api, source)
+}
+
 tasks.register('preprocessBrokerSpec') {
     group = 'openapi tools'
     description = 'Sanitises the broker OpenAPI spec before code generation'
@@ -58,23 +77,22 @@ tasks.register('preprocessBrokerSpec') {
         inputs.files(file(brokerSpecSource))
     }
     inputs.property('preprocessedSpecInputs', preprocessedSpecInputs)
+    inputs.property('usePinnedInput', usePinnedInput('broker', brokerSpecSource))
     outputs.file(preprocessedBrokerSpec)
 
     doLast {
         def outputFile = preprocessedBrokerSpec.get().asFile
         outputFile.parentFile.mkdirs()
-        if (preprocessedSpecInputs) {
+        if (usePinnedInput('broker', brokerSpecSource)) {
             if (OpenApiSpecSupport.isUrl(brokerSpecSource)) {
                 throw new GradleException(
-                    'alpaca.preprocessedSpecInputs requires local spec files')
+                    'Pinned/preprocessed spec inputs require local spec files')
             }
             outputFile.bytes = file(brokerSpecSource).bytes
             return
         }
         def spec = OpenApiSpecSupport.loadSpec(brokerSpecSource) as Map
-        OpenApiSpecSupport.removeEmptyKeyProperties(spec)
-        OpenApiSpecSupport.removeDiscriminatorEnums(spec)
-        OpenApiSpecSupport.removeActivityV2DetailTrdRequired(spec)
+        OpenApiSpecSupport.sanitizeBrokerSpec(spec)
         outputFile.text = OpenApiSpecSupport.dumpYaml(spec)
     }
 }
@@ -89,21 +107,22 @@ tasks.register('preprocessDataSpec') {
         inputs.files(file(dataSpecSource))
     }
     inputs.property('preprocessedSpecInputs', preprocessedSpecInputs)
+    inputs.property('usePinnedInput', usePinnedInput('data', dataSpecSource))
     outputs.file(preprocessedDataSpec)
 
     doLast {
         def outputFile = preprocessedDataSpec.get().asFile
         outputFile.parentFile.mkdirs()
-        if (preprocessedSpecInputs) {
+        if (usePinnedInput('data', dataSpecSource)) {
             if (OpenApiSpecSupport.isUrl(dataSpecSource)) {
                 throw new GradleException(
-                    'alpaca.preprocessedSpecInputs requires local spec files')
+                    'Pinned/preprocessed spec inputs require local spec files')
             }
             outputFile.bytes = file(dataSpecSource).bytes
             return
         }
         def spec = OpenApiSpecSupport.loadSpec(dataSpecSource) as Map
-        OpenApiSpecSupport.removeInternalSchemaMarkers(spec)
+        OpenApiSpecSupport.sanitizeDataSpec(spec)
         outputFile.text = OpenApiSpecSupport.dumpYaml(spec)
     }
 }
@@ -118,22 +137,22 @@ tasks.register('preprocessTradingSpec') {
         inputs.files(file(tradingSpecSource))
     }
     inputs.property('preprocessedSpecInputs', preprocessedSpecInputs)
+    inputs.property('usePinnedInput', usePinnedInput('trading', tradingSpecSource))
     outputs.file(preprocessedTradingSpec)
 
     doLast {
         def outputFile = preprocessedTradingSpec.get().asFile
         outputFile.parentFile.mkdirs()
-        if (preprocessedSpecInputs) {
+        if (usePinnedInput('trading', tradingSpecSource)) {
             if (OpenApiSpecSupport.isUrl(tradingSpecSource)) {
                 throw new GradleException(
-                    'alpaca.preprocessedSpecInputs requires local spec files')
+                    'Pinned/preprocessed spec inputs require local spec files')
             }
             outputFile.bytes = file(tradingSpecSource).bytes
             return
         }
         def spec = OpenApiSpecSupport.loadSpec(tradingSpecSource) as Map
-        OpenApiSpecSupport.removeActivityV2DetailTrdRequired(spec)
-        OpenApiSpecSupport.requireDistinctAccountActivityTypes(spec)
+        OpenApiSpecSupport.sanitizeTradingSpec(spec)
         outputFile.text = OpenApiSpecSupport.dumpYaml(spec)
     }
 }
@@ -153,16 +172,19 @@ tasks.register('generateBrokerApi', GenerateTask) {
     templateDir = openApiTemplateDir.asFile.absolutePath
     cleanupOutput = true
     skipValidateSpec = false
+    outputs.dir(committedOpenApiJavaDir.dir('broker'))
 
     doLast {
+        def output = generatedBrokerDir.get().asFile
         OpenApiSpecSupport.writeOpenApiPackageInfo(
-            generatedBrokerDir.get().asFile,
+            output,
             'Broker API',
             preprocessedBrokerSpec.get().asFile.absolutePath,
             'markets.alpaca.client.openapi.broker',
             apiPackage.get(),
             modelPackage.get(),
             invokerPackage.get())
+        syncGeneratedApi(output, 'broker')
     }
 }
 
@@ -181,16 +203,19 @@ tasks.register('generateDataApi', GenerateTask) {
     templateDir = openApiTemplateDir.asFile.absolutePath
     cleanupOutput = true
     skipValidateSpec = false
+    outputs.dir(committedOpenApiJavaDir.dir('data'))
 
     doLast {
+        def output = generatedDataDir.get().asFile
         OpenApiSpecSupport.writeOpenApiPackageInfo(
-            generatedDataDir.get().asFile,
+            output,
             'Market Data API',
             preprocessedDataSpec.get().asFile.absolutePath,
             'markets.alpaca.client.openapi.data',
             apiPackage.get(),
             modelPackage.get(),
             invokerPackage.get())
+        syncGeneratedApi(output, 'data')
     }
 }
 
@@ -209,16 +234,19 @@ tasks.register('generateTradingApi', GenerateTask) {
     templateDir = openApiTemplateDir.asFile.absolutePath
     cleanupOutput = true
     skipValidateSpec = false
+    outputs.dir(committedOpenApiJavaDir.dir('trading'))
 
     doLast {
+        def output = generatedTradingDir.get().asFile
         OpenApiSpecSupport.writeOpenApiPackageInfo(
-            generatedTradingDir.get().asFile,
+            output,
             'Trading API',
             preprocessedTradingSpec.get().asFile.absolutePath,
             'markets.alpaca.client.openapi.trading',
             apiPackage.get(),
             modelPackage.get(),
             invokerPackage.get())
+        syncGeneratedApi(output, 'trading')
     }
 }
 
@@ -226,6 +254,34 @@ tasks.register('generateApis') {
     group = 'openapi tools'
     description = 'Generates all three Alpaca API clients (Broker, Data, Trading)'
     dependsOn 'generateBrokerApi', 'generateDataApi', 'generateTradingApi'
+    doLast {
+        OpenApiSpecSupport.writeOpenApiRootPackageInfo(committedMainJavaDir.asFile)
+    }
+}
+
+tasks.register('checkGenerated') {
+    group = 'verification'
+    description = 'Regenerates from pinned specs and fails if specs/ or generated OpenAPI sources drift'
+    dependsOn 'generateApis'
+    doLast {
+        def proc = new ProcessBuilder(
+            'git', 'status', '--porcelain', '--',
+            'specs', 'src/main/java/markets/alpaca/client/openapi')
+            .directory(rootProject.projectDir)
+            .redirectErrorStream(true)
+            .start()
+        def out = new String(proc.inputStream.readAllBytes()).trim()
+        def exit = proc.waitFor()
+        if (exit != 0) {
+            throw new GradleException("git status failed while checking generated outputs:\n${out}")
+        }
+        if (out) {
+            throw new GradleException(
+                "Generated OpenAPI outputs are out of date:\n${out}\n" +
+                    'Run ./gradlew generateApis and commit specs/ + ' +
+                    'src/main/java/markets/alpaca/client/openapi/.')
+        }
+    }
 }
 
 def printSpecVersionsEnabled = !providers
@@ -298,20 +354,221 @@ tasks.register('printSpecVersions') {
     }
 }
 
+def upstreamBrokerJson = layout.buildDirectory.file('upstream/broker.json')
+def upstreamDataJson = layout.buildDirectory.file('upstream/data.json')
+def upstreamTradingJson = layout.buildDirectory.file('upstream/trading.json')
+def adoptBrokerSpec = layout.buildDirectory.file('specs-adopt/broker/openapi.yaml')
+def adoptDataSpec = layout.buildDirectory.file('specs-adopt/data/openapi.yaml')
+def adoptTradingSpec = layout.buildDirectory.file('specs-adopt/trading/openapi.yaml')
+
+tasks.register('downloadUpstreamOpenApi') {
+    group = 'openapi tools'
+    description = 'Downloads live Broker/Data/Trading OAS into build/upstream/'
+    outputs.files(upstreamBrokerJson, upstreamDataJson, upstreamTradingJson)
+    outputs.upToDateWhen { false }
+
+    doLast {
+        def downloads = [
+            [upstreamUrlDefaults.broker, upstreamBrokerJson.get().asFile],
+            [upstreamUrlDefaults.data, upstreamDataJson.get().asFile],
+            [upstreamUrlDefaults.trading, upstreamTradingJson.get().asFile],
+        ]
+        downloads.each { entry ->
+            def url = entry[0] as String
+            def destination = entry[1] as File
+            destination.parentFile.mkdirs()
+            println "Fetching ${url}"
+            def connection = URI.create(url).toURL().openConnection()
+            connection.setRequestProperty('User-Agent', 'alpaca-java-openapi-adopt/1.0')
+            connection.setRequestProperty('Accept', 'application/json, application/yaml, text/yaml, */*')
+            connection.setConnectTimeout(60_000)
+            connection.setReadTimeout(60_000)
+            def status = connection.responseCode
+            if (status < 200 || status >= 300) {
+                throw new GradleException(
+                    "Failed to download OpenAPI spec from ${url} (HTTP ${status})")
+            }
+            destination.withOutputStream { output ->
+                connection.inputStream.withStream { input ->
+                    output << input
+                }
+            }
+        }
+    }
+}
+
+// Isolated from pin-based preprocess*: safe to combine with ./gradlew build in one invocation.
+tasks.register('preprocessUpstreamBrokerSpec') {
+    group = 'openapi tools'
+    description = 'Preprocesses downloaded upstream Broker OAS into build/specs-adopt/'
+    dependsOn 'downloadUpstreamOpenApi'
+    inputs.files(upstreamBrokerJson)
+    outputs.file(adoptBrokerSpec)
+    doLast {
+        OpenApiSpecSupport.writeSanitizedSpec(
+            upstreamBrokerJson.get().asFile.absolutePath,
+            adoptBrokerSpec.get().asFile,
+            OpenApiSpecSupport.&sanitizeBrokerSpec)
+    }
+}
+
+tasks.register('preprocessUpstreamDataSpec') {
+    group = 'openapi tools'
+    description = 'Preprocesses downloaded upstream Market Data OAS into build/specs-adopt/'
+    dependsOn 'downloadUpstreamOpenApi'
+    inputs.files(upstreamDataJson)
+    outputs.file(adoptDataSpec)
+    doLast {
+        OpenApiSpecSupport.writeSanitizedSpec(
+            upstreamDataJson.get().asFile.absolutePath,
+            adoptDataSpec.get().asFile,
+            OpenApiSpecSupport.&sanitizeDataSpec)
+    }
+}
+
+tasks.register('preprocessUpstreamTradingSpec') {
+    group = 'openapi tools'
+    description = 'Preprocesses downloaded upstream Trading OAS into build/specs-adopt/'
+    dependsOn 'downloadUpstreamOpenApi'
+    inputs.files(upstreamTradingJson)
+    outputs.file(adoptTradingSpec)
+    doLast {
+        OpenApiSpecSupport.writeSanitizedSpec(
+            upstreamTradingJson.get().asFile.absolutePath,
+            adoptTradingSpec.get().asFile,
+            OpenApiSpecSupport.&sanitizeTradingSpec)
+    }
+}
+
+def runAdoptProcess = { org.gradle.process.ExecOperations execOps, List<String> command, Map<String, String> env = [:] ->
+    execOps.exec {
+        workingDir rootProject.projectDir
+        commandLine command
+        env.each { key, value -> environment key, value }
+    }
+}
+
+def ensureOpenApiPython = { org.gradle.process.ExecOperations execOps ->
+    runAdoptProcess(execOps, [
+        'bash', '-c',
+        '''
+set -euo pipefail
+VENV='.venv-openapi'
+REQ='scripts/requirements.txt'
+STAMP="${VENV}/.requirements-stamp"
+if [[ ! -x "${VENV}/bin/python" ]]; then
+  python3 -m venv "${VENV}"
+fi
+if [[ ! -f "${STAMP}" ]] || ! cmp -s "${REQ}" "${STAMP}"; then
+  "${VENV}/bin/pip" install -q -r "${REQ}"
+  cp "${REQ}" "${STAMP}"
+fi
+''',
+    ])
+}
+
+def runAdoptPython = { org.gradle.process.ExecOperations execOps, List<String> scriptArgs ->
+    ensureOpenApiPython(execOps)
+    runAdoptProcess(
+        execOps,
+        [
+            new File(rootProject.projectDir, '.venv-openapi/bin/python').absolutePath,
+            new File(rootProject.projectDir, 'scripts/adopt_openapi.py').absolutePath,
+        ] + scriptArgs,
+        [PYTHONPATH: rootProject.projectDir.absolutePath])
+}
+
+def upstreamPreprocessTasks = [
+    'downloadUpstreamOpenApi',
+    'preprocessUpstreamBrokerSpec',
+    'preprocessUpstreamDataSpec',
+    'preprocessUpstreamTradingSpec',
+]
+
+// Diff/apply against build/specs-adopt only — never rewires pin-based preprocess*.
+// Project.exec was removed in Gradle 9; use injected ExecOperations instead.
+tasks.register('adoptOpenApiDryRun') {
+    group = 'openapi tools'
+    description = 'Fetch upstream OAS, preprocess, and print a semantic adopt report (no pin writes)'
+    dependsOn upstreamPreprocessTasks
+    outputs.upToDateWhen { false }
+    def execOps = objects.newInstance(markets.alpaca.gradle.InjectedExecOps).execOps
+    doLast {
+        runAdoptPython(execOps, ['--dry-run', '--skip-fetch', '--skip-preprocess'])
+    }
+}
+
+tasks.register('adoptOpenApiApplyPins') {
+    group = 'openapi tools'
+    description = 'Write additive upstream pins into specs/ (no generate); fails on breaking drift'
+    dependsOn upstreamPreprocessTasks
+    outputs.upToDateWhen { false }
+    def execOps = objects.newInstance(markets.alpaca.gradle.InjectedExecOps).execOps
+    doLast {
+        runAdoptPython(execOps, ['--yes', '--skip-fetch', '--skip-preprocess', '--skip-generate'])
+    }
+}
+
+tasks.register('adoptOpenApiApplyPinsBreaking') {
+    group = 'openapi tools'
+    description = 'Write upstream pins into specs/ including breaking changes (no generate)'
+    dependsOn upstreamPreprocessTasks
+    outputs.upToDateWhen { false }
+    def execOps = objects.newInstance(markets.alpaca.gradle.InjectedExecOps).execOps
+    doLast {
+        runAdoptPython(
+            execOps,
+            ['--yes', '--allow-breaking', '--skip-fetch', '--skip-preprocess', '--skip-generate'])
+    }
+}
+
+// Nested generate+test so pin writes are re-snapshotted. In-process generateApis as a
+// sibling of adoptOpenApiApplyPins* keeps a stale specs/ fingerprint from before the
+// pin write (mustRunAfter on the umbrella task does not order preprocess*Spec).
+tasks.register('adoptOpenApiRegenerate', Exec) {
+    group = 'openapi tools'
+    description = 'Nested generateApis + test after adopt pin writes (fresh specs/ snapshot)'
+    workingDir = rootDir
+    outputs.upToDateWhen { false }
+    def gradleWrapper = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
+        ? 'gradlew.bat'
+        : './gradlew'
+    doFirst {
+        def forwardedProperties = gradle.startParameter.projectProperties.collect {
+            key, value -> "-P${key}=${value}"
+        }
+        commandLine([gradleWrapper, 'generateApis', 'test'] + forwardedProperties)
+    }
+}
+
+tasks.register('adoptOpenApi') {
+    group = 'openapi tools'
+    description = 'Adopt additive upstream OAS changes into specs/ and regenerate clients'
+    dependsOn 'adoptOpenApiApplyPins', 'adoptOpenApiRegenerate'
+}
+
+tasks.register('adoptOpenApiBreaking') {
+    group = 'openapi tools'
+    description = 'Adopt upstream OAS including breaking changes into specs/ and regenerate clients'
+    dependsOn 'adoptOpenApiApplyPinsBreaking', 'adoptOpenApiRegenerate'
+}
+
+tasks.named('adoptOpenApiRegenerate').configure {
+    mustRunAfter 'adoptOpenApiApplyPins', 'adoptOpenApiApplyPinsBreaking'
+}
+
 pluginManager.withPlugin('java') {
+    tasks.named('test').configure {
+        mustRunAfter 'generateApis'
+    }
+
     tasks.matching {
         it.name in ['compileJava', 'sourcesJar', 'javadocJar', 'javadoc']
     }.configureEach {
         dependsOn 'generateApis'
     }
 
-    sourceSets {
-        main {
-            java {
-                srcDir generatedBrokerDir.map { it.dir('src/main/java') }
-                srcDir generatedDataDir.map { it.dir('src/main/java') }
-                srcDir generatedTradingDir.map { it.dir('src/main/java') }
-            }
-        }
+    tasks.matching { it.name == 'check' }.configureEach {
+        dependsOn 'checkGenerated'
     }
 }

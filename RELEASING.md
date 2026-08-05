@@ -42,8 +42,8 @@ all NMCP snapshot tasks. Use these commands rather than lower-level publishing t
 ## Automated snapshots
 
 After a successful current `main` push, the Build workflow publishes the version in
-`gradle.properties` when it ends in `-SNAPSHOT`. It resolves and preprocesses each OpenAPI source
-once, builds from read-only copies, rechecks `main`, then publishes those same copies. Pull
+`gradle.properties` when it ends in `-SNAPSHOT`. It freezes the committed OpenAPI pins under
+`specs/`, builds from read-only copies, rechecks `main`, then publishes those same copies. Pull
 requests, non-`main` pushes, failed builds, and stale commits never publish.
 
 ## Release workflow
@@ -52,7 +52,7 @@ Create and push a `vMAJOR.MINOR.PATCH` tag reachable from `main`, then dispatch 
 workflow from `main` with that tag. Do not queue release dispatches.
 
 The workflow verifies the tag and its reachability, rejects an existing release POM, tests release
-tools, resolves and archives one immutable set of preprocessed OpenAPI inputs, builds and signs the
+tools, archives the committed OpenAPI pins under `specs/`, builds and signs the
 release, publishes it, creates or publishes the GitHub Release, and opens a pull request that
 changes only `gradle.properties` to the next patch `-SNAPSHOT`. Merge that PR through normal branch
 protection; its Build workflow publishes the next snapshot.

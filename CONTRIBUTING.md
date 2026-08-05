@@ -33,9 +33,11 @@ recovering from a failed publication.
 
 ### Generated vs handwritten code
 
-**Never edit files under `build/generated/`** — they are overwritten on every `./gradlew generateApis` run.
+**Never hand-edit files under `src/main/java/markets/alpaca/client/openapi/`** — regenerate with
+`./gradlew generateApis` or adopt upstream via `./gradlew adoptOpenApi` /
+`./gradlew adoptOpenApiBreaking`. See [`GENERATION.md`](GENERATION.md).
 
-Handwritten code belongs in:
+Pinned OpenAPI documents live under `specs/`. Handwritten code belongs in:
 
 - `src/main/java/markets/alpaca/client/` — top-level SDK concepts such as `AlpacaClientFactory` and `AlpacaCredentials`
 - `src/main/java/markets/alpaca/client/data/` — handwritten Market Data helpers
@@ -91,7 +93,8 @@ npm run build --prefix docs             # validate generated Docusaurus docs
 pre-commit run markdown-links --all-files  # validate non-Docusaurus Markdown links
 ```
 
-Generated OpenAPI output under `build/generated/` is excluded from formatting and static-analysis checks.
+Generated OpenAPI output under `src/main/java/markets/alpaca/client/openapi/` is excluded from
+formatting and static-analysis checks.
 
 To run non-Docusaurus Markdown link validation before each commit, install the local hook once. The
 hook uses the local `lychee` binary, matching the CI link checker.
@@ -102,7 +105,7 @@ pre-commit install
 
 ## PR Checklist
 
-- [ ] Generated code (`build/generated/`) was not edited directly.
+- [ ] Generated code (`src/main/java/markets/alpaca/client/openapi/`) was not edited directly.
 - [ ] New behaviour has focused unit tests.
 - [ ] WebSocket monetary values avoid floating-point types (`double`/`float`).
 - [ ] Relevant docs (`README.md`, `AGENTS.md`, `LLMS.md`, `TESTING.md`, `RELEASING.md`) and `CHANGELOG.md` are updated when public behaviour changes.

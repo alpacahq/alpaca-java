@@ -31,6 +31,7 @@ jobs:
             --include-fragments
             README.md
             AGENTS.md
+            GENERATION.md
             LLMS.md
             CONTRIBUTING.md
             RELEASING.md
@@ -79,9 +80,13 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install OpenAPI script dependencies
+        run: python3 -m pip install --user -r scripts/requirements.txt
+
       - name: Test release tooling
         env:
           PYTHONDONTWRITEBYTECODE: '1'
+          PYTHONPATH: '.'
         run: python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
 
   build:
@@ -202,16 +207,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ./gradlew \
-            preprocessBrokerSpec \
-            preprocessDataSpec \
-            preprocessTradingSpec
-
           spec_dir="$RUNNER_TEMP/alpaca-snapshot-specs"
           if ! python3 scripts/release_tools.py prepare-frozen-specs \
-            --source-root build/specs \
+            --source-root specs \
             --output-dir "$spec_dir"; then
-            echo "::error::Unable to prepare immutable OpenAPI snapshot inputs"
+            echo "::error::Unable to prepare immutable OpenAPI snapshot inputs from committed specs/"
             exit 1
           fi
           echo "directory=$spec_dir" >> "$GITHUB_OUTPUT"

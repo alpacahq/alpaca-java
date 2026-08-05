@@ -1,0 +1,5 @@
+# Python deps for OpenAPI adopt / semantic-diff tooling under scripts/.
+#   python3 -m venv .venv-openapi
+#   source .venv-openapi/bin/activate
+#   pip install -r scripts/requirements.txt
+PyYAML>=6.0,<7

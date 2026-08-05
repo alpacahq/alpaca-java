@@ -1,0 +1,5 @@
+{
+  "broker": "https://docs.alpaca.markets/openapi/broker-api.json",
+  "data": "https://docs.alpaca.markets/openapi/market-data-api.json",
+  "trading": "https://docs.alpaca.markets/openapi/trading-api.json"
+}

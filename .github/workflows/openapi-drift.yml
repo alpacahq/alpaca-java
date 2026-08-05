@@ -1,0 +1,138 @@
+name: OpenAPI drift
+
+on:
+  schedule:
+    # Weekly Monday 09:15 UTC
+    - cron: "15 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  adopt-pr:
+    name: Open adopt PR from upstream OAS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Java
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      - name: Install OpenAPI script dependencies
+        run: python3 -m pip install --user -r scripts/requirements.txt
+
+      - name: Adopt additive upstream changes
+        id: adopt
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONPATH: '.'
+        run: |
+          set -euo pipefail
+          # Single pass: --yes applies additive adopts only. Breaking exits 2
+          # without writing pins/generated (requires a human --allow-breaking run).
+          set +e
+          python3 scripts/adopt_openapi.py --yes
+          status=$?
+          set -e
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+
+          if [[ "$status" == "2" ]]; then
+            echo "breaking=true" >> "$GITHUB_OUTPUT"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [[ "$status" != "0" ]]; then
+            echo "::error::adopt failed with status $status"
+            exit "$status"
+          fi
+
+          echo "breaking=false" >> "$GITHUB_OUTPUT"
+          if git status --porcelain -- specs src/main/java/markets/alpaca/client/openapi | grep -q .; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open breaking-drift issue
+        if: steps.adopt.outputs.breaking == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          body_file="$(mktemp)"
+          {
+            echo "Weekly OpenAPI drift detected **breaking** changes."
+            echo
+            echo "Pins and generated sources were **not** updated."
+            echo "Review the report, then run locally:"
+            echo
+            echo '```bash'
+            echo './gradlew adoptOpenApiBreaking'
+            echo '```'
+            echo
+            echo "Commit \`specs/\`, \`src/main/java/markets/alpaca/client/openapi/\`, and \`CHANGELOG.md\`."
+            echo
+            if [[ -f build/openapi-adopt-report.md ]]; then
+              cat build/openapi-adopt-report.md
+            else
+              echo "_Report file missing; check the workflow logs._"
+            fi
+          } > "$body_file"
+
+          existing="$(
+            gh issue list --label openapi-drift --label breaking --state open \
+              --json number,title --jq '.[] | select(.title | startswith("OpenAPI drift: breaking")) | .number' \
+              | head -n1
+          )"
+          title="OpenAPI drift: breaking upstream changes need adopt"
+          if [[ -n "$existing" ]]; then
+            gh issue edit "$existing" --title "$title" --body-file "$body_file"
+          else
+            gh issue create --title "$title" --body-file "$body_file" \
+              --label openapi-drift --label breaking \
+              || gh issue create --title "$title" --body-file "$body_file"
+          fi
+
+      - name: Open or update additive adopt pull request
+        if: steps.adopt.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B bot/openapi-adopt
+          git add specs src/main/java/markets/alpaca/client/openapi
+          git commit -m "chore(openapi): adopt upstream OpenAPI specs"
+          git push -u origin bot/openapi-adopt --force
+
+          title="chore(openapi): adopt upstream OpenAPI specs"
+          body_file="$(mktemp)"
+          {
+            echo "Automated OpenAPI adopt (policy B drift job)."
+            echo
+            echo "Additive-only changes. Humans must review and merge."
+            echo
+            if [[ -f build/openapi-adopt-report.md ]]; then
+              cat build/openapi-adopt-report.md
+            fi
+          } > "$body_file"
+
+          existing="$(gh pr list --head bot/openapi-adopt --json number --jq '.[0].number')"
+          if [[ -n "$existing" ]]; then
+            gh pr edit "$existing" --title "$title" --body-file "$body_file"
+          else
+            gh pr create --base main --head bot/openapi-adopt --title "$title" --body-file "$body_file"
+            gh pr edit --add-label openapi-adopt || true
+          fi
