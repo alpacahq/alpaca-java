@@ -7,8 +7,21 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+def rootGradleProps = new Properties()
+file('../gradle.properties').withInputStream { rootGradleProps.load(it) }
+// Prefer an explicit -Pversion (forwarded from the root compileExamples task) so
+// release overrides stay aligned. Do not use findProperty('version'): the nested
+// project defaults to "unspecified" when no local version is configured.
+def alpacaJavaVersion =
+    gradle.startParameter.projectProperties.get('version')
+        ?: rootGradleProps.getProperty('version')
+if (!alpacaJavaVersion) {
+    throw new GradleException(
+        'Could not resolve alpaca-java version from -Pversion or ../gradle.properties')
+}
+
 dependencies {
-    implementation 'markets.alpaca:alpaca-java:0.1.0-SNAPSHOT'
+    implementation "markets.alpaca:alpaca-java:${alpacaJavaVersion}"
 }
 
 def rootLocalProps = new Properties()

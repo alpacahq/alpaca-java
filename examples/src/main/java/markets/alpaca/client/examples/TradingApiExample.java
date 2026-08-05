@@ -8,9 +8,9 @@ import markets.alpaca.client.openapi.trading.api.OrdersApi;
 import markets.alpaca.client.openapi.trading.api.PortfolioHistoryApi;
 import markets.alpaca.client.openapi.trading.api.PositionsApi;
 import markets.alpaca.client.openapi.trading.model.AssetClass;
+import markets.alpaca.client.openapi.trading.model.CreateOrderRequest;
 import markets.alpaca.client.openapi.trading.model.OrderSide;
 import markets.alpaca.client.openapi.trading.model.OrderType;
-import markets.alpaca.client.openapi.trading.model.PostOrderRequest;
 import markets.alpaca.client.openapi.trading.model.TimeInForce;
 import markets.alpaca.client.trading.ListOrdersRequest;
 
@@ -100,7 +100,7 @@ public final class TradingApiExample {
 
     String clientOrderId = "alpaca-java-example-" + UUID.randomUUID();
     var request =
-        new PostOrderRequest()
+        new CreateOrderRequest()
             .symbol(symbol)
             .qty("1")
             .side(OrderSide.fromValue("buy"))

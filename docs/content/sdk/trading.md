@@ -89,15 +89,15 @@ your application manages client order IDs carefully.
 ```java
 import java.util.UUID;
 import markets.alpaca.client.openapi.trading.api.OrdersApi;
+import markets.alpaca.client.openapi.trading.model.CreateOrderRequest;
 import markets.alpaca.client.openapi.trading.model.OrderSide;
 import markets.alpaca.client.openapi.trading.model.OrderType;
-import markets.alpaca.client.openapi.trading.model.PostOrderRequest;
 import markets.alpaca.client.openapi.trading.model.TimeInForce;
 
 var ordersApi = new OrdersApi(client.newTradingClient());
 var clientOrderId = "my-app-" + UUID.randomUUID();
 
-var request = new PostOrderRequest()
+var request = new CreateOrderRequest()
     .symbol("AAPL")
     .qty("1")
     .side(OrderSide.BUY)
