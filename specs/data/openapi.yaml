@@ -273,14 +273,6 @@ components:
       required: false
       schema:
         $ref: '#/components/schemas/forex_timeframe'
-    isins:
-      description: A comma-separated list of ISINs with a limit of 1000.
-      example: US912797KJ59,US912797KS58,US912797LB15
-      in: query
-      name: isins
-      required: true
-      schema:
-        type: string
     limit:
       description: |
         The maximum number of data points to return in the response page.
@@ -535,15 +527,6 @@ components:
       required: true
       schema:
         type: string
-    trade_size:
-      description: |
-        Filters to best bid/ask where the minimum trade size is less than or equal to the given numeric value. For any negative value the best bid/ask will be returned for the smallest trade size on either side.
-      in: query
-      name: trade_size
-      required: false
-      schema:
-        format: int32
-        type: integer
   responses:
     '400':
       description: |
@@ -2252,121 +2235,6 @@ components:
     expiration_date:
       format: date
       type: string
-    fixed_income_latest_prices_resp:
-      properties:
-        prices:
-          additionalProperties:
-            $ref: '#/components/schemas/fixed_income_price'
-          type: object
-      required:
-        - prices
-      type: object
-    fixed_income_latest_quotes_resp:
-      properties:
-        quotes:
-          additionalProperties:
-            $ref: '#/components/schemas/fixed_income_quote'
-          type: object
-      required:
-        - quotes
-      type: object
-    fixed_income_price:
-      description: The price of the instrument as a percentage of its par value.
-      example:
-        p: 99.6459
-        t: '2025-02-14T20:58:00.648Z'
-        ytm: 4.249
-        ytw: 4.249
-      properties:
-        p:
-          description: Price
-          format: double
-          type: number
-        t:
-          $ref: '#/components/schemas/timestamp'
-        ytm:
-          description: Yield to maturity.
-          format: double
-          type: number
-        ytw:
-          description: Yield to worst.
-          format: double
-          type: number
-      required:
-        - t
-        - p
-      type: object
-    fixed_income_quote:
-      description: |
-        The best bid and ask information for a given fixed income security. A value of 0 means there is no active bid or ask for that field.
-      example:
-        ams: 1000
-        ap: 99.91958333
-        as: 1000000
-        aytm: 2.226923
-        aytw: 2.226923
-        bms: 1000
-        bp: 99.81091667
-        bs: 1000000
-        bytm: 5.236154
-        bytw: 5.236154
-        t: '2026-05-21T06:56:01.882466873Z'
-      properties:
-        ams:
-          description: Best ask minimum trade size in par value.
-          format: int64
-          type: integer
-        ap:
-          description: Best ask price. 0 means there is no active ask.
-          format: double
-          type: number
-        as:
-          description: Best ask size in par value. 0 means there is no active ask.
-          format: int64
-          type: integer
-        aytm:
-          description: Best ask yield to maturity.
-          format: double
-          type: number
-        aytw:
-          description: Best ask yield to worst.
-          format: double
-          type: number
-        bms:
-          description: Best bid minimum trade size in par value.
-          format: int64
-          type: integer
-        bp:
-          description: Best bid price. 0 means there is no active bid.
-          format: double
-          type: number
-        bs:
-          description: Best bid size in par value. 0 means there is no active bid.
-          format: int64
-          type: integer
-        bytm:
-          description: Best bid yield to maturity.
-          format: double
-          type: number
-        bytw:
-          description: Best bid yield to worst.
-          format: double
-          type: number
-        t:
-          $ref: '#/components/schemas/timestamp'
-      required:
-        - t
-        - bp
-        - bs
-        - bms
-        - bytm
-        - bytw
-        - ap
-        - as
-        - ams
-        - aytm
-        - aytw
-      type: object
     forex_currency_pairs:
       description: A comma-separated string with currency pairs.
       example: USDJPY,USDMXN
@@ -4072,7 +3940,7 @@ info:
     name: Alpaca Support
     url: https://alpaca.markets/support
   description: |
-    Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News.
+    Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News.
   license:
     name: Creative Commons Attribution Share Alike 4.0 International
     url: https://spdx.org/licenses/CC-BY-SA-4.0.html
@@ -4440,128 +4308,6 @@ paths:
       summary: Subscribe to Corporate Actions Events (SSE)
       tags:
         - Corporate actions
-  /v1beta1/fixed_income/latest/prices:
-    get:
-      description: |
-        This endpoint returns the latest prices for the given fixed income securities.
-      operationId: FixedIncomeLatestPrices
-      parameters:
-        - $ref: '#/components/parameters/isins'
-      responses:
-        '200':
-          content:
-            application/json:
-              examples:
-                prices:
-                  value:
-                    prices:
-                      US912797KJ59:
-                        p: 99.6459
-                        t: '2025-02-14T20:58:00.648Z'
-                        ytm: 4.249
-                        ytw: 4.249
-                      US912797KS58:
-                        p: 99.3193
-                        t: '2025-02-14T20:58:00.648Z'
-                        ytm: 4.2245
-                        ytw: 4.2245
-                      US912797LB15:
-                        p: 98.9927
-                        t: '2025-02-14T20:58:00.648Z'
-                        ytm: 4.2165
-                        ytw: 4.2165
-              schema:
-                $ref: '#/components/schemas/fixed_income_latest_prices_resp'
-          description: OK
-          headers:
-            X-RateLimit-Limit:
-              $ref: '#/components/headers/ratelimit_limit'
-            X-RateLimit-Remaining:
-              $ref: '#/components/headers/ratelimit_remaining'
-            X-RateLimit-Reset:
-              $ref: '#/components/headers/ratelimit_reset'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '429':
-          $ref: '#/components/responses/429'
-        '500':
-          $ref: '#/components/responses/500'
-      summary: Latest prices
-      tags:
-        - Fixed income
-  /v1beta1/fixed_income/latest/quotes:
-    get:
-      description: |
-        This endpoint returns the latest quotes for the given fixed income securities.
-      operationId: FixedIncomeLatestQuotes
-      parameters:
-        - description: A comma-separated list of ISINs with a limit of 100.
-          example: US912797SX61,US912810SK51
-          in: query
-          name: isins
-          required: true
-          schema:
-            type: string
-        - $ref: '#/components/parameters/trade_size'
-      responses:
-        '200':
-          content:
-            application/json:
-              examples:
-                quotes:
-                  value:
-                    quotes:
-                      US912797SX61:
-                        ams: 1000
-                        ap: 99.91958333
-                        as: 1000000
-                        aytm: 2.226923
-                        aytw: 2.226923
-                        bms: 1000
-                        bp: 99.81091667
-                        bs: 1000000
-                        bytm: 5.236154
-                        bytw: 5.236154
-                        t: '2026-05-21T06:56:01.882466873Z'
-                      US912810SK51:
-                        ams: 1000
-                        ap: 63.06436526
-                        as: 1000000
-                        aytm: 5.08819
-                        aytw: 5.08819
-                        bms: 1000
-                        bp: 60.60009769
-                        bs: 1000000
-                        bytm: 5.338343
-                        bytw: 5.338343
-                        t: '2026-05-21T07:27:53.683424845Z'
-              schema:
-                $ref: '#/components/schemas/fixed_income_latest_quotes_resp'
-          description: OK
-          headers:
-            X-RateLimit-Limit:
-              $ref: '#/components/headers/ratelimit_limit'
-            X-RateLimit-Remaining:
-              $ref: '#/components/headers/ratelimit_remaining'
-            X-RateLimit-Reset:
-              $ref: '#/components/headers/ratelimit_reset'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '429':
-          $ref: '#/components/responses/429'
-        '500':
-          $ref: '#/components/responses/500'
-      summary: Latest quotes
-      tags:
-        - Fixed income
   /v1beta1/forex/latest/rates:
     get:
       description: |
@@ -7112,8 +6858,6 @@ tags:
     name: Index
   - description: Endpoints for cryptocurrencies.
     name: Crypto
-  - description: Endpoints for fixed income data.
-    name: Fixed income
   - description: Endpoints for forex currency rates.
     name: Forex
   - description: Endpoints for getting company logo images.

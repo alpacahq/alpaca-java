@@ -3312,8 +3312,9 @@ components:
 
         This model represents the fields you can specify when creating a request of many Journals out of one account to many others at once.
       properties:
-        description:
-          description: Journal description, gets returned in the response
+        correspondent:
+          description: The 4-character correspondent code
+          example: LPCA
           type: string
         entries:
           description: An array of objects describing which accounts you want to move funds into and how much to move into each account
@@ -3321,12 +3322,19 @@ components:
             properties:
               amount:
                 description: Journal amount in USD
+                nullable: true
                 type: string
               currency:
-                description: Currency
+                description: Currency code in ISO format
+                nullable: true
                 type: string
               description:
                 description: Journal entry description, gets returned in the response
+                type: string
+              qty:
+                nullable: true
+                type: string
+              symbol:
                 type: string
               to_account:
                 description: The ID of the account that you want to journal funds into

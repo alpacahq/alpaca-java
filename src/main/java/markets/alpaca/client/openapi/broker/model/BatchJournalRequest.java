@@ -57,10 +57,10 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 public class BatchJournalRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  public static final String SERIALIZED_NAME_DESCRIPTION = "description";
-  @SerializedName(SERIALIZED_NAME_DESCRIPTION)
+  public static final String SERIALIZED_NAME_CORRESPONDENT = "correspondent";
+  @SerializedName(SERIALIZED_NAME_CORRESPONDENT)
   @javax.annotation.Nullable
-  private String description;
+  private String correspondent;
 
   public static final String SERIALIZED_NAME_ENTRIES = "entries";
   @SerializedName(SERIALIZED_NAME_ENTRIES)
@@ -130,22 +130,22 @@ public class BatchJournalRequest implements Serializable {
   public BatchJournalRequest() {
   }
 
-  public BatchJournalRequest description(@javax.annotation.Nullable String description) {
-    this.description = description;
+  public BatchJournalRequest correspondent(@javax.annotation.Nullable String correspondent) {
+    this.correspondent = correspondent;
     return this;
   }
 
   /**
-   * Journal description, gets returned in the response
-   * @return description
+   * The 4-character correspondent code
+   * @return correspondent
    */
   @javax.annotation.Nullable
-  public String getDescription() {
-    return description;
+  public String getCorrespondent() {
+    return correspondent;
   }
 
-  public void setDescription(@javax.annotation.Nullable String description) {
-    this.description = description;
+  public void setCorrespondent(@javax.annotation.Nullable String correspondent) {
+    this.correspondent = correspondent;
   }
 
 
@@ -268,7 +268,7 @@ public class BatchJournalRequest implements Serializable {
       return false;
     }
     BatchJournalRequest batchJournalRequest = (BatchJournalRequest) o;
-    return Objects.equals(this.description, batchJournalRequest.description) &&
+    return Objects.equals(this.correspondent, batchJournalRequest.correspondent) &&
         Objects.equals(this.entries, batchJournalRequest.entries) &&
         Objects.equals(this.entryType, batchJournalRequest.entryType) &&
         Objects.equals(this.fromAccount, batchJournalRequest.fromAccount)&&
@@ -277,14 +277,14 @@ public class BatchJournalRequest implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, entries, entryType, fromAccount, additionalProperties);
+    return Objects.hash(correspondent, entries, entryType, fromAccount, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class BatchJournalRequest {\n");
-    sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    correspondent: ").append(toIndentedString(correspondent)).append("\n");
     sb.append("    entries: ").append(toIndentedString(entries)).append("\n");
     sb.append("    entryType: ").append(toIndentedString(entryType)).append("\n");
     sb.append("    fromAccount: ").append(toIndentedString(fromAccount)).append("\n");
@@ -307,7 +307,7 @@ public class BatchJournalRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("description", "entries", "entry_type", "from_account"));
+    openapiFields = new HashSet<String>(Arrays.asList("correspondent", "entries", "entry_type", "from_account"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("entries", "entry_type", "from_account"));
@@ -333,8 +333,8 @@ public class BatchJournalRequest implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("description") != null && !jsonObj.get("description").isJsonNull()) && !jsonObj.get("description").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `description` to be a primitive type in the JSON string but got `%s`", jsonObj.get("description").toString()));
+      if ((jsonObj.get("correspondent") != null && !jsonObj.get("correspondent").isJsonNull()) && !jsonObj.get("correspondent").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `correspondent` to be a primitive type in the JSON string but got `%s`", jsonObj.get("correspondent").toString()));
       }
       if (jsonObj.get("entries") != null) {
         if (!jsonObj.get("entries").isJsonArray()) {

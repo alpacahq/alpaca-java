@@ -57,7 +57,7 @@ public class BatchJournalRequestEntriesInner implements Serializable {
 
   public static final String SERIALIZED_NAME_AMOUNT = "amount";
   @SerializedName(SERIALIZED_NAME_AMOUNT)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private String amount;
 
   public static final String SERIALIZED_NAME_CURRENCY = "currency";
@@ -69,6 +69,16 @@ public class BatchJournalRequestEntriesInner implements Serializable {
   @SerializedName(SERIALIZED_NAME_DESCRIPTION)
   @javax.annotation.Nullable
   private String description;
+
+  public static final String SERIALIZED_NAME_QTY = "qty";
+  @SerializedName(SERIALIZED_NAME_QTY)
+  @javax.annotation.Nullable
+  private String qty;
+
+  public static final String SERIALIZED_NAME_SYMBOL = "symbol";
+  @SerializedName(SERIALIZED_NAME_SYMBOL)
+  @javax.annotation.Nullable
+  private String symbol;
 
   public static final String SERIALIZED_NAME_TO_ACCOUNT = "to_account";
   @SerializedName(SERIALIZED_NAME_TO_ACCOUNT)
@@ -103,7 +113,7 @@ public class BatchJournalRequestEntriesInner implements Serializable {
   public BatchJournalRequestEntriesInner() {
   }
 
-  public BatchJournalRequestEntriesInner amount(@javax.annotation.Nonnull String amount) {
+  public BatchJournalRequestEntriesInner amount(@javax.annotation.Nullable String amount) {
     this.amount = amount;
     return this;
   }
@@ -112,12 +122,12 @@ public class BatchJournalRequestEntriesInner implements Serializable {
    * Journal amount in USD
    * @return amount
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public String getAmount() {
     return amount;
   }
 
-  public void setAmount(@javax.annotation.Nonnull String amount) {
+  public void setAmount(@javax.annotation.Nullable String amount) {
     this.amount = amount;
   }
 
@@ -128,7 +138,7 @@ public class BatchJournalRequestEntriesInner implements Serializable {
   }
 
   /**
-   * Currency
+   * Currency code in ISO format
    * @return currency
    */
   @javax.annotation.Nullable
@@ -157,6 +167,44 @@ public class BatchJournalRequestEntriesInner implements Serializable {
 
   public void setDescription(@javax.annotation.Nullable String description) {
     this.description = description;
+  }
+
+
+  public BatchJournalRequestEntriesInner qty(@javax.annotation.Nullable String qty) {
+    this.qty = qty;
+    return this;
+  }
+
+  /**
+   * Get qty
+   * @return qty
+   */
+  @javax.annotation.Nullable
+  public String getQty() {
+    return qty;
+  }
+
+  public void setQty(@javax.annotation.Nullable String qty) {
+    this.qty = qty;
+  }
+
+
+  public BatchJournalRequestEntriesInner symbol(@javax.annotation.Nullable String symbol) {
+    this.symbol = symbol;
+    return this;
+  }
+
+  /**
+   * Get symbol
+   * @return symbol
+   */
+  @javax.annotation.Nullable
+  public String getSymbol() {
+    return symbol;
+  }
+
+  public void setSymbol(@javax.annotation.Nullable String symbol) {
+    this.symbol = symbol;
   }
 
 
@@ -331,6 +379,8 @@ public class BatchJournalRequestEntriesInner implements Serializable {
     return Objects.equals(this.amount, batchJournalRequestEntriesInner.amount) &&
         Objects.equals(this.currency, batchJournalRequestEntriesInner.currency) &&
         Objects.equals(this.description, batchJournalRequestEntriesInner.description) &&
+        Objects.equals(this.qty, batchJournalRequestEntriesInner.qty) &&
+        Objects.equals(this.symbol, batchJournalRequestEntriesInner.symbol) &&
         Objects.equals(this.toAccount, batchJournalRequestEntriesInner.toAccount) &&
         Objects.equals(this.transmitterAccountNumber, batchJournalRequestEntriesInner.transmitterAccountNumber) &&
         Objects.equals(this.transmitterAddress, batchJournalRequestEntriesInner.transmitterAddress) &&
@@ -342,7 +392,7 @@ public class BatchJournalRequestEntriesInner implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(amount, currency, description, toAccount, transmitterAccountNumber, transmitterAddress, transmitterFinancialInstitution, transmitterName, transmitterTimestamp, additionalProperties);
+    return Objects.hash(amount, currency, description, qty, symbol, toAccount, transmitterAccountNumber, transmitterAddress, transmitterFinancialInstitution, transmitterName, transmitterTimestamp, additionalProperties);
   }
 
   @Override
@@ -352,6 +402,8 @@ public class BatchJournalRequestEntriesInner implements Serializable {
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
     sb.append("    currency: ").append(toIndentedString(currency)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    qty: ").append(toIndentedString(qty)).append("\n");
+    sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
     sb.append("    toAccount: ").append(toIndentedString(toAccount)).append("\n");
     sb.append("    transmitterAccountNumber: ").append(toIndentedString(transmitterAccountNumber)).append("\n");
     sb.append("    transmitterAddress: ").append(toIndentedString(transmitterAddress)).append("\n");
@@ -377,7 +429,7 @@ public class BatchJournalRequestEntriesInner implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("amount", "currency", "description", "to_account", "transmitter_account_number", "transmitter_address", "transmitter_financial_institution", "transmitter_name", "transmitter_timestamp"));
+    openapiFields = new HashSet<String>(Arrays.asList("amount", "currency", "description", "qty", "symbol", "to_account", "transmitter_account_number", "transmitter_address", "transmitter_financial_institution", "transmitter_name", "transmitter_timestamp"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("amount", "to_account"));
@@ -403,7 +455,7 @@ public class BatchJournalRequestEntriesInner implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if (!jsonObj.get("amount").isJsonPrimitive()) {
+      if ((jsonObj.get("amount") != null && !jsonObj.get("amount").isJsonNull()) && !jsonObj.get("amount").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `amount` to be a primitive type in the JSON string but got `%s`", jsonObj.get("amount").toString()));
       }
       if ((jsonObj.get("currency") != null && !jsonObj.get("currency").isJsonNull()) && !jsonObj.get("currency").isJsonPrimitive()) {
@@ -411,6 +463,12 @@ public class BatchJournalRequestEntriesInner implements Serializable {
       }
       if ((jsonObj.get("description") != null && !jsonObj.get("description").isJsonNull()) && !jsonObj.get("description").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `description` to be a primitive type in the JSON string but got `%s`", jsonObj.get("description").toString()));
+      }
+      if ((jsonObj.get("qty") != null && !jsonObj.get("qty").isJsonNull()) && !jsonObj.get("qty").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("qty").toString()));
+      }
+      if ((jsonObj.get("symbol") != null && !jsonObj.get("symbol").isJsonNull()) && !jsonObj.get("symbol").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
       }
       if (!jsonObj.get("to_account").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `to_account` to be a primitive type in the JSON string but got `%s`", jsonObj.get("to_account").toString()));
