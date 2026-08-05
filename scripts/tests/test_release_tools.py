@@ -538,6 +538,122 @@ class ReleaseToolsCliTest(unittest.TestCase):
         self.assertIn("release tool error:", failure.stderr)
         self.assertIn("stale", failure.stderr)
 
+    def test_extract_changelog_cli_writes_notes_and_source(self):
+        changelog = self.root / "CHANGELOG.md"
+        changelog.write_text(
+            "## [Unreleased]\n\n- Pending.\n\n## [1.2.3] - 2026-01-02\n\n- Shipped.\n",
+            encoding="utf-8",
+        )
+        notes = self.root / "notes.md"
+        github_output = self.root / "github-output"
+
+        success = self.run_cli(
+            "extract-changelog",
+            "--changelog",
+            str(changelog),
+            "--version",
+            "1.2.3",
+            "--allow-unreleased",
+            "--output",
+            str(notes),
+            "--github-output",
+            str(github_output),
+        )
+        self.assertEqual(success.returncode, 0)
+        self.assertEqual(success.stdout, "")
+        self.assertEqual(success.stderr, "")
+        self.assertEqual(notes.read_text(encoding="utf-8"), "- Shipped.\n")
+        self.assertEqual(
+            github_output.read_text(encoding="utf-8"), "source=version\n"
+        )
+
+        fallback = self.run_cli(
+            "extract-changelog",
+            "--changelog",
+            str(changelog),
+            "--version",
+            "9.9.9",
+            "--allow-unreleased",
+        )
+        self.assertEqual(fallback.returncode, 0)
+        self.assertEqual(fallback.stdout, "- Pending.\n")
+
+        failure = self.run_cli(
+            "extract-changelog",
+            "--changelog",
+            str(changelog),
+            "--version",
+            "9.9.9",
+        )
+        self.assertEqual(failure.returncode, 2)
+        self.assertEqual(failure.stdout, "")
+        self.assertIn("release tool error:", failure.stderr)
+
+    def test_promote_changelog_cli_reports_status(self):
+        changelog = self.root / "CHANGELOG.md"
+        changelog.write_text(
+            "## [Unreleased]\n\n- Pending.\n\n## [1.0.0] - 2025-01-01\n\n- Old.\n",
+            encoding="utf-8",
+        )
+        expected = self.root / "expected.md"
+        expected.write_text("- Pending.\n", encoding="utf-8")
+        github_output = self.root / "github-output"
+
+        arguments = (
+            "promote-changelog",
+            "--changelog",
+            str(changelog),
+            "--version",
+            "1.2.3",
+            "--date",
+            "2026-08-05",
+            "--expected-body",
+            str(expected),
+            "--github-output",
+            str(github_output),
+        )
+        success = self.run_cli(*arguments)
+        self.assertEqual(success.returncode, 0)
+        self.assertEqual(success.stdout, "")
+        self.assertEqual(success.stderr, "")
+        self.assertEqual(
+            github_output.read_text(encoding="utf-8"),
+            "changelog_status=promoted\nchanged=true\n",
+        )
+        self.assertIn(
+            "## [1.2.3] - 2026-08-05", changelog.read_text(encoding="utf-8")
+        )
+
+        github_output.unlink()
+        repeated = self.run_cli(*arguments)
+        self.assertEqual(repeated.returncode, 0)
+        self.assertEqual(
+            github_output.read_text(encoding="utf-8"),
+            "changelog_status=unchanged\nchanged=false\n",
+        )
+
+        expected.write_text("- Notes that were actually published.\n", encoding="utf-8")
+        github_output.unlink()
+        diverged = self.run_cli(*arguments)
+        self.assertEqual(diverged.returncode, 0)
+        self.assertEqual(
+            github_output.read_text(encoding="utf-8"),
+            "changelog_status=diverged\nchanged=false\n",
+        )
+
+        failure = self.run_cli(
+            "promote-changelog",
+            "--changelog",
+            str(changelog),
+            "--version",
+            "2.0.0",
+            "--date",
+            "2026-08-05",
+        )
+        self.assertEqual(failure.returncode, 2)
+        self.assertEqual(failure.stdout, "")
+        self.assertIn("release tool error:", failure.stderr)
+
     def test_prepare_frozen_specs_cli(self):
         source = self.root / "build" / "specs"
         for api in ("broker", "data", "trading"):
@@ -632,6 +748,247 @@ class PrepareFrozenSpecsTest(unittest.TestCase):
         (self.source / "trading" / "openapi.yaml").unlink()
         with self.assertRaises(release_tools.ReleaseToolError):
             release_tools.prepare_frozen_specs(self.source, self.root / "frozen")
+
+
+SAMPLE_CHANGELOG = """# Changelog
+
+## [Unreleased]
+
+### Added
+- Pending feature.
+
+## [1.2.3] - 2026-01-02
+
+### Fixed
+- Important fix.
+- Second bullet.
+
+## [1.2.2] - 2025-12-01
+
+### Changed
+- Older change.
+"""
+
+
+class ExtractChangelogTest(unittest.TestCase):
+    def setUp(self):
+        self.temporary_directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary_directory.cleanup)
+        self.changelog = Path(self.temporary_directory.name) / "CHANGELOG.md"
+        self.changelog.write_text(SAMPLE_CHANGELOG, encoding="utf-8")
+
+    def test_extracts_version_section_body(self):
+        result = release_tools.extract_changelog(
+            self.changelog, "1.2.3", allow_unreleased=False
+        )
+        self.assertEqual(result.source, "version")
+        self.assertEqual(
+            result.body,
+            "### Fixed\n- Important fix.\n- Second bullet.",
+        )
+
+    def test_does_not_leak_adjacent_sections(self):
+        result = release_tools.extract_changelog(
+            self.changelog, "1.2.3", allow_unreleased=True
+        )
+        self.assertNotIn("Pending feature", result.body)
+        self.assertNotIn("Older change", result.body)
+        self.assertNotIn("## [", result.body)
+
+    def test_prefers_version_over_unreleased(self):
+        result = release_tools.extract_changelog(
+            self.changelog, "1.2.3", allow_unreleased=True
+        )
+        self.assertEqual(result.source, "version")
+        self.assertIn("Important fix", result.body)
+
+    def test_falls_back_to_unreleased_when_allowed(self):
+        result = release_tools.extract_changelog(
+            self.changelog, "9.9.9", allow_unreleased=True
+        )
+        self.assertEqual(result.source, "unreleased")
+        self.assertEqual(result.body, "### Added\n- Pending feature.")
+
+    def test_rejects_missing_version_without_fallback(self):
+        with self.assertRaises(release_tools.ReleaseToolError):
+            release_tools.extract_changelog(
+                self.changelog, "9.9.9", allow_unreleased=False
+            )
+
+    def test_rejects_empty_unreleased_fallback(self):
+        self.changelog.write_text(
+            "## [Unreleased]\n\n## [1.0.0] - 2026-01-01\n\n### Added\n- Ship it.\n",
+            encoding="utf-8",
+        )
+        with self.assertRaises(release_tools.ReleaseToolError):
+            release_tools.extract_changelog(
+                self.changelog, "2.0.0", allow_unreleased=True
+            )
+
+    def test_rejects_empty_version_section(self):
+        self.changelog.write_text(
+            "## [Unreleased]\n\n## [1.0.0] - 2026-01-01\n\n",
+            encoding="utf-8",
+        )
+        with self.assertRaises(release_tools.ReleaseToolError):
+            release_tools.extract_changelog(
+                self.changelog, "1.0.0", allow_unreleased=True
+            )
+
+    def test_empty_version_section_never_falls_back_to_unreleased(self):
+        self.changelog.write_text(
+            "## [Unreleased]\n\n- pending\n\n## [1.0.0] - 2026-01-01\n\n",
+            encoding="utf-8",
+        )
+        with self.assertRaises(release_tools.ReleaseToolError):
+            release_tools.extract_changelog(
+                self.changelog, "1.0.0", allow_unreleased=True
+            )
+
+
+class PromoteChangelogTest(unittest.TestCase):
+    def setUp(self):
+        self.temporary_directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary_directory.cleanup)
+        self.changelog = Path(self.temporary_directory.name) / "CHANGELOG.md"
+
+    def test_promotes_unreleased_when_version_missing(self):
+        self.changelog.write_text(
+            "# Changelog\n\n## [Unreleased]\n\n### Added\n- Feature.\n\n"
+            "## [1.0.0] - 2025-01-01\n\n### Fixed\n- Old.\n",
+            encoding="utf-8",
+        )
+        result = release_tools.promote_changelog(
+            self.changelog, "1.2.3", release_date="2026-08-05"
+        )
+        self.assertEqual(result.status, "promoted")
+        self.assertTrue(result.changed)
+        text = self.changelog.read_text(encoding="utf-8")
+        self.assertIn("## [Unreleased]\n\n## [1.2.3] - 2026-08-05\n", text)
+        self.assertIn("### Added\n- Feature.\n", text)
+        self.assertIn("## [1.0.0] - 2025-01-01\n", text)
+        version = release_tools.extract_changelog(
+            self.changelog, "1.2.3", allow_unreleased=False
+        )
+        self.assertEqual(version.body, "### Added\n- Feature.")
+        with self.assertRaises(release_tools.ReleaseToolError):
+            release_tools.extract_changelog(
+                self.changelog, "9.9.9", allow_unreleased=True
+            )
+
+    def test_leaves_changelog_when_version_exists(self):
+        original = SAMPLE_CHANGELOG
+        self.changelog.write_text(original, encoding="utf-8")
+        result = release_tools.promote_changelog(
+            self.changelog, "1.2.3", release_date="2026-08-05"
+        )
+        self.assertEqual(result.status, "unchanged")
+        self.assertFalse(result.changed)
+        self.assertEqual(self.changelog.read_text(encoding="utf-8"), original)
+
+    def test_fails_when_nothing_to_promote(self):
+        self.changelog.write_text(
+            "## [Unreleased]\n\n## [1.0.0] - 2025-01-01\n\n### Fixed\n- Old.\n",
+            encoding="utf-8",
+        )
+        with self.assertRaises(release_tools.ReleaseToolError):
+            release_tools.promote_changelog(
+                self.changelog, "2.0.0", release_date="2026-08-05"
+            )
+
+    def test_fails_when_version_section_is_empty(self):
+        self.changelog.write_text(
+            "## [Unreleased]\n\n- pending\n\n## [1.2.3] - 2026-01-01\n\n",
+            encoding="utf-8",
+        )
+        with self.assertRaises(release_tools.ReleaseToolError):
+            release_tools.promote_changelog(
+                self.changelog, "1.2.3", release_date="2026-08-05"
+            )
+
+    def test_promotes_when_unreleased_matches_expected_body(self):
+        self.changelog.write_text(
+            "## [Unreleased]\n\n### Added\n- Feature.\n\n## [1.0.0] - 2025-01-01\n\n- Old.\n",
+            encoding="utf-8",
+        )
+        result = release_tools.promote_changelog(
+            self.changelog,
+            "1.2.3",
+            release_date="2026-08-05",
+            expected_body="### Added\n- Feature.\n",
+        )
+        self.assertEqual(result.status, "promoted")
+        self.assertIn(
+            "## [1.2.3] - 2026-08-05",
+            self.changelog.read_text(encoding="utf-8"),
+        )
+
+    def test_existing_version_section_matching_expected_body_is_unchanged(self):
+        self.changelog.write_text(
+            "## [Unreleased]\n\n## [1.2.3] - 2026-08-05\n\n### Added\n- Feature.\n",
+            encoding="utf-8",
+        )
+        result = release_tools.promote_changelog(
+            self.changelog,
+            "1.2.3",
+            release_date="2026-08-05",
+            expected_body="### Added\n- Feature.",
+        )
+        self.assertEqual(result.status, "unchanged")
+        self.assertFalse(result.changed)
+
+    def test_existing_version_section_differing_from_published_notes_diverges(self):
+        original = (
+            "## [Unreleased]\n\n## [1.2.3] - 2026-08-05\n\n### Added\n- Rewritten later.\n"
+        )
+        self.changelog.write_text(original, encoding="utf-8")
+        result = release_tools.promote_changelog(
+            self.changelog,
+            "1.2.3",
+            release_date="2026-08-05",
+            expected_body="### Added\n- Feature.",
+        )
+        self.assertEqual(result.status, "diverged")
+        self.assertFalse(result.changed)
+        self.assertEqual(self.changelog.read_text(encoding="utf-8"), original)
+
+    def test_fails_when_unreleased_drifted_from_expected_body(self):
+        original = (
+            "## [Unreleased]\n\n### Added\n- Feature.\n- Landed after the tag.\n\n"
+            "## [1.0.0] - 2025-01-01\n\n- Old.\n"
+        )
+        self.changelog.write_text(original, encoding="utf-8")
+        with self.assertRaises(release_tools.ReleaseToolError):
+            release_tools.promote_changelog(
+                self.changelog,
+                "1.2.3",
+                release_date="2026-08-05",
+                expected_body="### Added\n- Feature.",
+            )
+        self.assertEqual(self.changelog.read_text(encoding="utf-8"), original)
+
+
+class ComposeGithubReleaseNotesTest(unittest.TestCase):
+    def test_appends_full_changelog_link_only(self):
+        curated = "### Fixed\n- Important fix."
+        generated = (
+            "## What's Changed\n"
+            "* chore(deps): bump foo by @dependabot in https://example/pull/1\n"
+            "* fix: Important fix by @dev in https://example/pull/2\n"
+            "\n"
+            "**Full Changelog**: https://github.com/alpacahq/alpaca-java/compare/v1.2.2...v1.2.3"
+        )
+        self.assertEqual(
+            release_tools.compose_github_release_notes(curated, generated),
+            "### Fixed\n- Important fix.\n\n"
+            "**Full Changelog**: https://github.com/alpacahq/alpaca-java/compare/v1.2.2...v1.2.3\n",
+        )
+
+    def test_omits_link_when_generate_notes_has_none(self):
+        self.assertEqual(
+            release_tools.compose_github_release_notes("### Added\n- Feature.", ""),
+            "### Added\n- Feature.\n",
+        )
 
 
 if __name__ == "__main__":

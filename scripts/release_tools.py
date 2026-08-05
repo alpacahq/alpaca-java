@@ -43,6 +43,8 @@ _UNSUPPORTED_UNICODE_BOMS = (
 )
 _GIT_SHA_PATTERN = re.compile(r"^[0-9a-fA-F]{40}$")
 _FROZEN_SPEC_APIS = ("broker", "data", "trading")
+_CHANGELOG_SECTION_HEADING_PATTERN = re.compile(r"^## \[([^\]]+)\](.*)$")
+_RELEASE_DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 class ReleaseToolError(ValueError):
@@ -52,6 +54,18 @@ class ReleaseToolError(ValueError):
 @dataclass(frozen=True)
 class VersionUpdate:
     version: str
+    status: str
+    changed: bool
+
+
+@dataclass(frozen=True)
+class ChangelogExtract:
+    body: str
+    source: str
+
+
+@dataclass(frozen=True)
+class ChangelogPromotion:
     status: str
     changed: bool
 
@@ -275,6 +289,159 @@ def prepare_frozen_specs(source_root: Path, output_dir: Path) -> Path:
     return output_dir
 
 
+def _iter_changelog_sections(text: str) -> list[tuple[str, str, int, int]]:
+    """Return (label, body, heading_start, body_end) for each ## [label] section."""
+    lines = text.splitlines(keepends=True)
+    headings: list[tuple[str, int, int]] = []
+    offset = 0
+    for line in lines:
+        match = _CHANGELOG_SECTION_HEADING_PATTERN.fullmatch(line.rstrip("\r\n"))
+        if match is not None:
+            headings.append((match.group(1), offset, offset + len(line)))
+        offset += len(line)
+
+    sections: list[tuple[str, str, int, int]] = []
+    for index, (label, heading_start, body_start) in enumerate(headings):
+        body_end = headings[index + 1][1] if index + 1 < len(headings) else len(text)
+        body = text[body_start:body_end].strip("\n")
+        # Normalize to LF-only logical body for consumers; keep file newlines on write.
+        body = body.replace("\r\n", "\n").replace("\r", "\n").strip("\n")
+        sections.append((label, body, heading_start, body_end))
+    return sections
+
+
+def _find_changelog_section(
+    sections: list[tuple[str, str, int, int]], label: str
+) -> tuple[str, str, int, int] | None:
+    for section in sections:
+        if section[0] == label:
+            return section
+    return None
+
+
+def extract_changelog(
+    changelog_path: Path, version: str, *, allow_unreleased: bool
+) -> ChangelogExtract:
+    """Extract a Keep a Changelog section body for release notes."""
+    parse_release_version(version)
+    text, _ = _read_utf8_document(changelog_path)
+    sections = _iter_changelog_sections(text)
+
+    version_section = _find_changelog_section(sections, version)
+    if version_section is not None:
+        body = version_section[1].strip()
+        if body:
+            return ChangelogExtract(body, "version")
+        # An empty version heading is ambiguous: fall back and the same notes
+        # would later be promoted into a duplicate section.
+        raise ReleaseToolError(
+            f"CHANGELOG section [{version}] exists but is empty; "
+            "fill it or remove the heading"
+        )
+
+    if allow_unreleased:
+        unreleased = _find_changelog_section(sections, "Unreleased")
+        if unreleased is not None and unreleased[1].strip():
+            return ChangelogExtract(unreleased[1].strip(), "unreleased")
+        raise ReleaseToolError(
+            f"CHANGELOG has no non-empty [{version}] or [Unreleased] section"
+        )
+
+    raise ReleaseToolError(f"CHANGELOG has no [{version}] section")
+
+
+def promote_changelog(
+    changelog_path: Path,
+    version: str,
+    *,
+    release_date: str,
+    expected_body: str | None = None,
+) -> ChangelogPromotion:
+    """Promote [Unreleased] to a dated [version] section when needed."""
+    parse_release_version(version)
+    if _RELEASE_DATE_PATTERN.fullmatch(release_date) is None:
+        raise ReleaseToolError("release date must match YYYY-MM-DD")
+
+    text, has_utf8_bom = _read_utf8_document(changelog_path)
+    sections = _iter_changelog_sections(text)
+
+    version_section = _find_changelog_section(sections, version)
+    if version_section is not None:
+        existing_body = version_section[1].strip()
+        if not existing_body:
+            raise ReleaseToolError(
+                f"CHANGELOG section [{version}] exists but is empty; "
+                "fill it or remove the heading before promoting [Unreleased]"
+            )
+        if expected_body is not None and existing_body != expected_body.strip():
+            # Nothing to promote, but the section no longer matches the notes
+            # published for this release; callers decide how loud that is.
+            return ChangelogPromotion("diverged", False)
+        return ChangelogPromotion("unchanged", False)
+
+    unreleased = _find_changelog_section(sections, "Unreleased")
+    if unreleased is None or not unreleased[1].strip():
+        raise ReleaseToolError(
+            f"CHANGELOG cannot promote release {version}: "
+            "missing non-empty [Unreleased] and no existing version section"
+        )
+
+    _label, body, heading_start, body_end = unreleased
+    if expected_body is not None and body.strip() != expected_body.strip():
+        raise ReleaseToolError(
+            f"CHANGELOG [Unreleased] no longer matches the notes published for "
+            f"{version}; promote the release section manually"
+        )
+
+    # Reconstruct: keep prefix, empty Unreleased, dated version with body, suffix.
+    # heading_start points at "## [Unreleased]"; body_end at next section or EOF.
+    lines_prefix = text[:heading_start]
+    suffix = text[body_end:]
+    # Detect newline style from the Unreleased heading line.
+    heading_line_end = text.find("\n", heading_start)
+    if heading_line_end == -1:
+        newline = ""
+    elif heading_line_end > heading_start and text[heading_line_end - 1] == "\r":
+        newline = "\r\n"
+    else:
+        newline = "\n"
+
+    promoted_body = body.replace("\n", newline)
+    promoted = (
+        f"{lines_prefix}"
+        f"## [Unreleased]{newline}"
+        f"{newline}"
+        f"## [{version}] - {release_date}{newline}"
+        f"{newline}"
+        f"{promoted_body}{newline}"
+        f"{newline}"
+        f"{suffix.lstrip('\r\n')}"
+    )
+    if has_utf8_bom:
+        promoted = "\ufeff" + promoted
+    _atomic_write_text(changelog_path, promoted)
+    return ChangelogPromotion("promoted", True)
+
+
+def compose_github_release_notes(curated_body: str, generated_notes: str) -> str:
+    """Build a GitHub Release body from curated notes plus an optional compare link.
+
+    GitHub's generate-notes output includes a noisy PR list and a useful
+    ``**Full Changelog**: …`` compare URL. Keep only the curated section and
+    that compare link so Dependabot/PR titles are not duplicated.
+    """
+    curated = curated_body.strip()
+    compare_line = ""
+    for line in generated_notes.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("**Full Changelog**:"):
+            compare_line = stripped
+            break
+    if compare_line:
+        return f"{curated}\n\n{compare_line}\n"
+    return f"{curated}\n"
+
+
 def _write_github_output(path: Path | None, values: str) -> None:
     if path is None:
         print(values, end="")
@@ -384,6 +551,25 @@ def build_parser() -> argparse.ArgumentParser:
     prepare_specs = subparsers.add_parser("prepare-frozen-specs")
     prepare_specs.add_argument("--source-root", required=True)
     prepare_specs.add_argument("--output-dir", required=True)
+
+    extract_changelog_cmd = subparsers.add_parser("extract-changelog")
+    extract_changelog_cmd.add_argument("--changelog", required=True)
+    extract_changelog_cmd.add_argument("--version", required=True)
+    extract_changelog_cmd.add_argument("--allow-unreleased", action="store_true")
+    extract_changelog_cmd.add_argument("--output")
+    extract_changelog_cmd.add_argument("--github-output")
+
+    promote_changelog_cmd = subparsers.add_parser("promote-changelog")
+    promote_changelog_cmd.add_argument("--changelog", required=True)
+    promote_changelog_cmd.add_argument("--version", required=True)
+    promote_changelog_cmd.add_argument("--date", required=True)
+    promote_changelog_cmd.add_argument("--expected-body")
+    promote_changelog_cmd.add_argument("--github-output")
+
+    compose_notes = subparsers.add_parser("compose-github-release-notes")
+    compose_notes.add_argument("--curated", required=True)
+    compose_notes.add_argument("--generated", required=True)
+    compose_notes.add_argument("--output", required=True)
     return parser
 
 
@@ -430,6 +616,44 @@ def main(argv: list[str] | None = None) -> int:
                 Path(arguments.source_root), Path(arguments.output_dir)
             )
             print(output)
+        elif arguments.command == "extract-changelog":
+            extracted = extract_changelog(
+                Path(arguments.changelog),
+                arguments.version,
+                allow_unreleased=arguments.allow_unreleased,
+            )
+            if arguments.output:
+                _atomic_write_text(Path(arguments.output), extracted.body + "\n")
+            else:
+                print(extracted.body)
+            if arguments.github_output:
+                _write_github_output(
+                    Path(arguments.github_output),
+                    f"source={extracted.source}\n",
+                )
+        elif arguments.command == "promote-changelog":
+            expected_body = None
+            if arguments.expected_body:
+                expected_body, _ = _read_utf8_document(Path(arguments.expected_body))
+            promotion = promote_changelog(
+                Path(arguments.changelog),
+                arguments.version,
+                release_date=arguments.date,
+                expected_body=expected_body,
+            )
+            values = (
+                f"changelog_status={promotion.status}\n"
+                f"changed={str(promotion.changed).lower()}\n"
+            )
+            _write_github_output(
+                Path(arguments.github_output) if arguments.github_output else None,
+                values,
+            )
+        elif arguments.command == "compose-github-release-notes":
+            curated, _ = _read_utf8_document(Path(arguments.curated))
+            generated, _ = _read_utf8_document(Path(arguments.generated))
+            composed = compose_github_release_notes(curated, generated)
+            _atomic_write_text(Path(arguments.output), composed)
         else:
             raise AssertionError(f"unsupported command: {arguments.command}")
     except (OSError, ReleaseToolError) as exc:
