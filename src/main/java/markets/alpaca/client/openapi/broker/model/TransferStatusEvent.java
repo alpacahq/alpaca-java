@@ -361,8 +361,6 @@ public class TransferStatusEvent implements Serializable {
       }
       // validate the required field `status_from`
       TransferStatusFrom.validateJsonElement(jsonObj.get("status_from"));
-      // validate the required field `status_from`
-      TransferStatusFrom.validateJsonElement(jsonObj.get("status_from"));
       // validate the required field `status_to`
       TransferStatus.validateJsonElement(jsonObj.get("status_to"));
       if (!jsonObj.get("transfer_id").isJsonPrimitive()) {
