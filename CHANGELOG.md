@@ -20,6 +20,8 @@ the policy below applies strictly.
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-08-06
+
 ### Breaking
 Adopting the upstream Broker and Trading documents, which are now OpenAPI 3.1.2 rather than 3.0.0,
 changed two parts of the generated API surface.
