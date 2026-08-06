@@ -19,8 +19,8 @@ import markets.alpaca.client.openapi.broker.model.IPOEvent;
 import markets.alpaca.client.openapi.broker.model.JournalStatusEvent;
 import markets.alpaca.client.openapi.broker.model.JournalStatusEventV2;
 import markets.alpaca.client.openapi.broker.model.NonTradeActivityEvent;
+import markets.alpaca.client.openapi.broker.model.StatusFundingEvent;
 import markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner;
-import markets.alpaca.client.openapi.broker.model.SubscribeToFundingStatusSSE200ResponseInner;
 import markets.alpaca.client.openapi.broker.model.SystemEventV2;
 import markets.alpaca.client.openapi.broker.model.TradeUpdateEventV2;
 import okhttp3.OkHttpClient;
@@ -186,8 +186,7 @@ public final class BrokerEventsSseClient {
 
   /** Opens the Broker funding status SSE stream. */
   public BrokerSseSubscription subscribeToFundingStatus(
-      BrokerSseDateOptions options,
-      BrokerSseEventListener<SubscribeToFundingStatusSSE200ResponseInner> listener)
+      BrokerSseDateOptions options, BrokerSseEventListener<StatusFundingEvent> listener)
       throws ApiException {
     Objects.requireNonNull(options, "options must not be null");
     return open(
@@ -195,7 +194,7 @@ public final class BrokerEventsSseClient {
             .subscribeToFundingStatusSSECall(
                 options.since(), options.until(), options.sinceId(), options.untilId(), null)
             .request(),
-        SubscribeToFundingStatusSSE200ResponseInner.class,
+        StatusFundingEvent.class,
         listener);
   }
 
@@ -205,7 +204,7 @@ public final class BrokerEventsSseClient {
       LocalDate until,
       String sinceId,
       String untilId,
-      BrokerSseEventListener<SubscribeToFundingStatusSSE200ResponseInner> listener)
+      BrokerSseEventListener<StatusFundingEvent> listener)
       throws ApiException {
     return subscribeToFundingStatus(
         new BrokerSseDateOptions(since, until, sinceId, untilId), listener);

@@ -1292,8 +1292,9 @@ components:
             The CUSIP identifier for the asset (US Equities only).
             To request a specific CUSIP, please reach out to Alpaca support.
           example: '987654321'
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         easy_to_borrow:
           deprecated: true
           description: |
@@ -1957,8 +1958,9 @@ components:
             Maximum acceptable locate fee per share, as a decimal string in USD.
             If omitted, any quoted fee is accepted.
           example: '0.05'
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         qty:
           description: Number of shares to locate. Must be positive and in round lots of 100; invalid quantities return HTTP 400.
           example: 100
@@ -2061,8 +2063,9 @@ components:
         symbols:
           description: List of asset symbols to include in the watchlist.
           items:
-            nullable: true
-            type: string
+            type:
+              - string
+              - 'null'
           type: array
       required:
         - name
@@ -2497,8 +2500,9 @@ components:
           type: array
         next_page_token:
           description: The token to use to retrieve the next page of results. If `null`, there are no more pages.
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
       required:
         - locates
         - next_page_token
@@ -2531,8 +2535,9 @@ components:
           description: Time when the active locate expires. Omitted when rejected.
           example: '2026-01-03T01:00:00Z'
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         id:
           description: Locate ID.
           example: 550e8400-e29b-41d4-a716-446655440000
@@ -2541,24 +2546,28 @@ components:
         limit_price:
           description: Maximum acceptable fee per share from the request.
           example: '0.05'
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         located_price:
           description: Locate fee per share in USD. Omitted when rejected.
           example: '0.05'
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         located_qty:
           description: Number of shares located. Omitted when rejected.
           example: 100
           format: int64
-          nullable: true
-          type: integer
+          type:
+            - integer
+            - 'null'
         rejection_reason:
           description: Machine-readable rejection reason.
           example: inventory_unavailable
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         requested_qty:
           description: Number of shares requested.
           example: 100
@@ -2573,8 +2582,9 @@ components:
         total_fee:
           description: Total locate fee in USD. Omitted when rejected.
           example: '5.00'
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
       required:
         - id
         - symbol
@@ -2748,8 +2758,9 @@ components:
       description: |
         Use this token in your next API call to paginate through the dataset and retrieve the next page of results. A null token indicates there are no more data to fetch.
       example: MTAwMA==
-      nullable: true
-      type: string
+      type:
+        - string
+        - 'null'
     NonTradeActivities:
       properties:
         activity_sub_type:
@@ -3240,8 +3251,9 @@ components:
           type: string
         canceled_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         client_order_id:
           description: Client unique order ID
           maxLength: 128
@@ -3251,8 +3263,9 @@ components:
           type: string
         expired_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         expires_at:
           format: date-time
           type: string
@@ -3261,24 +3274,28 @@ components:
           type: boolean
         failed_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         filled_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         filled_avg_price:
           description: Filled average price
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         filled_qty:
           description: Filled quantity
           minLength: 1
           type: string
         hwm:
           description: The highest (lowest) market price seen since the trailing stop order was submitted.
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         id:
           description: Order ID
           format: uuid
@@ -3287,17 +3304,20 @@ components:
           description: When querying non-simple order_class orders in a nested style, an array of Order entities associated with this order. Otherwise, null. Required if order class is `mleg`.
           items:
             $ref: '#/components/schemas/OrderLeg'
-          nullable: true
-          type: array
+          type:
+            - array
+            - 'null'
         limit_price:
           description: Limit price
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         notional:
           description: Ordered notional amount. If entered, qty will be null. Can take up to 9 decimal points.
           minLength: 1
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         order_class:
           $ref: '#/components/schemas/OrderClass'
         order_type:
@@ -3309,39 +3329,46 @@ components:
         qty:
           description: Ordered quantity. If entered, notional will be null. Can take up to 9 decimal points. Required if order class is `mleg`.
           minLength: 1
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         ratio_qty:
           description: The proportional quantity of this leg in relation to the overall multi-leg order quantity.
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         replaced_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         replaced_by:
           description: The order ID that this order was replaced by
           format: uuid
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         replaces:
           description: The order ID that this order replaces
           format: uuid
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         side:
           $ref: '#/components/schemas/OrderSide'
         status:
           $ref: '#/components/schemas/OrderStatus'
         stop_price:
           description: Stop price
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         submitted_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         symbol:
           description: Asset symbol, required for all order classes except for `mleg`
           minLength: 1
@@ -3350,18 +3377,21 @@ components:
           $ref: '#/components/schemas/TimeInForce'
         trail_percent:
           description: The percent value away from the high water mark for trailing stop orders.
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         trail_price:
           description: The dollar value away from the high water mark for trailing stop orders.
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         type:
           $ref: '#/components/schemas/OrderType'
         updated_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
       required:
         - notional
         - type
@@ -3397,8 +3427,9 @@ components:
           type: string
         canceled_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         client_order_id:
           description: Client unique order ID
           maxLength: 128
@@ -3408,31 +3439,36 @@ components:
           type: string
         expired_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         extended_hours:
           description: If true, eligible for execution outside regular trading hours.
           type: boolean
         failed_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         filled_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         filled_avg_price:
           description: Filled average price
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         filled_qty:
           description: Filled quantity
           minLength: 1
           type: string
         hwm:
           description: The highest (lowest) market price seen since the trailing stop order was submitted.
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         id:
           description: Order ID
           format: uuid
@@ -3440,19 +3476,18 @@ components:
         legs:
           description: Always null for an order leg; legs are not nested beyond one level.
           example: null
-          items:
-            type: object
-          nullable: true
-          type: array
+          type: object
         limit_price:
           description: Limit price
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         notional:
           description: Ordered notional amount. If entered, qty will be null. Can take up to 9 decimal points.
           minLength: 1
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         order_class:
           $ref: '#/components/schemas/OrderClass'
         order_type:
@@ -3464,34 +3499,40 @@ components:
         qty:
           description: Ordered quantity. If entered, notional will be null. Can take up to 9 decimal points.
           minLength: 1
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         replaced_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         replaced_by:
           description: The order ID that this order was replaced by
           format: uuid
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         replaces:
           description: The order ID that this order replaces
           format: uuid
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         side:
           $ref: '#/components/schemas/OrderSide'
         status:
           $ref: '#/components/schemas/OrderStatus'
         stop_price:
           description: Stop price
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         submitted_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         symbol:
           description: Asset symbol
           minLength: 1
@@ -3500,18 +3541,21 @@ components:
           $ref: '#/components/schemas/TimeInForce'
         trail_percent:
           description: The percent value away from the high water mark for trailing stop orders.
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         trail_price:
           description: The dollar value away from the high water mark for trailing stop orders.
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         type:
           $ref: '#/components/schemas/OrderType'
         updated_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
       required:
         - symbol
         - type
@@ -3678,8 +3722,9 @@ components:
       properties:
         base_value:
           description: basis in dollar of the profit loss calculation
-          nullable: true
-          type: number
+          type:
+            - number
+            - 'null'
         base_value_asof:
           description: |
             If included, then it indicates that the base_value is the account's closing
@@ -3701,14 +3746,16 @@ components:
         equity:
           description: equity value of the account in dollar amount as of the end of each time window
           items:
-            nullable: true
-            type: number
+            type:
+              - number
+              - 'null'
           type: array
         profit_loss:
           description: profit/loss in dollar from the base value
           items:
-            nullable: true
-            type: number
+            type:
+              - number
+              - 'null'
           type: array
         profit_loss_pct:
           description: profit/loss in percentage from the base value
@@ -3716,8 +3763,9 @@ components:
             - 0.001
             - 0.002
           items:
-            nullable: true
-            type: number
+            type:
+              - number
+              - 'null'
           type: array
         timeframe:
           description: time window size of each data element
@@ -4214,8 +4262,9 @@ components:
           type: string
         fees:
           description: Fees charged for this tokenization request
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         issuer:
           $ref: '#/components/schemas/TokenizationIssuer'
         issuer_account:
@@ -4228,8 +4277,9 @@ components:
             sunset: '2026-10-15'
         issuer_request_id:
           description: Unique identifier of the tokenization request set by the issuer
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         network:
           $ref: '#/components/schemas/TokenizationNetwork'
         qty:
@@ -4245,8 +4295,9 @@ components:
           type: string
         tx_hash:
           description: Transaction hash of the completed request on the blockchain
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         type:
           $ref: '#/components/schemas/TokenizationRequestType'
         underlying_symbol:
@@ -4254,8 +4305,9 @@ components:
           type: string
         updated_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         wallet_address:
           description: The wallet address associated with this tokenization request
           type: string
@@ -4472,8 +4524,9 @@ components:
         symbols:
           description: List of asset symbols to include in the watchlist. The existing assets will be replaced with the new list.
           items:
-            nullable: true
-            type: string
+            type:
+              - string
+              - 'null'
           type: array
       title: PutWatchlistRequest
       type: object
@@ -4926,7 +4979,7 @@ info:
   termsOfService: https://s3.amazonaws.com/files.alpaca.markets/disclosures/library/TermsAndConditions.pdf
   title: Trading API
   version: 2.0.1
-openapi: 3.0.0
+openapi: 3.1.2
 paths:
   /v1/locates:
     get:
@@ -5472,6 +5525,12 @@ paths:
       description: Returns account activity entries for a specific type of activity.
       operationId: getAccountActivitiesByActivityType
       parameters:
+        - description: The activity type you want to view entries for. A list of valid activity types can be found at the bottom of this page.
+          in: path
+          name: activity_type
+          required: true
+          schema:
+            type: string
         - description: Filter activities associated with a specific order. Useful for retrieving the fills that make up a completely filled order.
           in: query
           name: order_id
@@ -5536,13 +5595,6 @@ paths:
       summary: Retrieve Account Activities of Specific Type
       tags:
         - Account Activities
-    parameters:
-      - description: The activity type you want to view entries for. A list of valid activity types can be found at the bottom of this page.
-        in: path
-        name: activity_type
-        required: true
-        schema:
-          type: string
   /v2/account/configurations:
     get:
       description: gets the current account configuration values
@@ -6007,13 +6059,13 @@ paths:
       summary: Get an Asset by ID or Symbol
       tags:
         - Assets
-    parameters:
-      - description: symbol or assetId. CUSIP is also accepted for US equities.
-        in: path
-        name: symbol_or_asset_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: symbol or assetId. CUSIP is also accepted for US equities.
+          in: path
+          name: symbol_or_asset_id
+          required: true
+          schema:
+            type: string
   /v2/calendar:
     get:
       description: |
@@ -6174,13 +6226,13 @@ paths:
       summary: Retrieve a Specific Announcement
       tags:
         - Corporate Actions
-    parameters:
-      - description: The corporate announcement's id
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: The corporate announcement's id
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
   /v2/options/contracts:
     get:
       description: |
@@ -6310,13 +6362,13 @@ paths:
       summary: Get an option contract by ID or Symbol
       tags:
         - Assets
-    parameters:
-      - description: symbol or contract ID
-        in: path
-        name: symbol_or_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: symbol or contract ID
+          in: path
+          name: symbol_or_id
+          required: true
+          schema:
+            type: string
   /v2/orders:
     delete:
       description: Attempts to cancel all open orders. A response will be provided for each order that is attempted to be cancelled. If an order is no longer cancelable, the server will respond with status
@@ -6557,10 +6609,25 @@ paths:
       summary: Delete Order by ID
       tags:
         - Orders
+      parameters:
+        - description: order id
+          in: path
+          name: order_id
+          required: true
+          schema:
+            format: uuid
+            type: string
     get:
       description: Retrieves a single order for the given order_id.
       operationId: getOrderByOrderID
       parameters:
+        - description: order id
+          in: path
+          name: order_id
+          required: true
+          schema:
+            format: uuid
+            type: string
         - description: If true, the result will roll up multi-leg orders under the legs field of primary order.
           in: query
           name: nested
@@ -6587,14 +6654,6 @@ paths:
       summary: Get Order by ID
       tags:
         - Orders
-    parameters:
-      - description: order id
-        in: path
-        name: order_id
-        required: true
-        schema:
-          format: uuid
-          type: string
     patch:
       description: |
         Replaces a single order with updated parameters. Each parameter overrides the corresponding attribute of the existing order. The other attributes remain the same as the existing order.
@@ -6651,6 +6710,14 @@ paths:
       summary: Replace Order by ID
       tags:
         - Orders
+      parameters:
+        - description: order id
+          in: path
+          name: order_id
+          required: true
+          schema:
+            format: uuid
+            type: string
   /v2/orders:by_client_order_id:
     get:
       description: Retrieves a single order specified by the client order ID.
@@ -6723,6 +6790,12 @@ paths:
       description: Closes (liquidates) the account's open position for the given symbol. Works for both long and short positions.
       operationId: deleteOpenPosition
       parameters:
+        - description: symbol or assetId
+          in: path
+          name: symbol_or_asset_id
+          required: true
+          schema:
+            type: string
         - description: the number of shares to liquidate. Can accept up to 9 decimal points. Cannot work with percentage
           in: query
           name: qty
@@ -6760,13 +6833,13 @@ paths:
       summary: Get an Open Position
       tags:
         - Positions
-    parameters:
-      - description: symbol or assetId
-        in: path
-        name: symbol_or_asset_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: symbol or assetId
+          in: path
+          name: symbol_or_asset_id
+          required: true
+          schema:
+            type: string
   /v2/positions/{symbol_or_contract_id}/do-not-exercise:
     post:
       description: |-
@@ -7211,27 +7284,27 @@ paths:
       summary: Retrieve Crypto Funding Wallets
       tags:
         - Crypto Funding
-    parameters:
-      - description: Filter by crypto asset symbol, e.g. BTC, ETH, USDT. If specified and no wallet exists, one will be created.
-        in: query
-        name: asset
-        schema:
-          type: string
-      - description: Optional chain identifier. Use to request wallets for a specific chain when asset is a multi-chain crypto asset. If not specified, network is considered.
-        in: query
-        name: chain
-        schema:
-          $ref: '#/components/schemas/CryptoChain'
-      - description: Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both 'chain' and 'network'
-          are specified, 'chain' will take precedence and 'network' will be ignored. If 'chain' and 'network' are not specified, the default 'network' (ethereum) will be used.
-        in: query
-        name: network
-        schema:
-          deprecated: true
-          enum:
-            - ethereum
-            - solana
-          type: string
+      parameters:
+        - description: Filter by crypto asset symbol, e.g. BTC, ETH, USDT. If specified and no wallet exists, one will be created.
+          in: query
+          name: asset
+          schema:
+            type: string
+        - description: Optional chain identifier. Use to request wallets for a specific chain when asset is a multi-chain crypto asset. If not specified, network is considered.
+          in: query
+          name: chain
+          schema:
+            $ref: '#/components/schemas/CryptoChain'
+        - description: Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both 'chain' and
+            'network' are specified, 'chain' will take precedence and 'network' will be ignored. If 'chain' and 'network' are not specified, the default 'network' (ethereum) will be used.
+          in: query
+          name: network
+          schema:
+            deprecated: true
+            enum:
+              - ethereum
+              - solana
+            type: string
   /v2/wallets/fees/estimate:
     get:
       description: Returns the estimated on-chain network (gas) fee for a proposed crypto withdrawal at current chain conditions. Pass the `asset`, `from_address`, `to_address`, and `amount` you intend
@@ -7321,13 +7394,13 @@ paths:
       summary: Retrieve a Crypto Funding Transfer
       tags:
         - Crypto Funding
-    parameters:
-      - description: The crypto transfer to retrieve
-        in: path
-        name: transfer_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: The crypto transfer to retrieve
+          in: path
+          name: transfer_id
+          required: true
+          schema:
+            type: string
   /v2/wallets/whitelists:
     get:
       description: Returns the list of whitelisted withdrawal addresses for your account.
@@ -7376,13 +7449,13 @@ paths:
       summary: Delete a whitelisted address
       tags:
         - Crypto Funding
-    parameters:
-      - description: The whitelisted address to delete
-        in: path
-        name: whitelisted_address_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: The whitelisted address to delete
+          in: path
+          name: whitelisted_address_id
+          required: true
+          schema:
+            type: string
   /v2/watchlists:
     get:
       description: Returns the list of watchlists registered under the account.
@@ -7438,6 +7511,14 @@ paths:
       summary: Delete Watchlist By Id
       tags:
         - Watchlists
+      parameters:
+        - description: watchlist id
+          in: path
+          name: watchlist_id
+          required: true
+          schema:
+            format: uuid
+            type: string
     get:
       description: Returns a watchlist identified by the ID.
       operationId: getWatchlistById
@@ -7451,14 +7532,14 @@ paths:
       summary: Get Watchlist by ID
       tags:
         - Watchlists
-    parameters:
-      - description: watchlist id
-        in: path
-        name: watchlist_id
-        required: true
-        schema:
-          format: uuid
-          type: string
+      parameters:
+        - description: watchlist id
+          in: path
+          name: watchlist_id
+          required: true
+          schema:
+            format: uuid
+            type: string
     post:
       description: Append an asset for the symbol to the end of watchlist asset list
       operationId: addAssetToWatchlist
@@ -7477,6 +7558,14 @@ paths:
       summary: Add Asset to Watchlist
       tags:
         - Watchlists
+      parameters:
+        - description: watchlist id
+          in: path
+          name: watchlist_id
+          required: true
+          schema:
+            format: uuid
+            type: string
     put:
       description: Update the name and/or content of watchlist
       operationId: updateWatchlistById
@@ -7495,6 +7584,14 @@ paths:
       summary: Update Watchlist By Id
       tags:
         - Watchlists
+      parameters:
+        - description: watchlist id
+          in: path
+          name: watchlist_id
+          required: true
+          schema:
+            format: uuid
+            type: string
   /v2/watchlists/{watchlist_id}/{symbol}:
     delete:
       description: Delete one entry for an asset by symbol name
@@ -7509,20 +7606,20 @@ paths:
       summary: Delete Symbol from Watchlist
       tags:
         - Watchlists
-    parameters:
-      - description: Watchlist ID
-        in: path
-        name: watchlist_id
-        required: true
-        schema:
-          format: uuid
-          type: string
-      - description: symbol name to remove from the watchlist content
-        in: path
-        name: symbol
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: Watchlist ID
+          in: path
+          name: watchlist_id
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - description: symbol name to remove from the watchlist content
+          in: path
+          name: symbol
+          required: true
+          schema:
+            type: string
   /v2/watchlists:by_name:
     delete:
       description: Delete a watchlist. This is a permanent deletion.

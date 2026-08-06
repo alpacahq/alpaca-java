@@ -364,8 +364,6 @@ public class JournalStatusEvent implements Serializable {
       }
       // validate the required field `status_from`
       JournalStatusFrom.validateJsonElement(jsonObj.get("status_from"));
-      // validate the required field `status_from`
-      JournalStatusFrom.validateJsonElement(jsonObj.get("status_from"));
       // validate the required field `status_to`
       JournalStatus.validateJsonElement(jsonObj.get("status_to"));
   }

@@ -20,6 +20,33 @@ the policy below applies strictly.
 
 ## [Unreleased]
 
+### Breaking
+Adopting the upstream Broker and Trading documents, which are now OpenAPI 3.1.2 rather than 3.0.0,
+changed two parts of the generated API surface.
+
+- Broker `EventsApi.subscribeToFundingStatusSSE` now returns `List<StatusFundingEvent>`, and
+  `BrokerEventsSseClient.subscribeToFundingStatus` emits `StatusFundingEvent`. The
+  `SubscribeToFundingStatusSSE200ResponseInner` wrapper is removed; it only ever held a
+  single-member union and now collapses to the member itself.
+- Broker and Trading `OrderLeg.getLegs()` returns `Object` rather than `List<Object>`, and
+  `addLegsItem` is gone. Upstream now declares the property as null-only, matching its existing
+  documentation that legs are never nested beyond one level.
+
+### Fixed
+- Preprocessing now normalizes the OpenAPI 3.1 constructs that the Java generator renders into
+  uncompilable or under-typed code, so adopting a 3.1 document no longer silently degrades the
+  generated clients:
+  - A standalone `type: 'null'` schema became a `ModelNull` class the generator never emitted,
+    breaking compilation. Null-only subschemas of `anyOf` / `oneOf` are left alone, since those
+    are the idiomatic 3.1 spelling of "nullable" and already generate correctly.
+  - A schema with `items` and no `type` is no longer read as an array, which had turned Broker
+    `FundingWalletsApi.listFundingDetails` into a bare `Object`.
+  - A `oneOf` of string enums is collapsed back into one enum, keeping Broker `JournalStatusFrom`
+    and `TransferStatusFrom` as enums instead of `AbstractOpenApiSchema` wrappers.
+  - Path-item parameters are inlined into each operation ahead of the operation's own parameters,
+    which had otherwise duplicated Broker `createTransferForAccount`'s `account_id` into a second
+    `accountId2` argument and reordered `getOrderByClientOrderIdForAccount`'s arguments.
+
 ### Changed
 - GitHub Releases now use the curated `CHANGELOG.md` section for the tag (with a
   non-empty `[Unreleased]` fallback), then append GitHub’s compare link for the

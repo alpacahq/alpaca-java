@@ -4,6 +4,25 @@ import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 
 final class OpenApiSpecSupport {
+    private static final List<String> OPERATION_METHODS =
+        ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace'].asImmutable()
+
+    /** Keywords whose value is a single nested schema. */
+    private static final List<String> NESTED_SCHEMA_KEYS =
+        ['items', 'additionalProperties', 'not', 'contains', 'propertyNames'].asImmutable()
+
+    /** Keywords that combine sibling subschemas into one effective schema. */
+    private static final List<String> COMPOSITION_KEYS = ['allOf', 'oneOf', 'anyOf'].asImmutable()
+
+    /** Keywords whose value is a list of nested schemas. */
+    private static final List<String> NESTED_SCHEMA_LIST_KEYS = ['prefixItems'].asImmutable()
+
+    /** Keywords whose value maps names to nested schemas. */
+    private static final List<String> NESTED_SCHEMA_MAP_KEYS =
+        ['properties', 'patternProperties'].asImmutable()
+
+    private static final String SCHEMA_REF_PREFIX = '#/components/schemas/'
+
     private OpenApiSpecSupport() {}
 
     static String dumpYaml(Object tree) {
@@ -86,6 +105,137 @@ final class OpenApiSpecSupport {
         }
     }
 
+    /**
+     * Calls {@code visitor} once for every schema object reachable from the document.
+     *
+     * <p>Traversal is schema aware rather than a blind deep walk, so a property literally named
+     * {@code items} or {@code not} is never mistaken for a schema keyword.</p>
+     */
+    static void eachSchema(Map spec, Closure visitor) {
+        traverseSchemas(spec) { schema, composed -> visitor.call(schema) }
+    }
+
+    /**
+     * Calls {@code visitor} for every schema that stands on its own, skipping the subschemas of
+     * {@code allOf}, {@code anyOf}, and {@code oneOf}, whose meaning comes from their siblings.
+     */
+    static void eachStandaloneSchema(Map spec, Closure visitor) {
+        traverseSchemas(spec) { schema, composed -> if (!composed) visitor.call(schema) }
+    }
+
+    /**
+     * Rewrites null-only schemas so the generator can render them.
+     *
+     * <p>OpenAPI 3.1 lets a schema declare {@code type: 'null'}, which upstream uses for
+     * properties that are always null. OpenAPI Generator maps that to a {@code ModelNull} class
+     * it never emits, so the generated sources do not compile. Java has no null-only type, so the
+     * closest equivalent is a nullable free-form value.</p>
+     *
+     * <p>The type becomes {@code object} rather than being dropped entirely because the generator
+     * documents a free-form object but emits an untyped schema as a bare, undocumented
+     * {@code Object} — losing the property description that explains why the value is always
+     * null. Both spellings generate the same Java type. Any {@code items} left over from the
+     * previous array declaration is dropped as it no longer applies.</p>
+     *
+     * <p>Only standalone schemas are rewritten. A null-only subschema inside {@code anyOf} or
+     * {@code oneOf} is the idiomatic 3.1 spelling of "nullable", which the generator already
+     * collapses into its nullable sibling; rewriting it would instead produce a two-member union
+     * and an extra model class.</p>
+     */
+    static void relaxNullOnlySchemas(Map spec) {
+        eachStandaloneSchema(spec) { schema ->
+            if (schema['type'] != 'null') return
+            schema['type'] = 'object'
+            schema.remove('items')
+        }
+    }
+
+    /**
+     * Restores the {@code type: array} that a schema with {@code items} implies.
+     *
+     * <p>Under OpenAPI 3.0 an absent {@code type} alongside {@code items} was read as an array.
+     * Under 3.1 an absent {@code type} means "any type", so such a schema generates as
+     * {@code Object} and the item model is lost from the signature.</p>
+     */
+    static void inferArrayTypeFromItems(Map spec) {
+        eachSchema(spec) { schema ->
+            if (!schema.containsKey('items') || schema['type'] != null || schema['$ref']) return
+            if (COMPOSITION_KEYS.any { schema[it] != null }) return
+            schema['type'] = 'array'
+        }
+    }
+
+    /**
+     * Collapses a {@code oneOf} of string enums into one string enum.
+     *
+     * <p>Upstream models "an existing status, or an empty string" as a union of two string enums.
+     * OpenAPI 3.0 parsing merged those into a single enum; under 3.1 the generator emits an
+     * {@code AbstractOpenApiSchema} wrapper instead, which is far clumsier to consume for what is
+     * still just a closed set of strings.</p>
+     */
+    static void flattenStringEnumUnions(Map spec) {
+        def schemas = spec?.components?.schemas
+        eachSchema(spec) { schema ->
+            def members = schema['oneOf']
+            if (!(members instanceof List) || members.isEmpty() || schema['discriminator']) return
+
+            def values = new LinkedHashSet()
+            for (member in members) {
+                def resolved = resolveSchemaRef(schemas, member)
+                if (!(resolved instanceof Map)
+                    || resolved['type'] != 'string'
+                    || !(resolved['enum'] instanceof List)) {
+                    return
+                }
+                values.addAll(resolved['enum'] as List)
+            }
+
+            schema.remove('oneOf')
+            schema['type'] = 'string'
+            schema['enum'] = new ArrayList(values)
+        }
+    }
+
+    /**
+     * Inlines path-item parameters into every operation, ahead of the operation's own parameters.
+     *
+     * <p>Operation parameters that redeclare a path-item parameter (same {@code name} and
+     * {@code in}) are dropped, since OpenAPI forbids duplicating a parameter within an operation.
+     * Without this the generator emits such a parameter twice (as {@code accountId} and
+     * {@code accountId2}) and, for operations whose own parameters are also required, appends the
+     * path-item parameters last and reorders the generated method arguments.</p>
+     */
+    static void inlinePathLevelParameters(Map spec) {
+        def paths = spec?.paths
+        if (!(paths instanceof Map)) return
+
+        paths.each { path, item ->
+            def shared = item instanceof Map ? item['parameters'] : null
+            if (!(shared instanceof List) || shared.isEmpty()) return
+
+            def sharedKeys = shared
+                .collect { parameterKey(spec, it) }
+                .findAll { it != null } as Set
+            OPERATION_METHODS.each { method ->
+                def operation = item[method]
+                if (!(operation instanceof Map)) return
+
+                // Deep copies keep each operation's list independent so the YAML dump does not
+                // collapse the repeated parameters into anchors and aliases.
+                def merged = shared.collect { deepCopy(it) }
+                def own = operation['parameters']
+                if (own instanceof List) {
+                    own.each { parameter ->
+                        def key = parameterKey(spec, parameter)
+                        if (key == null || !sharedKeys.contains(key)) merged << parameter
+                    }
+                }
+                operation['parameters'] = merged
+            }
+            item.remove('parameters')
+        }
+    }
+
     static void removeActivityV2DetailTrdRequired(Map spec) {
         def schema = spec?.components?.schemas?.get('ActivityV2DetailTRD')
         if (schema instanceof Map) schema.remove('required')
@@ -102,22 +252,39 @@ final class OpenApiSpecSupport {
             activityTypes.findAll { it != 'FILL' })
     }
 
+    /**
+     * Sanitizers that apply to every API because they address OpenAPI 3.1 constructs the Java
+     * generator renders into code that does not compile or that loses type information.
+     *
+     * <p>{@link #relaxNullOnlySchemas} must run before {@link #inferArrayTypeFromItems} so the
+     * {@code items} it strips from a null-only schema is not read back as an array type.</p>
+     */
+    static void sanitizeSpec(Map spec) {
+        relaxNullOnlySchemas(spec)
+        inferArrayTypeFromItems(spec)
+        flattenStringEnumUnions(spec)
+        inlinePathLevelParameters(spec)
+    }
+
     /** Shared Broker sanitizers for pin preprocess and upstream-adopt preprocess. */
     static void sanitizeBrokerSpec(Map spec) {
         removeEmptyKeyProperties(spec)
         removeDiscriminatorEnums(spec)
         removeActivityV2DetailTrdRequired(spec)
+        sanitizeSpec(spec)
     }
 
     /** Shared Market Data sanitizers for pin preprocess and upstream-adopt preprocess. */
     static void sanitizeDataSpec(Map spec) {
         removeInternalSchemaMarkers(spec)
+        sanitizeSpec(spec)
     }
 
     /** Shared Trading sanitizers for pin preprocess and upstream-adopt preprocess. */
     static void sanitizeTradingSpec(Map spec) {
         removeActivityV2DetailTrdRequired(spec)
         requireDistinctAccountActivityTypes(spec)
+        sanitizeSpec(spec)
     }
 
     static void writeSanitizedSpec(String source, File outputFile, Closure sanitize) {
@@ -125,6 +292,110 @@ final class OpenApiSpecSupport {
         def spec = loadSpec(source) as Map
         sanitize.call(spec)
         outputFile.text = dumpYaml(spec)
+    }
+
+    private static void traverseSchemas(Map spec, Closure visitor) {
+        def visited = Collections.newSetFromMap(new IdentityHashMap())
+        schemaRoots(spec).each { root -> visitSchema(root, false, visited, visitor) }
+    }
+
+    private static void visitSchema(Object node, boolean composed, Set visited, Closure visitor) {
+        if (!(node instanceof Map) || !visited.add(node)) return
+        visitor.call(node, composed)
+
+        NESTED_SCHEMA_KEYS.each { key -> visitSchema(node[key], false, visited, visitor) }
+        (COMPOSITION_KEYS + NESTED_SCHEMA_LIST_KEYS).each { key ->
+            def parts = node[key]
+            if (parts instanceof List) {
+                parts.each { visitSchema(it, key in COMPOSITION_KEYS, visited, visitor) }
+            }
+        }
+        NESTED_SCHEMA_MAP_KEYS.each { key ->
+            def entries = node[key]
+            if (entries instanceof Map) {
+                entries.each { name, value -> visitSchema(value, false, visited, visitor) }
+            }
+        }
+    }
+
+    /** Collects every position in the document that holds a schema object. */
+    private static List schemaRoots(Map spec) {
+        def roots = []
+        def components = spec?.components
+        if (components instanceof Map) {
+            [components.schemas, components.headers].each { entries ->
+                if (entries instanceof Map) roots.addAll(entries.values())
+            }
+            if (components.parameters instanceof Map) {
+                roots.addAll(parameterSchemas(components.parameters.values().toList()))
+            }
+            [components.responses, components.requestBodies].each { entries ->
+                if (!(entries instanceof Map)) return
+                entries.each { name, value -> roots.addAll(contentSchemas(value)) }
+            }
+        }
+
+        def paths = spec?.paths
+        if (paths instanceof Map) {
+            paths.each { path, item ->
+                if (!(item instanceof Map)) return
+                roots.addAll(parameterSchemas(item['parameters']))
+                OPERATION_METHODS.each { method ->
+                    def operation = item[method]
+                    if (!(operation instanceof Map)) return
+                    roots.addAll(parameterSchemas(operation['parameters']))
+                    roots.addAll(contentSchemas(operation['requestBody']))
+                    def responses = operation['responses']
+                    if (responses instanceof Map) {
+                        responses.each { code, response -> roots.addAll(contentSchemas(response)) }
+                    }
+                }
+            }
+        }
+        roots.findAll { it instanceof Map }
+    }
+
+    private static List parameterSchemas(Object parameters) {
+        parameters instanceof List
+            ? parameters.collect { it instanceof Map ? it['schema'] : null }
+            : []
+    }
+
+    private static List contentSchemas(Object holder) {
+        def content = holder instanceof Map ? holder['content'] : null
+        if (!(content instanceof Map)) return []
+        content.values().collect { it instanceof Map ? it['schema'] : null }
+    }
+
+    /** Resolves a local {@code #/components/schemas} reference; returns null for anything else. */
+    private static Object resolveSchemaRef(Object schemas, Object schema) {
+        if (!(schema instanceof Map)) return null
+        def ref = schema['$ref']
+        if (!ref) return schema
+        if (!(schemas instanceof Map) || !ref.toString().startsWith(SCHEMA_REF_PREFIX)) return null
+        schemas[ref.toString().substring(SCHEMA_REF_PREFIX.length())]
+    }
+
+    /** Identity of a parameter as OpenAPI defines it: its location plus its name. */
+    private static String parameterKey(Map spec, Object parameter) {
+        if (!(parameter instanceof Map)) return null
+        def resolved = parameter['$ref']
+            ? spec?.components?.parameters?.get(parameter['$ref'].toString().tokenize('/').last())
+            : parameter
+        if (!(resolved instanceof Map)) return null
+        def name = resolved['name']
+        def location = resolved['in']
+        (name && location) ? "${location}:${name}".toString() : null
+    }
+
+    private static Object deepCopy(Object value) {
+        if (value instanceof Map) {
+            def copy = new LinkedHashMap()
+            value.each { key, entry -> copy[key] = deepCopy(entry) }
+            return copy
+        }
+        if (value instanceof List) return value.collect { deepCopy(it) }
+        value
     }
 
     private static void constrainActivityType(Object schema, List values) {

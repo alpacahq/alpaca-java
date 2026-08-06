@@ -1083,8 +1083,9 @@ components:
       properties:
         account_number:
           description: A human-readable account number that can be shown to the end user
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         account_type:
           $ref: '#/components/schemas/AccountType'
         agreements:
@@ -1140,8 +1141,9 @@ components:
             Only populated when the account was created by referencing an existing account holder via `primary_account_holder_id`
             on `POST /v1/accounts`. Otherwise `null`. Currently only supported for `account_type` of `trading` and `ira`.
           format: uuid
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         status:
           $ref: '#/components/schemas/AccountStatus'
         trusted_contact:
@@ -1434,8 +1436,9 @@ components:
         account_name:
           type: string
         account_number:
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         account_sub_type:
           $ref: '#/components/schemas/AccountSubType'
         account_type:
@@ -1528,8 +1531,9 @@ components:
             Only populated when the account was created by referencing an existing account holder via `primary_account_holder_id`
             on `POST /v1/accounts`. Otherwise `null`. Currently only supported for `account_type` of `trading` and `ira`.
           format: uuid
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         risk_tolerance:
           description: |
             The user's investment risk tolerance. This field should be used instead of the deprecated `risk_tolerance` under identity.
@@ -2844,8 +2848,9 @@ components:
         cash:
           description: The amount of cash to be paid per share held by an account on the record date.
           minLength: 1
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         corporate_action_id:
           description: ID that remains consistent across all announcements for the same corporate action. Unlike 'id', this can be used to connect multiple announcements to see how the terms have changed
             throughout the lifecycle of the corporate action event.
@@ -2858,8 +2863,9 @@ components:
         ex_date:
           description: The first date that purchasing a security will not result in a corporate action entitlement.
           minLength: 1
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         id:
           description: ID that is specific to a single announcement.
           minLength: 1
@@ -2875,13 +2881,15 @@ components:
         new_rate:
           description: The numerator to determine any quantity change ratios in positions.
           minLength: 1
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         old_rate:
           description: The denominator to determine any quantity change ratios in positions.
           minLength: 1
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         payable_date:
           description: The date the announcement will take effect. On this date, account stock and cash balances are expected to be processed accordingly.
           minLength: 1
@@ -2889,18 +2897,21 @@ components:
         record_date:
           description: The date an account must hold a settled position in the security in order to receive the corporate action entitlement.
           minLength: 1
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         target_original_cusip:
           description: CUSIP of the child company involved in the announcement.
           minLength: 1
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         target_symbol:
           description: Symbol of the child company involved in the announcement.
           minLength: 1
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
       required:
         - id
         - corporate_action_id
@@ -3322,18 +3333,21 @@ components:
             properties:
               amount:
                 description: Journal amount in USD
-                nullable: true
-                type: string
+                type:
+                  - string
+                  - 'null'
               currency:
                 description: Currency code in ISO format
-                nullable: true
-                type: string
+                type:
+                  - string
+                  - 'null'
               description:
                 description: Journal entry description, gets returned in the response
                 type: string
               qty:
-                nullable: true
-                type: string
+                type:
+                  - string
+                  - 'null'
               symbol:
                 type: string
               to_account:
@@ -4312,8 +4326,9 @@ components:
         phone_number:
           description: 'Phone number should include the country code, format: "+15555555555"'
           example: '+15556667788'
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         postal_code:
           example: '94401'
           type: string
@@ -4800,8 +4815,9 @@ components:
       properties:
         additional_information:
           description: Additional details for when type = `wire`
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         amount:
           description: Must be > 0.00
           format: decimal
@@ -5249,8 +5265,9 @@ components:
           description: Array of annotations describing the rationale for marking `is_control_person`, `is_affiliated_exchange_or_finra`, and/or `immediate_family_exposed` as true
           items:
             $ref: '#/components/schemas/DisclosureContextAnnotation'
-          nullable: true
-          type: array
+          type:
+            - array
+            - 'null'
         employer_address:
           description: The employer's address if the user is employed.
           type: string
@@ -5331,8 +5348,9 @@ components:
           type: array
         next_page_token:
           example: 293639be-8807-423f-b00d-68c781e8bb56
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
       type: object
     Error:
       properties:
@@ -6137,8 +6155,9 @@ components:
         next_page_token:
           description: |
             Opaque cursor for the next page of results. When `null`, there are no further pages. Pass this value back as the `page_token` query parameter to fetch the next page.
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
       required:
         - data
         - next_page_token
@@ -6664,8 +6683,9 @@ components:
             settle_date:
               description: Settlement date for the journal. Absent or `null` until the journal settles (for example, while `status` is `queued` or `pending`).
               format: date
-              nullable: true
-              type: string
+              type:
+                - string
+                - 'null'
             status:
               $ref: '#/components/schemas/JournalStatus'
             to_account:
@@ -6889,11 +6909,19 @@ components:
           status_to: executed
     JournalStatusFrom:
       description: Previous journal status in stream status-change events. Empty string is used for the initial status-change event when there is no previous status.
-      oneOf:
-        - $ref: '#/components/schemas/JournalStatus'
-        - enum:
-            - ''
-          type: string
+      type: string
+      enum:
+        - pending
+        - canceled
+        - executed
+        - activity_created
+        - queued
+        - rejected
+        - deleted
+        - refused
+        - sent_to_clearing
+        - correct
+        - ''
     KYCResultType:
       description: "IDENTITY_VERIFICATION\tIdentity needs to be verified\n\nTAX_IDENTIFICATION\tTax ID number needs to be verified\n\nADDRESS_VERIFICATION\tAddress needs to be verified\n\nDATE_OF_BIRTH\t\
         Date of birth needs to be verified\n\nINVALID_IDENTITY_PASSPORT\tIdentity needs to be verified via a \ngovernment issued ID. This is commonly used in conjuction with OTHER to describe the exact\
@@ -6945,8 +6973,9 @@ components:
         next_page_token:
           description: |
             The token to use to retrieve the next page of results. If `null`, there are no more pages.
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
       required:
         - loans
         - next_page_token
@@ -7042,8 +7071,9 @@ components:
       description: |
         Use this token in your next API call to paginate through the dataset and retrieve the next page of results. A null token indicates there are no more data to fetch.
       example: MTAwMA==
-      nullable: true
-      type: string
+      type:
+        - string
+        - 'null'
     NonTradeActivity:
       properties:
         activity_sub_type:
@@ -7775,14 +7805,16 @@ components:
           description: Time when cancellation or bust was requested (if applicable)
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         canceled_at:
           description: Can be null
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         client_order_id:
           description: Client unique order ID
           example: 61e69015-8549-4bfd-b9c3-01e75843f47d
@@ -7812,8 +7844,9 @@ components:
           description: Can be null
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         extended_hours:
           example: true
           type: boolean
@@ -7821,20 +7854,23 @@ components:
           description: Can be null
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         filled_at:
           description: Time the order was filled. Can be null if not filled
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         filled_avg_price:
           description: Filled average price. Can be 0 until order is processed in case order is passed outside of market hours
           example: '4.2'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         filled_qty:
           description: Filled quantity
           example: '4.2'
@@ -7844,8 +7880,9 @@ components:
           description: The highest (lowest) market price seen since the trailing stop order was submitted.
           example: '3.14'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         id:
           description: Order ID generated by Alpaca
           example: 61e69015-8549-4bfd-b9c3-01e75843f47d
@@ -7855,20 +7892,23 @@ components:
           description: When querying non-simple order_class orders in a nested style, an array of Order entities associated with this order. Otherwise, null.
           items:
             $ref: '#/components/schemas/OrderLeg'
-          nullable: true
-          type: array
+          type:
+            - array
+            - 'null'
         limit_price:
           description: Limit price
           example: '3.14'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         notional:
           description: Ordered notional amount. If entered, qty will be null. Can take up to 2 decimal points.
           example: '4.2'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         order_class:
           $ref: '#/components/schemas/OrderClass'
         order_type:
@@ -7879,26 +7919,30 @@ components:
           description: Ordered quantity. If entered, notional will be null. Can take up to 2 decimal points.
           example: '4.2'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         replaced_at:
           description: Can be null
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         replaced_by:
           description: The order ID that this order was replaced by. (Can be null)
           example: 61e69015-8549-4bfd-b9c3-01e75843f47d
           format: uuid
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         replaces:
           description: The order ID that this order replaces. (Can be null)
           example: 61e69015-8549-4bfd-b9c3-01e75843f47d
           format: uuid
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         side:
           $ref: '#/components/schemas/OrderSide'
         status:
@@ -7907,8 +7951,9 @@ components:
           description: Stop price
           example: '3.14'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         submitted_at:
           description: Time the order was submitted for execution or, if not yet submitted the created_at time. Because orders are submitted for execution asynchronous to database updates, at times this
             may be before the created_at time.
@@ -7931,14 +7976,16 @@ components:
           description: The percent value away from the high water mark for trailing stop orders.
           example: '5.0'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         trail_price:
           description: The dollar value away from the high water mark for trailing stop orders.
           example: '3.14'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         type:
           $ref: '#/components/schemas/OrderType'
         updated_at:
@@ -8002,8 +8049,9 @@ components:
           description: Can be null
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         client_order_id:
           description: Client unique order ID
           example: 61e69015-8549-4bfd-b9c3-01e75843f47d
@@ -8033,8 +8081,9 @@ components:
           description: Can be null
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         extended_hours:
           example: true
           type: boolean
@@ -8042,20 +8091,23 @@ components:
           description: Can be null
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         filled_at:
           description: Time the order was filled. Can be null if not filled
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         filled_avg_price:
           description: Filled average price. Can be 0 until order is processed in case order is passed outside of market hours
           example: '4.2'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         filled_qty:
           description: Filled quantity
           example: '4.2'
@@ -8065,8 +8117,9 @@ components:
           description: The highest (lowest) market price seen since the trailing stop order was submitted.
           example: '3.14'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         id:
           description: Order ID generated by Alpaca
           example: 61e69015-8549-4bfd-b9c3-01e75843f47d
@@ -8075,22 +8128,21 @@ components:
         legs:
           description: Always null for an order leg; legs are not nested beyond one level.
           example: null
-          items:
-            type: object
-          nullable: true
-          type: array
+          type: object
         limit_price:
           description: Limit price
           example: '3.14'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         notional:
           description: Ordered notional amount. If entered, qty will be null. Can take up to 2 decimal points.
           example: '4.2'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         order_class:
           $ref: '#/components/schemas/OrderClass'
         order_type:
@@ -8101,26 +8153,30 @@ components:
           description: Ordered quantity. If entered, notional will be null. Can take up to 2 decimal points.
           example: '4.2'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         replaced_at:
           description: Can be null
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         replaced_by:
           description: The order ID that this order was replaced by. (Can be null)
           example: 61e69015-8549-4bfd-b9c3-01e75843f47d
           format: uuid
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         replaces:
           description: The order ID that this order replaces. (Can be null)
           example: 61e69015-8549-4bfd-b9c3-01e75843f47d
           format: uuid
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         side:
           $ref: '#/components/schemas/OrderSide'
         status:
@@ -8129,8 +8185,9 @@ components:
           description: Stop price
           example: '3.14'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         submitted_at:
           description: Time the order was submitted for execution or, if not yet submitted the created_at time. Because orders are submitted for execution asynchronous to database updates, at times this
             may be before the created_at time.
@@ -8153,14 +8210,16 @@ components:
           description: The percent value away from the high water mark for trailing stop orders.
           example: '5.0'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         trail_price:
           description: The dollar value away from the high water mark for trailing stop orders.
           example: '3.14'
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         type:
           $ref: '#/components/schemas/OrderType'
         updated_at:
@@ -8292,9 +8351,9 @@ components:
         mime_type: image/jpeg
       properties:
         content:
+          contentEncoding: base64
           description: The base64 string encoding of the document contents. This property is required unless content_data is provided.
           example: /9j/Cg==
-          format: base64
           type: string
         content_data:
           $ref: '#/components/schemas/W8benDocument'
@@ -8363,8 +8422,9 @@ components:
       properties:
         base_value:
           description: basis in dollar of the profit loss calculation
-          nullable: true
-          type: number
+          type:
+            - number
+            - 'null'
         base_value_asof:
           description: |
             If included, then it indicates that the base_value is the account's closing
@@ -8386,14 +8446,16 @@ components:
         equity:
           description: equity value of the account in dollar amount as of the end of each time window
           items:
-            nullable: true
-            type: number
+            type:
+              - number
+              - 'null'
           type: array
         profit_loss:
           description: profit/loss in dollar from the base value
           items:
-            nullable: true
-            type: number
+            type:
+              - number
+              - 'null'
           type: array
         profit_loss_pct:
           description: profit/loss in percentage from the base value
@@ -8401,8 +8463,9 @@ components:
             - 0.001
             - 0.002
           items:
-            nullable: true
-            type: number
+            type:
+              - number
+              - 'null'
           type: array
         timeframe:
           description: time window size of each data element
@@ -9731,8 +9794,9 @@ components:
           type: string
         fees:
           description: Fees charged for this tokenization request
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         issuer:
           $ref: '#/components/schemas/TokenizationIssuer'
         issuer_account:
@@ -9745,8 +9809,9 @@ components:
             sunset: '2026-10-15'
         issuer_request_id:
           description: Unique identifier of the tokenization request set by the issuer
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         network:
           $ref: '#/components/schemas/TokenizationNetwork'
         qty:
@@ -9762,8 +9827,9 @@ components:
           type: string
         tx_hash:
           description: Transaction hash of the completed request on the blockchain
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         type:
           $ref: '#/components/schemas/TokenizationRequestType'
         underlying_symbol:
@@ -9771,8 +9837,9 @@ components:
           type: string
         updated_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         wallet_address:
           description: The wallet address associated with this tokenization request
           type: string
@@ -9819,8 +9886,9 @@ components:
         account_number:
           description: The account number
           example: '927584925'
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         accrued_fees:
           description: Accrued fees
           example: '12345.6789'
@@ -10036,14 +10104,13 @@ components:
           example: false
           type: boolean
         user_configurations:
-          allOf:
+          anyOf:
             - $ref: '#/components/schemas/AccountConfigurations'
+            - type: 'null'
           description: |-
             Custom user-level configuration overrides for this account.
 
             This field is always present in the response, but its value will be `null` until user-level configurations have been explicitly set for the account.
-          nullable: true
-          type: object
       required:
         - id
         - admin_configurations
@@ -10425,8 +10492,9 @@ components:
           type: string
         additional_information:
           description: Additional information. Only applies when type = "wire".
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         amount:
           description: Must be > 0.00
           format: decimal
@@ -10448,12 +10516,14 @@ components:
         fee:
           description: Fee amount to be collected. Only applies when type = "wire".
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         fee_payment_method:
           description: Either "user" or "invoice". Only applies when type = "wire".
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         hold_until:
           format: date-time
           type: string
@@ -10467,8 +10537,9 @@ components:
           $ref: '#/components/schemas/TransferIRADetails'
         reason:
           description: Cause of the status
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         relationship_id:
           description: The ACH relationship ID only present if type = "ach"
           format: uuid
@@ -10476,8 +10547,9 @@ components:
         requested_amount:
           description: Must be > 0.00. Only applies when type = "wire".
           format: decimal
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
         status:
           $ref: '#/components/schemas/TransferStatus'
         type:
@@ -10677,11 +10749,18 @@ components:
           transfer_id: c4ed4206-697b-4859-ab71-b9de6649859d
     TransferStatusFrom:
       description: Previous transfer status in stream status-change events. Empty string is used for the initial status-change event when there is no previous status.
-      oneOf:
-        - $ref: '#/components/schemas/TransferStatus'
-        - enum:
-            - ''
-          type: string
+      type: string
+      enum:
+        - QUEUED
+        - APPROVAL_PENDING
+        - PENDING
+        - SENT_TO_CLEARING
+        - REJECTED
+        - CANCELED
+        - APPROVED
+        - COMPLETE
+        - RETURNED
+        - ''
     TransferType:
       description: |
         - **ach**
@@ -11894,7 +11973,7 @@ info:
   termsOfService: https://s3.amazonaws.com/files.alpaca.markets/disclosures/library/TermsAndConditions.pdf
   title: Broker API
   version: 1.1.1
-openapi: 3.0.0
+openapi: 3.1.2
 paths:
   /v1beta/accounts/{account_id}/funding_wallet:
     get:
@@ -11979,6 +12058,7 @@ paths:
               schema:
                 items:
                   $ref: '#/components/schemas/ListFundingDetails'
+                type: array
           description: list of wallets
         default:
           content:
@@ -12287,6 +12367,12 @@ paths:
         The API response will return the raw image as a binary
       operationId: get-v1beta1-logos-symbol
       parameters:
+        - description: Stock or crypto symbol (e.g. AAPL, BTCUSD, etc.)
+          in: path
+          name: symbol
+          required: true
+          schema:
+            type: string
         - description: True by default, will return sample placeholder images with the first letter of the asset symbol. If false, 404 will be returned for symbols which do not contain an image.
           in: query
           name: placeholder
@@ -12298,13 +12384,6 @@ paths:
       summary: Get Logo
       tags:
         - Logos
-    parameters:
-      - description: Stock or crypto symbol (e.g. AAPL, BTCUSD, etc.)
-        in: path
-        name: symbol
-        required: true
-        schema:
-          type: string
   /v1/accounts:
     get:
       description: |
@@ -12419,8 +12498,8 @@ paths:
       summary: Get An Account by ID
       tags:
         - Accounts
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
     patch:
       description: |-
         This operation updates account information.
@@ -12459,11 +12538,14 @@ paths:
       summary: Update an Account
       tags:
         - Accounts
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
   /v1/accounts/{account_id}/ach_relationships:
     get:
       description: Returns a list of ACH Relationships for an account
       operationId: getAccountACHRelationships
       parameters:
+        - $ref: '#/components/parameters/AccountID'
         - description: Comma-separated status values
           in: query
           name: statuses
@@ -12481,8 +12563,6 @@ paths:
       summary: Retrieve ACH Relationships for an account
       tags:
         - Funding
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
     post:
       description: |-
         Create a new ACHRelationship for an account
@@ -12516,6 +12596,8 @@ paths:
       summary: Create an ACH Relationship
       tags:
         - Funding
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
   /v1/accounts/{account_id}/ach_relationships/{ach_relationship_id}:
     delete:
       description: Delete an existing ACH relationship for an account
@@ -12530,23 +12612,16 @@ paths:
       summary: Delete an existing ACH relationship
       tags:
         - Funding
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
-      - description: ACH relationship identifier
-        in: path
-        name: ach_relationship_id
-        required: true
-        schema:
-          format: uuid
-          type: string
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - description: ACH relationship identifier
+          in: path
+          name: ach_relationship_id
+          required: true
+          schema:
+            format: uuid
+            type: string
   /v1/accounts/{account_id}/actions/close:
-    parameters:
-      - description: The id of the account to be closed
-        in: path
-        name: account_id
-        required: true
-        schema:
-          type: string
     post:
       description: |-
         This operation closes an active account. The underlying records and information of the account are not deleted by this operation.
@@ -12561,6 +12636,13 @@ paths:
       summary: Close an Account
       tags:
         - Accounts
+      parameters:
+        - description: The id of the account to be closed
+          in: path
+          name: account_id
+          required: true
+          schema:
+            type: string
   /v1/accounts/{account_id}/cip:
     get:
       description: You can retrieve the CIP information you've submitted for a given account.
@@ -12575,12 +12657,12 @@ paths:
       summary: Retrieve CIP information
       tags:
         - KYC
-    parameters:
-      - in: path
-        name: account_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - in: path
+          name: account_id
+          required: true
+          schema:
+            type: string
     post:
       description: |-
         The customer identification program (CIP) API allows you to submit the CIP results received from your KYC provider.
@@ -12603,6 +12685,12 @@ paths:
       summary: Upload CIP information
       tags:
         - KYC
+      parameters:
+        - in: path
+          name: account_id
+          required: true
+          schema:
+            type: string
   /v1/accounts/{account_id}/documents:
     get:
       description: |-
@@ -12611,6 +12699,7 @@ paths:
         These account documents are tax statements, trade confirmations, etc, generated by the Alpaca system. They are distinct from the owner documents you upload and later access via the account object's documents property.
       operationId: getDocsForAccount
       parameters:
+        - $ref: '#/components/parameters/AccountID'
         - description: optional date value to filter the list (inclusive).
           in: query
           name: start
@@ -12643,8 +12732,6 @@ paths:
       summary: Retrieve a List of Account Documents
       tags:
         - Documents
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
   /v1/accounts/{account_id}/documents/{document_id}/download:
     get:
       description: |
@@ -12667,12 +12754,10 @@ paths:
       summary: Download an Account Document
       tags:
         - Documents
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
-      - $ref: '#/components/parameters/DocumentID'
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/DocumentID'
   /v1/accounts/{account_id}/documents/upload:
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
     post:
       description: |-
         Upload documents for the primary account owner of an account.
@@ -12709,6 +12794,8 @@ paths:
       summary: Upload Owner Documents for an Existing Account
       tags:
         - Documents
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
   /v1/accounts/{account_id}/documents/w8ben/{document_id}/download:
     get:
       description: |-
@@ -12728,26 +12815,20 @@ paths:
       summary: Download the W8BEN document for the primary owner of an account
       tags:
         - Documents
-    parameters:
-      - description: The id of the related account
-        in: path
-        name: account_id
-        required: true
-        schema:
-          type: string
-      - description: The id of the W8BEN to download
-        in: path
-        name: document_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: The id of the related account
+          in: path
+          name: account_id
+          required: true
+          schema:
+            type: string
+        - description: The id of the W8BEN to download
+          in: path
+          name: document_id
+          required: true
+          schema:
+            type: string
   /v1/accounts/{account_id}/onfido/sdk:
-    parameters:
-      - in: path
-        name: account_id
-        required: true
-        schema:
-          type: string
     patch:
       description: This request allows you to send Alpaca the result of the Onfido SDK flow in your app. A notification of a successful outcome is required for Alpaca to continue the KYC process.
       operationId: patch-v1-accounts-account_id-onfido-sdk
@@ -12783,6 +12864,12 @@ paths:
       summary: Update the Onfido SDK Outcome
       tags:
         - KYC
+      parameters:
+        - in: path
+          name: account_id
+          required: true
+          schema:
+            type: string
   /v1/accounts/{account_id}/onfido/sdk/tokens:
     get:
       description: Get an SDK token to activate the Onfido SDK flow within your app. You will have to keep track of the SDK token so you can pass it back when you upload the SDK outcome. We recommend storing
@@ -12874,6 +12961,7 @@ paths:
       description: Retrieves Bank Relationships for an account
       operationId: getRecipientBanks
       parameters:
+        - $ref: '#/components/parameters/AccountID'
         - in: query
           name: status
           schema:
@@ -12904,8 +12992,6 @@ paths:
       tags:
         - Funding
         - Accounts
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
     post:
       description: If successful, retrieves Bank Relationships for an account
       operationId: createRecipientBank
@@ -12946,14 +13032,14 @@ paths:
       summary: Delete a Bank Relationship for an Account
       tags:
         - Funding
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
-      - in: path
-        name: bank_id
-        required: true
-        schema:
-          format: uuid
-          type: string
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - in: path
+          name: bank_id
+          required: true
+          schema:
+            format: uuid
+            type: string
   /v1/accounts/{account_id}/tokenization/callback/mint:
     post:
       description: This endpoint is used by the issuer to confirm the minting of tokenized assets previously requested by the Authorized Participant.
@@ -13500,6 +13586,7 @@ paths:
         Returns a list of transfer entities ordered by created_at
       operationId: getTransfersForAccount
       parameters:
+        - $ref: '#/components/parameters/AccountID'
         - description: INCOMING or OUTGOING
           in: query
           name: direction
@@ -13575,8 +13662,6 @@ paths:
       summary: Retrieve List of Transfers for an Account.
       tags:
         - Funding
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
     post:
       description: |-
         Create a new transfer to deposit money into or withdraw money from an account.
@@ -13589,12 +13674,7 @@ paths:
         In the sandbox environment, ACH deposits and withdrawals settle instantly against virtual funds. Outgoing wire withdrawals are accepted and simulated end-to-end — no funds are transmitted to a bank, but the transfer progresses to `COMPLETE` and the account is debited against virtual funds. Sandbox wire withdrawals are asynchronous (not instant) and auto-complete on weekdays only; transfers submitted on a weekend will not progress until Monday. For more on funding accounts in sandbox, see [this tutorial](https://alpaca.markets/learn/fund-broker-api/).
       operationId: createTransferForAccount
       parameters:
-        - in: path
-          name: account_id
-          required: true
-          schema:
-            format: uuid
-            type: string
+        - $ref: '#/components/parameters/AccountID'
       requestBody:
         content:
           application/json:
@@ -13690,33 +13770,33 @@ paths:
       summary: Retrieve Crypto Funding Wallets
       tags:
         - Crypto Funding
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
-      - in: query
-        name: asset
-        schema:
-          type: string
-      - description: Optional chain identifier. Use to request wallets for a specific chain when asset is a multi-chain crypto asset. If not specified, network is considered.
-        in: query
-        name: chain
-        schema:
-          enum:
-            - SOL
-            - ETH
-            - BTC
-            - XRP
-            - ARB
-          type: string
-      - description: Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both 'chain' and 'network'
-          are specified, 'chain' will take precedence and 'network' will be ignored. If 'chain' and 'network' are not specified, the default 'network' (ethereum) will be used.
-        in: query
-        name: network
-        schema:
-          deprecated: true
-          enum:
-            - ethereum
-            - solana
-          type: string
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - in: query
+          name: asset
+          schema:
+            type: string
+        - description: Optional chain identifier. Use to request wallets for a specific chain when asset is a multi-chain crypto asset. If not specified, network is considered.
+          in: query
+          name: chain
+          schema:
+            enum:
+              - SOL
+              - ETH
+              - BTC
+              - XRP
+              - ARB
+            type: string
+        - description: Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both 'chain' and
+            'network' are specified, 'chain' will take precedence and 'network' will be ignored. If 'chain' and 'network' are not specified, the default 'network' (ethereum) will be used.
+          in: query
+          name: network
+          schema:
+            deprecated: true
+            enum:
+              - ethereum
+              - solana
+            type: string
   /v1/accounts/{account_id}/wallets/transfers:
     get:
       description: Returns an array of all transfers associated with the given account across all wallets.
@@ -13737,8 +13817,8 @@ paths:
       summary: Retrieve Crypto Funding Transfers
       tags:
         - Crypto Funding
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
     post:
       description: Creates a withdrawal request. Note that outgoing withdrawals must be sent to a whitelisted address and you must whitelist addresses at least 24 hours in advance. If you attempt to withdraw
         funds to a non-whitelisted address then the transfer will be rejected.
@@ -13759,6 +13839,8 @@ paths:
       summary: Request a New Withdrawal
       tags:
         - Crypto Funding
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
   /v1/accounts/{account_id}/wallets/transfers/{transfer_id}:
     get:
       description: Returns a specific wallet transfer by passing into the query the transfer_id.
@@ -13773,14 +13855,14 @@ paths:
       summary: Retrieve a Crypto Funding Transfer
       tags:
         - Crypto Funding
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
-      - description: The crypto transfer to retrieve
-        in: path
-        name: transfer_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - description: The crypto transfer to retrieve
+          in: path
+          name: transfer_id
+          required: true
+          schema:
+            type: string
   /v1/accounts/{account_id}/wallets/whitelists:
     get:
       description: Returns the list of whitelisted withdrawal addresses for the specified account.
@@ -13801,8 +13883,8 @@ paths:
       summary: An array of whitelisted addresses
       tags:
         - Crypto Funding
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
     post:
       description: |-
         Submits a new whitelisted withdrawal address for the specified account. The chain is derived from the supplied asset symbol and address, and the same address cannot be whitelisted twice on the same chain.
@@ -13843,6 +13925,8 @@ paths:
       summary: Request a new whitelisted address
       tags:
         - Crypto Funding
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
   /v1/accounts/{account_id}/wallets/whitelists/{whitelisted_address_id}:
     delete:
       description: Deletes a whitelisted withdrawal address from the specified account by ID. Subsequent withdrawals targeting the deleted address will be rejected.
@@ -13853,14 +13937,14 @@ paths:
       summary: Delete a whitelisted address
       tags:
         - Crypto Funding
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
-      - description: The whitelisted address to delete
-        in: path
-        name: whitelisted_address_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - description: The whitelisted address to delete
+          in: path
+          name: whitelisted_address_id
+          required: true
+          schema:
+            type: string
   /v1/accounts/activities:
     get:
       description: |-
@@ -13972,6 +14056,7 @@ paths:
         * If `date` is specified, the default behavior is to return all results, and there is no maximum page size.
       operationId: getAccountActivitiesByType
       parameters:
+        - $ref: '#/components/parameters/ActivityType'
         - description: id of a single account to filter by
           in: query
           name: account_id
@@ -14030,8 +14115,6 @@ paths:
       summary: Retrieve Account Activities of Specific Type
       tags:
         - Accounts
-    parameters:
-      - $ref: '#/components/parameters/ActivityType'
   /v1/accounts/ira_excess_contributions:
     get:
       description: Returns all overcontributed IRA accounts
@@ -14284,13 +14367,13 @@ paths:
       summary: Retrieve an Asset by ID
       tags:
         - Assets
-    parameters:
-      - description: you can use either the asset's Id or the symbol to search
-        in: path
-        name: symbol_or_asset_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: you can use either the asset's Id or the symbol to search
+          in: path
+          name: symbol_or_asset_id
+          required: true
+          schema:
+            type: string
   /v1/assets/entry-requirements:
     get:
       description: Returns all entry-requirements
@@ -14594,13 +14677,13 @@ paths:
       summary: Retrieve a Specific Announcement
       tags:
         - Corporate Actions
-    parameters:
-      - description: The id of the corporate action announcement to be returned.
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: The id of the corporate action announcement to be returned.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
   /v1/country-info:
     get:
       description: The Country Info API serves country information for every supported countries including risk ratings and supported crypto states where applicable.
@@ -14634,6 +14717,7 @@ paths:
         Only the changed properties are included in the event payload.
 
         Query Parameter Rules:
+        - `since_id` and `until_id` are deprecated and available only to select broker partners; use `since_ulid` and `until_ulid` instead
         - `since` is required if `until` specified
         - `since_id` is required if `until_id` specified
         - `since_ulid` is required if `until_ulid` specified
@@ -14665,14 +14749,24 @@ paths:
           schema:
             format: date
             type: string
-        - in: query
+        - deprecated: true
+          in: query
           name: since_id
           schema:
             type: integer
-        - in: query
+          x-deprecation:
+            reason: Use since_ulid instead.
+            since: '2023-08-01'
+            sunset: '2027-02-15'
+        - deprecated: true
+          in: query
           name: until_id
           schema:
             type: integer
+          x-deprecation:
+            reason: Use until_ulid instead.
+            since: '2023-08-01'
+            sunset: '2027-02-15'
         - in: query
           name: since_ulid
           schema:
@@ -14710,6 +14804,7 @@ paths:
         Historical events are streamed immediately if queried, and updates are pushed as events occur.
 
         Query Params Rules:
+        - `since_id` and `until_id` are deprecated and available only to select broker partners; use `since_ulid` and `until_ulid` instead
         - `since` required if `until` specified
         - `since_id` required if `until_id` specified
         - `since_ulid` required if `until_ulid` specified
@@ -14745,14 +14840,24 @@ paths:
           schema:
             format: date
             type: string
-        - in: query
+        - deprecated: true
+          in: query
           name: since_id
           schema:
             type: integer
-        - in: query
+          x-deprecation:
+            reason: Use since_ulid instead.
+            since: '2023-08-01'
+            sunset: '2027-02-15'
+        - deprecated: true
+          in: query
           name: until_id
           schema:
             type: integer
+          x-deprecation:
+            reason: Use until_ulid instead.
+            since: '2023-08-01'
+            sunset: '2027-02-15'
         - in: query
           name: since_ulid
           schema:
@@ -14791,6 +14896,7 @@ paths:
         You can listen to when NTAs are pushed such as CSDs, JNLC (journals) or FEEs.
 
         Query Params Rules:
+        - `since_id` and `until_id` are deprecated and available only to select broker partners; use `since_ulid` and `until_ulid` instead
         - `since` required if `until` specified
         - `since_id` required if `until_id` specified
         - `since_ulid` required if `until_ulid` specified
@@ -14816,14 +14922,24 @@ paths:
           schema:
             format: date
             type: string
-        - in: query
+        - deprecated: true
+          in: query
           name: since_id
           schema:
             type: integer
-        - in: query
+          x-deprecation:
+            reason: Use since_ulid instead.
+            since: '2023-08-01'
+            sunset: '2027-02-15'
+        - deprecated: true
+          in: query
           name: until_id
           schema:
             type: integer
+          x-deprecation:
+            reason: Use until_ulid instead.
+            since: '2023-08-01'
+            sunset: '2027-02-15'
         - in: query
           name: since_ulid
           schema:
@@ -14877,6 +14993,7 @@ paths:
         Historical events are streamed immediately if queried, and updates are pushed as events occur.
 
         Query Params Rules:
+        - `since_id` and `until_id` are deprecated and available only to select broker partners; use `since_ulid` and `until_ulid` instead
         - `since` required if `until` specified
         - `since_id` required if `until_id` specified
         - `since_ulid` required if `until_ulid` specified
@@ -14904,14 +15021,24 @@ paths:
           schema:
             format: date
             type: string
-        - in: query
+        - deprecated: true
+          in: query
           name: since_id
           schema:
             type: integer
-        - in: query
+          x-deprecation:
+            reason: Use since_ulid instead.
+            since: '2023-08-01'
+            sunset: '2027-02-15'
+        - deprecated: true
+          in: query
           name: until_id
           schema:
             type: integer
+          x-deprecation:
+            reason: Use until_ulid instead.
+            since: '2023-08-01'
+            sunset: '2027-02-15'
         - in: query
           name: since_ulid
           schema:
@@ -15545,14 +15672,14 @@ paths:
       summary: Retrieve an IPO Offering
       tags:
         - IPO
-    parameters:
-      - description: The unique offering identifier (also referred to as `ipo_reference` in the response body).
-        example: FI111225
-        in: path
-        name: offering_reference
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: The unique offering identifier (also referred to as `ipo_reference` in the response body).
+          example: FI111225
+          in: path
+          name: offering_reference
+          required: true
+          schema:
+            type: string
   /v1/jit/settlements:
     get:
       description: Returns all JIT settlements filtered by status if provided.
@@ -15795,6 +15922,13 @@ paths:
       summary: Cancel a Pending Journal
       tags:
         - Journals
+      parameters:
+        - in: path
+          name: journal_id
+          required: true
+          schema:
+            format: uuid
+            type: string
     get:
       description: |-
         You can query a specific journal entry that you submitted to Alpaca by passing into the query the journal_id.
@@ -15811,13 +15945,13 @@ paths:
       summary: Retrieve a Single Journal Entry
       tags:
         - Journals
-    parameters:
-      - in: path
-        name: journal_id
-        required: true
-        schema:
-          format: uuid
-          type: string
+      parameters:
+        - in: path
+          name: journal_id
+          required: true
+          schema:
+            format: uuid
+            type: string
   /v1/journals/batch:
     post:
       description: |-
@@ -15948,6 +16082,12 @@ paths:
         The endpoint returns the details of OAuth client to display in the authorization page.
       operationId: getOAuthClient
       parameters:
+        - in: path
+          name: client_id
+          required: true
+          schema:
+            format: uuid
+            type: string
         - description: code or token
           in: query
           name: response_type
@@ -15999,13 +16139,6 @@ paths:
       summary: Get an OAuth client
       tags:
         - OAuth
-    parameters:
-      - in: path
-        name: client_id
-        required: true
-        schema:
-          format: uuid
-          type: string
   /v1/oauth/token:
     post:
       description: |
@@ -16192,13 +16325,13 @@ paths:
       summary: Get an option contract by ID or Symbol (BETA)
       tags:
         - Assets
-    parameters:
-      - description: The contract symbol or ID.
-        in: path
-        name: symbol_or_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: The contract symbol or ID.
+          in: path
+          name: symbol_or_id
+          required: true
+          schema:
+            type: string
   /v1/rebalancing/portfolios:
     get:
       description: |-
@@ -16303,6 +16436,13 @@ paths:
       summary: Inactivate Portfolio By ID
       tags:
         - Rebalancing
+      parameters:
+        - description: The Portfolio ID
+          in: path
+          name: portfolio_id
+          required: true
+          schema:
+            type: string
     get:
       description: Get a portfolio by its ID.
       operationId: get-v1-rebalancing-portfolios-portfolio_id
@@ -16316,13 +16456,13 @@ paths:
       summary: Get Portfolio by ID
       tags:
         - Rebalancing
-    parameters:
-      - description: The Portfolio ID
-        in: path
-        name: portfolio_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: The Portfolio ID
+          in: path
+          name: portfolio_id
+          required: true
+          schema:
+            type: string
     patch:
       description: Updates a portfolio. If weights or conditions are changed, all subscribed accounts will be evaluated for rebalancing at the next opportunity (normal market hours). If a cooldown is active
         on the portfolio, the rebalancing will occur after the cooldown expired.
@@ -16364,6 +16504,13 @@ paths:
       summary: Update Portfolio by ID
       tags:
         - Rebalancing
+      parameters:
+        - description: The Portfolio ID
+          in: path
+          name: portfolio_id
+          required: true
+          schema:
+            type: string
   /v1/rebalancing/runs:
     get:
       description: Lists runs.
@@ -16479,6 +16626,13 @@ paths:
       summary: Cancel Run by ID
       tags:
         - Rebalancing
+      parameters:
+        - description: the id of the portfolio run
+          in: path
+          name: run_id
+          required: true
+          schema:
+            type: string
     get:
       description: Get a run by its ID.
       operationId: get-v1-rebalancing-runs-run_id
@@ -16492,13 +16646,13 @@ paths:
       summary: Get Run by ID
       tags:
         - Rebalancing
-    parameters:
-      - description: the id of the portfolio run
-        in: path
-        name: run_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: the id of the portfolio run
+          in: path
+          name: run_id
+          required: true
+          schema:
+            type: string
   /v1/rebalancing/subscriptions:
     get:
       description: Lists subscriptions
@@ -16580,6 +16734,12 @@ paths:
       summary: Unsubscribe Account (Delete Subscription)
       tags:
         - Rebalancing
+      parameters:
+        - in: path
+          name: subscription_id
+          required: true
+          schema:
+            type: string
     get:
       description: Get a subscription by its ID.
       operationId: get-v1-rebalancing-subscriptions-subscription_id
@@ -16593,12 +16753,12 @@ paths:
       summary: Get Subscription by ID
       tags:
         - Rebalancing
-    parameters:
-      - in: path
-        name: subscription_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - in: path
+          name: subscription_id
+          required: true
+          schema:
+            type: string
   /v1/reporting/eod/aggregate_positions:
     get:
       description: This API endpoint provides reporting data to partners for aggregate common stock and crypto positions across their account base. Partners can view historical snapshots of their holding
@@ -16804,15 +16964,9 @@ paths:
       summary: Retrieve Trading Details for an Account
       tags:
         - Accounts
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
   /v1/trading/accounts/{account_id}/account/configurations:
-    parameters:
-      - in: path
-        name: account_id
-        required: true
-        schema:
-          type: string
     patch:
       description: You can also set the margin settings for your users' account by passing a PATCH request. By default any account with funds under $2,000 is set a margin multiplier of 1.0, and accounts
         with over $2,000 are set to 2.0.
@@ -16832,6 +16986,12 @@ paths:
       summary: Update Trading Configurations for an Account
       tags:
         - Trading
+      parameters:
+        - in: path
+          name: account_id
+          required: true
+          schema:
+            type: string
   /v1/trading/accounts/{account_id}/account/portfolio/history:
     get:
       description: Returns timeseries data about equity and profit/loss (P/L) of the account in requested timespan.
@@ -17244,6 +17404,8 @@ paths:
       summary: Cancel all Open Orders For an Account
       tags:
         - Trading
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
     get:
       description: |-
         Retrieves a list of orders for the account, filtered by the supplied query parameters.
@@ -17251,6 +17413,7 @@ paths:
         Endpoint defaults to open orders if no parameters are provided.
       operationId: getAllOrdersForAccount
       parameters:
+        - $ref: '#/components/parameters/AccountID'
         - description: Order status to be queried. open, closed or all. Defaults to open.
           in: query
           name: status
@@ -17304,8 +17467,6 @@ paths:
       summary: Retrieve a List of Orders
       tags:
         - Trading
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
     post:
       description: |-
         Creating an order for your end customer. Each trading request must pass in the account_id in the URL.
@@ -17398,6 +17559,8 @@ paths:
       summary: Create an Order for an Account
       tags:
         - Trading
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
   /v1/trading/accounts/{account_id}/orders/{order_id}:
     delete:
       description: |-
@@ -17415,6 +17578,9 @@ paths:
       summary: Cancel an Open Order
       tags:
         - Trading
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/OrderID'
     get:
       description: Retrieves a single order for the given order_id.
       operationId: getOrderForAccount
@@ -17432,9 +17598,9 @@ paths:
       summary: Retrieve an Order by its ID
       tags:
         - Trading
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
-      - $ref: '#/components/parameters/OrderID'
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/OrderID'
     patch:
       description: |-
         Replaces a single order with updated parameters. Each parameter overrides the corresponding attribute of the existing order. The other attributes remain the same as the existing order.
@@ -17496,13 +17662,10 @@ paths:
       summary: Replace an Order
       tags:
         - Trading
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/OrderID'
   /v1/trading/accounts/{account_id}/orders/estimation:
-    parameters:
-      - in: path
-        name: account_id
-        required: true
-        schema:
-          type: string
     post:
       description: |-
         Order estimation endpoint will display, based on user's account balance, the estimated quantity and price they will receive for their notional order.
@@ -17551,11 +17714,18 @@ paths:
       summary: Estimate an Order
       tags:
         - Trading
+      parameters:
+        - in: path
+          name: account_id
+          required: true
+          schema:
+            type: string
   /v1/trading/accounts/{account_id}/orders:by_client_order_id:
     get:
       description: Retrieves a single order specified by the client order ID.
       operationId: getOrderByClientOrderIdForAccount
       parameters:
+        - $ref: '#/components/parameters/AccountID'
         - description: The client-assigned order ID.
           in: query
           name: client_order_id
@@ -17576,14 +17746,13 @@ paths:
       summary: Retrieves a single order specified by the client order ID.
       tags:
         - Trading
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
   /v1/trading/accounts/{account_id}/positions:
     delete:
       description: Closes (liquidates) all of the account's open long and short positions. A response will be provided for each order that is attempted to be cancelled. If an order is no longer cancelable,
         the server will respond with status 500 and reject the request.
       operationId: closeAllPositionsForAccount
       parameters:
+        - $ref: '#/components/parameters/AccountID'
         - description: If true is specified, cancel all open orders before liquidating all positions.
           in: query
           name: cancel_orders
@@ -17657,13 +17826,20 @@ paths:
       summary: List Open Positions for an Account
       tags:
         - Trading
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
   /v1/trading/accounts/{account_id}/positions/{symbol_or_asset_id}:
     delete:
       description: Closes (liquidates) the account's open position for the given symbol. Works for both long and short positions.
       operationId: closePositionForAccountBySymbol
       parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - description: 'The symbol or asset_id '
+          in: path
+          name: symbol_or_asset_id
+          required: true
+          schema:
+            type: string
         - description: Optional the number of shares to liquidate. Can accept up to 9 decimal points. Cannot work with percentage
           in: query
           name: qty
@@ -17700,14 +17876,14 @@ paths:
       summary: Get an Open Position for account by Symbol or AssetId
       tags:
         - Trading
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
-      - description: 'The symbol or asset_id '
-        in: path
-        name: symbol_or_asset_id
-        required: true
-        schema:
-          type: string
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - description: 'The symbol or asset_id '
+          in: path
+          name: symbol_or_asset_id
+          required: true
+          schema:
+            type: string
   /v1/trading/accounts/{account_id}/positions/{symbol_or_contract_id}/do-not-exercise:
     post:
       description: |-
@@ -17836,14 +18012,14 @@ paths:
       summary: Retrieve all Watchlists for an Account
       tags:
         - Watchlist
-    parameters:
-      - description: Unique identifier of an account.
-        in: path
-        name: account_id
-        required: true
-        schema:
-          format: uuid
-          type: string
+      parameters:
+        - description: Unique identifier of an account.
+          in: path
+          name: account_id
+          required: true
+          schema:
+            format: uuid
+            type: string
     post:
       description: Returns the watchlist object
       operationId: createWatchlistForAccount
@@ -17862,6 +18038,14 @@ paths:
       summary: Create a New Watchlist for an Account
       tags:
         - Watchlist
+      parameters:
+        - description: Unique identifier of an account.
+          in: path
+          name: account_id
+          required: true
+          schema:
+            format: uuid
+            type: string
   /v1/trading/accounts/{account_id}/watchlists/{watchlist_id}:
     delete:
       description: Irrevocably delete a watchlist.
@@ -17872,6 +18056,21 @@ paths:
       summary: Remove a Watchlist
       tags:
         - Watchlist
+      parameters:
+        - description: Unique identifier of an account
+          in: path
+          name: account_id
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - description: Unique identifier of a watchlist
+          in: path
+          name: watchlist_id
+          required: true
+          schema:
+            format: uuid
+            type: string
     get:
       description: Retrieve Watchlist by ID
       operationId: getWatchlistForAccountById
@@ -17885,21 +18084,21 @@ paths:
       summary: Manage watchlists
       tags:
         - Watchlist
-    parameters:
-      - description: Unique identifier of an account
-        in: path
-        name: account_id
-        required: true
-        schema:
-          format: uuid
-          type: string
-      - description: Unique identifier of a watchlist
-        in: path
-        name: watchlist_id
-        required: true
-        schema:
-          format: uuid
-          type: string
+      parameters:
+        - description: Unique identifier of an account
+          in: path
+          name: account_id
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - description: Unique identifier of a watchlist
+          in: path
+          name: watchlist_id
+          required: true
+          schema:
+            format: uuid
+            type: string
     post:
       description: Adds an asset to an existing watchlist.
       operationId: post-v1-trading-accounts-account_id-watchlists-watchlist_id
@@ -17927,6 +18126,21 @@ paths:
       summary: Add an Asset to a Watchlist
       tags:
         - Watchlist
+      parameters:
+        - description: Unique identifier of an account
+          in: path
+          name: account_id
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - description: Unique identifier of a watchlist
+          in: path
+          name: watchlist_id
+          required: true
+          schema:
+            format: uuid
+            type: string
     put:
       description: Replace entirely the set of securities contained in the watchlist while optionally renaming it. Destructive operation.
       operationId: replaceWatchlistForAccountById
@@ -17945,6 +18159,21 @@ paths:
       summary: Update a Watchlist
       tags:
         - Watchlist
+      parameters:
+        - description: Unique identifier of an account
+          in: path
+          name: account_id
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - description: Unique identifier of a watchlist
+          in: path
+          name: watchlist_id
+          required: true
+          schema:
+            format: uuid
+            type: string
   /v1/trading/accounts/{account_id}/watchlists/{watchlist_id}/{symbol}:
     delete:
       description: Delete one entry for an asset by symbol name
@@ -17957,25 +18186,25 @@ paths:
       summary: Remove a Symbol from a Watchlist
       tags:
         - Watchlist
-    parameters:
-      - description: Account identifier.
-        in: path
-        name: account_id
-        required: true
-        schema:
-          type: string
-      - description: The Watchlist ID
-        in: path
-        name: watchlist_id
-        required: true
-        schema:
-          type: string
-      - description: 'The symbol '
-        in: path
-        name: symbol
-        required: true
-        schema:
-          type: string
+      parameters:
+        - description: Account identifier.
+          in: path
+          name: account_id
+          required: true
+          schema:
+            type: string
+        - description: The Watchlist ID
+          in: path
+          name: watchlist_id
+          required: true
+          schema:
+            type: string
+        - description: 'The symbol '
+          in: path
+          name: symbol
+          required: true
+          schema:
+            type: string
   /v1/transfers/jit/{ledger_id}/balances:
     get:
       description: Returns an array of objects that correspond to each ledger account.
@@ -18223,15 +18452,15 @@ paths:
       summary: Get a single activity (V2) event by event_id ULID.
       tags:
         - Accounts
-    parameters:
-      - $ref: '#/components/parameters/AccountID'
-      - description: The ULID that uniquely identifies the activity event.
-        in: path
-        name: event_id
-        required: true
-        schema:
-          format: ulid
-          type: string
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - description: The ULID that uniquely identifies the activity event.
+          in: path
+          name: event_id
+          required: true
+          schema:
+            format: ulid
+            type: string
   /v2beta1/events/activities:
     get:
       description: |-
