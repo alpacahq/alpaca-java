@@ -29,6 +29,9 @@ def committedMainJavaDir = layout.projectDirectory.dir('src/main/java')
 def committedOpenApiJavaDir = committedMainJavaDir.dir('markets/alpaca/client/openapi')
 def openApiTemplateDir = layout.projectDirectory.dir('src/main/openapi-templates/Java')
 
+// Present only while adopt has advanced specs/ without regenerating from it yet.
+def pinBackupRoot = layout.buildDirectory.dir('specs-pin-backup')
+
 def preprocessedBrokerSpec = layout.buildDirectory.file('specs/broker/openapi.yaml')
 def preprocessedDataSpec = layout.buildDirectory.file('specs/data/openapi.yaml')
 def preprocessedTradingSpec = layout.buildDirectory.file('specs/trading/openapi.yaml')
@@ -256,6 +259,8 @@ tasks.register('generateApis') {
     dependsOn 'generateBrokerApi', 'generateDataApi', 'generateTradingApi'
     doLast {
         OpenApiSpecSupport.writeOpenApiRootPackageInfo(committedMainJavaDir.asFile)
+        // Generated sources now match specs/, so an adopt pin write has nothing left to undo.
+        pinBackupRoot.get().asFile.deleteDir()
     }
 }
 
@@ -375,24 +380,8 @@ tasks.register('downloadUpstreamOpenApi') {
         ]
         downloads.each { entry ->
             def url = entry[0] as String
-            def destination = entry[1] as File
-            destination.parentFile.mkdirs()
             println "Fetching ${url}"
-            def connection = URI.create(url).toURL().openConnection()
-            connection.setRequestProperty('User-Agent', 'alpaca-java-openapi-adopt/1.0')
-            connection.setRequestProperty('Accept', 'application/json, application/yaml, text/yaml, */*')
-            connection.setConnectTimeout(60_000)
-            connection.setReadTimeout(60_000)
-            def status = connection.responseCode
-            if (status < 200 || status >= 300) {
-                throw new GradleException(
-                    "Failed to download OpenAPI spec from ${url} (HTTP ${status})")
-            }
-            destination.withOutputStream { output ->
-                connection.inputStream.withStream { input ->
-                    output << input
-                }
-            }
+            OpenApiSpecSupport.downloadSpec(url, entry[1] as File)
         }
     }
 }
@@ -440,42 +429,21 @@ tasks.register('preprocessUpstreamTradingSpec') {
     }
 }
 
-def runAdoptProcess = { org.gradle.process.ExecOperations execOps, List<String> command, Map<String, String> env = [:] ->
+def runAdoptProcess = { org.gradle.process.ExecOperations execOps, List<String> command,
+    boolean ignoreExitValue = false ->
     execOps.exec {
         workingDir rootProject.projectDir
         commandLine command
-        env.each { key, value -> environment key, value }
+        it.ignoreExitValue = ignoreExitValue
     }
 }
 
-def ensureOpenApiPython = { org.gradle.process.ExecOperations execOps ->
-    runAdoptProcess(execOps, [
-        'bash', '-c',
-        '''
-set -euo pipefail
-VENV='.venv-openapi'
-REQ='scripts/requirements.txt'
-STAMP="${VENV}/.requirements-stamp"
-if [[ ! -x "${VENV}/bin/python" ]]; then
-  python3 -m venv "${VENV}"
-fi
-if [[ ! -f "${STAMP}" ]] || ! cmp -s "${REQ}" "${STAMP}"; then
-  "${VENV}/bin/pip" install -q -r "${REQ}"
-  cp "${REQ}" "${STAMP}"
-fi
-''',
-    ])
-}
-
+// The shell entrypoint owns the .venv-openapi bootstrap for both Gradle and standalone use.
 def runAdoptPython = { org.gradle.process.ExecOperations execOps, List<String> scriptArgs ->
-    ensureOpenApiPython(execOps)
     runAdoptProcess(
         execOps,
-        [
-            new File(rootProject.projectDir, '.venv-openapi/bin/python').absolutePath,
-            new File(rootProject.projectDir, 'scripts/adopt_openapi.py').absolutePath,
-        ] + scriptArgs,
-        [PYTHONPATH: rootProject.projectDir.absolutePath])
+        [new File(rootProject.projectDir, 'scripts/run_adopt_openapi.sh').absolutePath]
+            + scriptArgs)
 }
 
 def upstreamPreprocessTasks = [
@@ -525,19 +493,59 @@ tasks.register('adoptOpenApiApplyPinsBreaking') {
 // Nested generate+test so pin writes are re-snapshotted. In-process generateApis as a
 // sibling of adoptOpenApiApplyPins* keeps a stale specs/ fingerprint from before the
 // pin write (mustRunAfter on the umbrella task does not order preprocess*Spec).
-tasks.register('adoptOpenApiRegenerate', Exec) {
+tasks.register('adoptOpenApiRegenerate') {
     group = 'openapi tools'
     description = 'Nested generateApis + test after adopt pin writes (fresh specs/ snapshot)'
-    workingDir = rootDir
     outputs.upToDateWhen { false }
+    def execOps = objects.newInstance(markets.alpaca.gradle.InjectedExecOps).execOps
+    def pinBackupSpecs = ['broker', 'data', 'trading'].collect { api ->
+        layout.buildDirectory.file("specs-pin-backup/${api}/openapi.yaml")
+    }
+    def specSourceProperties = ['brokerSpec', 'dataSpec', 'tradingSpec']
+    def restoredPinProperties = ['broker', 'data', 'trading'].collect { api ->
+        "-P${api}Spec=${rootProject.file("specs/${api}/openapi.yaml").absolutePath}"
+    }
     def gradleWrapper = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
         ? 'gradlew.bat'
         : './gradlew'
-    doFirst {
+    doLast {
         def forwardedProperties = gradle.startParameter.projectProperties.collect {
             key, value -> "-P${key}=${value}"
         }
-        commandLine([gradleWrapper, 'generateApis', 'test'] + forwardedProperties)
+        def result = runAdoptProcess(
+            execOps,
+            [gradleWrapper, 'generateApis', 'test'] + forwardedProperties,
+            true)
+        if (result.exitValue == 0) {
+            return
+        }
+        // A surviving backup means generation never completed, so specs/ is ahead of the
+        // generated sources; undo the pin write. Otherwise both already advanced together.
+        if (pinBackupSpecs.every { it.get().asFile.isFile() }) {
+            runAdoptPython(execOps, ['--restore-pins'])
+            // Generation syncs each API as it finishes, so a failed run can still have
+            // rewritten some packages; rebuild them all from the restored pins. Spec-source
+            // overrides are dropped: recovery must read specs/, not whatever redirected
+            // (and possibly broke) the run being undone.
+            def recoveryProperties = gradle.startParameter.projectProperties
+                .findAll { key, value -> !(key in specSourceProperties) }
+                .collect { key, value -> "-P${key}=${value}" }
+            def resync = runAdoptProcess(
+                execOps,
+                [gradleWrapper, 'generateApis'] + recoveryProperties + restoredPinProperties,
+                true)
+            throw new GradleException(resync.exitValue == 0
+                ? 'generateApis failed after the adopt pin update; pinned specs and generated ' +
+                    'sources were restored.'
+                : 'generateApis failed after the adopt pin update. Pinned specs were restored ' +
+                    'but regenerating from them failed too; inspect specs/ and ' +
+                    'src/main/java/markets/alpaca/client/openapi/ with git status.')
+        }
+        throw new GradleException(
+            'The nested generateApis/test build failed with no pending pin update to undo ' +
+            '(for example failing tests after a successful generate), so specs/ was left ' +
+            'as-is. Review the output above and revert specs/ plus ' +
+            'src/main/java/markets/alpaca/client/openapi/ with git to abandon the adopt.')
     }
 }
 

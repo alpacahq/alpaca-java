@@ -171,6 +171,38 @@ def _strip_docs(node: Any, *, name_keyed: bool = False) -> Any:
     return node
 
 
+def _fold_added_enum_values(old_node: Any, new_node: Any) -> tuple[Any, bool]:
+    """Fold widened ``new_node`` enums back to ``old_node``, reporting whether any value was added."""
+    if isinstance(old_node, dict) and isinstance(new_node, dict):
+        folded: dict[str, Any] = {}
+        widened = False
+        for key, new_value in new_node.items():
+            old_value = old_node.get(key)
+            if key == "enum" and isinstance(old_value, list) and isinstance(new_value, list):
+                old_values = {str(item) for item in old_value}
+                new_values = {str(item) for item in new_value}
+                if old_values <= new_values:
+                    folded[key] = old_value
+                    widened = widened or old_values < new_values
+                    continue
+            folded[key], nested_widened = _fold_added_enum_values(old_value, new_value)
+            widened = widened or nested_widened
+        return folded, widened
+    if (
+        isinstance(old_node, list)
+        and isinstance(new_node, list)
+        and len(old_node) == len(new_node)
+    ):
+        folded_items = []
+        widened = False
+        for old_item, new_item in zip(old_node, new_node, strict=True):
+            folded_item, item_widened = _fold_added_enum_values(old_item, new_item)
+            folded_items.append(folded_item)
+            widened = widened or item_widened
+        return folded_items, widened
+    return new_node, False
+
+
 def _comparable_operation(operation: dict[str, Any]) -> dict[str, Any]:
     ignored = {"tags", "x-codegen-request-body-name"}
     return _strip_docs({k: v for k, v in operation.items() if k not in ignored})
@@ -217,11 +249,20 @@ def _classify_schema_change(old_schema: Any, new_schema: Any) -> tuple[bool, str
             return None
         return False, "documentation only"
 
-    removed, added, changed = _diff_keys(_mapping(old_bare, "properties"), _mapping(new_bare, "properties"))
-    newly_required = sorted(_required(new_bare) - _required(old_bare))
-    no_longer_required = sorted(_required(old_bare) - _required(new_bare))
+    # A widened enum keeps every value callers already compile against, so classify
+    # against a schema whose added enum values are folded back to the pinned ones.
+    # The additions are still reported under enum values added.
+    new_surface, enum_values_added = _fold_added_enum_values(old_bare, new_bare)
+    if _schema_fingerprint(old_bare) == _schema_fingerprint(new_surface):
+        return False, "added enum values" if enum_values_added else "enum values reordered"
+
+    removed, added, changed = _diff_keys(
+        _mapping(old_bare, "properties"), _mapping(new_surface, "properties")
+    )
+    newly_required = sorted(_required(new_surface) - _required(old_bare))
+    no_longer_required = sorted(_required(old_bare) - _required(new_surface))
     old_rest = {k: v for k, v in old_bare.items() if k != "properties"}
-    new_rest = {k: v for k, v in new_bare.items() if k != "properties"}
+    new_rest = {k: v for k, v in new_surface.items() if k != "properties"}
     keywords_changed = _schema_fingerprint(old_rest) != _schema_fingerprint(new_rest)
 
     parts: list[str] = []
@@ -237,6 +278,8 @@ def _classify_schema_change(old_schema: Any, new_schema: Any) -> tuple[bool, str
         parts.append("schema keywords changed")
     if added:
         parts.append("added properties: " + ", ".join(added))
+    if enum_values_added:
+        parts.append("added enum values")
 
     breaking = bool(removed or changed or keywords_changed)
     return breaking, "; ".join(parts) or "schema changed"
@@ -253,8 +296,14 @@ def _classify_operation_change(
             return None
         return False, "documentation only"
 
+    new_surface, enum_values_added = _fold_added_enum_values(old_bare, new_bare)
+    if _schema_fingerprint(old_bare) == _schema_fingerprint(new_surface):
+        return False, "added enum values" if enum_values_added else "enum values reordered"
+
     parts: list[str] = []
-    removed, added, changed = _diff_keys(_parameter_map(old_bare), _parameter_map(new_bare))
+    removed, added, changed = _diff_keys(
+        _parameter_map(old_bare), _parameter_map(new_surface)
+    )
     if removed:
         parts.append("removed parameters: " + ", ".join(removed))
     # A new parameter is breaking here: the Java generator widens every overload's
@@ -264,11 +313,11 @@ def _classify_operation_change(
     if changed:
         parts.append("changed parameters: " + ", ".join(changed))
     if _schema_fingerprint(old_bare.get("requestBody")) != _schema_fingerprint(
-        new_bare.get("requestBody")
+        new_surface.get("requestBody")
     ):
         parts.append("request body changed")
     resp_removed, resp_added, resp_changed = _diff_keys(
-        _mapping(old_bare, "responses"), _mapping(new_bare, "responses")
+        _mapping(old_bare, "responses"), _mapping(new_surface, "responses")
     )
     if resp_removed:
         parts.append("removed responses: " + ", ".join(resp_removed))
@@ -276,6 +325,8 @@ def _classify_operation_change(
         parts.append("added responses: " + ", ".join(resp_added))
     if resp_changed:
         parts.append("changed responses: " + ", ".join(resp_changed))
+    if enum_values_added:
+        parts.append("added enum values")
 
     return True, "; ".join(parts) or "operation definition changed"
 
@@ -297,6 +348,43 @@ def _collect_enums(schema: Any, path: str, out: dict[str, set[str]]) -> None:
     elif isinstance(schema, list):
         for index, item in enumerate(schema):
             _collect_enums(item, f"{path}[{index}]", out)
+
+
+def _collect_content_enums(content: Any, path: str, out: dict[str, set[str]]) -> None:
+    if not isinstance(content, dict):
+        return
+    for media_type, media in content.items():
+        if isinstance(media, dict):
+            _collect_enums(media.get("schema"), f"{path} {media_type}", out)
+
+
+def _collect_operation_enums(
+    operation: dict[str, Any], path: str, out: dict[str, set[str]]
+) -> None:
+    parameters = operation.get("parameters")
+    if isinstance(parameters, list):
+        for parameter in parameters:
+            if not isinstance(parameter, dict):
+                continue
+            parameter_path = (
+                f"{path} parameter {parameter.get('in')}:{parameter.get('name')}"
+            )
+            _collect_enums(parameter.get("schema"), parameter_path, out)
+            _collect_content_enums(parameter.get("content"), parameter_path, out)
+
+    request_body = operation.get("requestBody")
+    if isinstance(request_body, dict):
+        _collect_content_enums(
+            request_body.get("content"), f"{path} request body", out
+        )
+
+    responses = operation.get("responses")
+    if isinstance(responses, dict):
+        for status, response in responses.items():
+            if isinstance(response, dict):
+                _collect_content_enums(
+                    response.get("content"), f"{path} response {status}", out
+                )
 
 
 def semantic_diff(old: dict[str, Any], new: dict[str, Any]) -> DiffResult:
@@ -367,6 +455,10 @@ def semantic_diff(old: dict[str, Any], new: dict[str, Any]) -> DiffResult:
         _collect_enums(schema, name, old_enums)
     for name, schema in new_schemas.items():
         _collect_enums(schema, name, new_enums)
+    for key, operation in old_ops.items():
+        _collect_operation_enums(operation, key, old_enums)
+    for key, operation in new_ops.items():
+        _collect_operation_enums(operation, key, new_enums)
     for path in sorted(set(old_enums) | set(new_enums)):
         before = old_enums.get(path, set())
         after = new_enums.get(path, set())

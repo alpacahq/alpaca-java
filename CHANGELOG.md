@@ -20,6 +20,19 @@ the policy below applies strictly.
 
 ## [Unreleased]
 
+### Fixed
+- The semantic diff no longer classifies added enum values as breaking. A widened enum keeps every
+  value callers already compile against, so `adoptOpenApi` adopts it without `--allow-breaking`, as
+  the additive category always documented. Enum value removals stay breaking.
+
+### Changed
+- A failed `generateApis` after an adopt pin write now restores the previous pins and regenerates
+  from them, so a partly synced generation cannot leave `specs/` and the generated sources out of
+  step. A completed `generateApis` drops the backup, so a later unrelated failure cannot rewind
+  adopted pins.
+- `spotbugsMain` now analyses every handwritten class except `markets.alpaca.client.openapi`,
+  instead of an allowlist that silently skipped new packages.
+
 ## [0.1.3] - 2026-08-06
 
 ### Breaking
