@@ -106,9 +106,20 @@ pluginManager.withPlugin('java') {
             def reportXml = reports.xml.outputLocation.asFile.get()
             if (!reportXml.exists()) return
 
+            // JaCoCo emits a DOCTYPE, so it cannot be disallowed outright; block external
+            // entity and DTD resolution instead.
             def factory = SAXParserFactory.newInstance()
             factory.setFeature(
                 'http://apache.org/xml/features/disallow-doctype-decl',
+                false)
+            factory.setFeature(
+                'http://xml.org/sax/features/external-general-entities',
+                false)
+            factory.setFeature(
+                'http://xml.org/sax/features/external-parameter-entities',
+                false)
+            factory.setFeature(
+                'http://apache.org/xml/features/nonvalidating/load-external-dtd',
                 false)
             def xmlParser = new XmlParser(factory.newSAXParser())
             xmlParser.setEntityResolver { publicId, systemId ->

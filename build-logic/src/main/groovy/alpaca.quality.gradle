@@ -56,17 +56,10 @@ pluginManager.withPlugin('java') {
     tasks.named('spotbugsMain').configure {
         dependsOn 'compileJava'
         sourceDirs = files('src/main/java')
+        // Exclude rather than allowlist so new handwritten packages are analysed by default.
         classes = fileTree(
             dir: layout.buildDirectory.dir('classes/java/main'),
-            include: [
-                'markets/alpaca/client/*.class',
-                'markets/alpaca/client/broker/sse/**/*.class',
-                'markets/alpaca/client/data/**/*.class',
-                'markets/alpaca/client/http/**/*.class',
-                'markets/alpaca/client/rest/**/*.class',
-                'markets/alpaca/client/trading/**/*.class',
-                'markets/alpaca/client/ws/**/*.class',
-            ])
+            exclude: ['markets/alpaca/client/openapi/**'])
         auxClassPaths = files(
             sourceSets.main.compileClasspath,
             layout.buildDirectory.dir('classes/java/main'))
