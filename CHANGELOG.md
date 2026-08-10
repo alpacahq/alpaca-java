@@ -32,6 +32,15 @@ the policy below applies strictly.
   adopted pins.
 - `spotbugsMain` now analyses every handwritten class except `markets.alpaca.client.openapi`,
   instead of an allowlist that silently skipped new packages.
+- The semantic diff also treats security-only operation changes, OAS 3.1 `nullable` /
+  `format: binary` equivalents, and additive `oneOf` / `anyOf` composition members as
+  non-breaking, alongside the enum-value handling above. Added `allOf` members remain
+  breaking because an intersection can tighten the generated model.
+- Adopt now updates the pins whenever the preprocessed upstream document differs from the
+  committed one (structural YAML compare), not only when the semantic diff is non-empty.
+  Changes the classifier treats as equivalent (operation `security`, `nullable` spellings,
+  binary media types) previously left the pins stale forever. Key-order-only churn does not
+  count as drift.
 
 ## [0.1.3] - 2026-08-06
 

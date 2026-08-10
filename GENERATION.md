@@ -81,6 +81,12 @@ scripts/run_adopt_openapi.sh --yes --allow-breaking
 Then edit `CHANGELOG.md`, commit `specs/` + `src/main/java/markets/alpaca/client/openapi/`
 (+ changelog).
 
+Pins are adopted whenever the preprocessed upstream document differs from the
+committed one, even when the semantic diff is empty — the classifier ignores
+spellings that cannot reach the generated Java surface (operation `security`,
+`nullable` forms, binary media types), and those pins must still catch up. Such
+an adopt is reported as a pin spelling catch-up and is never breaking.
+
 `./gradlew adoptOpenApi` refuses to write and exits with code 2 when the
 semantic diff is breaking. Re-run `./gradlew adoptOpenApiBreaking` after review.
 Adopt is all-or-nothing across broker/data/trading: if any API is breaking,
@@ -107,14 +113,16 @@ the affected properties, parameters, or responses.
 
 **Breaking** (requires `adoptOpenApiBreaking`): removals, renames, moves, enum
 value removals, and modifications — a schema whose existing properties are
-removed, retyped, or newly required, or an operation whose parameters, request
-body, or responses change. Note that *adding* an operation parameter is breaking
-for this SDK: the generator widens every overload's signature.
+removed, retyped, or newly required, an added `allOf` member (intersection can
+tighten the model), or an operation whose parameters, request body, or responses
+change. Note that *adding* an operation parameter is breaking for this SDK: the
+generator widens every overload's signature.
 
 **Additive** (`adoptOpenApi` alone): new operations, schemas, and enum values;
-schemas that only gain properties; and documentation-only edits (`description`,
-`summary`, `example`, `examples`), which are still adopted so pins stay faithful
-to upstream but never classified as breaking.
+schemas that only gain properties; additive `oneOf` / `anyOf` members; and
+documentation-only edits (`description`, `summary`, `example`, `examples`), which
+are still adopted so pins stay faithful to upstream but never classified as
+breaking.
 
 ### Manual venv (optional)
 
