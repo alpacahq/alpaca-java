@@ -9,6 +9,8 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  # Needed so the job can create openapi-drift / openapi-adopt / breaking if missing.
+  issues: write
 
 jobs:
   adopt-pr:
