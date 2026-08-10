@@ -136,7 +136,7 @@ def _schema_fingerprint(schema: Any) -> str:
 _DOC_KEYS = frozenset({"description", "summary", "example", "examples", "externalDocs"})
 
 # Operation fields ignored when comparing generated client surface.
-_IGNORABLE_OPERATION_KEYS = frozenset({"tags", "x-codegen-request-body-name", "security"})
+_IGNORABLE_OPERATION_KEYS = frozenset({"tags", "x-codegen-request-body-name"})
 
 # Maps whose keys are author-chosen names (property names, status codes, media types)
 # rather than OpenAPI keywords. Their keys must survive doc stripping — a schema may
@@ -588,6 +588,10 @@ def _classify_operation_change(
         parts.append("added enum values")
     if composition_members_added:
         parts.append("added composition members")
+    if _schema_fingerprint(old_bare.get("security")) != _schema_fingerprint(
+        new_surface.get("security")
+    ):
+        parts.append("security requirements changed")
 
     # An unknown residual delta after the known-additive folds leaves `parts` empty;
     # stay breaking rather than treat an unrecognized change as additive.

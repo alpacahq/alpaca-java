@@ -121,10 +121,10 @@ def restore_pins() -> int:
 def pin_text_drift(pinned: Path, candidate: Path) -> bool:
     """True when the preprocessed candidate is not the same OpenAPI document as the pin.
 
-    The semantic diff deliberately ignores spellings that cannot reach the generated
-    Java surface (operation ``security``, ``nullable`` forms, binary media types). Pins
-    must still catch up with upstream, or those APIs would drift forever with an empty
-    diff and never be adopted.
+    The semantic diff deliberately ignores equivalent spellings that cannot change the
+    generated Java surface (``nullable`` forms and binary media types). Pins must still
+    catch up with upstream, or those APIs would drift forever with an empty diff and
+    never be adopted.
 
     Comparison is structural (parsed YAML fingerprint), not raw bytes, so key-order or
     insignificant whitespace churn does not force a catch-up adopt on its own.

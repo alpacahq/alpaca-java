@@ -677,7 +677,7 @@ class SemanticDiffTests(unittest.TestCase):
         diff = openapi_tools.semantic_diff(old, new)
         self.assertTrue(diff.is_empty())
 
-    def test_security_only_operation_change_is_not_breaking(self):
+    def test_security_only_operation_changes_are_breaking(self):
         def op(**extra):
             body = {
                 "operationId": "getBars",
@@ -687,19 +687,26 @@ class SemanticDiffTests(unittest.TestCase):
             body.update(extra)
             return body
 
-        old = _spec(paths={"/v2/stocks/bars": {"get": op()}})
-        new = _spec(
-            paths={
-                "/v2/stocks/bars": {
-                    "get": op(security=[{"BasicAuth": []}, {"apiKey": [], "apiSecret": []}])
-                }
-            }
-        )
-        diff = openapi_tools.semantic_diff(old, new)
-        self.assertEqual(diff.operations_modified, [])
-        self.assertEqual(diff.operations_extended, [])
-        self.assertFalse(diff.is_breaking())
-        self.assertTrue(diff.is_empty())
+        security_cases = [
+            (op(), op(security=[{"BasicAuth": []}])),
+            (op(security=[{"BasicAuth": []}]), op()),
+            (
+                op(security=[{"BasicAuth": []}]),
+                op(security=[{"apiKey": [], "apiSecret": []}]),
+            ),
+        ]
+        for old_op, new_op in security_cases:
+            with self.subTest(old=old_op.get("security"), new=new_op.get("security")):
+                old = _spec(paths={"/v2/stocks/bars": {"get": old_op}})
+                new = _spec(paths={"/v2/stocks/bars": {"get": new_op}})
+                diff = openapi_tools.semantic_diff(old, new)
+                self.assertEqual(diff.operations_modified, ["GET /v2/stocks/bars"])
+                self.assertEqual(diff.operations_extended, [])
+                self.assertTrue(diff.is_breaking())
+                self.assertEqual(
+                    diff.detail("operation", "GET /v2/stocks/bars"),
+                    "security requirements changed",
+                )
 
     def test_added_oneof_member_is_additive(self):
         old = _spec(

@@ -212,7 +212,9 @@ components:
 class PinTextDriftTests(unittest.TestCase):
     """Equivalences the classifier ignores must still move the pins forward."""
 
-    def _adopt_pin_only(self, root: Path) -> dict:
+    def _adopt_pin_only(
+        self, root: Path, *, allow_breaking: bool = False, expected_exit: int = 0
+    ) -> dict:
         import json
 
         with _patched_root(root), mock.patch.object(adopt_openapi, "_run") as run:
@@ -220,12 +222,12 @@ class PinTextDriftTests(unittest.TestCase):
                 adopt_openapi.adopt(
                     dry_run=False,
                     yes=True,
-                    allow_breaking=False,
+                    allow_breaking=allow_breaking,
                     skip_generate=True,
                     skip_fetch=True,
                     skip_preprocess=True,
                 ),
-                0,
+                expected_exit,
             )
             run.assert_not_called()
         return json.loads(
@@ -233,7 +235,7 @@ class PinTextDriftTests(unittest.TestCase):
         )
 
     @unittest.skipUnless(_HAS_YAML, "PyYAML is required to load the spec fixtures")
-    def test_security_only_drift_is_adopted(self):
+    def test_security_only_drift_requires_breaking_adoption(self):
         with _adopt_workspace() as root:
             for api in adopt_openapi.APIS:
                 pinned = _spec_yaml(security="basicAuth" if api == "broker" else "bearerAuth")
@@ -242,11 +244,18 @@ class PinTextDriftTests(unittest.TestCase):
                     _spec_yaml(security="bearerAuth"), encoding="utf-8"
                 )
 
-            status = self._adopt_pin_only(root)
+            status = self._adopt_pin_only(root, expected_exit=2)
 
             self.assertTrue(status["changed"])
-            self.assertFalse(status["breaking"])
+            self.assertTrue(status["breaking"])
+            self.assertEqual(status["breaking_apis"], ["broker"])
             self.assertEqual(status["changed_apis"], ["broker"])
+            self.assertEqual(
+                (root / "specs" / "broker" / "openapi.yaml").read_text(encoding="utf-8"),
+                _spec_yaml(security="basicAuth"),
+            )
+
+            self._adopt_pin_only(root, allow_breaking=True)
             self.assertEqual(
                 (root / "specs" / "broker" / "openapi.yaml").read_text(encoding="utf-8"),
                 _spec_yaml(security="bearerAuth"),
