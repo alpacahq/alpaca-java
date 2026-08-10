@@ -12,6 +12,13 @@ permissions:
   # Needed so the job can create openapi-drift / openapi-adopt / breaking if missing.
   issues: write
 
+# Serialize against the shared bot/openapi-adopt branch and PR. Overlapping
+# schedule + workflow_dispatch runs would otherwise interleave force-pushes and
+# PR draft/body/label updates, so an older run could clear the breaking gate.
+concurrency:
+  group: openapi-adopt
+  cancel-in-progress: false
+
 jobs:
   adopt-pr:
     name: Open adopt PR from upstream OAS
