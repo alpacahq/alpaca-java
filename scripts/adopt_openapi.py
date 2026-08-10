@@ -68,11 +68,21 @@ def pinned_spec(api: str) -> Path:
     return ROOT / "specs" / api / "openapi.yaml"
 
 
+def pinned_spec_gradle_args() -> list[str]:
+    """Force nested generateApis onto committed pins.
+
+    Without these, APCA_*_SPEC / APCA_OAS_ROOT / local.properties can redirect the
+    nested build away from the pins just written by adopt.
+    """
+    return [f"-P{api}Spec={pinned_spec(api)}" for api in APIS]
+
+
 def write_pins(candidates_root: Path) -> None:
     """Update every pinned spec or none, keeping a backup so a later step can undo it.
 
-    The backup doubles as the "regenerate not confirmed yet" marker: whoever runs
-    generation clears it on success (or restores from it on failure).
+    The backup doubles as the "regenerate not confirmed yet" marker:
+    clearOpenApiPinBackup drops it after a successful compile (or a lone
+    generateApis when compile is not in that build); failure restores from it.
     """
     for api in APIS:
         backup = PIN_BACKUP_ROOT / api / "openapi.yaml"
@@ -96,12 +106,12 @@ def write_pins(candidates_root: Path) -> None:
 
 
 def clear_pin_backup() -> None:
-    """Drop the backup once pins and generated sources agree, so it cannot be replayed."""
+    """Drop the backup once generate+compile confirmed, so it cannot be replayed."""
     shutil.rmtree(PIN_BACKUP_ROOT, ignore_errors=True)
 
 
 def pin_backup_pending() -> bool:
-    """True while pins have been advanced but nothing has regenerated from them yet."""
+    """True while pins have been advanced but clearOpenApiPinBackup has not confirmed them."""
     return all((PIN_BACKUP_ROOT / api / "openapi.yaml").is_file() for api in APIS)
 
 
@@ -289,33 +299,38 @@ def adopt(
 
     if not skip_generate:
         try:
-            # A successful generateApis clears the pin backup itself.
-            _run([str(ROOT / "gradlew"), "generateApis", "test"])
+            # Nested test depends on clearOpenApiPinBackup (after compileJava). Force pin
+            # paths so env / local.properties redirects cannot generate from a different
+            # source and then clear the backup while specs/ and Java drift.
+            _run(
+                [str(ROOT / "gradlew"), "generateApis", "test"] + pinned_spec_gradle_args()
+            )
+            clear_pin_backup()
         except subprocess.CalledProcessError:
             if pin_backup_pending():
                 restore_pins()
                 # Generation syncs each API as it finishes, so a failed run can still have
-                # rewritten some packages; rebuild them all from the restored pins. The
-                # explicit -P*Spec arguments keep recovery on specs/ even when the
-                # environment or local.properties redirects spec sources elsewhere.
+                # rewritten some packages; rebuild and recompile from the restored pins.
+                # Explicit -P*Spec keeps recovery on specs/ even when the environment or
+                # local.properties redirects spec sources elsewhere.
                 try:
                     _run(
-                        [str(ROOT / "gradlew"), "generateApis"]
-                        + [f"-P{api}Spec={pinned_spec(api)}" for api in APIS]
+                        [str(ROOT / "gradlew"), "clearOpenApiPinBackup"]
+                        + pinned_spec_gradle_args()
                     )
                 except subprocess.CalledProcessError:
                     raise SystemExit(
-                        "ERROR: generateApis failed after the pin update. Pins were restored "
-                        "but regenerating from them failed too.\n"
+                        "ERROR: generateApis/compileJava failed after the pin update. Pins "
+                        "were restored but regenerating from them failed too.\n"
                         "  Inspect specs/ and the generated sources with git status."
                     ) from None
                 raise SystemExit(
-                    "ERROR: generateApis failed after the pin update; pins and generated "
-                    "sources were restored."
+                    "ERROR: generateApis/compileJava failed after the pin update; pins and "
+                    "generated sources were restored."
                 ) from None
             raise SystemExit(
-                "ERROR: the clients regenerated but the nested build failed (for example "
-                "failing tests).\n"
+                "ERROR: the clients regenerated and compiled but the nested build failed "
+                "(for example failing tests).\n"
                 "  specs/ and the generated sources are consistent; revert both with git "
                 "to abandon the adopt."
             ) from None

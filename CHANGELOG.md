@@ -26,10 +26,11 @@ the policy below applies strictly.
   the additive category always documented. Enum value removals stay breaking.
 
 ### Changed
-- A failed `generateApis` after an adopt pin write now restores the previous pins and regenerates
-  from them, so a partly synced generation cannot leave `specs/` and the generated sources out of
-  step. A completed `generateApis` drops the backup, so a later unrelated failure cannot rewind
-  adopted pins.
+- A failed `generateApis` or `compileJava` after an adopt pin write now restores the previous pins
+  and regenerates/recompiles from them, so a partly synced or uncompilable generation cannot leave
+  `specs/` and the generated sources out of step. The pin backup is dropped by
+  `clearOpenApiPinBackup` after a successful compile (including when compile is UP-TO-DATE), so
+  failing tests afterward cannot rewind adopted pins.
 - `spotbugsMain` now analyses every handwritten class except `markets.alpaca.client.openapi`,
   instead of an allowlist that silently skipped new packages.
 
