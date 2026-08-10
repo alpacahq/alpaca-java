@@ -509,12 +509,14 @@ tasks.register('adoptOpenApiRegenerate') {
         ? 'gradlew.bat'
         : './gradlew'
     doLast {
-        def forwardedProperties = gradle.startParameter.projectProperties.collect {
-            key, value -> "-P${key}=${value}"
-        }
+        // Drop spec-source overrides and force pin paths so nested generateApis
+        // reads the pins just written to specs/, not whatever redirected the parent.
+        def forwardedProperties = gradle.startParameter.projectProperties
+            .findAll { key, value -> !(key in specSourceProperties) }
+            .collect { key, value -> "-P${key}=${value}" }
         def result = runAdoptProcess(
             execOps,
-            [gradleWrapper, 'generateApis', 'test'] + forwardedProperties,
+            [gradleWrapper, 'generateApis', 'test'] + forwardedProperties + restoredPinProperties,
             true)
         if (result.exitValue == 0) {
             return
