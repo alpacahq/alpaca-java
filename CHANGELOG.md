@@ -41,6 +41,11 @@ the policy below applies strictly.
   Changes the classifier treats as equivalent (operation `security`, `nullable` spellings,
   binary media types) previously left the pins stale forever. Key-order-only churn does not
   count as drift.
+- The weekly drift workflow always opens a single adopt PR on `bot/openapi-adopt` (force-pushed),
+  draft when the classifier finds breaking changes and ready otherwise; it no longer files a
+  separate breaking-drift issue. A breaking adopt is expected to fail its nested
+  `generateApis test` run, so the workflow still publishes the resulting pins and generated
+  sources as a draft PR and only then fails the run.
 
 ## [0.1.3] - 2026-08-06
 

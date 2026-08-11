@@ -141,9 +141,15 @@ Or on CI images that allow user installs:
 - PR/`main` builds run `./gradlew build` (`check` → `checkGenerated`).
 - Snapshot and release freeze committed `specs/` (no live fetch at publish time).
 - Weekly `openapi-drift.yml`:
-  - Additive drift → bot PR on `bot/openapi-adopt` (human merge).
-  - Breaking drift → GitHub issue with the report; pins are **not** updated until
-    someone runs `./gradlew adoptOpenApiBreaking` and opens a normal PR.
+  - Any drift → bot PR on `bot/openapi-adopt` (force-pushed). Additive/equivalent
+    changes open a ready PR; classifier-breaking changes open a **draft** PR with
+    pins and generated sources already updated for review. Local
+    `./gradlew adoptOpenApi` still refuses breaking writes without
+    `adoptOpenApiBreaking`.
+  - A breaking adopt usually fails its nested `generateApis test` run. The workflow
+    still commits whatever pins and generated sources survived, opens the PR as a
+    **draft** noting the failure, and only then fails the run. If adopt restored the
+    pins and left nothing to commit, the PR step is skipped with a notice.
 
 ## Spec resolution order
 
