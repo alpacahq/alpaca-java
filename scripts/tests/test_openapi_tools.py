@@ -8,13 +8,16 @@ import unittest
 from scripts import openapi_tools
 
 
-def _spec(*, paths=None, schemas=None):
-    return {
+def _spec(*, paths=None, schemas=None, security=None):
+    doc = {
         "openapi": "3.0.3",
         "info": {"title": "t", "version": "1"},
         "paths": paths or {},
         "components": {"schemas": schemas or {}},
     }
+    if security is not None:
+        doc["security"] = security
+    return doc
 
 
 class SemanticDiffTests(unittest.TestCase):
@@ -613,6 +616,72 @@ class SemanticDiffTests(unittest.TestCase):
         self.assertFalse(diff.is_breaking())
         self.assertTrue(diff.is_empty())
 
+    def test_nullable_anyof_null_member_is_not_breaking(self):
+        # OAS 3.1 nullable spelling used by Broker (e.g. user_configurations).
+        old = _spec(schemas={"token": {"type": "string", "nullable": True}})
+        for composition in ("anyOf", "oneOf"):
+            with self.subTest(composition=composition):
+                new = _spec(
+                    schemas={
+                        "token": {
+                            composition: [
+                                {"type": "null"},
+                                {"type": "string"},
+                            ]
+                        }
+                    }
+                )
+                diff = openapi_tools.semantic_diff(old, new)
+                self.assertEqual(diff.schemas_modified, [])
+                self.assertEqual(diff.schemas_extended, [])
+                self.assertFalse(diff.is_breaking())
+                self.assertTrue(diff.is_empty())
+
+    def test_nullable_anyof_ref_null_member_is_not_breaking(self):
+        old = _spec(
+            schemas={
+                "AccountConfigurations": {"type": "object"},
+                "user_configurations": {
+                    "$ref": "#/components/schemas/AccountConfigurations",
+                    "nullable": True,
+                },
+            }
+        )
+        new = _spec(
+            schemas={
+                "AccountConfigurations": {"type": "object"},
+                "user_configurations": {
+                    "anyOf": [
+                        {"$ref": "#/components/schemas/AccountConfigurations"},
+                        {"type": "null"},
+                    ]
+                },
+            }
+        )
+        diff = openapi_tools.semantic_diff(old, new)
+        self.assertEqual(diff.schemas_modified, [])
+        self.assertEqual(diff.schemas_extended, [])
+        self.assertFalse(diff.is_breaking())
+        self.assertTrue(diff.is_empty())
+
+    def test_anyof_with_null_and_extra_member_is_not_folded(self):
+        # Three-way unions that include null are not the same as nullable: true.
+        old = _spec(
+            schemas={
+                "value": {
+                    "anyOf": [
+                        {"type": "string"},
+                        {"type": "integer"},
+                        {"type": "null"},
+                    ]
+                }
+            }
+        )
+        new = _spec(schemas={"value": {"type": "string", "nullable": True}})
+        diff = openapi_tools.semantic_diff(old, new)
+        self.assertEqual(diff.schemas_modified, ["value"])
+        self.assertTrue(diff.is_breaking())
+
     def test_binary_format_vs_content_media_type_is_not_breaking(self):
         old = _spec(
             paths={
@@ -677,7 +746,7 @@ class SemanticDiffTests(unittest.TestCase):
         diff = openapi_tools.semantic_diff(old, new)
         self.assertTrue(diff.is_empty())
 
-    def test_security_only_operation_changes_are_breaking(self):
+    def test_security_alternative_widening_is_additive(self):
         def op(**extra):
             body = {
                 "operationId": "getBars",
@@ -687,15 +756,70 @@ class SemanticDiffTests(unittest.TestCase):
             body.update(extra)
             return body
 
-        security_cases = [
-            (op(), op(security=[{"BasicAuth": []}])),
+        keys = [{"apiKey": [], "apiSecret": []}]
+        keys_or_basic = [{"BasicAuth": []}, {"apiKey": [], "apiSecret": []}]
+
+        additive_cases = [
+            # New OR alternative while keeping the existing scheme set.
+            (op(security=[{"BasicAuth": []}]), op(security=keys_or_basic)),
+            (op(security=keys), op(security=keys_or_basic)),
+            # Document-level inherit vs explicit listing of the same effective auth,
+            # plus an added BasicAuth alternative (Market Data-shaped drift).
+            (
+                ("inherit", op()),
+                ("explicit", op(security=keys_or_basic)),
+            ),
+        ]
+
+        for old_case, new_case in additive_cases:
+            with self.subTest(old=old_case, new=new_case):
+                if isinstance(old_case, tuple):
+                    old = _spec(
+                        paths={"/v2/stocks/bars": {"get": old_case[1]}},
+                        security=keys,
+                    )
+                    new = _spec(paths={"/v2/stocks/bars": {"get": new_case[1]}})
+                else:
+                    old = _spec(paths={"/v2/stocks/bars": {"get": old_case}})
+                    new = _spec(paths={"/v2/stocks/bars": {"get": new_case}})
+                diff = openapi_tools.semantic_diff(old, new)
+                self.assertEqual(diff.operations_modified, [])
+                self.assertEqual(diff.operations_extended, ["GET /v2/stocks/bars"])
+                self.assertFalse(diff.is_breaking())
+                self.assertEqual(
+                    diff.detail("operation", "GET /v2/stocks/bars"),
+                    "added security alternatives",
+                )
+
+    def test_security_requirement_removal_or_replacement_is_breaking(self):
+        def op(**extra):
+            body = {
+                "operationId": "getBars",
+                "tags": ["Bars"],
+                "responses": {"200": {"description": "ok"}},
+            }
+            body.update(extra)
+            return body
+
+        breaking_cases = [
+            # Dropping auth entirely removes generated auth application.
             (op(security=[{"BasicAuth": []}]), op()),
+            (op(security=[{"BasicAuth": []}]), op(security=[])),
+            # Optional/empty → required tightens previously unauthenticated calls.
+            (op(security=[]), op(security=[{"apiKey": [], "apiSecret": []}])),
+            (op(), op(security=[{"apiKey": [], "apiSecret": []}])),
+            # Replacing one scheme set with another is not a pure widening.
             (
                 op(security=[{"BasicAuth": []}]),
                 op(security=[{"apiKey": [], "apiSecret": []}]),
             ),
+            # AND-tightening within an alternative is not OR widening.
+            (
+                op(security=[{"apiKey": []}]),
+                op(security=[{"apiKey": [], "apiSecret": []}]),
+            ),
         ]
-        for old_op, new_op in security_cases:
+        for old_op, new_op in breaking_cases:
             with self.subTest(old=old_op.get("security"), new=new_op.get("security")):
                 old = _spec(paths={"/v2/stocks/bars": {"get": old_op}})
                 new = _spec(paths={"/v2/stocks/bars": {"get": new_op}})
@@ -707,6 +831,35 @@ class SemanticDiffTests(unittest.TestCase):
                     diff.detail("operation", "GET /v2/stocks/bars"),
                     "security requirements changed",
                 )
+
+    def test_effective_security_inherit_matches_explicit(self):
+        keys = [{"apiKey": [], "apiSecret": []}]
+        op = {
+            "operationId": "getBars",
+            "tags": ["Bars"],
+            "responses": {"200": {"description": "ok"}},
+        }
+        old = _spec(paths={"/v2/stocks/bars": {"get": dict(op)}}, security=keys)
+        new = _spec(
+            paths={"/v2/stocks/bars": {"get": {**op, "security": keys}}},
+        )
+        diff = openapi_tools.semantic_diff(old, new)
+        self.assertTrue(diff.is_empty())
+
+    def test_nullable_anyof_null_member_with_title_is_not_breaking(self):
+        old = _spec(schemas={"token": {"type": "string", "nullable": True}})
+        new = _spec(
+            schemas={
+                "token": {
+                    "anyOf": [
+                        {"type": "null", "title": "Empty"},
+                        {"type": "string"},
+                    ]
+                }
+            }
+        )
+        diff = openapi_tools.semantic_diff(old, new)
+        self.assertTrue(diff.is_empty())
 
     def test_added_oneof_member_is_additive(self):
         old = _spec(

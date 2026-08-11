@@ -33,15 +33,21 @@ the policy below applies strictly.
   failing tests afterward cannot rewind adopted pins.
 - `spotbugsMain` now analyses every handwritten class except `markets.alpaca.client.openapi`,
   instead of an allowlist that silently skipped new packages.
-- The semantic diff also treats OAS 3.1 `nullable` / `format: binary` equivalents and
-  additive `oneOf` / `anyOf` composition members as non-breaking, alongside the enum-value
-  handling above. Added `allOf` members remain breaking because an intersection can tighten
-  the generated model. Operation-level `security` requirement changes stay breaking (they
-  feed generated auth method names).
+- The semantic diff also treats OAS 3.1 `nullable` equivalents (`type: [T, null]`,
+  `anyOf`/`oneOf` with a `type: null` member — including `$ref` siblings) and
+  `format: binary` / binary `contentMediaType` spellings as non-breaking, alongside
+  the enum-value handling above and additive `oneOf` / `anyOf` composition members.
+  Added `allOf` members remain breaking because an intersection can tighten the
+  generated model. Operation `security` is compared after document-level inheritance:
+  adding OR alternatives while keeping every previously accepted scheme set is
+  additive; removing or replacing scheme sets, AND-tightening within an alternative,
+  and optional/empty → required auth stay breaking.
 - Adopt now updates the pins whenever the preprocessed upstream document differs from the
   committed one (structural YAML compare), not only when the semantic diff is non-empty.
-  Changes the classifier treats as equivalent (`nullable` spellings, binary media types)
-  previously left the pins stale forever. Key-order-only churn does not count as drift.
+  Changes the classifier treats as equivalent (`nullable` spellings, binary media types,
+  inherit-vs-explicit security with the same effective requirements) previously left the
+  pins stale forever when only the spelling moved. Key-order-only churn does not count as
+  drift.
 - The weekly drift workflow always opens a single adopt PR on `bot/openapi-adopt` (force-pushed),
   draft when the classifier finds breaking changes and ready otherwise; it no longer files a
   separate breaking-drift issue. A breaking adopt is expected to fail its nested

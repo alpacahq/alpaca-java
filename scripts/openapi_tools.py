@@ -188,6 +188,40 @@ def _is_binary_media_type(value: Any) -> bool:
     return media_type in _BINARY_MEDIA_TYPES or media_type.startswith(_BINARY_MEDIA_PREFIXES)
 
 
+def _is_null_only_schema(schema: Any) -> bool:
+    """True for a ``type: null`` schema used as the null branch of a nullable union.
+
+    Non-structural metadata (``title``, ``description``, …) is ignored so a decorated
+    null member still folds the same way the generator collapses it.
+    """
+    if not isinstance(schema, dict) or schema.get("type") != "null":
+        return False
+    return not (set(schema) - _DOC_KEYS - {"type", "title", "default"})
+
+
+def _fold_nullable_composition(schema: dict[str, Any]) -> dict[str, Any]:
+    """Collapse ``anyOf``/``oneOf`` null unions into ``nullable: true`` on the sibling.
+
+    OpenAPI 3.1 writes nullable schemas as a two-member composition with a
+    ``type: null`` branch. The Java generator collapses that the same way it
+    treats ``nullable: true`` / ``type: [T, null]``, including when the non-null
+    branch is a ``$ref`` (as in Broker ``user_configurations``).
+    """
+    for key in ("anyOf", "oneOf"):
+        members = schema.get(key)
+        if not isinstance(members, list) or len(members) != 2:
+            continue
+        nulls = [member for member in members if _is_null_only_schema(member)]
+        others = [member for member in members if not _is_null_only_schema(member)]
+        if len(nulls) != 1 or len(others) != 1 or not isinstance(others[0], dict):
+            continue
+        folded = {k: v for k, v in schema.items() if k != key}
+        folded.update(others[0])
+        folded["nullable"] = True
+        return folded
+    return schema
+
+
 def _normalize_equivalences(node: Any) -> Any:
     """Canonicalize OAS spellings that do not change the generated Java surface."""
     if isinstance(node, dict):
@@ -208,7 +242,7 @@ def _normalize_equivalences(node: Any) -> Any:
         ):
             normalized["format"] = "binary"
             normalized.pop("contentMediaType", None)
-        return normalized
+        return _fold_nullable_composition(normalized)
     if isinstance(node, list):
         return [_normalize_equivalences(item) for item in node]
     return node
@@ -425,6 +459,64 @@ def _comparable_operation(operation: dict[str, Any]) -> dict[str, Any]:
     )
 
 
+def _security_alternative(requirement: Any) -> frozenset[tuple[str, tuple[str, ...]]]:
+    """One OR-branch: schemes that must all be satisfied (with scopes)."""
+    if not isinstance(requirement, dict):
+        return frozenset()
+    return frozenset(
+        (
+            str(scheme),
+            tuple(str(scope) for scope in scopes)
+            if isinstance(scopes, list)
+            else (),
+        )
+        for scheme, scopes in requirement.items()
+    )
+
+
+def _security_alternatives(security: Any) -> frozenset[frozenset[tuple[str, tuple[str, ...]]]]:
+    """Normalize a security requirement list to a set of OR alternatives."""
+    if not isinstance(security, list):
+        return frozenset()
+    return frozenset(_security_alternative(requirement) for requirement in security)
+
+
+def _effective_security_alternatives(
+    operation: dict[str, Any], document_security: Any
+) -> frozenset[frozenset[tuple[str, tuple[str, ...]]]]:
+    """Resolve operation security, honoring document-level inheritance.
+
+    An explicit empty list overrides document security (no auth). Absent operation
+    security inherits the document requirement (or none when the document omits it).
+    """
+    if "security" in operation:
+        return _security_alternatives(operation.get("security"))
+    return _security_alternatives(document_security)
+
+
+def _canonical_security(
+    alternatives: frozenset[frozenset[tuple[str, tuple[str, ...]]]]
+) -> list[dict[str, list[str]]]:
+    """Stable security list for fingerprinting (sorted OR branches and schemes)."""
+    canonical: list[dict[str, list[str]]] = []
+    for alternative in sorted(alternatives, key=lambda alt: sorted(name for name, _ in alt)):
+        requirement = {
+            scheme: list(scopes) for scheme, scopes in sorted(alternative, key=lambda item: item[0])
+        }
+        canonical.append(requirement)
+    return canonical
+
+
+def _with_effective_security(
+    operation: dict[str, Any], document_security: Any
+) -> dict[str, Any]:
+    comparable = _comparable_operation(operation)
+    comparable["security"] = _canonical_security(
+        _effective_security_alternatives(operation, document_security)
+    )
+    return comparable
+
+
 def _mapping(node: Any, key: str) -> dict[str, Any]:
     value = node.get(key) if isinstance(node, dict) else None
     return value if isinstance(value, dict) else {}
@@ -521,14 +613,22 @@ def _classify_schema_change(old_schema: Any, new_schema: Any) -> tuple[bool, str
 
 
 def _classify_operation_change(
-    old_op: dict[str, Any], new_op: dict[str, Any]
+    old_op: dict[str, Any],
+    new_op: dict[str, Any],
+    *,
+    old_document_security: Any = None,
+    new_document_security: Any = None,
 ) -> tuple[bool, str] | None:
     """Classify an operation change as (breaking, detail), or None when identical."""
-    old_bare = _normalize_equivalences(_comparable_operation(old_op))
-    new_bare = _normalize_equivalences(_comparable_operation(new_op))
+    old_bare = _normalize_equivalences(
+        _with_effective_security(old_op, old_document_security)
+    )
+    new_bare = _normalize_equivalences(
+        _with_effective_security(new_op, new_document_security)
+    )
     if _schema_fingerprint(old_bare) == _schema_fingerprint(new_bare):
-        old_comparable = _comparable_operation(old_op)
-        new_comparable = _comparable_operation(new_op)
+        old_comparable = _with_effective_security(old_op, old_document_security)
+        new_comparable = _with_effective_security(new_op, new_document_security)
         if _schema_fingerprint(old_comparable) != _schema_fingerprint(new_comparable):
             return None
         old_without_ignorable = {
@@ -537,22 +637,55 @@ def _classify_operation_change(
         new_without_ignorable = {
             k: v for k, v in new_op.items() if k not in _IGNORABLE_OPERATION_KEYS
         }
+        # Effective security already matched; ignore raw inherit-vs-explicit spelling.
+        old_without_ignorable = {
+            k: v for k, v in old_without_ignorable.items() if k != "security"
+        }
+        new_without_ignorable = {
+            k: v for k, v in new_without_ignorable.items() if k != "security"
+        }
         if _schema_fingerprint(old_without_ignorable) == _schema_fingerprint(
             new_without_ignorable
         ):
             return None
         return False, "documentation only"
 
-    new_surface, enum_values_added = _fold_added_enum_values(old_bare, new_bare)
+    old_security = _security_alternatives(old_bare.get("security"))
+    new_security = _security_alternatives(new_bare.get("security"))
+    security_added = False
+    security_breaking = False
+    new_surface = new_bare
+    if old_security != new_security:
+        # Pure OR widening: every previously accepted scheme set remains, and at
+        # least one set already existed. Empty/optional → required is breaking
+        # (previously unauthenticated call sites may start applying auth).
+        if old_security and old_security <= new_security:
+            security_added = True
+            new_surface = dict(new_bare)
+            new_surface["security"] = old_bare.get("security")
+        else:
+            security_breaking = True
+
+    if security_added and _schema_fingerprint(old_bare) == _schema_fingerprint(new_surface):
+        return False, "added security alternatives"
+
+    new_surface, enum_values_added = _fold_added_enum_values(old_bare, new_surface)
     if _schema_fingerprint(old_bare) == _schema_fingerprint(new_surface):
-        return False, "added enum values" if enum_values_added else "enum values reordered"
+        fold_parts: list[str] = []
+        if security_added:
+            fold_parts.append("added security alternatives")
+        if enum_values_added:
+            fold_parts.append("added enum values")
+        return False, "; ".join(fold_parts) or "enum values reordered"
 
     new_surface, composition_members_added, composition_enum_widened = (
         _fold_added_composition_members(old_bare, new_surface)
     )
     enum_values_added = enum_values_added or composition_enum_widened
     if _schema_fingerprint(old_bare) == _schema_fingerprint(new_surface):
-        fold_parts: list[str] = []
+        fold_parts = []
+        if security_added:
+            fold_parts.append("added security alternatives")
         if enum_values_added:
             fold_parts.append("added enum values")
         if composition_members_added:
@@ -588,9 +721,9 @@ def _classify_operation_change(
         parts.append("added enum values")
     if composition_members_added:
         parts.append("added composition members")
-    if _schema_fingerprint(old_bare.get("security")) != _schema_fingerprint(
-        new_surface.get("security")
-    ):
+    if security_added:
+        parts.append("added security alternatives")
+    if security_breaking:
         parts.append("security requirements changed")
 
     # An unknown residual delta after the known-additive folds leaves `parts` empty;
@@ -845,7 +978,12 @@ def semantic_diff(old: dict[str, Any], new: dict[str, Any]) -> DiffResult:
             diff.operations_moved.append(
                 f"{key}: tag {old_tag!r} -> {new_tag!r}"
             )
-        classified = _classify_operation_change(old_op, new_op)
+        classified = _classify_operation_change(
+            old_op,
+            new_op,
+            old_document_security=old.get("security"),
+            new_document_security=new.get("security"),
+        )
         if classified is not None:
             breaking, detail = classified
             target = diff.operations_modified if breaking else diff.operations_extended

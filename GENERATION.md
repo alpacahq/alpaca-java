@@ -83,10 +83,11 @@ Then edit `CHANGELOG.md`, commit `specs/` + `src/main/java/markets/alpaca/client
 
 Pins are adopted whenever the preprocessed upstream document differs from the
 committed one, even when the semantic diff is empty — the classifier ignores
-spellings that cannot reach the generated Java surface (`nullable` forms, binary
-media types), and those pins must still catch up. Such an adopt is reported as a
-pin spelling catch-up and is never breaking. Operation-level `security` changes
-are classified as breaking (they feed generated auth method names).
+spellings that cannot reach the generated Java surface (`nullable` forms including
+`type: [T, null]` and `anyOf`/`oneOf` with a `type: null` member, binary media
+types, and document-inherited vs explicit `security` with the same effective
+requirements), and those pins must still catch up. Such an adopt is reported as a
+pin spelling catch-up and is never breaking.
 
 `./gradlew adoptOpenApi` refuses to write and exits with code 2 when the
 semantic diff is breaking. Re-run `./gradlew adoptOpenApiBreaking` after review.
@@ -118,15 +119,20 @@ the affected properties, parameters, or responses.
 **Breaking** (requires `adoptOpenApiBreaking`): removals, renames, moves, enum
 value removals, and modifications — a schema whose existing properties are
 removed, retyped, or newly required, an added `allOf` member (intersection can
-tighten the model), or an operation whose parameters, request body, responses,
-or `security` requirements change. Note that *adding* an operation parameter is
-breaking for this SDK: the generator widens every overload's signature.
+tighten the model), an operation whose parameters, request body, or responses
+change, or an operation whose effective `security` requirements remove or
+replace previously accepted scheme sets, AND-tighten an alternative, or move
+from optional/empty auth to required schemes. Note that *adding* an operation
+parameter is breaking for this SDK: the generator widens every overload's
+signature.
 
 **Additive** (`adoptOpenApi` alone): new operations, schemas, and enum values;
-schemas that only gain properties; additive `oneOf` / `anyOf` members; and
-documentation-only edits (`description`, `summary`, `example`, `examples`), which
-are still adopted so pins stay faithful to upstream but never classified as
-breaking.
+schemas that only gain properties; additive `oneOf` / `anyOf` members; added
+operation `security` OR alternatives that keep every previously accepted
+non-empty scheme set (callers using existing auth keep working); and
+documentation-only edits (`description`, `summary`, `example`, `examples`),
+which are still adopted so pins stay faithful to upstream but never classified
+as breaking.
 
 ### Manual venv (optional)
 
