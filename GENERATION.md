@@ -83,9 +83,10 @@ Then edit `CHANGELOG.md`, commit `specs/` + `src/main/java/markets/alpaca/client
 
 Pins are adopted whenever the preprocessed upstream document differs from the
 committed one, even when the semantic diff is empty — the classifier ignores
-spellings that cannot reach the generated Java surface (operation `security`,
-`nullable` forms, binary media types), and those pins must still catch up. Such
-an adopt is reported as a pin spelling catch-up and is never breaking.
+spellings that cannot reach the generated Java surface (`nullable` forms, binary
+media types), and those pins must still catch up. Such an adopt is reported as a
+pin spelling catch-up and is never breaking. Operation-level `security` changes
+are classified as breaking (they feed generated auth method names).
 
 `./gradlew adoptOpenApi` refuses to write and exits with code 2 when the
 semantic diff is breaking. Re-run `./gradlew adoptOpenApiBreaking` after review.
@@ -93,13 +94,16 @@ Adopt is all-or-nothing across broker/data/trading: if any API is breaking,
 additive changes on the others are not applied until `--allow-breaking`.
 
 Applying pins backs the previous ones up to `build/specs-pin-backup/`. That backup
-exists only while `specs/` is ahead of the generated sources: a completed
-`generateApis` deletes it, and a failed one restores from it. Because generation
-syncs each API into `src/main/java/markets/alpaca/client/openapi/` as that API
-finishes, a failure part way through can leave some packages already rewritten, so
-the restore also re-runs `generateApis` against the restored pins to bring both
-trees back in step. A failure after generation completed (failing tests, say) keeps
-the adopted pins and sources — revert both with git to abandon the adopt.
+exists until generated sources compile successfully. `clearOpenApiPinBackup`
+(pulled in by `test`, always runs even when `compileJava` is UP-TO-DATE) deletes
+it after compile; a lone `generateApis` deletes it when compile is not in the same
+build. A failed generate or compile restores from it. Because generation syncs
+each API into `src/main/java/markets/alpaca/client/openapi/` as that API finishes,
+a failure part way through can leave some packages already rewritten, so the
+restore also re-runs `clearOpenApiPinBackup` against the restored pins to bring
+both trees back in step and recompile. A failure after a successful compile
+(failing tests, say) keeps the adopted pins and sources — revert both with git to
+abandon the adopt.
 
 To undo a pin write by hand before regenerating, run
 `scripts/run_adopt_openapi.sh --restore-pins` (one-shot: it consumes the backup),
@@ -114,9 +118,9 @@ the affected properties, parameters, or responses.
 **Breaking** (requires `adoptOpenApiBreaking`): removals, renames, moves, enum
 value removals, and modifications — a schema whose existing properties are
 removed, retyped, or newly required, an added `allOf` member (intersection can
-tighten the model), or an operation whose parameters, request body, or responses
-change. Note that *adding* an operation parameter is breaking for this SDK: the
-generator widens every overload's signature.
+tighten the model), or an operation whose parameters, request body, responses,
+or `security` requirements change. Note that *adding* an operation parameter is
+breaking for this SDK: the generator widens every overload's signature.
 
 **Additive** (`adoptOpenApi` alone): new operations, schemas, and enum values;
 schemas that only gain properties; additive `oneOf` / `anyOf` members; and

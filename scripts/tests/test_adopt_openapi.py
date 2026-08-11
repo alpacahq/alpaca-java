@@ -67,6 +67,29 @@ class WriteAdoptStatusTests(unittest.TestCase):
             )
 
 
+@contextlib.contextmanager
+def _adopt_workspace():
+    """Temporary repo root holding pinned specs and adopt candidates for all APIs."""
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        for api in adopt_openapi.APIS:
+            pinned = root / "specs" / api / "openapi.yaml"
+            pinned.parent.mkdir(parents=True)
+            pinned.write_text(f"pinned {api}\n", encoding="utf-8")
+            candidate = root / "build" / "specs-adopt" / api / "openapi.yaml"
+            candidate.parent.mkdir(parents=True)
+            candidate.write_text(f"upstream {api}\n", encoding="utf-8")
+        yield root
+
+
+def _patched_root(root: Path):
+    return mock.patch.multiple(
+        adopt_openapi,
+        ROOT=root,
+        PIN_BACKUP_ROOT=root / "build" / "specs-pin-backup",
+    )
+
+
 class ResolveAdoptExitCodeTests(unittest.TestCase):
     def test_no_changes_is_success(self):
         self.assertEqual(
@@ -361,16 +384,14 @@ class PinBackupTests(unittest.TestCase):
                 with self.assertRaises(SystemExit) as ctx:
                     self._adopt()
 
-            # A partial generate can leave some APIs synced, so the restored pins must be
-            # regenerated from rather than just written back, and recovery must read those
-            # pins rather than any redirected spec source.
-            self.assertEqual(commands[0][1:], ["generateApis", "test"])
-            self.assertEqual(
-                commands[1][1:],
-                ["generateApis"]
-                + [f"-P{api}Spec={root / 'specs' / api / 'openapi.yaml'}" for api in
-                   adopt_openapi.APIS],
-            )
+            # Both the initial regenerate and recovery must force pin paths so env /
+            # local.properties redirects cannot bypass the pins just written (or restored).
+            pin_args = [
+                f"-P{api}Spec={root / 'specs' / api / 'openapi.yaml'}"
+                for api in adopt_openapi.APIS
+            ]
+            self.assertEqual(commands[0][1:], ["generateApis", "test"] + pin_args)
+            self.assertEqual(commands[1][1:], ["clearOpenApiPinBackup"] + pin_args)
             self.assertIn("pins and generated sources were restored", str(ctx.exception))
             for api in adopt_openapi.APIS:
                 self.assertEqual(
@@ -404,7 +425,7 @@ class PinBackupTests(unittest.TestCase):
         import subprocess
 
         def generate_then_fail(_command):
-            # generateApis clears the backup before the nested build reaches `test`.
+            # Nested clearOpenApiPinBackup drops the backup before `test` runs.
             adopt_openapi.clear_pin_backup()
             raise subprocess.CalledProcessError(1, "gradlew")
 
@@ -423,15 +444,27 @@ class PinBackupTests(unittest.TestCase):
                     f"upstream {api}\n",
                 )
 
-    def test_successful_adopt_leaves_the_backup_for_generation_to_clear(self):
+    def test_successful_adopt_clears_backup_and_forces_pins(self):
+        commands: list[list[str]] = []
+
         with _adopt_workspace() as root:
             with _patched_root(root), mock.patch.object(
                 adopt_openapi.openapi_tools, "load_spec", side_effect=_additive_load_spec
-            ), mock.patch.object(adopt_openapi, "_run"):
+            ), mock.patch.object(
+                adopt_openapi, "_run", side_effect=lambda command: commands.append(command)
+            ):
                 self.assertEqual(self._adopt(), 0)
-                # The real nested generateApis consumes this marker; _run is stubbed here.
-                self.assertTrue(adopt_openapi.pin_backup_pending())
+                # Successful nested generate+test is followed by clear_pin_backup().
+                self.assertFalse(adopt_openapi.pin_backup_pending())
 
+            self.assertEqual(
+                commands[0][1:],
+                ["generateApis", "test"]
+                + [
+                    f"-P{api}Spec={root / 'specs' / api / 'openapi.yaml'}"
+                    for api in adopt_openapi.APIS
+                ],
+            )
             for api in adopt_openapi.APIS:
                 self.assertEqual(
                     (root / "specs" / api / "openapi.yaml").read_text(encoding="utf-8"),

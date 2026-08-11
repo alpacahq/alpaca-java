@@ -26,26 +26,28 @@ the policy below applies strictly.
   the additive category always documented. Enum value removals stay breaking.
 
 ### Changed
-- A failed `generateApis` after an adopt pin write now restores the previous pins and regenerates
-  from them, so a partly synced generation cannot leave `specs/` and the generated sources out of
-  step. A completed `generateApis` drops the backup, so a later unrelated failure cannot rewind
-  adopted pins.
+- A failed `generateApis` or `compileJava` after an adopt pin write now restores the previous pins
+  and regenerates/recompiles from them, so a partly synced or uncompilable generation cannot leave
+  `specs/` and the generated sources out of step. The pin backup is dropped by
+  `clearOpenApiPinBackup` after a successful compile (including when compile is UP-TO-DATE), so
+  failing tests afterward cannot rewind adopted pins.
 - `spotbugsMain` now analyses every handwritten class except `markets.alpaca.client.openapi`,
   instead of an allowlist that silently skipped new packages.
-- The semantic diff also treats security-only operation changes, OAS 3.1 `nullable` /
-  `format: binary` equivalents, and additive `oneOf` / `anyOf` composition members as
-  non-breaking, alongside the enum-value handling above. Added `allOf` members remain
-  breaking because an intersection can tighten the generated model.
+- The semantic diff also treats OAS 3.1 `nullable` / `format: binary` equivalents and
+  additive `oneOf` / `anyOf` composition members as non-breaking, alongside the enum-value
+  handling above. Added `allOf` members remain breaking because an intersection can tighten
+  the generated model. Operation-level `security` requirement changes stay breaking (they
+  feed generated auth method names).
 - Adopt now updates the pins whenever the preprocessed upstream document differs from the
   committed one (structural YAML compare), not only when the semantic diff is non-empty.
-  Changes the classifier treats as equivalent (operation `security`, `nullable` spellings,
-  binary media types) previously left the pins stale forever. Key-order-only churn does not
-  count as drift.
+  Changes the classifier treats as equivalent (`nullable` spellings, binary media types)
+  previously left the pins stale forever. Key-order-only churn does not count as drift.
 - The weekly drift workflow always opens a single adopt PR on `bot/openapi-adopt` (force-pushed),
   draft when the classifier finds breaking changes and ready otherwise; it no longer files a
   separate breaking-drift issue. A breaking adopt is expected to fail its nested
   `generateApis test` run, so the workflow still publishes the resulting pins and generated
   sources as a draft PR and only then fails the run.
+
 
 ## [0.1.3] - 2026-08-06
 
