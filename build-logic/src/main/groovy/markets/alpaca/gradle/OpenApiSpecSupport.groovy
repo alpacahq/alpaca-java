@@ -23,6 +23,9 @@ final class OpenApiSpecSupport {
 
     private static final String SCHEMA_REF_PREFIX = '#/components/schemas/'
 
+    private static final String SPEC_USER_AGENT = 'alpaca-java-openapi-adopt/1.0'
+    private static final String SPEC_ACCEPT = 'application/json, application/yaml, text/yaml, */*'
+
     private OpenApiSpecSupport() {}
 
     static String dumpYaml(Object tree) {
@@ -41,12 +44,36 @@ final class OpenApiSpecSupport {
 
     static Object loadSpec(String source) {
         if (isUrl(source)) {
-            def connection = new URI(source).toURL().openConnection()
-            connection.connectTimeout = 15_000
-            connection.readTimeout = 30_000
-            return connection.getInputStream().withCloseable { stream -> new Yaml().load(stream) }
+            return openSpecStream(source, 15_000, 30_000)
+                .withCloseable { stream -> new Yaml().load(stream) }
         }
         new File(source).withInputStream { stream -> new Yaml().load(stream) }
+    }
+
+    /** Downloads an OpenAPI document verbatim, failing on a non-2xx status or empty body. */
+    static void downloadSpec(String url, File destination) {
+        def body = openSpecStream(url, 60_000, 60_000).withCloseable { it.readAllBytes() }
+        if (body.length == 0) {
+            throw new IllegalStateException(
+                "Failed to download OpenAPI spec from ${url}: empty response body")
+        }
+        destination.parentFile.mkdirs()
+        destination.bytes = body
+    }
+
+    private static InputStream openSpecStream(String url, int connectTimeout, int readTimeout) {
+        def connection = new URI(url).toURL().openConnection() as HttpURLConnection
+        connection.setRequestProperty('User-Agent', SPEC_USER_AGENT)
+        connection.setRequestProperty('Accept', SPEC_ACCEPT)
+        connection.connectTimeout = connectTimeout
+        connection.readTimeout = readTimeout
+        def status = connection.responseCode
+        if (status < 200 || status >= 300) {
+            connection.disconnect()
+            throw new IllegalStateException(
+                "Failed to download OpenAPI spec from ${url} (HTTP ${status})")
+        }
+        connection.inputStream
     }
 
     static void removeDiscriminatorEnums(Map spec) {

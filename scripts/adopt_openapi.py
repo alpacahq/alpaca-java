@@ -17,6 +17,7 @@ from scripts import openapi_tools
 ROOT = Path(__file__).resolve().parents[1]
 APIS = ("broker", "data", "trading")
 UPSTREAM_URLS_PATH = ROOT / "scripts" / "upstream_openapi_urls.json"
+PIN_BACKUP_ROOT = ROOT / "build" / "specs-pin-backup"
 
 
 def load_upstream_defaults() -> dict[str, str]:
@@ -61,6 +62,70 @@ def _download(url: str, destination: Path) -> None:
     if not body:
         raise SystemExit(f"Failed to download OpenAPI spec from {url}: empty response body")
     destination.write_bytes(body)
+
+
+def pinned_spec(api: str) -> Path:
+    return ROOT / "specs" / api / "openapi.yaml"
+
+
+def pinned_spec_gradle_args() -> list[str]:
+    """Force nested generateApis onto committed pins.
+
+    Without these, APCA_*_SPEC / APCA_OAS_ROOT / local.properties can redirect the
+    nested build away from the pins just written by adopt.
+    """
+    return [f"-P{api}Spec={pinned_spec(api)}" for api in APIS]
+
+
+def write_pins(candidates_root: Path) -> None:
+    """Update every pinned spec or none, keeping a backup so a later step can undo it.
+
+    The backup doubles as the "regenerate not confirmed yet" marker:
+    clearOpenApiPinBackup drops it after a successful compile (or a lone
+    generateApis when compile is not in that build); failure restores from it.
+    """
+    for api in APIS:
+        backup = PIN_BACKUP_ROOT / api / "openapi.yaml"
+        backup.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(pinned_spec(api), backup)
+
+    written: list[str] = []
+    try:
+        for api in APIS:
+            destination = pinned_spec(api)
+            shutil.copyfile(candidates_root / api / "openapi.yaml", destination)
+            written.append(api)
+            print(f"Updated {destination}")
+    except OSError:
+        # Half-written pins would leave specs/ inconsistent across the three APIs.
+        for api in written:
+            shutil.copyfile(PIN_BACKUP_ROOT / api / "openapi.yaml", pinned_spec(api))
+            print(f"Restored {pinned_spec(api)}")
+        clear_pin_backup()
+        raise
+
+
+def clear_pin_backup() -> None:
+    """Drop the backup once generate+compile confirmed, so it cannot be replayed."""
+    shutil.rmtree(PIN_BACKUP_ROOT, ignore_errors=True)
+
+
+def pin_backup_pending() -> bool:
+    """True while pins have been advanced but clearOpenApiPinBackup has not confirmed them."""
+    return all((PIN_BACKUP_ROOT / api / "openapi.yaml").is_file() for api in APIS)
+
+
+def restore_pins() -> int:
+    """Restore pinned specs from the backup written by the last pin update."""
+    missing = [api for api in APIS if not (PIN_BACKUP_ROOT / api / "openapi.yaml").is_file()]
+    if missing:
+        raise SystemExit(f"No pin backup to restore for: {', '.join(missing)}")
+    for api in APIS:
+        destination = pinned_spec(api)
+        shutil.copyfile(PIN_BACKUP_ROOT / api / "openapi.yaml", destination)
+        print(f"Restored {destination}")
+    clear_pin_backup()
+    return 0
 
 
 def resolve_adopt_exit_code(
@@ -230,14 +295,45 @@ def adopt(
         print("Refusing to write without --yes (non-interactive adopt).")
         return exit_code
 
-    for api in APIS:
-        destination = ROOT / "specs" / api / "openapi.yaml"
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(candidates_root / api / "openapi.yaml", destination)
-        print(f"Updated {destination}")
+    write_pins(candidates_root)
 
     if not skip_generate:
-        _run([str(ROOT / "gradlew"), "generateApis", "test"])
+        try:
+            # Nested test depends on clearOpenApiPinBackup (after compileJava). Force pin
+            # paths so env / local.properties redirects cannot generate from a different
+            # source and then clear the backup while specs/ and Java drift.
+            _run(
+                [str(ROOT / "gradlew"), "generateApis", "test"] + pinned_spec_gradle_args()
+            )
+            clear_pin_backup()
+        except subprocess.CalledProcessError:
+            if pin_backup_pending():
+                restore_pins()
+                # Generation syncs each API as it finishes, so a failed run can still have
+                # rewritten some packages; rebuild and recompile from the restored pins.
+                # Explicit -P*Spec keeps recovery on specs/ even when the environment or
+                # local.properties redirects spec sources elsewhere.
+                try:
+                    _run(
+                        [str(ROOT / "gradlew"), "clearOpenApiPinBackup"]
+                        + pinned_spec_gradle_args()
+                    )
+                except subprocess.CalledProcessError:
+                    raise SystemExit(
+                        "ERROR: generateApis/compileJava failed after the pin update. Pins "
+                        "were restored but regenerating from them failed too.\n"
+                        "  Inspect specs/ and the generated sources with git status."
+                    ) from None
+                raise SystemExit(
+                    "ERROR: generateApis/compileJava failed after the pin update; pins and "
+                    "generated sources were restored."
+                ) from None
+            raise SystemExit(
+                "ERROR: the clients regenerated and compiled but the nested build failed "
+                "(for example failing tests).\n"
+                "  specs/ and the generated sources are consistent; revert both with git "
+                "to abandon the adopt."
+            ) from None
 
     print("Adopt complete. Review openapi sources + CHANGELOG, then commit.")
     return 0
@@ -278,7 +374,17 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Diff against build/specs-adopt (Gradle preprocessUpstream* already ran)",
     )
+    parser.add_argument(
+        "--restore-pins",
+        action="store_true",
+        help=(
+            "Undo the last pin update from build/specs-pin-backup and exit "
+            "(run ./gradlew generateApis afterwards to resync generated sources)"
+        ),
+    )
     args = parser.parse_args(argv)
+    if args.restore_pins:
+        return restore_pins()
     return adopt(
         dry_run=args.dry_run,
         yes=args.yes,

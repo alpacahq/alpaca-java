@@ -221,6 +221,65 @@ class SemanticDiffTests(unittest.TestCase):
         self.assertIn("### Added", changelog)
         self.assertNotIn("### Breaking", changelog)
 
+    def test_added_enum_values_are_additive(self):
+        def spec(values):
+            return _spec(
+                schemas={
+                    "ActivityType": {"type": "string", "enum": values},
+                    "Order": {
+                        "type": "object",
+                        "properties": {"status": {"type": "string", "enum": values}},
+                    },
+                }
+            )
+
+        diff = openapi_tools.semantic_diff(spec(["FILL"]), spec(["FILL", "CSD"]))
+        self.assertEqual(sorted(diff.schemas_extended), ["ActivityType", "Order"])
+        self.assertEqual(diff.schemas_modified, [])
+        self.assertEqual(diff.enum_values_added, ["ActivityType: CSD", "Order.status: CSD"])
+        self.assertEqual(diff.enum_values_removed, [])
+        self.assertFalse(diff.is_breaking())
+        self.assertEqual(diff.detail("schema", "ActivityType"), "added enum values")
+        changelog = openapi_tools.format_changelog_draft(diff)
+        self.assertIn("### Added", changelog)
+        self.assertNotIn("### Breaking", changelog)
+
+    def test_reordered_enum_values_are_not_reported_as_additions(self):
+        old = _spec(schemas={"S": {"type": "string", "enum": ["a", "b"]}})
+        new = _spec(schemas={"S": {"type": "string", "enum": ["b", "a"]}})
+        diff = openapi_tools.semantic_diff(old, new)
+        self.assertEqual(diff.schemas_extended, ["S"])
+        self.assertEqual(diff.enum_values_added, [])
+        self.assertFalse(diff.is_breaking())
+        self.assertEqual(diff.detail("schema", "S"), "enum values reordered")
+
+    def test_added_enum_values_beside_removed_property_stay_breaking(self):
+        old = _spec(
+            schemas={
+                "Order": {
+                    "type": "object",
+                    "properties": {
+                        "status": {"type": "string", "enum": ["new"]},
+                        "qty": {"type": "string"},
+                    },
+                }
+            }
+        )
+        new = _spec(
+            schemas={
+                "Order": {
+                    "type": "object",
+                    "properties": {"status": {"type": "string", "enum": ["new", "filled"]}},
+                }
+            }
+        )
+        diff = openapi_tools.semantic_diff(old, new)
+        self.assertEqual(diff.schemas_modified, ["Order"])
+        self.assertTrue(diff.is_breaking())
+        detail = diff.detail("schema", "Order")
+        self.assertIn("removed properties: qty", detail)
+        self.assertIn("added enum values", detail)
+
     def test_renamed_property_is_breaking_with_detail(self):
         old = _spec(
             schemas={
@@ -355,6 +414,110 @@ class SemanticDiffTests(unittest.TestCase):
             "added parameters: query:order_id",
             diff.detail("operation", "GET /v2/account/activities"),
         )
+
+    def test_added_inline_parameter_enum_value_is_additive(self):
+        def spec(values):
+            return _spec(
+                paths={
+                    "/v2/orders": {
+                        "get": {
+                            "operationId": "getOrders",
+                            "parameters": [
+                                {
+                                    "name": "status",
+                                    "in": "query",
+                                    "schema": {"type": "string", "enum": values},
+                                }
+                            ],
+                            "responses": {"200": {}},
+                        }
+                    }
+                }
+            )
+
+        diff = openapi_tools.semantic_diff(spec(["open"]), spec(["open", "closed"]))
+        self.assertEqual(diff.operations_extended, ["GET /v2/orders"])
+        self.assertEqual(diff.operations_modified, [])
+        self.assertEqual(
+            diff.enum_values_added,
+            ["GET /v2/orders parameter query:status: closed"],
+        )
+        self.assertFalse(diff.is_breaking())
+
+    def test_added_inline_request_body_enum_value_is_additive(self):
+        def spec(values):
+            return _spec(
+                paths={
+                    "/v2/orders": {
+                        "post": {
+                            "operationId": "createOrder",
+                            "requestBody": {
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": values,
+                                                }
+                                            },
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {"200": {}},
+                        }
+                    }
+                }
+            )
+
+        diff = openapi_tools.semantic_diff(spec(["new"]), spec(["new", "filled"]))
+        self.assertEqual(diff.operations_extended, ["POST /v2/orders"])
+        self.assertEqual(diff.operations_modified, [])
+        self.assertEqual(
+            diff.enum_values_added,
+            ["POST /v2/orders request body application/json.status: filled"],
+        )
+        self.assertFalse(diff.is_breaking())
+
+    def test_added_inline_response_enum_value_is_additive(self):
+        def spec(values):
+            return _spec(
+                paths={
+                    "/v2/orders": {
+                        "get": {
+                            "operationId": "getOrders",
+                            "responses": {
+                                "200": {
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": {
+                                                        "type": "string",
+                                                        "enum": values,
+                                                    }
+                                                },
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                        }
+                    }
+                }
+            )
+
+        diff = openapi_tools.semantic_diff(spec(["new"]), spec(["new", "filled"]))
+        self.assertEqual(diff.operations_extended, ["GET /v2/orders"])
+        self.assertEqual(diff.operations_modified, [])
+        self.assertEqual(
+            diff.enum_values_added,
+            ["GET /v2/orders response 200 application/json.status: filled"],
+        )
+        self.assertFalse(diff.is_breaking())
 
     def test_merge_diffs_preserves_details_and_extended_lists(self):
         old = _spec(schemas={"S": {"type": "object", "properties": {}}})

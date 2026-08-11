@@ -86,6 +86,22 @@ semantic diff is breaking. Re-run `./gradlew adoptOpenApiBreaking` after review.
 Adopt is all-or-nothing across broker/data/trading: if any API is breaking,
 additive changes on the others are not applied until `--allow-breaking`.
 
+Applying pins backs the previous ones up to `build/specs-pin-backup/`. That backup
+exists until generated sources compile successfully. `clearOpenApiPinBackup`
+(pulled in by `test`, always runs even when `compileJava` is UP-TO-DATE) deletes
+it after compile; a lone `generateApis` deletes it when compile is not in the same
+build. A failed generate or compile restores from it. Because generation syncs
+each API into `src/main/java/markets/alpaca/client/openapi/` as that API finishes,
+a failure part way through can leave some packages already rewritten, so the
+restore also re-runs `clearOpenApiPinBackup` against the restored pins to bring
+both trees back in step and recompile. A failure after a successful compile
+(failing tests, say) keeps the adopted pins and sources — revert both with git to
+abandon the adopt.
+
+To undo a pin write by hand before regenerating, run
+`scripts/run_adopt_openapi.sh --restore-pins` (one-shot: it consumes the backup),
+then `./gradlew generateApis` to resync the generated sources.
+
 Semantic categories: operations added/removed/modified/extended/renamed/moved;
 schemas added/removed/modified/extended; enum values added/removed. `modified`
 holds only changes that alter the generated Java surface; `extended` holds
