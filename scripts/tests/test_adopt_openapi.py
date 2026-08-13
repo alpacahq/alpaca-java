@@ -67,29 +67,6 @@ class WriteAdoptStatusTests(unittest.TestCase):
             )
 
 
-@contextlib.contextmanager
-def _adopt_workspace():
-    """Temporary repo root holding pinned specs and adopt candidates for all APIs."""
-    with tempfile.TemporaryDirectory() as tmp:
-        root = Path(tmp)
-        for api in adopt_openapi.APIS:
-            pinned = root / "specs" / api / "openapi.yaml"
-            pinned.parent.mkdir(parents=True)
-            pinned.write_text(f"pinned {api}\n", encoding="utf-8")
-            candidate = root / "build" / "specs-adopt" / api / "openapi.yaml"
-            candidate.parent.mkdir(parents=True)
-            candidate.write_text(f"upstream {api}\n", encoding="utf-8")
-        yield root
-
-
-def _patched_root(root: Path):
-    return mock.patch.multiple(
-        adopt_openapi,
-        ROOT=root,
-        PIN_BACKUP_ROOT=root / "build" / "specs-pin-backup",
-    )
-
-
 class ResolveAdoptExitCodeTests(unittest.TestCase):
     def test_no_changes_is_success(self):
         self.assertEqual(
