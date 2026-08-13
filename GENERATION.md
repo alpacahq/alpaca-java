@@ -81,6 +81,14 @@ scripts/run_adopt_openapi.sh --yes --allow-breaking
 Then edit `CHANGELOG.md`, commit `specs/` + `src/main/java/markets/alpaca/client/openapi/`
 (+ changelog).
 
+Pins are adopted whenever the preprocessed upstream document differs from the
+committed one, even when the semantic diff is empty — the classifier ignores
+spellings that cannot reach the generated Java surface (`nullable` forms including
+`type: [T, null]` and `anyOf`/`oneOf` with a `type: null` member, binary media
+types, and document-inherited vs explicit `security` with the same effective
+requirements), and those pins must still catch up. Such an adopt is reported as a
+pin spelling catch-up and is never breaking.
+
 `./gradlew adoptOpenApi` refuses to write and exits with code 2 when the
 semantic diff is breaking. Re-run `./gradlew adoptOpenApiBreaking` after review.
 Adopt is all-or-nothing across broker/data/trading: if any API is breaking,
@@ -110,14 +118,21 @@ the affected properties, parameters, or responses.
 
 **Breaking** (requires `adoptOpenApiBreaking`): removals, renames, moves, enum
 value removals, and modifications — a schema whose existing properties are
-removed, retyped, or newly required, or an operation whose parameters, request
-body, or responses change. Note that *adding* an operation parameter is breaking
-for this SDK: the generator widens every overload's signature.
+removed, retyped, or newly required, an added `allOf` member (intersection can
+tighten the model), an operation whose parameters, request body, or responses
+change, or an operation whose effective `security` requirements remove or
+replace previously accepted scheme sets, AND-tighten an alternative, or move
+from optional/empty auth to required schemes. Note that *adding* an operation
+parameter is breaking for this SDK: the generator widens every overload's
+signature.
 
 **Additive** (`adoptOpenApi` alone): new operations, schemas, and enum values;
-schemas that only gain properties; and documentation-only edits (`description`,
-`summary`, `example`, `examples`), which are still adopted so pins stay faithful
-to upstream but never classified as breaking.
+schemas that only gain properties; additive `oneOf` / `anyOf` members; added
+operation `security` OR alternatives that keep every previously accepted
+non-empty scheme set (callers using existing auth keep working); and
+documentation-only edits (`description`, `summary`, `example`, `examples`),
+which are still adopted so pins stay faithful to upstream but never classified
+as breaking.
 
 ### Manual venv (optional)
 
@@ -136,9 +151,15 @@ Or on CI images that allow user installs:
 - PR/`main` builds run `./gradlew build` (`check` → `checkGenerated`).
 - Snapshot and release freeze committed `specs/` (no live fetch at publish time).
 - Weekly `openapi-drift.yml`:
-  - Additive drift → bot PR on `bot/openapi-adopt` (human merge).
-  - Breaking drift → GitHub issue with the report; pins are **not** updated until
-    someone runs `./gradlew adoptOpenApiBreaking` and opens a normal PR.
+  - Any drift → bot PR on `bot/openapi-adopt` (force-pushed). Additive/equivalent
+    changes open a ready PR; classifier-breaking changes open a **draft** PR with
+    pins and generated sources already updated for review. Local
+    `./gradlew adoptOpenApi` still refuses breaking writes without
+    `adoptOpenApiBreaking`.
+  - A breaking adopt usually fails its nested `generateApis test` run. The workflow
+    still commits whatever pins and generated sources survived, opens the PR as a
+    **draft** noting the failure, and only then fails the run. If adopt restored the
+    pins and left nothing to commit, the PR step is skipped with a notice.
 
 ## Spec resolution order
 

@@ -128,6 +128,49 @@ def restore_pins() -> int:
     return 0
 
 
+def pin_text_drift(pinned: Path, candidate: Path) -> bool:
+    """True when the preprocessed candidate is not the same OpenAPI document as the pin.
+
+    The semantic diff deliberately ignores equivalent spellings that cannot change the
+    generated Java surface (``nullable`` forms and binary media types). Pins must still
+    catch up with upstream, or those APIs would drift forever with an empty diff and
+    never be adopted.
+
+    Comparison is structural (parsed YAML fingerprint), not raw bytes, so key-order or
+    insignificant whitespace churn does not force a catch-up adopt on its own.
+    """
+    if pinned.read_bytes() == candidate.read_bytes():
+        return False
+    return openapi_tools._schema_fingerprint(
+        openapi_tools.load_spec(pinned)
+    ) != openapi_tools._schema_fingerprint(openapi_tools.load_spec(candidate))
+
+
+def write_adopt_status(
+    path: Path,
+    *,
+    breaking: bool,
+    changed: bool,
+    breaking_apis: list[str],
+    changed_apis: list[str],
+) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(
+            {
+                "breaking": breaking,
+                "changed": changed,
+                "breaking_apis": breaking_apis,
+                "changed_apis": changed_apis,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def resolve_adopt_exit_code(
     *,
     dry_run: bool,
@@ -156,6 +199,7 @@ def print_adopt_summary(
     breaking_apis: list[str],
     changed_apis: list[str],
     report_path: Path,
+    pin_only_apis: list[str] | None = None,
 ) -> None:
     print()
     print("=" * 72)
@@ -178,6 +222,8 @@ def print_adopt_summary(
         if dry_run:
             print("  Dry-run only; pins were NOT updated.")
             print("  To apply: ./gradlew adoptOpenApi")
+    if pin_only_apis:
+        print(f"  Pin spelling catch-up only (no surface change): {', '.join(pin_only_apis)}")
     print("=" * 72)
     print(flush=True)
 
@@ -195,6 +241,7 @@ def adopt(
     adopt_specs_root = ROOT / "build" / "specs-adopt"
     built_specs_root = ROOT / "build" / "specs"
     report_path = ROOT / "build" / "openapi-adopt-report.md"
+    status_path = ROOT / "build" / "openapi-adopt-status.json"
     upstream_defaults = load_upstream_defaults()
 
     if not skip_fetch:
@@ -233,6 +280,7 @@ def adopt(
     any_changes = False
     breaking_apis: list[str] = []
     changed_apis: list[str] = []
+    pin_only_apis: list[str] = []
 
     for api in APIS:
         pinned = ROOT / "specs" / api / "openapi.yaml"
@@ -245,18 +293,32 @@ def adopt(
             openapi_tools.load_spec(pinned),
             openapi_tools.load_spec(candidate),
         )
-        if not diff.is_empty():
+        pin_drift = pin_text_drift(pinned, candidate)
+        if not diff.is_empty() or pin_drift:
             any_changes = True
             changed_apis.append(api)
         if diff.is_breaking():
             any_breaking = True
             breaking_apis.append(api)
         report_parts.append(openapi_tools.format_maintainer_report(diff, api=api))
+        if diff.is_empty() and pin_drift:
+            pin_only_apis.append(api)
+            report_parts.append(
+                "The pinned document still differs from upstream in ways the classifier "
+                "treats as equivalent (pin spelling catch-up).\n"
+            )
         changelog_parts.append(f"## {api}\n\n" + openapi_tools.format_changelog_draft(diff))
 
     report = "\n".join(report_parts).rstrip() + "\n\n" + "\n".join(changelog_parts)
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(report, encoding="utf-8")
+    write_adopt_status(
+        status_path,
+        breaking=any_breaking,
+        changed=any_changes,
+        breaking_apis=breaking_apis,
+        changed_apis=changed_apis,
+    )
     print(report)
     print(f"Wrote {report_path}")
 
@@ -271,6 +333,7 @@ def adopt(
         breaking_apis=breaking_apis,
         changed_apis=changed_apis,
         report_path=report_path,
+        pin_only_apis=pin_only_apis,
     )
 
     exit_code = resolve_adopt_exit_code(

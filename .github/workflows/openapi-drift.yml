@@ -9,7 +9,15 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  # Needed so the job can create openapi-drift / openapi-adopt / breaking if missing.
   issues: write
+
+# Serialize against the shared bot/openapi-adopt branch and PR. Overlapping
+# schedule + workflow_dispatch runs would otherwise interleave force-pushes and
+# PR draft/body/label updates, so an older run could clear the breaking gate.
+concurrency:
+  group: openapi-adopt
+  cancel-in-progress: false
 
 jobs:
   adopt-pr:
@@ -32,107 +40,154 @@ jobs:
       - name: Install OpenAPI script dependencies
         run: python3 -m pip install --user -r scripts/requirements.txt
 
-      - name: Adopt additive upstream changes
+      - name: Adopt upstream OpenAPI changes
         id: adopt
         env:
           GH_TOKEN: ${{ github.token }}
           PYTHONPATH: '.'
         run: |
           set -euo pipefail
-          # Single pass: --yes applies additive adopts only. Breaking exits 2
-          # without writing pins/generated (requires a human --allow-breaking run).
-          set +e
-          python3 scripts/adopt_openapi.py --yes
-          status=$?
-          set -e
-          echo "status=$status" >> "$GITHUB_OUTPUT"
+          # Always allow breaking on the bot branch; draft PR is the review gate.
+          adopt_exit=0
+          python3 scripts/adopt_openapi.py --yes --allow-breaking || adopt_exit=$?
 
-          if [[ "$status" == "2" ]]; then
-            echo "breaking=true" >> "$GITHUB_OUTPUT"
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          if [[ "$status" != "0" ]]; then
-            echo "::error::adopt failed with status $status"
-            exit "$status"
+          status_file=build/openapi-adopt-status.json
+          if [[ ! -f "$status_file" ]]; then
+            echo "::error::adopt exited $adopt_exit without writing $status_file"
+            exit 1
           fi
 
-          echo "breaking=false" >> "$GITHUB_OUTPUT"
-          if git status --porcelain -- specs src/main/java/markets/alpaca/client/openapi | grep -q .; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
+          # A real breaking adopt is expected to fail the nested generateApis/test run.
+          # The pins and generated sources it left behind are exactly what the draft PR
+          # exists to review, so read the status file regardless of the exit code.
+          outputs_file=build/adopt-outputs.env
+          python3 - <<'PY' > "$outputs_file"
+          import json
+          from pathlib import Path
+          data = json.loads(Path("build/openapi-adopt-status.json").read_text())
+          print(f"breaking={'true' if data.get('breaking') else 'false'}")
+          print(f"changed={'true' if data.get('changed') else 'false'}")
+          PY
+          if [[ "$adopt_exit" -eq 0 ]]; then
+            echo "adopt_failed=false" >> "$outputs_file"
           else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "adopt_failed=true" >> "$outputs_file"
+          fi
+          cat "$outputs_file" >> "$GITHUB_OUTPUT"
+
+          changed="$(awk -F= '$1 == "changed" { value = $2 } END { print value }' "$outputs_file")"
+          if [[ "$adopt_exit" -ne 0 && "$changed" != "true" ]]; then
+            echo "::error::adopt failed (exit $adopt_exit) with no adopted changes to publish"
+            exit "$adopt_exit"
+          fi
+          if [[ "$adopt_exit" -ne 0 ]]; then
+            echo "::warning::adopt exited $adopt_exit; publishing the partial result as a draft PR"
           fi
 
-      - name: Open breaking-drift issue
-        if: steps.adopt.outputs.breaking == 'true'
+      - name: Open or update adopt pull request
+        id: pr
+        if: always() && steps.adopt.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          body_file="$(mktemp)"
-          {
-            echo "Weekly OpenAPI drift detected **breaking** changes."
-            echo
-            echo "Pins and generated sources were **not** updated."
-            echo "Review the report, then run locally:"
-            echo
-            echo '```bash'
-            echo './gradlew adoptOpenApiBreaking'
-            echo '```'
-            echo
-            echo "Commit \`specs/\`, \`src/main/java/markets/alpaca/client/openapi/\`, and \`CHANGELOG.md\`."
-            echo
-            if [[ -f build/openapi-adopt-report.md ]]; then
-              cat build/openapi-adopt-report.md
-            else
-              echo "_Report file missing; check the workflow logs._"
-            fi
-          } > "$body_file"
-
-          existing="$(
-            gh issue list --label openapi-drift --label breaking --state open \
-              --json number,title --jq '.[] | select(.title | startswith("OpenAPI drift: breaking")) | .number' \
-              | head -n1
-          )"
-          title="OpenAPI drift: breaking upstream changes need adopt"
-          if [[ -n "$existing" ]]; then
-            gh issue edit "$existing" --title "$title" --body-file "$body_file"
-          else
-            gh issue create --title "$title" --body-file "$body_file" \
-              --label openapi-drift --label breaking \
-              || gh issue create --title "$title" --body-file "$body_file"
-          fi
-
-      - name: Open or update additive adopt pull request
-        if: steps.adopt.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
+          BREAKING: ${{ steps.adopt.outputs.breaking }}
+          ADOPT_FAILED: ${{ steps.adopt.outputs.adopt_failed }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -B bot/openapi-adopt
-          git add specs src/main/java/markets/alpaca/client/openapi
+          git add -A specs src/main/java/markets/alpaca/client/openapi
+          if git diff --cached --quiet; then
+            # Adopt restored the pins after a failed regenerate, so there is nothing to review.
+            echo "::notice::adopt left no spec or generated changes to commit; skipping PR"
+            exit 0
+          fi
           git commit -m "chore(openapi): adopt upstream OpenAPI specs"
           git push -u origin bot/openapi-adopt --force
 
-          title="chore(openapi): adopt upstream OpenAPI specs"
+          # A failed adopt cannot produce a mergeable PR, so it is reviewed as a draft too.
+          if [[ "$BREAKING" == "true" || "$ADOPT_FAILED" == "true" ]]; then
+            draft=true
+          else
+            draft=false
+          fi
+
           body_file="$(mktemp)"
           {
-            echo "Automated OpenAPI adopt (policy B drift job)."
+            if [[ "$BREAKING" == "true" ]]; then
+              echo "Automated OpenAPI adopt with **breaking** classifier findings."
+            else
+              echo "Automated OpenAPI adopt (additive / equivalent changes only)."
+            fi
             echo
-            echo "Additive-only changes. Humans must review and merge."
+            if [[ "$ADOPT_FAILED" == "true" ]]; then
+              echo "> [!WARNING]"
+              echo "> The nested \`./gradlew generateApis test\` run **failed** during adopt."
+              echo "> The pins and generated sources on this branch are the partial result;"
+              echo "> see the failed workflow run for the build/test output."
+              echo
+            fi
+            if [[ "$draft" == "true" ]]; then
+              echo "Opened as a **draft**. Review the report and generated diff carefully before marking ready to merge."
+            else
+              echo "Humans must review and merge."
+            fi
             echo
             if [[ -f build/openapi-adopt-report.md ]]; then
               cat build/openapi-adopt-report.md
             fi
           } > "$body_file"
 
-          existing="$(gh pr list --head bot/openapi-adopt --json number --jq '.[0].number')"
-          if [[ -n "$existing" ]]; then
-            gh pr edit "$existing" --title "$title" --body-file "$body_file"
+          if [[ "$draft" == "true" ]]; then
+            title="chore(openapi): adopt upstream OpenAPI specs (draft — needs review)"
           else
-            gh pr create --base main --head bot/openapi-adopt --title "$title" --body-file "$body_file"
-            gh pr edit --add-label openapi-adopt || true
+            title="chore(openapi): adopt upstream OpenAPI specs"
           fi
+
+          number="$(gh pr list --head bot/openapi-adopt --state open --json number --jq '.[0].number // empty')"
+          if [[ -n "$number" ]]; then
+            gh pr edit "$number" --title "$title" --body-file "$body_file"
+          else
+            draft_flag=()
+            if [[ "$draft" == "true" ]]; then
+              draft_flag=(--draft)
+            fi
+            # Parse the created PR from gh's own output; re-listing can race with indexing.
+            created_url="$(gh pr create --base main --head bot/openapi-adopt --title "$title" \
+              --body-file "$body_file" "${draft_flag[@]}" | tail -n1)"
+            number="${created_url##*/}"
+            if [[ ! "$number" =~ ^[0-9]+$ ]]; then
+              echo "::error::could not parse a PR number from: $created_url"
+              exit 1
+            fi
+          fi
+
+          is_draft="$(gh pr view "$number" --json isDraft --jq .isDraft)"
+          if [[ "$draft" == "true" && "$is_draft" != "true" ]]; then
+            gh pr ready "$number" --undo
+          elif [[ "$draft" != "true" && "$is_draft" == "true" ]]; then
+            gh pr ready "$number"
+          fi
+
+          # Ensure triage labels exist, then apply them strictly (missing labels must fail).
+          ensure_label() {
+            local name="$1" color="$2" desc="$3"
+            gh label create "$name" --color "$color" --description "$desc" >/dev/null 2>&1 || true
+          }
+          ensure_label openapi-drift "0E8A16" "OpenAPI pin/generated drift adopt"
+          ensure_label openapi-adopt "1D76DB" "Automated OpenAPI adopt PR"
+          ensure_label breaking "D93F0B" "Classifier reported breaking OpenAPI surface changes"
+
+          gh pr edit "$number" --add-label openapi-drift --add-label openapi-adopt
+          if [[ "$BREAKING" == "true" ]]; then
+            gh pr edit "$number" --add-label breaking
+          else
+            # remove-label fails when the label was never present; that is fine.
+            gh pr edit "$number" --remove-label breaking || true
+          fi
+
+      - name: Fail the run when adopt did not complete cleanly
+        if: always() && steps.adopt.outputs.adopt_failed == 'true' && steps.adopt.outputs.changed == 'true'
+        run: |
+          echo "::error::adopt exited non-zero; the branch holds the partial result for review"
+          exit 1

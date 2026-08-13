@@ -11,6 +11,13 @@ from unittest import mock
 
 from scripts import adopt_openapi
 
+try:  # Only the tests that read real spec files off disk need a YAML parser.
+    import yaml  # noqa: F401
+
+    _HAS_YAML = True
+except ImportError:  # pragma: no cover
+    _HAS_YAML = False
+
 
 @contextlib.contextmanager
 def _adopt_workspace():
@@ -33,6 +40,31 @@ def _patched_root(root: Path):
         ROOT=root,
         PIN_BACKUP_ROOT=root / "build" / "specs-pin-backup",
     )
+
+
+class WriteAdoptStatusTests(unittest.TestCase):
+    def test_write_adopt_status_json(self):
+        import json
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "openapi-adopt-status.json"
+            adopt_openapi.write_adopt_status(
+                path,
+                breaking=True,
+                changed=True,
+                breaking_apis=["data"],
+                changed_apis=["broker", "data"],
+            )
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(
+                payload,
+                {
+                    "breaking": True,
+                    "changed": True,
+                    "breaking_apis": ["data"],
+                    "changed_apis": ["broker", "data"],
+                },
+            )
 
 
 class ResolveAdoptExitCodeTests(unittest.TestCase):
@@ -152,6 +184,113 @@ def _additive_load_spec(path):
     if "specs-adopt" in str(path):
         schemas["Asset"] = {"type": "object", "properties": {}}
     return {"openapi": "3.0.3", "paths": {}, "components": {"schemas": schemas}}
+
+
+def _spec_yaml(*, security: str) -> str:
+    """Minimal spec whose only variable is an operation-level security requirement."""
+    return f"""openapi: 3.0.3
+info:
+  title: Test API
+  version: "1.0.0"
+paths:
+  /v2/orders:
+    get:
+      operationId: getOrders
+      security:
+      - {security}: []
+      responses:
+        "200":
+          description: OK
+components:
+  securitySchemes:
+    {security}:
+      type: http
+      scheme: bearer
+"""
+
+
+class PinTextDriftTests(unittest.TestCase):
+    """Equivalences the classifier ignores must still move the pins forward."""
+
+    def _adopt_pin_only(
+        self, root: Path, *, allow_breaking: bool = False, expected_exit: int = 0
+    ) -> dict:
+        import json
+
+        with _patched_root(root), mock.patch.object(adopt_openapi, "_run") as run:
+            self.assertEqual(
+                adopt_openapi.adopt(
+                    dry_run=False,
+                    yes=True,
+                    allow_breaking=allow_breaking,
+                    skip_generate=True,
+                    skip_fetch=True,
+                    skip_preprocess=True,
+                ),
+                expected_exit,
+            )
+            run.assert_not_called()
+        return json.loads(
+            (root / "build" / "openapi-adopt-status.json").read_text(encoding="utf-8")
+        )
+
+    @unittest.skipUnless(_HAS_YAML, "PyYAML is required to load the spec fixtures")
+    def test_security_only_drift_requires_breaking_adoption(self):
+        with _adopt_workspace() as root:
+            for api in adopt_openapi.APIS:
+                pinned = _spec_yaml(security="basicAuth" if api == "broker" else "bearerAuth")
+                (root / "specs" / api / "openapi.yaml").write_text(pinned, encoding="utf-8")
+                (root / "build" / "specs-adopt" / api / "openapi.yaml").write_text(
+                    _spec_yaml(security="bearerAuth"), encoding="utf-8"
+                )
+
+            status = self._adopt_pin_only(root, expected_exit=2)
+
+            self.assertTrue(status["changed"])
+            self.assertTrue(status["breaking"])
+            self.assertEqual(status["breaking_apis"], ["broker"])
+            self.assertEqual(status["changed_apis"], ["broker"])
+            self.assertEqual(
+                (root / "specs" / "broker" / "openapi.yaml").read_text(encoding="utf-8"),
+                _spec_yaml(security="basicAuth"),
+            )
+
+            self._adopt_pin_only(root, allow_breaking=True)
+            self.assertEqual(
+                (root / "specs" / "broker" / "openapi.yaml").read_text(encoding="utf-8"),
+                _spec_yaml(security="bearerAuth"),
+            )
+
+    @unittest.skipUnless(_HAS_YAML, "PyYAML is required to load the spec fixtures")
+    def test_identical_pins_report_no_change(self):
+        with _adopt_workspace() as root:
+            for api in adopt_openapi.APIS:
+                text = _spec_yaml(security="bearerAuth")
+                (root / "specs" / api / "openapi.yaml").write_text(text, encoding="utf-8")
+                (root / "build" / "specs-adopt" / api / "openapi.yaml").write_text(
+                    text, encoding="utf-8"
+                )
+
+            status = self._adopt_pin_only(root)
+
+            self.assertFalse(status["changed"])
+            self.assertEqual(status["changed_apis"], [])
+            self.assertFalse((root / "build" / "specs-pin-backup").exists())
+
+    @unittest.skipUnless(_HAS_YAML, "PyYAML is required to parse pin documents")
+    def test_pin_text_drift_compares_parsed_documents(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            pinned = root / "pinned.yaml"
+            candidate = root / "candidate.yaml"
+            pinned.write_text("a: 1\nb: 2\n", encoding="utf-8")
+            candidate.write_text("b: 2\na: 1\n", encoding="utf-8")
+            # Key order alone is not drift.
+            self.assertFalse(adopt_openapi.pin_text_drift(pinned, candidate))
+            candidate.write_text("a: 1\nb: 3\n", encoding="utf-8")
+            self.assertTrue(adopt_openapi.pin_text_drift(pinned, candidate))
+            candidate.write_text(pinned.read_text(encoding="utf-8"), encoding="utf-8")
+            self.assertFalse(adopt_openapi.pin_text_drift(pinned, candidate))
 
 
 class PinBackupTests(unittest.TestCase):
