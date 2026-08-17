@@ -640,6 +640,7 @@ components:
           - OPEXP
           - OPTRD
           - PTC
+          - REO
           - REORG
           - SPIN
           - SPLIT
@@ -1608,7 +1609,7 @@ components:
             is_discretionary: false
             is_politically_exposed: false
           documents:
-            - content: https://s3.amazonaws.com/stg.alpaca.markets/documents/accounts/3dcb795c-3ccc-402a-abb9-07e26a1b1326/2490f5d9-8988-4405-a3e0-d76e65de13c2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAJLDF4SCWSL6HUQKA%2F20220210%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20220210T162205Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=bc6cc0f541d569623f3973fb83734d7960a69886e8b175a9d472f666b87419f1
+            - content: https://example.com/documents/identity-verification.jpg
               created_at: '2022-01-21T21:25:28.184231Z'
               document_sub_type: passport
               document_type: identity_verification
@@ -2101,6 +2102,7 @@ components:
 
         - **DIV**: Dividend activity sub-types:
           - **CDIV**: Cash Dividend
+          - **ROC**: Return of Capital
           - **SDIV**: Stock Dividend
           - **SPD**: Substitute Payment In Lieu Of Dividend
 
@@ -2145,6 +2147,11 @@ components:
           - **SPLIT.FSPLIT**: Forward Stock Split
           - **SPLIT.RSPLIT**: Reverse Stock Split
           - **SPLIT.USPLIT**: Unit Split
+
+        - **REO**: Reorganization activity sub-types:
+          - **REOS**: Stock only (1 or more stock legs)
+          - **REOC**: Cash only (one cash leg)
+          - **REOSC**: Stock and cash
 
         - **REORG**: Reorganization activity sub-types:
           - **WRM**: Worthless Removal
@@ -2222,6 +2229,8 @@ components:
           Merger/Acquisition
         - **PTC**
           Pass Thru Change
+        - **REO**
+          Reorganization
         - **REORG**
           Reorg CA
         - **SPIN**
@@ -2258,6 +2267,7 @@ components:
         - OPEXP
         - OPTRD
         - PTC
+        - REO
         - REORG
         - SPIN
         - SPLIT
@@ -2279,6 +2289,7 @@ components:
             - $ref: '#/components/schemas/NCActivityV2'
             - $ref: '#/components/schemas/FixedIncomeRedemptionActivityV2'
             - $ref: '#/components/schemas/FixedIncomeInterestActivityV2'
+            - $ref: '#/components/schemas/REOActivityV2'
             - $ref: '#/components/schemas/RightsDistributionActivityV2'
             - $ref: '#/components/schemas/RightsSubscriptionElectionActivityV2'
             - $ref: '#/components/schemas/TenderOfferActivityV2'
@@ -3477,13 +3488,13 @@ components:
               description: Total cash amount paid
               type: string
             entitled_qty:
-              description: Quantity of shares entitled to receive the dividend
+              description: Quantity of shares entitled to receive the dividend or return of capital
               type: string
           required:
             - entitled_qty
             - cash_payout
           type: object
-      description: Cash dividend
+      description: Cash-dividend related details. Used for both Cash Dividend and Return of Capital.
       type: object
     CIPDocument:
       description: |
@@ -3935,7 +3946,10 @@ components:
           type: string
         foreign:
           description: Indicates if related to a non-US security
-          type: boolean
+          enum:
+            - 'true'
+            - 'false'
+          type: string
         isin:
           description: The ISIN of the security involved with the activity
           type: string
@@ -3954,7 +3968,10 @@ components:
           type: string
         special:
           description: Indicates if this is a special dividend
-          type: boolean
+          enum:
+            - 'true'
+            - 'false'
+          type: string
         symbol:
           description: The symbol of the security involved with the activity
           type: string
@@ -4146,6 +4163,74 @@ components:
         - $ref: '#/components/schemas/CommonNTAActivityV2'
       required:
         - group_id
+      type: object
+    CommonREOActivityV2:
+      description: |-
+        Reorganization (REO) activity sub-types:
+        - **REOS**: Stock only (1 or more stock legs)
+        - **REOC**: Cash only (one cash leg)
+        - **REOSC**: Stock and cash
+      properties:
+        cash_payout:
+          description: Cash payout amount
+          format: decimal
+          type: string
+        cash_rate:
+          description: Cash rate per share
+          format: decimal
+          type: string
+        cusip:
+          description: CUSIP received on this stock leg
+          type: string
+        effective_date:
+          description: Effective date of the reorganization
+          format: date
+          type: string
+        isin:
+          description: ISIN received on this stock leg
+          type: string
+        new_rate:
+          description: New ratio for this stock leg
+          format: decimal
+          type: string
+        payable_date:
+          description: Payable date of the reorganization
+          format: date
+          type: string
+        qty:
+          description: Quantity received on this stock leg
+          format: decimal
+          type: string
+        removed_qty:
+          description: Positive quantity removed from the source position
+          format: decimal
+          type: string
+        source_cusip:
+          description: CUSIP of the source security
+          type: string
+        source_isin:
+          description: ISIN of the source security
+          type: string
+        source_qty:
+          description: Source position quantity
+          format: decimal
+          type: string
+        source_rate:
+          description: Source ratio for this stock leg
+          format: decimal
+          type: string
+        source_symbol:
+          description: Symbol of the source security
+          example: CEPT
+          type: string
+        symbol:
+          description: Symbol received on this stock leg
+          example: SECZ
+          type: string
+      required:
+        - source_symbol
+        - source_cusip
+        - payable_date
       type: object
     CommonSDIVActivityV2:
       properties:
@@ -5054,7 +5139,10 @@ components:
               type: string
             foreign:
               description: Indicates if related to a non-US security
-              type: boolean
+              enum:
+                - 'true'
+                - 'false'
+              type: string
             isin:
               description: The ISIN of the security involved with the activity
               type: string
@@ -5073,7 +5161,10 @@ components:
               type: string
             special:
               description: Indicates if this is a special dividend
-              type: boolean
+              enum:
+                - 'true'
+                - 'false'
+              type: string
             symbol:
               description: The symbol of the security involved with the activity
               type: string
@@ -8804,6 +8895,12 @@ components:
       example: buy_to_open
       title: PositionIntent
       type: string
+    REOActivityV2:
+      allOf:
+        - $ref: '#/components/schemas/CommonCaActivityV2'
+        - $ref: '#/components/schemas/CommonREOActivityV2'
+      description: Reorganization (REO)
+      type: object
     RebalancingConditions:
       properties:
         day:
@@ -9561,6 +9658,8 @@ components:
       enum:
         - xstocks
         - st0x
+        - binance
+        - coinbase
       example: xstocks
       title: TokenizationIssuer
       type: string
@@ -9668,6 +9767,8 @@ components:
         - ton
         - tron
         - mantle
+        - cronos
+        - hyperevm
       example: solana
       title: TokenizationNetwork
       type: string
@@ -10297,7 +10398,7 @@ components:
           - `timestamp`: The time at which the order was filled.
         - `partial_fill`: Sent when a number of shares less than the total remaining quantity on your order has been filled.
           - `timestamp`: The time at which the shares were filled.
-        - `canceled`: Sent when your requested cancellation of an order is processed.
+        - `canceled`: Sent when the order transitions to the `canceled` state. This can be triggered by a user-submitted cancel request, by Alpaca as part of automated processing (e.g. corporate-action sweeps, aged-GTC expiration, overnight-session lifecycle), or by an upstream execution venue. When Alpaca populates a machine-readable cause, it is exposed on the top-level `reason` field — see the `reason` property on `TradeUpdateEventV2` for known values (e.g. `CORPORATE_ACTION`).
           - `timestamp`: The time at which the order was canceled.
         - `expired`: Sent when an order has reached the end of its lifespan, as determined by the order's time in force value.
           - `timestamp`: The time at which the order expired.
@@ -10395,6 +10496,23 @@ components:
           description: Only present when event is either `fill`, `partial_fill`, `trade_bust` and `trade_correct`. The amount of shares this Trade order was for. <br /> For `trade_bust` events, the qty
             field may be negative, representing a reversal of the original quantity.
           type: string
+        reason:
+          description: |
+            Machine-readable code that explains **why** the event occurred. Only present when a reason applies; omitted from routine lifecycle events such as `new`, `fill`, and `partial_fill`.
+
+            Known values:
+
+            | Value | Event(s) | Meaning |
+            | --- | --- | --- |
+            | `CORPORATE_ACTION` | `canceled` | Alpaca canceled the order internally because the underlying is scheduled for a mandatory corporate action other than a cash dividend (e.g. reverse split, symbol/CUSIP change, merger, liquidation). Emitted by the overnight-session lifecycle and, where enabled by Alpaca, the daytime GTC corporate-action sweep. Not emitted when the cancel is routed to the upstream venue instead (e.g. day-session, `extended_hours=false`, agency- or mixed-capacity orders); those `canceled` events carry the venue's own text in `reason` if any. |
+            | `TOO_LATE_TO_CANCEL` | `order_cancel_rejected`, `order_replace_rejected` | The cancel or replace request arrived after the order had already reached a terminal state (typically `filled`). |
+            | `TRADE_BUST` | `trade_bust` | Alpaca operations replayed or synthesized a bust of a previously reported execution. Busts that originate from the upstream venue surface the venue's own text in `reason` (or omit it entirely), so consumers should not rely on `TRADE_BUST` alone to identify all busts — key on the `event` field (`trade_bust`) for that. |
+
+            Free-form strings may also appear in `reason`. In particular, `canceled`, `trade_bust`, and `trade_correct` events originating from the upstream venue carry the venue's own text field (when the venue provides one) rather than an Alpaca-defined code. Consumers should tolerate unknown values and, where they need to distinguish cases, key on `event` first and use `reason` as a secondary hint.
+          example: CORPORATE_ACTION
+          type:
+            - string
+            - 'null'
         settle_date:
           description: Settlement date of the trade in format `YYYY-MM-DD` for `fill` and `partial_fill` events
           example: '2026-03-03'
@@ -15709,7 +15827,7 @@ paths:
         - Funding
     post:
       description: |
-        Creates a new JIT settlement, which will trigger the reconciliation process for all included accounts.
+        Creates a new JIT settlement, which will trigger the reconciliation process for all included accounts. There is a limit of 150,000 accounts per settlement. If more than 150,000 accounts need to be settled, they should be batched in multiple settlements.
       operationId: post-v1-jit-settlements
       requestBody:
         content:

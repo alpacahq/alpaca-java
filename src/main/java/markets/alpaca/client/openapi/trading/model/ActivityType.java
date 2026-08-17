@@ -25,7 +25,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * - FILL   Order fills (both partial and full fills)  - TRANS   Cash transactions (both CSD and CSW)  - MISC   Miscellaneous or rarely used activity types (All types except those in TRANS, DIV, or FILL)  - ACATC   ACATS IN/OUT (Cash)  - ACATS   ACATS IN/OUT (Securities)  - CFEE   Crypto fee  - CGD   Capital gain distribution  - CSD   Cash deposit(+)  - CSW   Cash withdrawal(-)  - DIV   Dividends  - DIVCGL   Dividend (capital gain long term)  - DIVCGS   Dividend (capital gain short term)  - DIVFEE   Dividend fee  - DIVFT   Dividend adjusted (Foreign Tax Withheld)  - DIVNRA   Dividend adjusted (NRA Withheld)  - DIVROC   Dividend return of capital  - DIVTW   Dividend adjusted (Tefra Withheld)  - DIVTXEX   Dividend (tax exempt)  - FEE   Fee denominated in USD  - INT   Interest (credit/margin)  - INTNRA   Interest adjusted (NRA Withheld)  - INTTW   Interest adjusted (Tefra Withheld)  - JNL   Journal entry  - JNLC   Journal entry (cash)  - JNLS   Journal entry (stock)  - MA   Merger/Acquisition  - NC   Name change  - OPASN   Option assignment  - OPCA   Option corporate action  - OPCSH   Option cash deliverable for non-standard contracts  - OPEXC   Option exercise  - OPEXP   Option expiration  - OPTRD   Option trade  - PTC   Pass Thru Charge  - PTR   Pass Thru Rebate  - REORG   Reorg CA  - SPIN   Stock spinoff  - SPLIT   Stock split  - FOPT   Free of Payment Transfers  - OCT   On chain transactions (blockchain deposits/withdrawals)
+ * - FILL   Order fills (both partial and full fills)  - TRANS   Cash transactions (both CSD and CSW)  - MISC   Miscellaneous or rarely used activity types (All types except those in TRANS, DIV, or FILL)  - ACATC   ACATS IN/OUT (Cash)  - ACATS   ACATS IN/OUT (Securities)  - CFEE   Crypto fee  - CGD   Capital gain distribution  - CSD   Cash deposit(+)  - CSW   Cash withdrawal(-)  - DIV   Dividends  - DIVCGL   Dividend (capital gain long term)  - DIVCGS   Dividend (capital gain short term)  - DIVFEE   Dividend fee  - DIVFT   Dividend adjusted (Foreign Tax Withheld)  - DIVNRA   Dividend adjusted (NRA Withheld)  - DIVROC   Dividend return of capital  - DIVTW   Dividend adjusted (Tefra Withheld)  - DIVTXEX   Dividend (tax exempt)  - FEE   Fee denominated in USD  - INT   Interest (credit/margin)  - INTNRA   Interest adjusted (NRA Withheld)  - INTTW   Interest adjusted (Tefra Withheld)  - JNL   Journal entry  - JNLC   Journal entry (cash)  - JNLS   Journal entry (stock)  - MA   Merger/Acquisition  - NC   Name change  - OPASN   Option assignment  - OPCA   Option corporate action  - OPCSH   Option cash deliverable for non-standard contracts  - OPEXC   Option exercise  - OPEXP   Option expiration  - OPTRD   Option trade  - PTC   Pass Thru Charge  - PTR   Pass Thru Rebate  - REO   Reorganization  - REORG   Reorg CA  - SPIN   Stock spinoff  - SPLIT   Stock split  - FOPT   Free of Payment Transfers  - OCT   On chain transactions (blockchain deposits/withdrawals)
  */
 @JsonAdapter(ActivityType.Adapter.class)
 public enum ActivityType implements Serializable {
@@ -99,6 +99,8 @@ public enum ActivityType implements Serializable {
   PTC("PTC"),
   
   PTR("PTR"),
+  
+  REO("REO"),
   
   REORG("REORG"),
   

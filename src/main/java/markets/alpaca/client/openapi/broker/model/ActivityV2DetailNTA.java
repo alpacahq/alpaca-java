@@ -111,10 +111,62 @@ public class ActivityV2DetailNTA implements Serializable {
   @javax.annotation.Nullable
   private LocalDate exDate;
 
+  /**
+   * Indicates if related to a non-US security
+   */
+  @JsonAdapter(ForeignEnum.Adapter.class)
+  public enum ForeignEnum {
+    TRUE("true"),
+    
+    FALSE("false");
+
+    private String value;
+
+    ForeignEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static ForeignEnum fromValue(String value) {
+      for (ForeignEnum b : ForeignEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<ForeignEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final ForeignEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public ForeignEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return ForeignEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      ForeignEnum.fromValue(value);
+    }
+  }
+
   public static final String SERIALIZED_NAME_FOREIGN = "foreign";
   @SerializedName(SERIALIZED_NAME_FOREIGN)
   @javax.annotation.Nonnull
-  private Boolean foreign;
+  private ForeignEnum foreign;
 
   public static final String SERIALIZED_NAME_ISIN = "isin";
   @SerializedName(SERIALIZED_NAME_ISIN)
@@ -136,10 +188,62 @@ public class ActivityV2DetailNTA implements Serializable {
   @javax.annotation.Nullable
   private LocalDate recordDate;
 
+  /**
+   * Indicates if this is a special dividend
+   */
+  @JsonAdapter(SpecialEnum.Adapter.class)
+  public enum SpecialEnum {
+    TRUE("true"),
+    
+    FALSE("false");
+
+    private String value;
+
+    SpecialEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static SpecialEnum fromValue(String value) {
+      for (SpecialEnum b : SpecialEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<SpecialEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final SpecialEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public SpecialEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return SpecialEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      SpecialEnum.fromValue(value);
+    }
+  }
+
   public static final String SERIALIZED_NAME_SPECIAL = "special";
   @SerializedName(SERIALIZED_NAME_SPECIAL)
   @javax.annotation.Nonnull
-  private Boolean special;
+  private SpecialEnum special;
 
   public static final String SERIALIZED_NAME_SYMBOL = "symbol";
   @SerializedName(SERIALIZED_NAME_SYMBOL)
@@ -169,7 +273,7 @@ public class ActivityV2DetailNTA implements Serializable {
   public static final String SERIALIZED_NAME_NEW_RATE = "new_rate";
   @SerializedName(SERIALIZED_NAME_NEW_RATE)
   @javax.annotation.Nonnull
-  private String newRate;
+  private BigDecimal newRate;
 
   public static final String SERIALIZED_NAME_OLD_CUSIP = "old_cusip";
   @SerializedName(SERIALIZED_NAME_OLD_CUSIP)
@@ -259,7 +363,7 @@ public class ActivityV2DetailNTA implements Serializable {
   public static final String SERIALIZED_NAME_SOURCE_RATE = "source_rate";
   @SerializedName(SERIALIZED_NAME_SOURCE_RATE)
   @javax.annotation.Nonnull
-  private String sourceRate;
+  private BigDecimal sourceRate;
 
   public static final String SERIALIZED_NAME_SOURCE_SYMBOL = "source_symbol";
   @SerializedName(SERIALIZED_NAME_SOURCE_SYMBOL)
@@ -324,7 +428,7 @@ public class ActivityV2DetailNTA implements Serializable {
   public static final String SERIALIZED_NAME_CASH_RATE = "cash_rate";
   @SerializedName(SERIALIZED_NAME_CASH_RATE)
   @javax.annotation.Nullable
-  private String cashRate;
+  private BigDecimal cashRate;
 
   public static final String SERIALIZED_NAME_POSITION_QTY = "position_qty";
   @SerializedName(SERIALIZED_NAME_POSITION_QTY)
@@ -351,15 +455,15 @@ public class ActivityV2DetailNTA implements Serializable {
   @javax.annotation.Nullable
   private BigDecimal price;
 
-  public static final String SERIALIZED_NAME_EXPIRATION_DATE = "expiration_date";
-  @SerializedName(SERIALIZED_NAME_EXPIRATION_DATE)
-  @javax.annotation.Nullable
-  private LocalDate expirationDate;
-
   public static final String SERIALIZED_NAME_REMOVED_QTY = "removed_qty";
   @SerializedName(SERIALIZED_NAME_REMOVED_QTY)
   @javax.annotation.Nonnull
   private String removedQty;
+
+  public static final String SERIALIZED_NAME_EXPIRATION_DATE = "expiration_date";
+  @SerializedName(SERIALIZED_NAME_EXPIRATION_DATE)
+  @javax.annotation.Nullable
+  private LocalDate expirationDate;
 
   public static final String SERIALIZED_NAME_NEW_CONTRACT_SYMBOL = "new_contract_symbol";
   @SerializedName(SERIALIZED_NAME_NEW_CONTRACT_SYMBOL)
@@ -515,7 +619,7 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
   /**
-   * The cash payout for this interest activity
+   * Cash payout amount
    * @return cashPayout
    */
   @javax.annotation.Nonnull
@@ -623,7 +727,7 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
 
-  public ActivityV2DetailNTA foreign(@javax.annotation.Nonnull Boolean foreign) {
+  public ActivityV2DetailNTA foreign(@javax.annotation.Nonnull ForeignEnum foreign) {
     this.foreign = foreign;
     return this;
   }
@@ -633,11 +737,11 @@ public class ActivityV2DetailNTA implements Serializable {
    * @return foreign
    */
   @javax.annotation.Nonnull
-  public Boolean getForeign() {
+  public ForeignEnum getForeign() {
     return foreign;
   }
 
-  public void setForeign(@javax.annotation.Nonnull Boolean foreign) {
+  public void setForeign(@javax.annotation.Nonnull ForeignEnum foreign) {
     this.foreign = foreign;
   }
 
@@ -718,7 +822,7 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
 
-  public ActivityV2DetailNTA special(@javax.annotation.Nonnull Boolean special) {
+  public ActivityV2DetailNTA special(@javax.annotation.Nonnull SpecialEnum special) {
     this.special = special;
     return this;
   }
@@ -728,11 +832,11 @@ public class ActivityV2DetailNTA implements Serializable {
    * @return special
    */
   @javax.annotation.Nonnull
-  public Boolean getSpecial() {
+  public SpecialEnum getSpecial() {
     return special;
   }
 
-  public void setSpecial(@javax.annotation.Nonnull Boolean special) {
+  public void setSpecial(@javax.annotation.Nonnull SpecialEnum special) {
     this.special = special;
   }
 
@@ -832,21 +936,21 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
 
-  public ActivityV2DetailNTA newRate(@javax.annotation.Nonnull String newRate) {
+  public ActivityV2DetailNTA newRate(@javax.annotation.Nonnull BigDecimal newRate) {
     this.newRate = newRate;
     return this;
   }
 
   /**
-   * Ratio of new shares received
+   * New ratio for this stock leg
    * @return newRate
    */
   @javax.annotation.Nonnull
-  public String getNewRate() {
+  public BigDecimal getNewRate() {
     return newRate;
   }
 
-  public void setNewRate(@javax.annotation.Nonnull String newRate) {
+  public void setNewRate(@javax.annotation.Nonnull BigDecimal newRate) {
     this.newRate = newRate;
   }
 
@@ -1142,7 +1246,7 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
   /**
-   * ISIN of the parent security
+   * ISIN of the source security
    * @return sourceIsin
    */
   @javax.annotation.Nullable
@@ -1174,21 +1278,21 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
 
-  public ActivityV2DetailNTA sourceRate(@javax.annotation.Nonnull String sourceRate) {
+  public ActivityV2DetailNTA sourceRate(@javax.annotation.Nonnull BigDecimal sourceRate) {
     this.sourceRate = sourceRate;
     return this;
   }
 
   /**
-   * Ratio of parent shares
+   * Source ratio for this stock leg
    * @return sourceRate
    */
   @javax.annotation.Nonnull
-  public String getSourceRate() {
+  public BigDecimal getSourceRate() {
     return sourceRate;
   }
 
-  public void setSourceRate(@javax.annotation.Nonnull String sourceRate) {
+  public void setSourceRate(@javax.annotation.Nonnull BigDecimal sourceRate) {
     this.sourceRate = sourceRate;
   }
 
@@ -1421,21 +1525,21 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
 
-  public ActivityV2DetailNTA cashRate(@javax.annotation.Nullable String cashRate) {
+  public ActivityV2DetailNTA cashRate(@javax.annotation.Nullable BigDecimal cashRate) {
     this.cashRate = cashRate;
     return this;
   }
 
   /**
-   * The cash rate
+   * Cash rate per share
    * @return cashRate
    */
   @javax.annotation.Nullable
-  public String getCashRate() {
+  public BigDecimal getCashRate() {
     return cashRate;
   }
 
-  public void setCashRate(@javax.annotation.Nullable String cashRate) {
+  public void setCashRate(@javax.annotation.Nullable BigDecimal cashRate) {
     this.cashRate = cashRate;
   }
 
@@ -1535,25 +1639,6 @@ public class ActivityV2DetailNTA implements Serializable {
   }
 
 
-  public ActivityV2DetailNTA expirationDate(@javax.annotation.Nullable LocalDate expirationDate) {
-    this.expirationDate = expirationDate;
-    return this;
-  }
-
-  /**
-   * The expiration date for the rights distribution
-   * @return expirationDate
-   */
-  @javax.annotation.Nullable
-  public LocalDate getExpirationDate() {
-    return expirationDate;
-  }
-
-  public void setExpirationDate(@javax.annotation.Nullable LocalDate expirationDate) {
-    this.expirationDate = expirationDate;
-  }
-
-
   public ActivityV2DetailNTA removedQty(@javax.annotation.Nonnull String removedQty) {
     this.removedQty = removedQty;
     return this;
@@ -1570,6 +1655,25 @@ public class ActivityV2DetailNTA implements Serializable {
 
   public void setRemovedQty(@javax.annotation.Nonnull String removedQty) {
     this.removedQty = removedQty;
+  }
+
+
+  public ActivityV2DetailNTA expirationDate(@javax.annotation.Nullable LocalDate expirationDate) {
+    this.expirationDate = expirationDate;
+    return this;
+  }
+
+  /**
+   * The expiration date for the rights distribution
+   * @return expirationDate
+   */
+  @javax.annotation.Nullable
+  public LocalDate getExpirationDate() {
+    return expirationDate;
+  }
+
+  public void setExpirationDate(@javax.annotation.Nullable LocalDate expirationDate) {
+    this.expirationDate = expirationDate;
   }
 
 
@@ -1876,8 +1980,8 @@ public class ActivityV2DetailNTA implements Serializable {
         Objects.equals(this.qty, activityV2DetailNTA.qty) &&
         Objects.equals(this.accruedInterestRate, activityV2DetailNTA.accruedInterestRate) &&
         Objects.equals(this.price, activityV2DetailNTA.price) &&
-        Objects.equals(this.expirationDate, activityV2DetailNTA.expirationDate) &&
         Objects.equals(this.removedQty, activityV2DetailNTA.removedQty) &&
+        Objects.equals(this.expirationDate, activityV2DetailNTA.expirationDate) &&
         Objects.equals(this.newContractSymbol, activityV2DetailNTA.newContractSymbol) &&
         Objects.equals(this.oldContractSymbol, activityV2DetailNTA.oldContractSymbol) &&
         Objects.equals(this.externalId, activityV2DetailNTA.externalId) &&
@@ -1893,7 +1997,7 @@ public class ActivityV2DetailNTA implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, cashPayout, cusip, dueBillOffDate, dueBillOnDate, entitledQty, exDate, foreign, isin, payableDate, rate, recordDate, special, symbol, newQty, paidQty, newCusip, newIsin, newRate, oldCusip, oldIsin, oldRate, oldQty, dueBillRedemptionDate, newSymbol, alternateCusip, alternateIsin, alternateQty, alternateRate, alternateSymbol, effectiveDate, oldSymbol, newPrice, sourceCusip, sourceIsin, sourcePrice, sourceRate, sourceSymbol, sourceQty, acquireeCusip, acquireeIsin, acquireeRate, acquireeSymbol, acquirerCusip, acquirerIsin, acquirerRate, acquirerSymbol, acquireeQty, acquirerQty, cashRate, positionQty, paymentDate, qty, accruedInterestRate, price, expirationDate, removedQty, newContractSymbol, oldContractSymbol, externalId, holdDate, requestId, contra, parentId, journalId, bankTransactionId, transferId, additionalProperties);
+    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, cashPayout, cusip, dueBillOffDate, dueBillOnDate, entitledQty, exDate, foreign, isin, payableDate, rate, recordDate, special, symbol, newQty, paidQty, newCusip, newIsin, newRate, oldCusip, oldIsin, oldRate, oldQty, dueBillRedemptionDate, newSymbol, alternateCusip, alternateIsin, alternateQty, alternateRate, alternateSymbol, effectiveDate, oldSymbol, newPrice, sourceCusip, sourceIsin, sourcePrice, sourceRate, sourceSymbol, sourceQty, acquireeCusip, acquireeIsin, acquireeRate, acquireeSymbol, acquirerCusip, acquirerIsin, acquirerRate, acquirerSymbol, acquireeQty, acquirerQty, cashRate, positionQty, paymentDate, qty, accruedInterestRate, price, removedQty, expirationDate, newContractSymbol, oldContractSymbol, externalId, holdDate, requestId, contra, parentId, journalId, bankTransactionId, transferId, additionalProperties);
   }
 
   @Override
@@ -1959,8 +2063,8 @@ public class ActivityV2DetailNTA implements Serializable {
     sb.append("    qty: ").append(toIndentedString(qty)).append("\n");
     sb.append("    accruedInterestRate: ").append(toIndentedString(accruedInterestRate)).append("\n");
     sb.append("    price: ").append(toIndentedString(price)).append("\n");
-    sb.append("    expirationDate: ").append(toIndentedString(expirationDate)).append("\n");
     sb.append("    removedQty: ").append(toIndentedString(removedQty)).append("\n");
+    sb.append("    expirationDate: ").append(toIndentedString(expirationDate)).append("\n");
     sb.append("    newContractSymbol: ").append(toIndentedString(newContractSymbol)).append("\n");
     sb.append("    oldContractSymbol: ").append(toIndentedString(oldContractSymbol)).append("\n");
     sb.append("    externalId: ").append(toIndentedString(externalId)).append("\n");
@@ -1990,7 +2094,7 @@ public class ActivityV2DetailNTA implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "cash_payout", "cusip", "due_bill_off_date", "due_bill_on_date", "entitled_qty", "ex_date", "foreign", "isin", "payable_date", "rate", "record_date", "special", "symbol", "new_qty", "paid_qty", "new_cusip", "new_isin", "new_rate", "old_cusip", "old_isin", "old_rate", "old_qty", "due_bill_redemption_date", "new_symbol", "alternate_cusip", "alternate_isin", "alternate_qty", "alternate_rate", "alternate_symbol", "effective_date", "old_symbol", "new_price", "source_cusip", "source_isin", "source_price", "source_rate", "source_symbol", "source_qty", "acquiree_cusip", "acquiree_isin", "acquiree_rate", "acquiree_symbol", "acquirer_cusip", "acquirer_isin", "acquirer_rate", "acquirer_symbol", "acquiree_qty", "acquirer_qty", "cash_rate", "position_qty", "payment_date", "qty", "accrued_interest_rate", "price", "expiration_date", "removed_qty", "new_contract_symbol", "old_contract_symbol", "external_id", "hold_date", "request_id", "contra", "parent_id", "journal_id", "bank_transaction_id", "transfer_id"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "cash_payout", "cusip", "due_bill_off_date", "due_bill_on_date", "entitled_qty", "ex_date", "foreign", "isin", "payable_date", "rate", "record_date", "special", "symbol", "new_qty", "paid_qty", "new_cusip", "new_isin", "new_rate", "old_cusip", "old_isin", "old_rate", "old_qty", "due_bill_redemption_date", "new_symbol", "alternate_cusip", "alternate_isin", "alternate_qty", "alternate_rate", "alternate_symbol", "effective_date", "old_symbol", "new_price", "source_cusip", "source_isin", "source_price", "source_rate", "source_symbol", "source_qty", "acquiree_cusip", "acquiree_isin", "acquiree_rate", "acquiree_symbol", "acquirer_cusip", "acquirer_isin", "acquirer_rate", "acquirer_symbol", "acquiree_qty", "acquirer_qty", "cash_rate", "position_qty", "payment_date", "qty", "accrued_interest_rate", "price", "removed_qty", "expiration_date", "new_contract_symbol", "old_contract_symbol", "external_id", "hold_date", "request_id", "contra", "parent_id", "journal_id", "bank_transaction_id", "transfer_id"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "cash_payout", "cusip", "entitled_qty", "foreign", "payable_date", "rate", "special", "symbol", "new_qty", "paid_qty", "new_cusip", "new_rate", "old_cusip", "old_rate", "old_qty", "new_symbol", "alternate_cusip", "alternate_qty", "alternate_rate", "alternate_symbol", "effective_date", "old_symbol", "new_price", "source_cusip", "source_price", "source_rate", "source_symbol", "source_qty", "acquiree_cusip", "acquiree_symbol", "acquiree_qty", "position_qty", "payment_date", "qty", "removed_qty", "new_contract_symbol", "old_contract_symbol", "external_id", "request_id", "contra", "parent_id", "transfer_id"));
@@ -2034,12 +2138,22 @@ public class ActivityV2DetailNTA implements Serializable {
       if (!jsonObj.get("entitled_qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `entitled_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("entitled_qty").toString()));
       }
+      if (!jsonObj.get("foreign").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `foreign` to be a primitive type in the JSON string but got `%s`", jsonObj.get("foreign").toString()));
+      }
+      // validate the required field `foreign`
+      ForeignEnum.validateJsonElement(jsonObj.get("foreign"));
       if ((jsonObj.get("isin") != null && !jsonObj.get("isin").isJsonNull()) && !jsonObj.get("isin").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("isin").toString()));
       }
       if (!jsonObj.get("rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("rate").toString()));
       }
+      if (!jsonObj.get("special").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `special` to be a primitive type in the JSON string but got `%s`", jsonObj.get("special").toString()));
+      }
+      // validate the required field `special`
+      SpecialEnum.validateJsonElement(jsonObj.get("special"));
       if (!jsonObj.get("symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
       }

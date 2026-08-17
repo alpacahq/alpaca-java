@@ -836,6 +836,7 @@ components:
 
         - **DIV**: Dividend activity sub-types:
           - **CDIV**: Cash Dividend
+          - **ROC**: Return of Capital
           - **SDIV**: Stock Dividend
           - **SPD**: Substitute Payment In Lieu Of Dividend
 
@@ -880,6 +881,11 @@ components:
           - **SPLIT.FSPLIT**: Forward Stock Split
           - **SPLIT.RSPLIT**: Reverse Stock Split
           - **SPLIT.USPLIT**: Unit Split
+
+        - **REO**: Reorganization activity sub-types
+          - **REOS**: Stock only (1 or more stock legs)
+          - **REOC**: Cash only (1 cash leg)
+          - **REOSC**: Stock and cash
 
         - **REORG**: Reorganization activity sub-types:
           - **WRM**: Worthless Removal
@@ -1008,6 +1014,9 @@ components:
         - PTR
           Pass Thru Rebate
 
+        - REO
+          Reorganization
+
         - REORG
           Reorg CA
 
@@ -1058,6 +1067,7 @@ components:
         - OPTRD
         - PTC
         - PTR
+        - REO
         - REORG
         - SPIN
         - SPLIT
@@ -1081,6 +1091,7 @@ components:
             - $ref: '#/components/schemas/NCActivityV2'
             - $ref: '#/components/schemas/FixedIncomeRedemptionActivityV2'
             - $ref: '#/components/schemas/FixedIncomeInterestActivityV2'
+            - $ref: '#/components/schemas/REOActivityV2'
             - $ref: '#/components/schemas/RightsDistributionActivityV2'
             - $ref: '#/components/schemas/RightsSubscriptionElectionActivityV2'
             - $ref: '#/components/schemas/TenderOfferActivityV2'
@@ -1398,13 +1409,13 @@ components:
               description: Total cash amount paid
               type: string
             entitled_qty:
-              description: Quantity of shares entitled to receive the dividend
+              description: Quantity of shares entitled to receive the dividend or return of capital
               type: string
           required:
             - entitled_qty
             - cash_payout
           type: object
-      description: Cash dividend
+      description: Cash-dividend related details. Used for both Cash Dividend and Return of Capital.
       type: object
     CSWActivityV2:
       allOf:
@@ -1474,7 +1485,10 @@ components:
           type: string
         foreign:
           description: Indicates if related to a non-US security
-          type: boolean
+          enum:
+            - 'true'
+            - 'false'
+          type: string
         isin:
           description: The ISIN of the security involved with the activity
           type: string
@@ -1493,7 +1507,10 @@ components:
           type: string
         special:
           description: Indicates if this is a special dividend
-          type: boolean
+          enum:
+            - 'true'
+            - 'false'
+          type: string
         symbol:
           description: The symbol of the security involved with the activity
           type: string
@@ -1685,6 +1702,74 @@ components:
         - $ref: '#/components/schemas/CommonNTAActivityV2'
       required:
         - group_id
+      type: object
+    CommonREOActivityV2:
+      description: |-
+        Reorganization (REO) activity sub-types:
+        - **REOS**: Stock only (1 or more stock legs)
+        - **REOC**: Cash only (one cash leg)
+        - **REOSC**: Stock and cash
+      properties:
+        cash_payout:
+          description: Cash payout amount
+          format: decimal
+          type: string
+        cash_rate:
+          description: Cash rate per share
+          format: decimal
+          type: string
+        cusip:
+          description: CUSIP received on this stock leg
+          type: string
+        effective_date:
+          description: Effective date of the reorganization
+          format: date
+          type: string
+        isin:
+          description: ISIN received on this stock leg
+          type: string
+        new_rate:
+          description: New ratio for this stock leg
+          format: decimal
+          type: string
+        payable_date:
+          description: Payable date of the reorganization
+          format: date
+          type: string
+        qty:
+          description: Quantity received on this stock leg
+          format: decimal
+          type: string
+        removed_qty:
+          description: Positive quantity removed from the source position
+          format: decimal
+          type: string
+        source_cusip:
+          description: CUSIP of the source security
+          type: string
+        source_isin:
+          description: ISIN of the source security
+          type: string
+        source_qty:
+          description: Source position quantity
+          format: decimal
+          type: string
+        source_rate:
+          description: Source ratio for this stock leg
+          format: decimal
+          type: string
+        source_symbol:
+          description: Symbol of the source security
+          example: CEPT
+          type: string
+        symbol:
+          description: Symbol received on this stock leg
+          example: SECZ
+          type: string
+      required:
+        - source_symbol
+        - source_cusip
+        - payable_date
       type: object
     CommonSDIVActivityV2:
       properties:
@@ -2204,7 +2289,10 @@ components:
               type: string
             foreign:
               description: Indicates if related to a non-US security
-              type: boolean
+              enum:
+                - 'true'
+                - 'false'
+              type: string
             isin:
               description: The ISIN of the security involved with the activity
               type: string
@@ -2223,7 +2311,10 @@ components:
               type: string
             special:
               description: Indicates if this is a special dividend
-              type: boolean
+              enum:
+                - 'true'
+                - 'false'
+              type: string
             symbol:
               description: The symbol of the security involved with the activity
               type: string
@@ -2802,6 +2893,7 @@ components:
             - OPTRD
             - PTC
             - PTR
+            - REO
             - REORG
             - SPIN
             - SPLIT
@@ -3995,6 +4087,12 @@ components:
       example: buy_to_open
       title: PositionIntent
       type: string
+    REOActivityV2:
+      allOf:
+        - $ref: '#/components/schemas/CommonCaActivityV2'
+        - $ref: '#/components/schemas/CommonREOActivityV2'
+      description: Reorganization (REO)
+      type: object
     ReverseSplitActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonSplitStockActivityV2'
@@ -4163,6 +4261,8 @@ components:
       enum:
         - xstocks
         - st0x
+        - binance
+        - coinbase
       example: xstocks
       title: TokenizationIssuer
       type: string
@@ -4234,6 +4334,8 @@ components:
         - ton
         - tron
         - mantle
+        - cronos
+        - hyperevm
       example: solana
       title: TokenizationNetwork
       type: string
@@ -7059,10 +7161,7 @@ paths:
           in: query
           name: issuer
           schema:
-            enum:
-              - xstocks
-            example: xstocks
-            type: string
+            $ref: '#/components/schemas/TokenizationIssuer'
         - description: Network of the tokenization requests to be queried
           in: query
           name: network
