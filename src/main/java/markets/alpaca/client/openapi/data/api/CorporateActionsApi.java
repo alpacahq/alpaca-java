@@ -1,6 +1,6 @@
 /*
  * Market Data API
- * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News. 
+ * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News. 
  *
  * The version of the OpenAPI document: 1.1
  * Contact: support@alpaca.markets
@@ -108,7 +108,7 @@ public class CorporateActionsApi {
      * @param limit Maximum number of corporate actions to return in a response. The limit applies to the total number of data points, not the count per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of corporate actions.  (optional, default to 100)
      * @param dataQuality Controls which corporate actions are returned based on data quality.  (optional, default to complete)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -208,7 +208,7 @@ public class CorporateActionsApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -231,7 +231,7 @@ public class CorporateActionsApi {
      * @param limit Maximum number of corporate actions to return in a response. The limit applies to the total number of data points, not the count per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of corporate actions.  (optional, default to 100)
      * @param dataQuality Controls which corporate actions are returned based on data quality.  (optional, default to complete)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return CorporateActionsResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -264,7 +264,7 @@ public class CorporateActionsApi {
      * @param limit Maximum number of corporate actions to return in a response. The limit applies to the total number of data points, not the count per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of corporate actions.  (optional, default to 100)
      * @param dataQuality Controls which corporate actions are returned based on data quality.  (optional, default to complete)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;CorporateActionsResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -298,7 +298,7 @@ public class CorporateActionsApi {
      * @param limit Maximum number of corporate actions to return in a response. The limit applies to the total number of data points, not the count per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of corporate actions.  (optional, default to 100)
      * @param dataQuality Controls which corporate actions are returned based on data quality.  (optional, default to complete)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -414,7 +414,7 @@ public class CorporateActionsApi {
         }
 
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
