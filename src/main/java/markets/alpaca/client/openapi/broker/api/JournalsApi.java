@@ -31,6 +31,7 @@ import markets.alpaca.client.openapi.broker.model.BatchJournalRequest;
 import markets.alpaca.client.openapi.broker.model.BatchJournalResponse;
 import markets.alpaca.client.openapi.broker.model.CreateJournalRequest;
 import markets.alpaca.client.openapi.broker.model.Error;
+import markets.alpaca.client.openapi.broker.model.JNLC;
 import markets.alpaca.client.openapi.broker.model.Journal;
 import markets.alpaca.client.openapi.broker.model.JournalStatus;
 import java.time.LocalDate;
@@ -904,9 +905,9 @@ public class JournalsApi {
 
     /**
      * Create a Reverse Batch Journal Transaction (Many-to-One)
-     * You can also create a batch journal request by using the following endpoint. This is enabled on JNLC for now only.  Note that if there is an invalid account_id the whole batch operation will be canceled. Every single request must be valid for the entire batch operation to succeed.  In the case of a successful request, the response will contain an array of journal objects with an extra attribute error_message in the case when a specific account fails to submit a journal.
+     * You can also create a batch journal request by using the following endpoint. This is enabled on JNLC for now only.  Note that if there is an invalid account_id the whole batch operation will be canceled. Every single request must be valid for the entire batch operation to succeed.  A successful response contains an array of JNLC journal objects. If any account or entry is invalid, the whole batch operation is canceled and no per-item error result is returned.
      * @param reverseBatchJournalRequest  (optional)
-     * @return List&lt;BatchJournalResponse&gt;
+     * @return List&lt;JNLC&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -918,16 +919,16 @@ public class JournalsApi {
         <tr><td> 404 </td><td> Account not found </td><td>  -  </td></tr>
      </table>
      */
-    public List<BatchJournalResponse> postV1JournalsReverseBatch(@javax.annotation.Nullable ReverseBatchJournalRequest reverseBatchJournalRequest) throws ApiException {
-        ApiResponse<List<BatchJournalResponse>> localVarResp = postV1JournalsReverseBatchWithHttpInfo(reverseBatchJournalRequest);
+    public List<JNLC> postV1JournalsReverseBatch(@javax.annotation.Nullable ReverseBatchJournalRequest reverseBatchJournalRequest) throws ApiException {
+        ApiResponse<List<JNLC>> localVarResp = postV1JournalsReverseBatchWithHttpInfo(reverseBatchJournalRequest);
         return localVarResp.getData();
     }
 
     /**
      * Create a Reverse Batch Journal Transaction (Many-to-One)
-     * You can also create a batch journal request by using the following endpoint. This is enabled on JNLC for now only.  Note that if there is an invalid account_id the whole batch operation will be canceled. Every single request must be valid for the entire batch operation to succeed.  In the case of a successful request, the response will contain an array of journal objects with an extra attribute error_message in the case when a specific account fails to submit a journal.
+     * You can also create a batch journal request by using the following endpoint. This is enabled on JNLC for now only.  Note that if there is an invalid account_id the whole batch operation will be canceled. Every single request must be valid for the entire batch operation to succeed.  A successful response contains an array of JNLC journal objects. If any account or entry is invalid, the whole batch operation is canceled and no per-item error result is returned.
      * @param reverseBatchJournalRequest  (optional)
-     * @return ApiResponse&lt;List&lt;BatchJournalResponse&gt;&gt;
+     * @return ApiResponse&lt;List&lt;JNLC&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -939,15 +940,15 @@ public class JournalsApi {
         <tr><td> 404 </td><td> Account not found </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<List<BatchJournalResponse>> postV1JournalsReverseBatchWithHttpInfo(@javax.annotation.Nullable ReverseBatchJournalRequest reverseBatchJournalRequest) throws ApiException {
+    public ApiResponse<List<JNLC>> postV1JournalsReverseBatchWithHttpInfo(@javax.annotation.Nullable ReverseBatchJournalRequest reverseBatchJournalRequest) throws ApiException {
         okhttp3.Call localVarCall = postV1JournalsReverseBatchValidateBeforeCall(reverseBatchJournalRequest, null);
-        Type localVarReturnType = new TypeToken<List<BatchJournalResponse>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<JNLC>>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
 
     /**
      * Create a Reverse Batch Journal Transaction (Many-to-One) (asynchronously)
-     * You can also create a batch journal request by using the following endpoint. This is enabled on JNLC for now only.  Note that if there is an invalid account_id the whole batch operation will be canceled. Every single request must be valid for the entire batch operation to succeed.  In the case of a successful request, the response will contain an array of journal objects with an extra attribute error_message in the case when a specific account fails to submit a journal.
+     * You can also create a batch journal request by using the following endpoint. This is enabled on JNLC for now only.  Note that if there is an invalid account_id the whole batch operation will be canceled. Every single request must be valid for the entire batch operation to succeed.  A successful response contains an array of JNLC journal objects. If any account or entry is invalid, the whole batch operation is canceled and no per-item error result is returned.
      * @param reverseBatchJournalRequest  (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
@@ -962,10 +963,10 @@ public class JournalsApi {
         <tr><td> 404 </td><td> Account not found </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call postV1JournalsReverseBatchAsync(@javax.annotation.Nullable ReverseBatchJournalRequest reverseBatchJournalRequest, final ApiCallback<List<BatchJournalResponse>> _callback) throws ApiException {
+    public okhttp3.Call postV1JournalsReverseBatchAsync(@javax.annotation.Nullable ReverseBatchJournalRequest reverseBatchJournalRequest, final ApiCallback<List<JNLC>> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = postV1JournalsReverseBatchValidateBeforeCall(reverseBatchJournalRequest, _callback);
-        Type localVarReturnType = new TypeToken<List<BatchJournalResponse>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<JNLC>>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
     }

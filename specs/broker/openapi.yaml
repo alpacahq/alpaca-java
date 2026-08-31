@@ -381,13 +381,6 @@ components:
         trail_price: null
         type: limit
         updated_at: '2023-12-12T21:35:49.102504673Z'
-    SystemEventV2:
-      value:
-        at: '2026-01-05T10:28:23.163857Z'
-        description: End-of-day balances are now available.
-        event_id: 01F535Y1FVY8WZHE763HCNS8SZ
-        system_date: '2026-01-05'
-        type: eod_balances_ready
     TradeUpdateEventV2MultilegOptionsFill:
       value:
         account_id: 529248ad-c4cc-4a50-bea4-6bfd2953f83a
@@ -640,6 +633,7 @@ components:
           - OPEXP
           - OPTRD
           - PTC
+          - REO
           - REORG
           - SPIN
           - SPLIT
@@ -1065,6 +1059,41 @@ components:
         - $ref: '#/components/schemas/CommonAcatActivityV2'
       description: Automated customer account transfer service (cash)
       type: object
+    AcatsAccountType:
+      description: Account type, as represented by DTCC
+      enum:
+        - AGENCY
+        - BANK_CUSTODY
+        - BENEFICIARY
+        - BENEFICIARY_ROTH_IRA
+        - CORPORATE
+        - CO_TRUSTEE
+        - COVERDELL_IRA
+        - CUSTODIAN_UGMA
+        - DIRECT_ROLLOVER
+        - ESTATE
+        - HSA
+        - IRA
+        - JOINT
+        - MEDICAL_SAVINGS_ACCOUNT
+        - OTHER
+        - QUALIFIED_OR_PROFIT_SHARING_OR_PENSION
+        - ROTH_401K
+        - ROTH_IRA
+        - ROTH_SEP
+        - ROTH_SIMPLE
+        - ROTH_SOLO_401K
+        - SARSEP
+        - SEP_IRA
+        - SIMPLE_IRA
+        - SINGLE
+        - SOLO_401K
+        - TRUST
+        - TYPE_401K
+        - TYPE_403B
+        - TYPE_457_PLAN
+        - TYPE_529_PLAN
+      type: string
     AcatsActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonNTAActivityV2'
@@ -1078,8 +1107,637 @@ components:
           type: object
       description: Automated customer account transfer service (stock)
       type: object
+    AcatsAsset:
+      description: An asset included in an ACATS transfer.
+      example:
+        amount: '24223.62'
+        asset_class: EQUITY
+        asset_description: APPLE INC
+        currency_code: USD
+        cusip: '037833100'
+        position: LONG
+        qty: '123'
+        status: SETTLED
+        symbol: AAPL
+      properties:
+        amount:
+          description: Positive number indicating the market value of the assets being transferred
+          format: decimal
+          type: string
+        asset_class:
+          description: Asset type
+          enum:
+            - EQUITY
+            - CASH
+            - OPTION
+            - OTHER
+          type: string
+        asset_description:
+          description: Description, usually from DTCC's Security Master File
+          type: string
+        currency_code:
+          description: ISO currency code in which amount is denominated
+          type: string
+        cusip:
+          description: CUSIP security identifier for the asset. Only returned when a CUSIP was provided for this asset at the time the transfer was initiated, in which case it is returned alongside `symbol`.
+          type: string
+        isin:
+          deprecated: true
+          description: ISIN for the asset. DEPRECATED -- will be removed in a future version; use `symbol` or `cusip` instead. Temporarily returned with all assets for backward compatibility.
+          type: string
+          x-deprecation:
+            reason: Use `symbol` or `cusip` instead. Returned with all assets only for backward compatibility while consumers migrate.
+            since: '2026-08-04'
+            sunset: '2027-02-04'
+        position:
+          $ref: '#/components/schemas/AcatsPosition'
+        qty:
+          description: Positive number indicating how many shares or units are being transferred
+          format: decimal
+          type: string
+        rejection_message:
+          description: Human readable reason for why an asset is considered ineligible for transfer
+          type: string
+        status:
+          description: Status
+          enum:
+            - NOT_VALIDATED
+            - REQUESTED
+            - DELETED
+            - SETTLED
+            - REVERSED
+            - INTERFACE_REJECTED
+          type: string
+        symbol:
+          description: Symbol identifier for the asset. Always returned when a symbol is known for the asset, including when the transfer was initiated with a CUSIP.
+          type: string
+      required:
+        - asset_class
+        - asset_description
+        - status
+        - position
+      type: object
+    AcatsCashBalance:
+      description: Cash balance
+      example:
+        amount: '10000'
+        currency: USD
+      properties:
+        amount:
+          description: 'Amount of cash to be transferred. Can be positive or negative. Use `transfer_all` to transfer the entire balance instead of specifying an amount -- `amount` and `transfer_all: true`
+            are mutually exclusive, and sending both is rejected with HTTP 400.'
+          format: decimal
+          type: string
+        currency:
+          description: Currency of the cash balance. Only `USD` is currently supported; any other value is rejected with HTTP 400. Each currency may appear at most once in the `cash` array.
+          enum:
+            - USD
+          type: string
+        transfer_all:
+          description: Set to true to transfer the entire balance of this currency. Must not be combined with `amount`. Setting it to `false` without an `amount` is rejected with HTTP 400.
+          type: boolean
+      required:
+        - currency
+      type: object
+    AcatsContraAccountDetails:
+      description: Contra account details
+      example:
+        account_number: 12345678A
+        broker_number: '1234'
+        customer_name: John Smith
+        customer_tax_id: '911923333'
+      properties:
+        account_number:
+          description: Account number at the contra broker
+          type: string
+        broker_name:
+          description: Name of the contra broker (non-functional, used for auditability and display purposes)
+          maxLength: 100
+          minLength: 1
+          type: string
+        broker_number:
+          description: Clearing number of the contra broker
+          type: string
+        customer_name:
+          description: Name on the account at the contra broker
+          type: string
+        customer_tax_id:
+          description: Tax ID on the account at the contra broker
+          type: string
+      required:
+        - account_number
+        - customer_name
+        - customer_tax_id
+        - broker_number
+      type: object
+    AcatsContraBroker:
+      description: A contra broker or bank participating in ACATS, identified by its DTCC account number.
+      properties:
+        name:
+          description: Participant name
+          type: string
+        number:
+          description: DTCC account number
+          type: string
+        type:
+          $ref: '#/components/schemas/AcatsContraBrokerType'
+      required:
+        - number
+        - type
+        - name
+      type: object
+    AcatsContraBrokerType:
+      description: ACATS participant type
+      enum:
+        - BANK
+        - BROKER
+      type: string
+    AcatsDtccStatus:
+      description: Transfer status as tracked by DTCC
+      enum:
+        - REQUEST
+        - REQUEST_ADJUST
+        - REQUEST_ADJUST_PAST
+        - REQUEST_PAST
+        - REQUEST_REJECT
+        - REVIEW
+        - REVIEW_ADJUST_DELIVERER
+        - REVIEW_ERROR
+        - REVIEW_ACCELERATE
+        - REVIEW_ADJUST_RECEIVER_ACCELERATE
+        - SETTLE_PREP
+        - SETTLE_CLOSE
+        - CLOSE_PURGE
+        - REQUEST_PTR
+        - MEMO_PURGE_PARTIAL_TRANSFER_REQUEST_RECEIVER
+        - REJECT
+        - SYSTEM_REJECTED
+      type: string
+    AcatsDtccTransferType:
+      description: ACATS transfer type
+      enum:
+        - FUL
+        - FRV
+        - MFC
+        - PTD
+        - PTR
+        - RCL
+        - RCR
+        - PTF
+      type: string
+    AcatsEquity:
+      description: 'Equity asset requested in a partial transfer. Identify the security with either `cusip` or `symbol` -- provide one, not both. Prefer `cusip` when you have it: it is a stable, unambiguous
+        identifier. Use `symbol` only when a CUSIP is not available, as ticker symbols can change or be reused over time.'
+      example:
+        position: LONG
+        qty: '2'
+        symbol: AAPL
+      oneOf:
+        - required:
+            - cusip
+            - position
+        - required:
+            - symbol
+            - position
+      properties:
+        cusip:
+          description: CUSIP security identifier for the asset -- 8 uppercase alphanumeric characters followed by a check character, which may be a digit or one of `*`, `@`, `#`. Recommended over `symbol`
+            for unambiguous identification. Provide either `cusip` or `symbol`, not both.
+          pattern: ^[0-9A-Z]{8}[0-9*@#]$
+          type: string
+        position:
+          description: Position type. Only `LONG` and `SHORT` are accepted for equities -- `CREDIT` and `DEBIT` apply to cash positions and are rejected with HTTP 400 here.
+          enum:
+            - LONG
+            - SHORT
+          type: string
+        qty:
+          description: 'Quantity of assets to transfer. Use `transfer_all` to transfer the entire position instead of specifying a quantity -- `qty` and `transfer_all: true` are mutually exclusive, and
+            sending both is rejected with HTTP 400. Note that the ACATS system will only transfer whole shares.'
+          format: decimal
+          type: string
+        symbol:
+          description: Stock ticker symbol (e.g. `AAPL`, `BRK.B`, `GOOGL`). Up to 6 alphanumeric characters, optionally followed by a single `.` or `-` separator and a 1-5 letter suffix. Values are trimmed
+            and upper-cased before validation. Use only when a CUSIP is not available, since symbols can change or be reused over time. Provide either `cusip` or `symbol`, not both.
+          pattern: ^[A-Z0-9]{1,6}([-.][A-Z]{1,5})?$
+          type: string
+        transfer_all:
+          description: Set to true to transfer the entire balance of this asset. Must not be combined with `qty`. Setting it to `false` without a `qty` is rejected with HTTP 400.
+          type: boolean
+      type: object
+    AcatsError:
+      description: Body for responses with HTTP status codes indicating an error
+      example:
+        message: contra broker number is required
+      properties:
+        message:
+          type: string
+      required:
+        - message
+      type: object
+    AcatsInitiateTransferDetails:
+      description: |
+        Transfer details. The two transfer types are mutually exclusive in what they accept:
+        - `FULL`: do not include the `cash` or `securities` objects (the entire account will be transferred). Including either is rejected with HTTP 400.
+        - `PARTIAL`: specify which assets to transfer using the `cash` and/or `securities` objects. At least one of the two must be present and non-empty, otherwise the request is rejected with HTTP 400.
+      example:
+        cash:
+          - amount: '10000'
+            currency: USD
+        securities:
+          equities:
+            - cusip: '037833100'
+              position: LONG
+              qty: '2'
+            - cusip: 78462F103
+              position: SHORT
+        type: PARTIAL
+      oneOf:
+        - description: Transfers the entire account. Must not carry `cash` or `securities`.
+          not:
+            anyOf:
+              - required:
+                  - cash
+              - required:
+                  - securities
+          properties:
+            type:
+              enum:
+                - FULL
+              type: string
+          title: Full transfer
+        - anyOf:
+            - properties:
+                cash:
+                  minItems: 1
+                  type: array
+              required:
+                - cash
+            - properties:
+                securities:
+                  properties:
+                    equities:
+                      minItems: 1
+                      type: array
+                  required:
+                    - equities
+                  type: object
+              required:
+                - securities
+          description: Transfers selected assets. Must carry a non-empty `cash` array, a non-empty `securities.equities` array, or both.
+          properties:
+            type:
+              enum:
+                - PARTIAL
+              type: string
+          title: Partial transfer
+      properties:
+        cash:
+          description: Cash amounts to transfer. Only used for PARTIAL transfers. Must not be included for FULL transfers.
+          items:
+            $ref: '#/components/schemas/AcatsCashBalance'
+          type: array
+        securities:
+          allOf:
+            - $ref: '#/components/schemas/AcatsSecurities'
+          description: Securities to transfer. Only used for PARTIAL transfers. Must not be included for FULL transfers.
+        type:
+          $ref: '#/components/schemas/AcatsInitiateTransferType'
+      required:
+        - type
+      type: object
+    AcatsInitiateTransferRequest:
+      description: Request body for initiating an incoming ACATS transfer.
+      example:
+        contra_account_details:
+          account_number: A00000123
+          broker_number: '0158'
+          customer_name: Jane Doe
+          customer_tax_id: '123456789'
+        ip_address: 203.0.113.42
+        signed_at: '2026-04-29T13:00:00Z'
+        transfer_details:
+          cash:
+            - amount: '10000'
+              currency: USD
+          securities:
+            equities:
+              - position: LONG
+                qty: '2'
+                symbol: AAPL
+              - cusip: '123456789'
+                position: LONG
+                qty: '5'
+              - position: SHORT
+                symbol: TSLA
+          type: PARTIAL
+      properties:
+        contra_account_details:
+          $ref: '#/components/schemas/AcatsContraAccountDetails'
+        ip_address:
+          description: IP address from which the account holder initiated the transfer (IPv4 or IPv6)
+          example: 203.0.113.42
+          type: string
+        signed_at:
+          description: Timestamp at which the account holder signed/authorized the transfer. Must be within the last week and must not be in the future (a 5 minute grace period absorbs clock skew); values
+            outside that window are rejected with HTTP 400.
+          example: '2026-04-29T13:00:00Z'
+          format: date-time
+          type: string
+        transfer_details:
+          $ref: '#/components/schemas/AcatsInitiateTransferDetails'
+        validate_account_number:
+          default: false
+          description: Whether to validate the contra account number against the contra broker's configured format rules. Defaults to false (no per-broker format check). Set to true to opt in, in which
+            case a number that matches none of the broker's enabled rules is rejected with HTTP 422.
+          type: boolean
+      required:
+        - contra_account_details
+        - transfer_details
+        - ip_address
+        - signed_at
+      type: object
+    AcatsInitiateTransferResponse:
+      description: Response returned when an ACATS transfer has been accepted for processing.
+      properties:
+        acats_id:
+          description: The ID of the ACATS transfer that was just initiated
+          example: 2c827687-ddd3-4ad9-bee8-0a3cdad35301
+          type: string
+      required:
+        - acats_id
+      type: object
+    AcatsInitiateTransferType:
+      description: Transfer type
+      enum:
+        - FULL
+        - PARTIAL
+      type: string
+    AcatsListAssetsResponse:
+      description: The list of assets associated with an ACATS transfer.
+      example:
+        - asset_class: EQUITY
+          asset_description: APPLE INC
+          cusip: '037833100'
+          position: LONG
+          qty: '10'
+          status: SETTLED
+          symbol: AAPL
+        - amount: '1250.75'
+          asset_class: CASH
+          asset_description: US DOLLAR
+          currency_code: USD
+          position: CREDIT
+          status: SETTLED
+      items:
+        $ref: '#/components/schemas/AcatsAsset'
+      type: array
+    AcatsListContraBrokersResponse:
+      description: Response containing the list of valid ACATS contra brokers.
+      example:
+        brokers:
+          - name: Example Brokerage Inc.
+            number: '0001'
+            type: BROKER
+          - name: Example Bank, N.A.
+            number: '0002'
+            type: BANK
+      properties:
+        brokers:
+          items:
+            $ref: '#/components/schemas/AcatsContraBroker'
+          type: array
+      type: object
+    AcatsListTransfersResponse:
+      description: A page of ACATS transfers, with optional pagination tokens.
+      example:
+        page_token_next: eyJjcmVhdGVkX2F0IjoiMjAyNi0wNC0yOFQxNDozMDowMFoiLCJpZCI6IjAxQUJDIn0=
+        pending_transfers: 37
+        transfers:
+          - acats_id: 2c827687-ddd3-4ad9-bee8-0a3cdad35301
+            account_id: 9ac16d7d-1f6e-445b-8e51-807e77ba2902
+            account_name: John Doe
+            account_number: '12345678'
+            account_type: SINGLE
+            contra_account_number: A00000123
+            contra_broker_name: Alpaca Clearing
+            contra_broker_number: '00001234'
+            contra_broker_type: BANK
+            created_at: '2026-04-21T12:41:03.505862Z'
+            direction: INCOMING
+            ip_address: 203.0.113.42
+            rejection_details:
+              rejection_message: SS# Tax ID Mismatch
+              rejection_reason: SS_TAX_ID_MISMATCH
+            status:
+              dtcc_status: REJECT
+              transfer_status: REJECTED
+            total_transfer_value: '24223.62'
+            transfer_identifier: '03251237654321'
+            transfer_type: FUL
+      properties:
+        page_token_next:
+          allOf:
+            - $ref: '#/components/schemas/AcatsPageToken'
+          description: Page token for the next page of transfers. Pass it back in the `page_token` query parameter to fetch that page. Not returned when the caller is on the last page.
+        page_token_previous:
+          allOf:
+            - $ref: '#/components/schemas/AcatsPageToken'
+          description: Page token for the previous page of transfers. Pass it back in the `page_token` query parameter to fetch that page. Not returned when the caller is on the first page.
+        pending_transfers:
+          description: The count of ACATS transfers pending review
+          example: 37
+          format: int32
+          type: integer
+        transfers:
+          items:
+            $ref: '#/components/schemas/AcatsTransfer'
+          type: array
+      required:
+        - transfers
+      type: object
+    AcatsPageToken:
+      description: Page token, pass it back unchanged in the `page_token` query parameter to fetch the next or previous page.
+      example: eyJjcmVhdGVkX2F0IjoiMjAyNi0wNC0yOFQxNDozMDowMFoiLCJpZCI6IjAxQUJDIn0=
+      type: string
+    AcatsPosition:
+      description: Position type. `LONG` and `SHORT` apply to security positions; `CREDIT` and `DEBIT` apply to cash positions.
+      enum:
+        - LONG
+        - SHORT
+        - CREDIT
+        - DEBIT
+      type: string
+    AcatsRejectionDetails:
+      description: Why the transfer was rejected, only present on transfers in rejected status
+      properties:
+        rejection_message:
+          description: Human readable message regarding the reason for the rejection
+          type: string
+        rejection_reason:
+          description: Rejection reason, as returned by DTCC
+          enum:
+            - SS_TAX_ID_MISMATCH
+            - ACCOUNT_TITLE_MISMATCH
+            - DOCUMENTATION_NEEDED
+            - ACCOUNT_FLAT
+            - INVALID_ACCOUNT_NUMBER
+            - DUPLICATE
+            - ACCOUNT_IN_DISTRIBUTION_OR_TRANSFER
+            - CLIENT_RESCINDED
+            - MISSING_AUTHORIZATION_SIGNATURE
+            - ACCOUNT_VIOLATES_CREDIT_POLICY_OF_RECEIVING_FIRM
+            - UNRECOGNIZED_FOR_RESIDUAL_CREDIT_BALANCE
+            - PARTIAL_TRANSFER_DELIVERER_INITIATED_REJECT
+            - FAIL_REVERSAL_REJECT
+            - RECLAIM_REJECT
+            - MUTUAL_FUND_CLEANUP
+            - SYSTEM_REJECTED
+            - INVALID_PARTICIPANT
+            - ASSOCIATED_RECORD_NOT_PRESENT_OR_INVALID
+            - MISSED_CUTOFF
+          type: string
+      type: object
+    AcatsSecurities:
+      description: List of securities to transfer
+      properties:
+        equities:
+          items:
+            $ref: '#/components/schemas/AcatsEquity'
+          type: array
+      type: object
+    AcatsSortDirection:
+      default: DESC
+      description: Sort direction for list results.
+      enum:
+        - ASC
+        - DESC
+      type: string
+    AcatsStatusDetails:
+      description: Status details
+      properties:
+        dtcc_status:
+          $ref: '#/components/schemas/AcatsDtccStatus'
+        transfer_status:
+          $ref: '#/components/schemas/AcatsTransferStatus'
+      type: object
+    AcatsTimestamp:
+      description: Timestamp in RFC-3339 format with microsecond precision
+      example: '2026-01-01T00:00:00Z'
+      format: date-time
+      type: string
+    AcatsTransfer:
+      description: An ACATS transfer and its current status.
+      example:
+        acats_id: 2c827687-ddd3-4ad9-bee8-0a3cdad35301
+        account_id: 9ac16d7d-1f6e-445b-8e51-807e77ba2902
+        account_name: John Doe
+        account_number: '12345678'
+        account_type: SINGLE
+        contra_account_number: A00000123
+        contra_broker_name: Alpaca Clearing
+        contra_broker_number: '00001234'
+        contra_broker_type: BANK
+        created_at: '2026-04-21T12:41:03.505862Z'
+        direction: INCOMING
+        ip_address: 203.0.113.42
+        rejection_details:
+          rejection_message: SS# Tax ID Mismatch
+          rejection_reason: SS_TAX_ID_MISMATCH
+        status:
+          dtcc_status: REJECT
+          transfer_status: REJECTED
+        total_transfer_value: '24223.62'
+        transfer_identifier: '03251237654321'
+        transfer_type: FUL
+      properties:
+        acats_id:
+          description: The ID of the ACATS transfer
+          format: uuid
+          type: string
+        account_id:
+          description: Account ID associated with the ACATS transfer
+          format: uuid
+          type: string
+        account_name:
+          description: Name on the Alpaca account associated with the transfer
+          type: string
+        account_number:
+          description: Account number at Alpaca
+          type: string
+        account_type:
+          $ref: '#/components/schemas/AcatsAccountType'
+        contra_account_number:
+          description: Account number at the contra broker
+          type: string
+        contra_broker_name:
+          description: Name of the contra broker
+          type: string
+        contra_broker_number:
+          description: DTCC account number for the contra broker
+          type: string
+        contra_broker_type:
+          $ref: '#/components/schemas/AcatsContraBrokerType'
+        created_at:
+          $ref: '#/components/schemas/AcatsTimestamp'
+        direction:
+          $ref: '#/components/schemas/AcatsTransferDirection'
+        ip_address:
+          description: User's IP address (IPv4 or IPv6) at time of submission
+          type: string
+        original_transfer_identifier:
+          description: DTCC transfer identifier for a previous, related transfer
+          type: string
+        rejection_details:
+          $ref: '#/components/schemas/AcatsRejectionDetails'
+        settlement_date:
+          $ref: '#/components/schemas/AcatsTimestamp'
+        status:
+          $ref: '#/components/schemas/AcatsStatusDetails'
+        total_transfer_value:
+          description: Total transfer value is the sum of the market value of all assets and securities in an ACAT at the time of settlement, plus any cash balance.
+          format: decimal
+          type: string
+        transfer_identifier:
+          description: DTCC transfer identifier, also known as the control number
+          type: string
+        transfer_type:
+          $ref: '#/components/schemas/AcatsDtccTransferType'
+      required:
+        - acats_id
+        - account_id
+        - account_number
+        - created_at
+        - contra_account_number
+        - contra_broker_number
+        - transfer_type
+        - direction
+        - status
+      type: object
+    AcatsTransferDirection:
+      description: Transfer direction
+      enum:
+        - INCOMING
+        - OUTGOING
+      type: string
+    AcatsTransferStatus:
+      description: Transfer status as tracked by Alpaca
+      enum:
+        - PENDING
+        - IN_PROGRESS
+        - REJECTED
+        - SETTLED
+      type: string
     Account:
       description: Represents high level account info. Used when returning entire account information would not be useful like the getAllAccounts operation
+      examples:
+        - account_number: '9034005019'
+          created_at: '2019-09-30T23:55:31.185998Z'
+          currency: USD
+          id: 0d18ae51-3c94-4511-b209-101e1666416b
+          last_equity: '1500.65'
+          primary_account_holder_id: null
+          status: APPROVED
       properties:
         account_number:
           description: A human-readable account number that can be shown to the end user
@@ -1156,15 +1814,6 @@ components:
         - created_at
         - last_equity
       type: object
-      x-examples:
-        example-1:
-          account_number: '9034005019'
-          created_at: '2019-09-30T23:55:31.185998Z'
-          currency: USD
-          id: 0d18ae51-3c94-4511-b209-101e1666416b
-          last_equity: '1500.65'
-          primary_account_holder_id: null
-          status: APPROVED
     AccountCashInterestEvent:
       description: |
         This property is included when the account's cash interest program had changed due to an enrollment, APR tier change, or unenrollment.
@@ -1432,6 +2081,70 @@ components:
     AccountExtended:
       description: Represents an account with all data available. If your api response is missing some of these fields, there is a good chance you are using a route that returns `Account` instances instead
         of these.
+      examples:
+        - account_number: '601842165'
+          account_type: trading
+          agreements:
+            - agreement: margin_agreement
+              ip_address: 127.0.0.1
+              revision: 16.2021.05
+              signed_at: '2022-01-21T21:25:26.579487214Z'
+            - agreement: customer_agreement
+              ip_address: 127.0.0.1
+              revision: 22.2024.08
+              signed_at: '2022-01-21T21:25:26.579487214Z'
+          beneficiaries:
+            - date_of_birth: '1970-01-01'
+              family_name: Smith
+              given_name: John
+              middle_name: P
+              relationship: spouse
+              share_pct: '100'
+              tax_id: xxx-xx-xxxx
+              tax_id_type: USA_SSN
+              type: primary
+          contact:
+            city: San Mateo
+            country: USA
+            email_address: strange_elbakyan_97324509@example.com
+            phone_number: 614-555-0697
+            postal_code: '94401'
+            state: CA
+            street_address:
+              - 20 N San Mateo Dr
+          created_at: '2022-01-21T21:25:26.583576Z'
+          crypto_status: INACTIVE
+          currency: USD
+          disclosures:
+            immediate_family_exposed: false
+            is_affiliated_exchange_or_finra: false
+            is_control_person: false
+            is_discretionary: false
+            is_politically_exposed: false
+          documents:
+            - content: https://example.com/documents/identity-verification.jpg
+              created_at: '2022-01-21T21:25:28.184231Z'
+              document_sub_type: passport
+              document_type: identity_verification
+              id: d5af1585-6c60-494d-9ea5-c5df62704229
+          id: 3dcb795c-3ccc-402a-abb9-07e26a1b1326
+          identity:
+            country_of_birth: USA
+            country_of_citizenship: USA
+            country_of_tax_residence: USA
+            date_of_birth: '1970-01-01'
+            family_name: Elbakyan
+            funding_source:
+              - employment_income
+            given_name: Strange
+            tax_id_type: USA_SSN
+          last_equity: '40645.13'
+          primary_account_holder_id: null
+          status: ACTIVE
+          trusted_contact:
+            email_address: strange_elbakyan_97324509@example.com
+            family_name: Doe
+            given_name: Jane
       properties:
         account_name:
           type: string
@@ -1565,77 +2278,6 @@ components:
         - created_at
         - account_type
       type: object
-      x-examples:
-        example-1:
-          account_number: '601842165'
-          account_sub_type: null
-          account_type: trading
-          agreements:
-            - agreement: margin_agreement
-              ip_address: 127.0.0.1
-              revision: 16.2021.05
-              signed_at: '2022-01-21T21:25:26.579487214Z'
-            - agreement: customer_agreement
-              ip_address: 127.0.0.1
-              revision: 22.2024.08
-              signed_at: '2022-01-21T21:25:26.579487214Z'
-          beneficiaries:
-            - date_of_birth: '1970-01-01'
-              family_name: Smith
-              given_name: John
-              middle_name: P
-              relationship: spouse
-              share_pct: '100'
-              tax_id: xxx-xx-xxxx
-              tax_id_type: USA_SSN
-              type: primary
-          contact:
-            city: San Mateo
-            country: USA
-            email_address: strange_elbakyan_97324509@example.com
-            phone_number: 614-555-0697
-            postal_code: '94401'
-            state: CA
-            street_address:
-              - 20 N San Mateo Dr
-          created_at: '2022-01-21T21:25:26.583576Z'
-          crypto_status: INACTIVE
-          currency: USD
-          disclosures:
-            immediate_family_exposed: false
-            is_affiliated_exchange_or_finra: false
-            is_control_person: false
-            is_discretionary: false
-            is_politically_exposed: false
-          documents:
-            - content: https://s3.amazonaws.com/stg.alpaca.markets/documents/accounts/3dcb795c-3ccc-402a-abb9-07e26a1b1326/2490f5d9-8988-4405-a3e0-d76e65de13c2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAJLDF4SCWSL6HUQKA%2F20220210%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20220210T162205Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=bc6cc0f541d569623f3973fb83734d7960a69886e8b175a9d472f666b87419f1
-              created_at: '2022-01-21T21:25:28.184231Z'
-              document_sub_type: passport
-              document_type: identity_verification
-              id: d5af1585-6c60-494d-9ea5-c5df62704229
-          id: 3dcb795c-3ccc-402a-abb9-07e26a1b1326
-          identity:
-            country_of_birth: USA
-            country_of_citizenship: USA
-            country_of_tax_residence: USA
-            date_of_birth: '1970-01-01'
-            date_of_departure_from_usa: null
-            family_name: Elbakyan
-            funding_source:
-              - employment_income
-            given_name: Strange
-            permanent_resident: null
-            tax_id_type: USA_SNN
-            visa_expiration_date: null
-            visa_type: null
-          last_equity: '40645.13'
-          primary_account_holder_id: null
-          status: ACTIVE
-          trading_configurations: null
-          trusted_contact:
-            email_address: strange_elbakyan_97324509@example.com
-            family_name: Doe
-            given_name: Jane
     AccountFPSLEvent:
       description: |
         This property is included when the account's FPSL information had changed due to an enrollment, tier change, or unenrollment.
@@ -1738,6 +2380,8 @@ components:
         Possible Values:
         - **INACTIVE**
         Account not set to trade given asset.
+        - **PAPER_ONLY**
+        The account is limited to paper trading.
         - **ONBOARDING**
         An application is expected for this user, but has not been submitted yet.
         - **SUBMITTED**
@@ -1760,6 +2404,7 @@ components:
         The account is closed.
       enum:
         - INACTIVE
+        - PAPER_ONLY
         - ONBOARDING
         - SUBMITTED
         - SUBMISSION_FAILED
@@ -1775,6 +2420,13 @@ components:
     AccountStatusEvent:
       description: |
         Represents a change to certain account properties, sent over the events streaming API.
+      examples:
+        - account_id: 4db36989-6565-4011-9126-39fe6b3d9bf6
+          at: '2021-06-14T09:59:15.232782Z'
+          event_id: 122039
+          event_ulid: 01F84ZC0H0Q1QN7XPNWX44HF5J
+          status_from: ''
+          status_to: APPROVED
       properties:
         account_blocked:
           description: If true the account was blocked, if false, the account got unblocked
@@ -1836,16 +2488,6 @@ components:
         - event_ulid
       title: AccountStatusEvent
       type: object
-      x-examples:
-        example-1:
-          account_id: 4db36989-6565-4011-9126-39fe6b3d9bf6
-          account_number: ''
-          at: '2021-06-14T09:59:15.232782Z'
-          event_id: 122039
-          event_ulid: 01F84ZC0H0Q1QN7XPNWX44HF5J
-          kyc_results: null
-          status_from: ''
-          status_to: APPROVED
     AccountSubType:
       description: |-
         IRA Account only
@@ -1904,43 +2546,8 @@ components:
       title: AccountType
       type: string
     AccountUpdateRequest:
-      properties:
-        agreements:
-          description: Additional agreements, or new revisions of existing agreements, read and signed by the account holder.
-          items:
-            $ref: '#/components/schemas/Agreement'
-          type: array
-        allow_instant_ach:
-          description: If provided, updates whether the account is enabled for Instant ACH by the partner. Omitting the field leaves the current setting unchanged.
-          type: boolean
-        beneficiaries:
-          items:
-            $ref: '#/components/schemas/Beneficiary'
-          type: array
-        cash_interest:
-          $ref: '#/components/schemas/AccountCashInterestPatch'
-        contact:
-          $ref: '#/components/schemas/Contact'
-        disclosures:
-          $ref: '#/components/schemas/Disclosures'
-        fpsl:
-          $ref: '#/components/schemas/AccountFPSLPatch'
-        identity:
-          $ref: '#/components/schemas/Identity'
-        primary_account_holder_id:
-          description: |
-            The UUID of the primary account holder. This field is immutable after the account is created.
-
-            - Omitting the field, or supplying the value already associated with the account, is a no-op.
-            - Supplying a value different from the current primary account holder returns HTTP 400.
-          format: uuid
-          type: string
-        trusted_contact:
-          $ref: '#/components/schemas/TrustedContact'
-      type: object
-      x-examples:
-        example-1:
-          beneficiaries:
+      examples:
+        - beneficiaries:
             - date_of_birth: '1970-01-01'
               family_name: Smith
               given_name: John
@@ -1979,6 +2586,40 @@ components:
             email_address: jane.doe@example.com
             family_name: Doe
             given_name: Jane
+      properties:
+        agreements:
+          description: Additional agreements, or new revisions of existing agreements, read and signed by the account holder.
+          items:
+            $ref: '#/components/schemas/Agreement'
+          type: array
+        allow_instant_ach:
+          description: If provided, updates whether the account is enabled for Instant ACH by the partner. Omitting the field leaves the current setting unchanged.
+          type: boolean
+        beneficiaries:
+          items:
+            $ref: '#/components/schemas/Beneficiary'
+          type: array
+        cash_interest:
+          $ref: '#/components/schemas/AccountCashInterestPatch'
+        contact:
+          $ref: '#/components/schemas/Contact'
+        disclosures:
+          $ref: '#/components/schemas/Disclosures'
+        fpsl:
+          $ref: '#/components/schemas/AccountFPSLPatch'
+        identity:
+          $ref: '#/components/schemas/Identity'
+        primary_account_holder_id:
+          description: |
+            The UUID of the primary account holder. This field is immutable after the account is created.
+
+            - Omitting the field, or supplying the value already associated with the account, is a no-op.
+            - Supplying a value different from the current primary account holder returns HTTP 400.
+          format: uuid
+          type: string
+        trusted_contact:
+          $ref: '#/components/schemas/TrustedContact'
+      type: object
     Activity:
       allOf:
         - properties:
@@ -2099,8 +2740,13 @@ components:
 
         Full mapping of `activity_type` to `activity_sub_type`:
 
+        - **CGD**: Capital Gains Distribution activity sub-types:
+          - **LTCG**: Long-Term Capital Gain
+          - **STCG**: Short-Term Capital Gain
+
         - **DIV**: Dividend activity sub-types:
           - **CDIV**: Cash Dividend
+          - **ROC**: Return of Capital
           - **SDIV**: Stock Dividend
           - **SPD**: Substitute Payment In Lieu Of Dividend
 
@@ -2146,7 +2792,12 @@ components:
           - **SPLIT.RSPLIT**: Reverse Stock Split
           - **SPLIT.USPLIT**: Unit Split
 
-        - **REORG**: Reorganization activity sub-types:
+        - **REO**: Reorganization activity sub-types:
+          - **REOS**: Stock only (1 or more stock legs)
+          - **REOC**: Cash only (one cash leg)
+          - **REOSC**: Stock and cash
+
+        - **REORG**: Activity sub-types:
           - **WRM**: Worthless Removal
 
         - **SPLIT**: Stock Split activity sub-types:
@@ -2179,7 +2830,7 @@ components:
         - **ACATS**
           ACATS IN/OUT (Securities)
         - **CGD**
-          Capital Gain Distribution
+          Capital Gains Distribution
         - **CIL**
           Cash in Lieu of Stock
         - **CSD**
@@ -2189,9 +2840,9 @@ components:
         - **DIV**
           Dividend
         - **DIVCGL**
-          Dividend (Capital Gain Long Term)
+          Dividend (Capital Gains Long Term)
         - **DIVCGS**
-          Dividend (Capital Gain Short Term)
+          Dividend (Capital Gains Short Term)
         - **DIVNRA**
           Dividend Adjusted (NRA Withheld)
         - **DIVROC**
@@ -2222,8 +2873,10 @@ components:
           Merger/Acquisition
         - **PTC**
           Pass Thru Change
+        - **REO**
+          Reorganization
         - **REORG**
-          Reorg CA
+          Worthless removal CA
         - **SPIN**
           Stock Spinoff
         - **SPLIT**
@@ -2258,6 +2911,7 @@ components:
         - OPEXP
         - OPTRD
         - PTC
+        - REO
         - REORG
         - SPIN
         - SPLIT
@@ -2271,6 +2925,7 @@ components:
             - $ref: '#/components/schemas/DIVSPDActivityV2'
             - $ref: '#/components/schemas/CDIVActivityV2'
             - $ref: '#/components/schemas/SDIVActivityV2'
+            - $ref: '#/components/schemas/CGDActivityV2'
             - $ref: '#/components/schemas/ForwardSplitActivityV2'
             - $ref: '#/components/schemas/ReverseSplitActivityV2'
             - $ref: '#/components/schemas/UnitSplitActivityV2'
@@ -2279,6 +2934,7 @@ components:
             - $ref: '#/components/schemas/NCActivityV2'
             - $ref: '#/components/schemas/FixedIncomeRedemptionActivityV2'
             - $ref: '#/components/schemas/FixedIncomeInterestActivityV2'
+            - $ref: '#/components/schemas/REOActivityV2'
             - $ref: '#/components/schemas/RightsDistributionActivityV2'
             - $ref: '#/components/schemas/RightsSubscriptionElectionActivityV2'
             - $ref: '#/components/schemas/TenderOfferActivityV2'
@@ -2297,6 +2953,7 @@ components:
             - $ref: '#/components/schemas/OPEXCActivityV2'
             - $ref: '#/components/schemas/OPEXPActivityV2'
             - $ref: '#/components/schemas/OPTRDActivityV2'
+            - $ref: '#/components/schemas/OPCSHActivityV2'
             - $ref: '#/components/schemas/AcatsActivityV2'
             - $ref: '#/components/schemas/AcatcActivityV2'
             - $ref: '#/components/schemas/FOPTActivityV2'
@@ -2375,6 +3032,7 @@ components:
     AdminActionCategory:
       description: Category of the Admin Action
       enum:
+        - accounts
         - order
         - other
     AdminActionCreatedBy:
@@ -2445,14 +3103,13 @@ components:
           title: AdminActionContextLegacyNote
           type: object
       description: Represents structure of a LegacyNote type AdminAction
-      x-examples:
-        example-1:
-          at: '2023-03-06T16:38:01Z'
+      examples:
+        - at: '2023-03-06T16:38:01Z'
           belongs_to:
             kind: account
             value: 0bbf1dd7-4235-4eca-8b1a-0db63572c735
           category: other
-          context: null
+          context: {}
           correspondent: LPCA
           created_by:
             kind: admin
@@ -2487,9 +3144,8 @@ components:
           title: AdminActionContextLiquidation
           type: object
       description: Represents structure of a Liquidation type AdminAction
-      x-examples:
-        example-1:
-          at: '2023-03-06T16:38:01Z'
+      examples:
+        - at: '2023-03-06T16:38:01Z'
           belongs_to:
             kind: account
             value: 0bbf1dd7-4235-4eca-8b1a-0db63572c735
@@ -2529,9 +3185,8 @@ components:
           title: AdminActionContextTransactionCancel
           type: object
       description: Represents structure of a TransactionCancel type AdminAction
-      x-examples:
-        example-1:
-          at: '2023-03-06T16:38:01Z'
+      examples:
+        - at: '2023-03-06T16:38:01Z'
           belongs_to:
             kind: account
             value: 0bbf1dd7-4235-4eca-8b1a-0db63572c735
@@ -2719,6 +3374,10 @@ components:
         Advanced instructions for Direct Market Access (DMA) routing. When `algorithm` is `DMA`,
         the order is routed directly to the exchange specified in `destination`. Note that this feature is only
         available to partners/correspondents who have been enabled for DMA.
+      examples:
+        - algorithm: DMA
+          destination: IEX
+          display_qty: '100'
       properties:
         algorithm:
           description: The advanced routing algorithm to use for the order. Only `DMA` (Direct Market Access) is supported.
@@ -2740,12 +3399,17 @@ components:
           type: string
       title: AdvancedInstructions
       type: object
-      x-examples:
-        example-1:
-          algorithm: DMA
-          destination: IEX
-          display_qty: 100
     AggregatePositionResponse:
+      examples:
+        - asset_type: us_equity
+          closing_price: '148.4700'
+          cusip: '037833100'
+          long_market_value: '148.4700'
+          long_qty: '1'
+          num_accounts: 1
+          short_market_value: '0'
+          short_qty: '0'
+          symbol: AAPL
       properties:
         asset_type:
           $ref: '#/components/schemas/AssetClass'
@@ -2782,17 +3446,6 @@ components:
           type: string
       title: ''
       type: object
-      x-examples:
-        Example 1:
-          asset_type: us_equity
-          closing_price: '148.4700'
-          cusip: '037833100'
-          long_market_value: '148.4700'
-          long_qty: '1'
-          num_accounts: '1'
-          short_market_value: '0'
-          short_qty: '0'
-          symbol: AAPL
     Agreement:
       properties:
         agreement:
@@ -2840,6 +3493,22 @@ components:
         The announcements endpoint contains public information on previous and upcoming dividends, mergers, spinoffs, and stock splits.
 
         Announcement data is made available through the API as soon as it is ingested by Alpaca, which is typically the following trading day after the declaration date. This provides insight into future account stock position and cash balance changes that will take effect on an announcement's payable date. Additionally, viewing previous announcement details can improve bookkeeping and reconciling previous account cash and position changes.
+      examples:
+        - ca_sub_type: cash
+          ca_type: dividend
+          cash: '0'
+          corporate_action_id: 78467X109_AA22
+          declaration_date: '2021-12-19'
+          ex_date: '2022-01-21'
+          id: bebc5ece-34be-47e9-b944-687e69a102be
+          initiating_original_cusip: '252787106'
+          initiating_symbol: DIA
+          new_rate: '1'
+          old_rate: '1'
+          payable_date: '2022-02-14'
+          record_date: '2022-01-24'
+          target_original_cusip: '252787106'
+          target_symbol: DIA
       properties:
         ca_sub_type:
           $ref: '#/components/schemas/AnnouncementCASubType'
@@ -2930,23 +3599,6 @@ components:
         - new_rate
       title: Announcement
       type: object
-      x-examples:
-        example-1:
-          ca_sub_type: cash
-          ca_type: dividend
-          cash: '0'
-          corporate_action_id: 78467X109_AA22
-          declaration_date: '2021-12-19'
-          ex_date: '2022-01-21'
-          id: bebc5ece-34be-47e9-b944-687e69a102be
-          initiating_original_cusip: '252787106'
-          initiating_symbol: DIA
-          new_rate: '1'
-          old_rate: '1'
-          payable_date: '2022-02-14'
-          record_date: '2022-01-24'
-          target_original_cusip: '252787106'
-          target_symbol: DIA
     AnnouncementCASubType:
       description: |-
         Announcements have both a type and a subtype to categorize them. This model represents the lowever level abstract "sub types" of Announcement. Please see the AnnouncementCAType model for higher level descriptions of the possible types
@@ -3088,10 +3740,14 @@ components:
             Shows the margin requirement percentage for the asset (equities only).
           type: number
         margin_requirement_long:
-          description: The margin requirement percentage for the asset's long positions (equities only).
+          description: The margin requirement percentage for the asset's long positions (equities only), encoded as a decimal string.
+          example: '100'
+          format: decimal
           type: string
         margin_requirement_short:
-          description: The margin requirement percentage for the asset's short positions (equities only).
+          description: The margin requirement percentage for the asset's short positions (equities only), encoded as a decimal string.
+          example: '30'
+          format: decimal
           type: string
         marginable:
           description: Asset is marginable or not
@@ -3176,6 +3832,11 @@ components:
       type: object
     AuthorizeOAuthTokenResponse:
       description: ''
+      examples:
+        - client_id: 7a3c52a910e1dc2abbb14da2b6b8e711
+          code: 912b5502-c983-40f7-a01d-6a66f13a754d
+          redirect_uri: http://localhost
+          scope: ''
       properties:
         client_id:
           description: OAuth `client_id`
@@ -3198,13 +3859,22 @@ components:
         - redirect_uri
         - scope
       type: object
-      x-examples:
-        example-1:
-          client_id: 7a3c52a910e1dc2abbb14da2b6b8e711
-          code: 912b5502-c983-40f7-a01d-6a66f13a754d
-          redirect_uri: http://localhost
-          scope: ''
     Bank:
+      examples:
+        - account_id: 56712986-9ff7-4d8f-8e52-077e099e533e
+          account_number: 123456789abc
+          bank_code: '123456789'
+          bank_code_type: ABA
+          city: ''
+          country: ''
+          created_at: '2022-02-11T21:35:19.268681613Z'
+          id: 8475c676-68e3-4cfc-a683-9ca2f47a6172
+          name: Bank XYZ
+          postal_code: ''
+          state_province: ''
+          status: QUEUED
+          street_address: ''
+          updated_at: '2022-02-11T21:35:19.268681613Z'
       properties:
         account_id:
           format: uuid
@@ -3272,22 +3942,6 @@ components:
         - bank_code_type
         - account_number
       type: object
-      x-examples:
-        example-1:
-          account_id: 56712986-9ff7-4d8f-8e52-077e099e533e
-          account_number: 123456789abc
-          bank_code: '123456789'
-          bank_code_type: ABA
-          city: ''
-          country: ''
-          created_at: '2022-02-11T21:35:19.268681613Z'
-          id: 8475c676-68e3-4cfc-a683-9ca2f47a6172
-          name: Bank XYZ
-          postal_code: ''
-          state_province: ''
-          status: QUEUED
-          street_address: ''
-          updated_at: '2022-02-11T21:35:19.268681613Z'
     BankAdditionalFields:
       description: |
         Additional wire instructions used to explicitly specify intermediary (correspondent) banks for international wire transfers. If omitted, intermediary banks may be automatically selected by downstream institutions, which can result in delays or additional charges.
@@ -3391,22 +4045,16 @@ components:
       title: BatchJournalRequest
       type: object
     BatchJournalResponse:
-      allOf:
-        - $ref: '#/components/schemas/Journal'
-        - properties:
-            error_message:
-              description: Description of why this journal transaction failed
-              type: string
-          required:
-            - error_message
-          type: object
-      description: A Journal object with an extra attribute error_message in the case when a specific account fails to receive a journal.
-      title: BatchJournalResponse
-      x-examples:
-        example-1:
+      description: A forward batch journal result selected by `entry_type`, with an optional non-empty failure message.
+      discriminator:
+        mapping:
+          JNLC: '#/components/schemas/BatchJournalResponseJNLC'
+          JNLS: '#/components/schemas/BatchJournalResponseJNLS'
+        propertyName: entry_type
+      examples:
+        - currency: USD
           description: ''
           entry_type: JNLC
-          error_message: ''
           from_account: 8f8c8cee-2591-4f83-be12-82c659b5e748
           id: 56f106e5-25a4-4eee-96fa-25bb05dc86bc
           net_amount: '1000'
@@ -3414,9 +4062,104 @@ components:
           qty: null
           settle_date: null
           status: pending
-          symbol: ''
+          symbol: null
           system_date: null
           to_account: 399f85f1-cbbd-4eaa-a934-70027fb5c1de
+        - currency: USD
+          description: this is a test journal
+          entry_type: JNLS
+          from_account: 8f4f3d11-4483-4199-840f-6c5fe0b7ca24
+          id: f45f67e8-d1fc-4136-aa4f-cf4460aecdfc
+          net_amount: null
+          price: '128.23'
+          qty: '0.5'
+          settle_date: '2020-12-24'
+          status: executed
+          symbol: AAPL
+          system_date: '2020-12-24'
+          to_account: a7a7e666-6f2a-433c-8c33-17b66b8941fa
+        - currency: USD
+          description: ''
+          entry_type: JNLC
+          error_message: The destination account is not eligible to receive this journal.
+          from_account: 8f8c8cee-2591-4f83-be12-82c659b5e748
+          id: c79bcd51-4bea-4d1d-9b3c-f37f5035b8f7
+          net_amount: '250'
+          price: null
+          qty: null
+          settle_date: null
+          status: refused
+          symbol: null
+          system_date: null
+          to_account: d5f7dbea-cb40-4ea6-a56d-e30d572ee84f
+      oneOf:
+        - $ref: '#/components/schemas/BatchJournalResponseJNLC'
+        - $ref: '#/components/schemas/BatchJournalResponseJNLS'
+      title: BatchJournalResponse
+    BatchJournalResponseJNLC:
+      allOf:
+        - $ref: '#/components/schemas/JNLC'
+        - properties:
+            error_message:
+              description: Description of why this journal transaction failed. Omitted for successful results.
+              minLength: 1
+              type: string
+          type: object
+      description: A cash journal result returned by the forward batch endpoint.
+      examples:
+        - currency: USD
+          description: ''
+          entry_type: JNLC
+          from_account: 8f8c8cee-2591-4f83-be12-82c659b5e748
+          id: 56f106e5-25a4-4eee-96fa-25bb05dc86bc
+          net_amount: '1000'
+          price: null
+          qty: null
+          settle_date: null
+          status: pending
+          symbol: null
+          system_date: null
+          to_account: 399f85f1-cbbd-4eaa-a934-70027fb5c1de
+        - currency: USD
+          description: ''
+          entry_type: JNLC
+          error_message: The destination account is not eligible to receive this journal.
+          from_account: 8f8c8cee-2591-4f83-be12-82c659b5e748
+          id: c79bcd51-4bea-4d1d-9b3c-f37f5035b8f7
+          net_amount: '250'
+          price: null
+          qty: null
+          settle_date: null
+          status: refused
+          symbol: null
+          system_date: null
+          to_account: d5f7dbea-cb40-4ea6-a56d-e30d572ee84f
+      title: BatchJournalResponseJNLC
+    BatchJournalResponseJNLS:
+      allOf:
+        - $ref: '#/components/schemas/JNLS'
+        - properties:
+            error_message:
+              description: Description of why this journal transaction failed. Omitted for successful results.
+              minLength: 1
+              type: string
+          type: object
+      description: A securities journal result that preserves discriminator-complete batch response modeling, although current public batch requests support JNLC only.
+      examples:
+        - currency: USD
+          description: this is a test journal
+          entry_type: JNLS
+          from_account: 8f4f3d11-4483-4199-840f-6c5fe0b7ca24
+          id: f45f67e8-d1fc-4136-aa4f-cf4460aecdfc
+          net_amount: null
+          price: '128.23'
+          qty: '0.5'
+          settle_date: '2020-12-24'
+          status: executed
+          symbol: AAPL
+          system_date: '2020-12-24'
+          to_account: a7a7e666-6f2a-433c-8c33-17b66b8941fa
+      title: BatchJournalResponseJNLS
     Beneficiary:
       description: Beneficiary of an account
       example:
@@ -3477,17 +4220,76 @@ components:
               description: Total cash amount paid
               type: string
             entitled_qty:
-              description: Quantity of shares entitled to receive the dividend
+              description: Quantity of shares entitled to receive the dividend or return of capital
               type: string
           required:
             - entitled_qty
             - cash_payout
           type: object
-      description: Cash dividend
+      description: Cash-dividend related details. Used for both Cash Dividend and Return of Capital.
+      type: object
+    CGDActivityV2:
+      allOf:
+        - $ref: '#/components/schemas/CommonCaActivityV2'
+        - properties:
+            cash_payout:
+              description: Cash amount paid for this leg
+              type: string
+            cusip:
+              description: The CUSIP of the security involved with the activity
+              type: string
+            entitled_qty:
+              description: Quantity of shares entitled to receive the capital gains distribution
+              type: string
+            ex_date:
+              description: The ex_date for this corporate action
+              format: date
+              minLength: 1
+              type: string
+            isin:
+              description: The ISIN of the security involved with the activity
+              type: string
+            long_term_rate:
+              description: Long-term capital gains distribution rate per share, when applicable
+              type: string
+            payable_date:
+              description: The payable_date for this corporate action
+              format: date
+              minLength: 1
+              type: string
+            rate:
+              description: Distribution rate per share for this leg (LTCG or STCG)
+              type: string
+            record_date:
+              description: The record_date for this corporate action
+              format: date
+              minLength: 1
+              type: string
+            short_term_rate:
+              description: Short-term capital gains distribution rate per share, when applicable
+              type: string
+            symbol:
+              description: The symbol of the security involved with the activity
+              type: string
+          required:
+            - entitled_qty
+            - cash_payout
+            - symbol
+            - cusip
+            - rate
+          type: object
+      description: Capital gains distribution. Used for both Long-Term (LTCG) and Short-Term (STCG) sub-types. Each activity represents a single leg; `long_term_rate` and/or `short_term_rate` are populated
+        based on the source event, and `rate` matches the leg's own rate.
       type: object
     CIPDocument:
       description: |
         Represents results of checking a document for CIPInfo
+      examples:
+        - created_at: '2021-06-10T15:37:03Z'
+          id: 55B9931A-3BE6-4BC0-9BDD-0B954E4A4632
+          image_integrity: clear
+          result: clear
+          status: complete
       properties:
         age_validation:
           $ref: '#/components/schemas/CIPResult'
@@ -3564,14 +4366,15 @@ components:
       required:
         - id
       type: object
-      x-examples:
-        Example 1:
-          created_at: '2021-06-10T15:37:03Z'
-          id: 55B9931A-3BE6-4BC0-9BDD-0B954E4A4632
-          image_integrity: clear
-          result: clear
-          status: complete
     CIPIdentity:
+      examples:
+        - address: clear
+          created_at: '2021-06-10T15:37:03Z'
+          date_of_birth: clear
+          id: 28E1CCE8-1B1A-4472-9AD4-C6C5B7C3A6AF
+          result: clear
+          sources: clear
+          status: complete
       properties:
         address:
           $ref: '#/components/schemas/CIPResult'
@@ -3617,15 +4420,6 @@ components:
       required:
         - id
       type: object
-      x-examples:
-        Example 1:
-          address: clear
-          created_at: '2021-06-10T15:37:03Z'
-          date_of_birth: clear
-          id: 28E1CCE8-1B1A-4472-9AD4-C6C5B7C3A6AF
-          result: clear
-          sources: clear
-          status: complete
     CIPInfo:
       description: Customer Identification Program (CIP) information for an account applicant.
       properties:
@@ -3662,6 +4456,24 @@ components:
       type: object
     CIPKYC:
       description: Represents Know Your Customer (KYC) info for a CIPInfo
+      examples:
+        - address: 42 Faux St
+          applicant_name: John Doe
+          approval_status: approved
+          approved_at: '2021-06-10T15:38:03Z'
+          approved_by: Jane Doe
+          check_completed_at: '2021-06-10T15:37:03Z'
+          check_initiated_at: '2021-06-10T15:37:03Z'
+          country_of_residency: USA
+          date_of_birth: '1970-12-01'
+          email_address: johndoe@example.com
+          id: CBDAD1C4-1047-450E-BAE5-B6C406F509B4
+          id_number: jd0000123456789
+          ip_address: 127.0.0.1
+          kyc_completed_at: '2021-06-10T15:37:03Z'
+          nationality: American
+          postal_code: '94401'
+          risk_level: LOW
       properties:
         address:
           description: Concatenated street address, city, state and country of applicant
@@ -3736,27 +4548,14 @@ components:
         - id
       title: CIPKYCInfo
       type: object
-      x-examples:
-        Example 1:
-          address: 42 Faux St
-          applicant_name: John Doe
-          approval_status: approved
-          approved_at: '2021-06-10T15:38:03Z'
-          approved_by: Jane Doe
-          check_completed_at: '2021-06-10T15:37:03Z'
-          check_initiated_at: '2021-06-10T15:37:03Z'
-          country_of_residency: USA
-          date_of_birth: '1970-12-01'
-          email_address: johndoe@example.com
-          id: CBDAD1C4-1047-450E-BAE5-B6C406F509B4
-          id_number: jd0000123456789
-          ip_address: 127.0.0.1
-          kyc_completed_at: '2021-06-10T15:37:03Z'
-          nationality: American
-          postal_code: '94401'
-          risk_level: LOW
     CIPPhoto:
       description: Represents the results of checking a Photo for CIPInfo
+      examples:
+        - created_at: '2021-06-10T15:37:03Z'
+          face_comparison: clear
+          id: 0DD13020-F0FD-4B5A-B58F-BC1885E90A6D
+          result: clear
+          status: complete
       properties:
         created_at:
           description: datetime of when the check happened
@@ -3796,13 +4595,6 @@ components:
       required:
         - id
       type: object
-      x-examples:
-        Example 1:
-          created_at: '2021-06-10T15:37:03Z'
-          face_comparison: clear
-          id: 0DD13020-F0FD-4B5A-B58F-BC1885E90A6D
-          result: clear
-          status: complete
     CIPProvider:
       description: |-
         "alloy"   - ALLOY
@@ -3828,6 +4620,15 @@ components:
       type: string
     CIPWatchlist:
       description: Represents the result of checking to see if the applicant is in any watchlists for a CIPInfo
+      examples:
+        - adverse_media: clear
+          created_at: '2021-06-10T15:37:03Z'
+          id: 7572B870-EB4C-46A2-8B88-509194CCEE7E
+          monitored_lists: clear
+          politically_exposed_person: clear
+          result: clear
+          sanction: clear
+          status: complete
       properties:
         adverse_media:
           $ref: '#/components/schemas/CIPResult'
@@ -3853,16 +4654,6 @@ components:
       required:
         - id
       type: object
-      x-examples:
-        Example 1:
-          adverse_media: clear
-          created_at: '2021-06-10T15:37:03Z'
-          id: 7572B870-EB4C-46A2-8B88-509194CCEE7E
-          monitored_lists: clear
-          politically_exposed_person: clear
-          result: clear
-          sanction: clear
-          status: complete
     CSWActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonNTAActivityV2'
@@ -3934,8 +4725,12 @@ components:
           minLength: 1
           type: string
         foreign:
-          description: Indicates if related to a non-US security
-          type: boolean
+          description: Indicates if related to a non-US security. Serialized as the JSON strings `"true"` or `"false"`, not a JSON boolean.
+          enum:
+            - 'true'
+            - 'false'
+          example: 'false'
+          type: string
         isin:
           description: The ISIN of the security involved with the activity
           type: string
@@ -3953,8 +4748,12 @@ components:
           minLength: 1
           type: string
         special:
-          description: Indicates if this is a special dividend
-          type: boolean
+          description: Indicates if this is a special dividend. Serialized as the JSON strings `"true"` or `"false"`, not a JSON boolean.
+          enum:
+            - 'true'
+            - 'false'
+          example: 'false'
+          type: string
         symbol:
           description: The symbol of the security involved with the activity
           type: string
@@ -4144,8 +4943,86 @@ components:
     CommonOptionsActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonNTAActivityV2'
+      properties:
+        contract_symbol:
+          description: The contract symbol of the security involved with the activity
+          type: string
+        cusip:
+          description: The CUSIP of the security involved with the activity
+          type: string
+        symbol:
+          description: The symbol of the security involved with the activity
+          type: string
       required:
         - group_id
+      type: object
+    CommonREOActivityV2:
+      description: |-
+        Reorganization (REO) activity sub-types:
+        - **REOS**: Stock only (1 or more stock legs)
+        - **REOC**: Cash only (one cash leg)
+        - **REOSC**: Stock and cash
+      properties:
+        cash_payout:
+          description: Cash payout amount
+          format: decimal
+          type: string
+        cash_rate:
+          description: Cash rate per share
+          format: decimal
+          type: string
+        cusip:
+          description: CUSIP received on this stock leg
+          type: string
+        effective_date:
+          description: Effective date of the reorganization
+          format: date
+          type: string
+        isin:
+          description: ISIN received on this stock leg
+          type: string
+        new_rate:
+          description: New ratio for this stock leg
+          format: decimal
+          type: string
+        payable_date:
+          description: Payable date of the reorganization
+          format: date
+          type: string
+        qty:
+          description: Quantity received on this stock leg
+          format: decimal
+          type: string
+        removed_qty:
+          description: Positive quantity removed from the source position
+          format: decimal
+          type: string
+        source_cusip:
+          description: CUSIP of the source security
+          type: string
+        source_isin:
+          description: ISIN of the source security
+          type: string
+        source_qty:
+          description: Source position quantity
+          format: decimal
+          type: string
+        source_rate:
+          description: Source ratio for this stock leg
+          format: decimal
+          type: string
+        source_symbol:
+          description: Symbol of the source security
+          example: CEPT
+          type: string
+        symbol:
+          description: Symbol received on this stock leg
+          example: SECZ
+          type: string
+      required:
+        - source_symbol
+        - source_cusip
+        - payable_date
       type: object
     CommonSDIVActivityV2:
       properties:
@@ -4397,50 +5274,45 @@ components:
         - crypto_risk_rating
       title: CountryInfo
       type: object
-      x-examples:
-        example: |
-          "ZAF": {
-              "full_name": "South Africa",
-              "crypto_risk_rating": "high",
-              "securities_risk_rating": "high"
-          }
-        example-1: |
-          "USA": {
-            "full_name": "United States of America",
-            "crypto_risk_rating": "medium",
-            "securities_risk_rating": "medium",
-            "crypto_supported_states": [
-                "CA",
-                "CT",
-                "GA",
-                "IA",
-                "ID",
-                "IL",
-                "IN",
-                "KS",
-                "KY",
-                "MA",
-                "MD",
-                "ME",
-                "MI",
-                "MS",
-                "MO",
-                "MT",
-                "NC",
-                "ND",
-                "NE",
-                "OH",
-                "RI",
-                "SD",
-                "UT",
-                "VT",
-                "WA"
-            ]
-          }
     CountryInfos:
       additionalProperties:
         $ref: '#/components/schemas/CountryInfo'
       description: Represents the info for countries as a map where the keys are the ISO 3166 country codes.
+      examples:
+        - ZAF:
+            crypto_risk_rating: high
+            full_name: South Africa
+            securities_risk_rating: high
+        - USA:
+            crypto_risk_rating: medium
+            crypto_supported_states:
+              - CA
+              - CT
+              - GA
+              - IA
+              - ID
+              - IL
+              - IN
+              - KS
+              - KY
+              - MA
+              - MD
+              - ME
+              - MI
+              - MS
+              - MO
+              - MT
+              - NC
+              - ND
+              - NE
+              - OH
+              - RI
+              - SD
+              - UT
+              - VT
+              - WA
+            full_name: United States of America
+            securities_risk_rating: medium
       title: CountryInfos
       type: object
     CreateACHRelationshipRequest:
@@ -4613,6 +5485,12 @@ components:
         - With Fixtures
           - any status = rejected will be rejected EOD
           - any status = pending will be pending forever
+      examples:
+        - amount: '51'
+          description: test text /fixtures/status=rejected/fixtures/
+          entry_type: JNLC
+          from_account: c94bu7rn-4483-4199-840f-6c5fe0b7ca24
+          to_account: fn68sbrk-6f2a-433c-8c33-17b66b8941fa
       properties:
         amount:
           description: Required if `entry_type` = `JNLC`
@@ -4666,13 +5544,6 @@ components:
         - from_account
         - entry_type
       type: object
-      x-examples:
-        example-1:
-          amount: '51'
-          description: test text /fixtures/status=rejected/fixtures/
-          entry_type: JNLC
-          from_account: c94bu7rn-4483-4199-840f-6c5fe0b7ca24
-          to_account: fn68sbrk-6f2a-433c-8c33-17b66b8941fa
     CreateOrderRequest:
       properties:
         advanced_instructions:
@@ -4842,17 +5713,6 @@ components:
             The ach_relationship created for the account_id [here](https://alpaca.markets/docs/api-references/broker-api/funding/ach/#creating-an-ach-relationship)
           format: uuid
           type: string
-        timing:
-          deprecated: true
-          description: Deprecated. Not honored by the API; values sent are silently ignored and this field will be removed.
-          enum:
-            - immediate
-          example: immediate
-          type: string
-          x-deprecation:
-            reason: Not honored by the API since January 2021; any value sent is silently ignored. Stop including this field in requests.
-            since: '2026-05-26'
-            sunset: '2026-08-26'
         transfer_type:
           $ref: '#/components/schemas/TransferType'
       required:
@@ -4991,7 +5851,6 @@ components:
         - state
         - email
       type: object
-      x-examples: {}
     CustodialAccountType:
       description: |-
         Represents the type of custodial account based on the state where the beneficiary resides.
@@ -5053,8 +5912,12 @@ components:
               minLength: 1
               type: string
             foreign:
-              description: Indicates if related to a non-US security
-              type: boolean
+              description: Indicates if related to a non-US security. Serialized as the JSON strings `"true"` or `"false"`, not a JSON boolean.
+              enum:
+                - 'true'
+                - 'false'
+              example: 'false'
+              type: string
             isin:
               description: The ISIN of the security involved with the activity
               type: string
@@ -5072,8 +5935,12 @@ components:
               minLength: 1
               type: string
             special:
-              description: Indicates if this is a special dividend
-              type: boolean
+              description: Indicates if this is a special dividend. Serialized as the JSON strings `"true"` or `"false"`, not a JSON boolean.
+              enum:
+                - 'true'
+                - 'false'
+              example: 'false'
+              type: string
             symbol:
               description: The symbol of the security involved with the activity
               type: string
@@ -5927,6 +6794,65 @@ components:
         - **`OfferingCancellation`** - offering was cancelled. **No `payload` is present.**
 
         See the example payloads below for a concrete example per verb.
+      examples:
+        - at: '2026-03-20T12:24:58.807230Z'
+          event_id: 01J9RPMV5TKB8WX3M4F1KZ7QH2
+          offering_reference: FI111225
+          payload:
+            available_to_order: Available
+            max_price: '42'
+            min_price: '42'
+            name: Example Corp
+            source: example source
+            ticker_symbol: EXMP
+          received_at: '2026-03-20T12:24:58.500000Z'
+          verb: Offering
+        - at: '2026-03-20T15:42:11.118274Z'
+          event_id: 01J9RQ5HNZQK7M3RDVJ8XBPCT1
+          offering_reference: FI111225
+          payload:
+            available_to_order: Available
+            max_price: '44'
+            min_price: '40'
+            name: Example Corp
+            source: example source
+            ticker_symbol: EXMP
+          received_at: '2026-03-20T15:42:10.892140Z'
+          verb: OfferingUpdate
+        - at: '2026-03-19T23:26:46.853262Z'
+          event_id: 01J9RSGD8JR2A4K7MZNTPVQ5XW
+          offering_reference: FI111225
+          payload:
+            prospectus_url: https://example.com/prospectus/example-corp.pdf
+            subject: 'IPO Prospectus: Example Corp'
+          received_at: '2026-03-19T23:26:46.612880Z'
+          verb: Prospectus
+        - at: '2026-03-19T22:50:11.729329Z'
+          event_id: 01J9RT9P3WYH8KCJM2LFQX5ZRD
+          offering_reference: FI111225
+          payload:
+            sixty_minute_expiration_time: '2026-03-19T23:50:11.729329Z'
+            subject: 'IPO 60 Minute Mail: Example Corp'
+          received_at: '2026-03-19T22:50:11.512640Z'
+          verb: SixtyMinMail
+        - account_id: 6221407b-32b2-3e6b-a7fe-cd79e1b68ba3
+          at: '2026-03-20T00:15:42.318901Z'
+          correspondent: COR1
+          event_id: 01J9RTPZGHKVB8M3X4F5J7LCQ9
+          offering_reference: FI111225
+          payload:
+            allocated_amount: '1764'
+            allocated_shares: '42'
+            cusip_id: '123456789'
+            final_price: '42'
+            subject: 'IPO Allocation: Example Corp'
+          received_at: '2026-03-20T00:15:42.103572Z'
+          verb: Allocation
+        - at: '2026-03-20T12:24:52.325158Z'
+          event_id: 01J9RVB6Y4ZK8M3N7QD2WX1RFP
+          offering_reference: FI111225
+          received_at: '2026-03-20T12:24:52.110430Z'
+          verb: OfferingCancellation
       properties:
         account_id:
           description: |
@@ -5977,71 +6903,6 @@ components:
         - received_at
       title: IPOEvent
       type: object
-      x-examples:
-        Allocation:
-          account_id: 6221407b-32b2-3e6b-a7fe-cd79e1b68ba3
-          at: '2026-03-20T00:15:42.318901Z'
-          correspondent: COR1
-          event_id: 01J9RTPZGHKVB8M3X4F5J7LCQ9
-          offering_reference: FI111225
-          payload:
-            allocated_amount: '1764'
-            allocated_shares: '42'
-            cusip_id: '123456789'
-            final_price: '42'
-            subject: 'IPO Allocation: Example Corp'
-          received_at: '2026-03-20T00:15:42.103572Z'
-          verb: Allocation
-        Offering:
-          at: '2026-03-20T12:24:58.807230Z'
-          event_id: 01J9RPMV5TKB8WX3M4F1KZ7QH2
-          offering_reference: FI111225
-          payload:
-            available_to_order: Available
-            max_price: '42'
-            min_price: '42'
-            name: Example Corp
-            source: example source
-            ticker_symbol: EXMP
-          received_at: '2026-03-20T12:24:58.500000Z'
-          verb: Offering
-        OfferingCancellation:
-          at: '2026-03-20T12:24:52.325158Z'
-          event_id: 01J9RVB6Y4ZK8M3N7QD2WX1RFP
-          offering_reference: FI111225
-          received_at: '2026-03-20T12:24:52.110430Z'
-          verb: OfferingCancellation
-        OfferingUpdate:
-          at: '2026-03-20T15:42:11.118274Z'
-          event_id: 01J9RQ5HNZQK7M3RDVJ8XBPCT1
-          offering_reference: FI111225
-          payload:
-            available_to_order: Available
-            max_price: '44'
-            min_price: '40'
-            name: Example Corp
-            source: example source
-            ticker_symbol: EXMP
-          received_at: '2026-03-20T15:42:10.892140Z'
-          verb: OfferingUpdate
-        Prospectus:
-          at: '2026-03-19T23:26:46.853262Z'
-          event_id: 01J9RSGD8JR2A4K7MZNTPVQ5XW
-          offering_reference: FI111225
-          payload:
-            prospectus_url: https://example.com/prospectus/example-corp.pdf
-            subject: 'IPO Prospectus: Example Corp'
-          received_at: '2026-03-19T23:26:46.612880Z'
-          verb: Prospectus
-        SixtyMinMail:
-          at: '2026-03-19T22:50:11.729329Z'
-          event_id: 01J9RT9P3WYH8KCJM2LFQX5ZRD
-          offering_reference: FI111225
-          payload:
-            sixty_minute_expiration_time: '2026-03-19T23:50:11.729329Z'
-            subject: 'IPO 60 Minute Mail: Example Corp'
-          received_at: '2026-03-19T22:50:11.512640Z'
-          verb: SixtyMinMail
     IPOOffering:
       description: |
         An IPO (Initial Public Offering) offering exposed via the IPO discovery REST API. Returned by `GET /v1/ipos` and `GET /v1/ipos/{offering_reference}`.
@@ -6441,6 +7302,10 @@ components:
       type: object
     IssueOAuthTokenResponse:
       description: ''
+      examples:
+        - access_token: 87586f14-c3f4-4912-b107-f75bc17ff87a
+          scope: general
+          token_type: Bearer
       properties:
         access_token:
           description: OAuth token
@@ -6459,11 +7324,6 @@ components:
         - token_type
         - scope
       type: object
-      x-examples:
-        example-1:
-          access_token: 87586f14-c3f4-4912-b107-f75bc17ff87a
-          scope: general
-          token_type: Bearer
     JITAssetClass:
       description: |
         Values:
@@ -6475,6 +7335,11 @@ components:
         - us_equity
       type: string
     JITLedgerAccount:
+      examples:
+        - created_at: '1653532627'
+          id: 2896b9e2-3198-44cd-a08e-4cc4079aee33
+          ledger_name: Securities JIT IN
+          status: active
       properties:
         created_at:
           description: Creation time in UNIX format
@@ -6489,12 +7354,6 @@ components:
           type: string
       title: JITLedgerAccount
       type: object
-      x-examples:
-        Example 1:
-          created_at: '1653532627'
-          id: 2896b9e2-3198-44cd-a08e-4cc4079aee33
-          ledger_name: Securities JIT IN
-          status: active
     JITReport:
       description: JIT Securities reports are made available through the API and can be accessed within the hour after 11:30 PM EST on the trade date (T+0). The reports communicate transaction-level details
         as well as overall settlement amounts, transfer direction, and payment timing.
@@ -6550,108 +7409,86 @@ components:
         - expires_at
       type: object
     JNLC:
-      description: Journal information specific to cash transfers. This field is required for `Journal`s with an `entry_type` of `jnlc` (cash transfers), but will be null for those with `jnls` (securities
-        transfers).
-      example:
-        entry_type: JNLC
-        from_account: 8fjkjn-4483-4199-840f-6c5fe0b7ca24
-        id: f45g67h8-d1fc-4136-aa4f-cf4460aecdfc
-        net_amount: '115.5'
-        status: pending
-        to_account: 3gtt65jd-6f2a-433c-8c33-17b66b8941fa
-      properties:
-        currency:
-          description: Currency denomination of the journal. USD by default.
-          type: string
-        description:
-          description: ID the amount goes to. Only valid for JNLC journals. Null for JNLS.
-          type: string
-        entry_type:
-          description: JNLC
-          type: string
-        net_amount:
-          description: Only valid for JNLC journals. Null for JNLS.
-          format: decimal
-          type: string
-        transmitter_account_number:
-          description: Only valid for JNLC journals. Null for JNLS.max 255 characters
-          type: string
-        transmitter_address:
-          description: Only valid for JNLC journals. Null for JNLS.max 255 characters
-          type: string
-        transmitter_financial_institution:
-          description: Only valid for JNLC journals. Null for JNLS.max 255 characters
-          type: string
-        transmitter_name:
-          description: Only valid for JNLC journals. Null for JNLS. Max 255 characters.
-          type: string
-        transmitter_timestamp:
-          description: Only valid for JNLC journals. Null for JNLS.
-          format: date-time
-          type: string
-      required:
-        - entry_type
-        - net_amount
+      allOf:
+        - $ref: '#/components/schemas/JournalBase'
+        - properties:
+            entry_type:
+              description: Cash journal discriminator value.
+              enum:
+                - JNLC
+              type: string
+            transmitter_account_number:
+              description: Optional for JNLC journals. Maximum 255 characters. See more details about [Travel Rule](https://alpaca.markets/docs/broker/integration/funding/#travel-rule) in our main documentation.
+              maxLength: 255
+              type: string
+            transmitter_address:
+              description: Optional for JNLC journals. Maximum 255 characters. See more details about [Travel Rule](https://alpaca.markets/docs/broker/integration/funding/#travel-rule) in our main documentation.
+              maxLength: 255
+              type: string
+            transmitter_financial_institution:
+              description: Optional for JNLC journals. Maximum 255 characters. See more details about [Travel Rule](https://alpaca.markets/docs/broker/integration/funding/#travel-rule) in our main documentation.
+              maxLength: 255
+              type: string
+            transmitter_name:
+              description: Optional for JNLC journals. Maximum 255 characters. See more details about [Travel Rule](https://alpaca.markets/docs/broker/integration/funding/#travel-rule) in our main documentation.
+              maxLength: 255
+              type: string
+            transmitter_timestamp:
+              description: Optional for JNLC journals. RFC 3339 format. See more details about [Travel Rule](https://alpaca.markets/docs/broker/integration/funding/#travel-rule) in our main documentation.
+              format: date-time
+              type: string
+          required:
+            - entry_type
+          type: object
+      description: A cash journal response with all shared Journal fields.
+      examples:
+        - currency: USD
+          description: ''
+          entry_type: JNLC
+          from_account: 8f8c8cee-2591-4f83-be12-82c659b5e748
+          id: 56f106e5-25a4-4eee-96fa-25bb05dc86bc
+          net_amount: '1000'
+          price: null
+          qty: null
+          settle_date: null
+          status: pending
+          symbol: null
+          system_date: null
+          to_account: 399f85f1-cbbd-4eaa-a934-70027fb5c1de
       title: JNLC
-      type: object
-      x-examples: {}
     JNLCActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonJournalActivityV2'
       description: Journal entry (cash)
       type: object
     JNLS:
-      properties:
-        currency:
-          description: Currency denomination of the journal. USD by default.
-          type: string
-        description:
-          type: string
-        entry_type:
-          description: JNLS
-          type: string
-        from_account:
-          description: The account ID that initiates the journal - account_status must equal to ACTIVE or CLOSE
-          type: string
-        id:
-          description: The journal ID
-          type: string
-        price:
-          description: The price of the security journaled
-          type: string
-        qty:
-          description: The quantity of the securities journaled
-          type: string
-        settle_date:
-          description: Date string in "%Y-%m-%d" format
-          type: string
-        status:
-          $ref: '#/components/schemas/JournalStatus'
-        symbol:
-          description: The symbol of the security journaled
-          type: string
-        system_date:
-          description: Date string in "%Y-%m-%d" format
-          type: string
-        to_account:
-          description: The account ID that received the journal - account_status must equal to ACTIVE
-          type: string
-      required:
-        - entry_type
-      type: object
-      x-examples:
-        Example 1:
+      allOf:
+        - $ref: '#/components/schemas/JournalBase'
+        - properties:
+            entry_type:
+              description: Securities journal discriminator value.
+              enum:
+                - JNLS
+              type: string
+          required:
+            - entry_type
+          type: object
+      description: A securities journal response with all shared Journal fields.
+      examples:
+        - currency: USD
           description: this is a test journal
           entry_type: JNLS
-          from_account: 8k4f3d-4483-4199-840f-6c5fe0b7ca24
-          id: f45g67h8-d1fc-4136-aa4f-cf4460aecdfc
+          from_account: 8f4f3d11-4483-4199-840f-6c5fe0b7ca24
+          id: f45f67e8-d1fc-4136-aa4f-cf4460aecdfc
+          net_amount: null
           price: '128.23'
           qty: '0.5'
           settle_date: '2020-12-24'
           status: executed
           symbol: AAPL
           system_date: '2020-12-24'
-          to_account: g7h7rg66-6f2a-433c-8c33-17b66b8941fa
+          to_account: a7a7e666-6f2a-433c-8c33-17b66b8941fa
+      title: JNLS
     JNLSActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonJournalActivityV2'
@@ -6665,98 +7502,122 @@ components:
       description: Journal entry (stock)
       type: object
     Journal:
-      allOf:
-        - properties:
-            created_at:
-              format: date-time
-              type: string
-            entry_type:
-              type: string
-            from_account:
-              description: account ID the shares go from
-              format: uuid
-              type: string
-            id:
-              description: journal ID
-              format: uuid
-              type: string
-            settle_date:
-              description: Settlement date for the journal. Absent or `null` until the journal settles (for example, while `status` is `queued` or `pending`).
-              format: date
-              type:
-                - string
-                - 'null'
-            status:
-              $ref: '#/components/schemas/JournalStatus'
-            to_account:
-              description: account ID the shares go to
-              format: uuid
-              type: string
-            transmitter_info:
-              $ref: '#/components/schemas/TransmitterInfo'
-          required:
-            - id
-            - entry_type
-            - from_account
-            - to_account
-          type: object
-        - oneOf:
-            - $ref: '#/components/schemas/JNLS'
-            - $ref: '#/components/schemas/JNLC'
-      description: Represents a cash or security transfer between accounts, as specified by the `entry_type` parameter.
+      description: Represents a cash or securities transfer between accounts, selected by `entry_type`.
       discriminator:
         mapping:
           JNLC: '#/components/schemas/JNLC'
           JNLS: '#/components/schemas/JNLS'
         propertyName: entry_type
-      example:
-        entry_type: JNLS
-        from_account: 8fjkjn-4483-4199-840f-6c5fe0b7ca24
-        id: h7h5g33f-ef01-4458-9a4b-9598727a406f
-        price: '128.23'
-        qty: '2'
-        settle_date: '2020-12-24'
-        status: executed
-        symbol: AAPL
-        to_account: 3gtt65jd-6f2a-433c-8c33-17b66b8941fa
-      title: Journal
-      x-examples:
-        example:
+      examples:
+        - currency: USD
+          description: ''
+          entry_type: JNLC
+          from_account: 8f8c8cee-2591-4f83-be12-82c659b5e748
+          id: 56f106e5-25a4-4eee-96fa-25bb05dc86bc
+          net_amount: '1000'
+          price: null
+          qty: null
+          settle_date: null
+          status: pending
+          symbol: null
+          system_date: null
+          to_account: 399f85f1-cbbd-4eaa-a934-70027fb5c1de
+        - currency: USD
+          description: this is a test journal
           entry_type: JNLS
-          from_account: 8fjkjn-4483-4199-840f-6c5fe0b7ca24
-          id: h7h5g33f-ef01-4458-9a4b-9598727a406f
+          from_account: 8f4f3d11-4483-4199-840f-6c5fe0b7ca24
+          id: f45f67e8-d1fc-4136-aa4f-cf4460aecdfc
+          net_amount: null
           price: '128.23'
-          qty: '2'
+          qty: '0.5'
           settle_date: '2020-12-24'
           status: executed
           symbol: AAPL
-          to_account: 3gtt65jd-6f2a-433c-8c33-17b66b8941fa
-        example-pending:
-          description: ''
-          entry_type: JNLC
-          from_account: 3dcb795c-3ccc-402a-abb9-07e26a1b1326
-          id: 6d2cba43-cb57-4534-9603-a6e159167c0a
-          net_amount: '645'
-          price: '0'
-          qty: null
-          settle_date: '2022-02-17'
-          status: pending
-          symbol: null
-          system_date: '2022-02-17'
-          to_account: 2a87c088-ffb6-472b-a4a3-cd9305c8605c
-        example-queued:
-          description: ''
-          entry_type: JNLC
-          from_account: 3dcb795c-3ccc-402a-abb9-07e26a1b1326
-          id: 6d2cba43-cb57-4534-9603-a6e159167c0a
-          net_amount: '645'
-          price: '0'
-          qty: null
-          settle_date: null
-          status: queued
-          symbol: ''
-          system_date: null
-          to_account: 2a87c088-ffb6-472b-a4a3-cd9305c8605c
+          system_date: '2020-12-24'
+          to_account: a7a7e666-6f2a-433c-8c33-17b66b8941fa
+      oneOf:
+        - $ref: '#/components/schemas/JNLC'
+        - $ref: '#/components/schemas/JNLS'
+      title: Journal
+    JournalBase:
+      description: Shared response fields returned for cash and securities journals.
+      properties:
+        created_at:
+          description: The creation time when supplied by the endpoint.
+          format: date-time
+          type: string
+        currency:
+          description: Currency denomination of the journal.
+          type: string
+        description:
+          description: The journal description.
+          type: string
+        from_account:
+          description: The account ID that initiated the journal.
+          format: uuid
+          type: string
+        id:
+          description: The journal ID.
+          format: uuid
+          type: string
+        net_amount:
+          description: The cash amount, or null when not applicable.
+          format: decimal
+          type:
+            - string
+            - 'null'
+        price:
+          description: The journaled security price, or null when not applicable.
+          format: decimal
+          type:
+            - string
+            - 'null'
+        qty:
+          description: The journaled security quantity, or null when not applicable.
+          format: decimal
+          type:
+            - string
+            - 'null'
+        settle_date:
+          description: The settlement date, or null until one is assigned.
+          format: date
+          type:
+            - string
+            - 'null'
+        status:
+          $ref: '#/components/schemas/JournalStatus'
+        symbol:
+          description: The journaled security symbol, or null for a cash journal.
+          type:
+            - string
+            - 'null'
+        system_date:
+          description: The booking-system date, or null until one is assigned.
+          format: date
+          type:
+            - string
+            - 'null'
+        to_account:
+          description: The account ID that received the journal.
+          format: uuid
+          type: string
+        transmitter_info:
+          $ref: '#/components/schemas/TransmitterInfo'
+      required:
+        - id
+        - from_account
+        - to_account
+        - symbol
+        - qty
+        - price
+        - status
+        - settle_date
+        - system_date
+        - net_amount
+        - description
+        - currency
+      title: JournalBase
+      type: object
     JournalEntryType:
       description: |-
         This enum represents the various kinds of Journal alpaca supports.
@@ -6797,6 +7658,14 @@ components:
     JournalStatusEvent:
       description: |
         Represents a change in a Journal's status, sent over the events streaming api.
+      examples:
+        - at: '2021-05-07T10:28:23.163857Z'
+          entry_type: JNLC
+          event_id: 1406
+          event_ulid: 01F535Y1FVY8WZHE763HCNS8SZ
+          journal_id: 2f144d2a-91e6-46ff-8e37-959a701cc58d
+          status_from: ''
+          status_to: queued
       properties:
         at:
           description: Timestamp of event
@@ -6830,18 +7699,26 @@ components:
         - status_to
       title: JournalStatusEvent
       type: object
-      x-examples:
-        example-1:
-          at: '2021-05-07T10:28:23.163857Z'
-          entry_type: JNLC
-          event_id: 1406
-          event_ulid: 01F535Y1FVY8WZHE763HCNS8SZ
-          journal_id: 2f144d2a-91e6-46ff-8e37-959a701cc58d
-          status_from: ''
-          status_to: queued
     JournalStatusEventV2:
       description: |
         Represents a change in a Journal's status, sent over the events streaming api.
+      examples:
+        - at: '2021-05-07T10:28:23.163857Z'
+          description: Journal of cash between accounts
+          entry_type: JNLC
+          event_id: 01F535Y1FVY8WZHE763HCNS8SZ
+          journal_id: 2f144d2a-91e6-46ff-8e37-959a701cc58d
+          status_from: ''
+          status_to: queued
+        - at: '2021-05-07T10:28:23.163857Z'
+          description: Journal of cash between accounts
+          entry_type: JNLC
+          event_id: 01F535Y1FVY8WZHE763HCNS8SZ
+          idempotency_key: 72bdf18f-7410-43ec-b4e8-b6e41c5c0160
+          idempotency_key_type: single
+          journal_id: 2f144d2a-91e6-46ff-8e37-959a701cc58d
+          status_from: queued
+          status_to: executed
       properties:
         at:
           description: Timestamp of event
@@ -6888,25 +7765,6 @@ components:
         - status_to
       title: JournalStatusEvent
       type: object
-      x-examples:
-        example-1:
-          at: '2021-05-07T10:28:23.163857Z'
-          description: Journal of cash between accounts
-          entry_type: JNLC
-          event_id: 01F535Y1FVY8WZHE763HCNS8SZ
-          journal_id: 2f144d2a-91e6-46ff-8e37-959a701cc58d
-          status_from: ''
-          status_to: queued
-        example-idempotency-key:
-          at: '2021-05-07T10:28:23.163857Z'
-          description: Journal of cash between accounts
-          entry_type: JNLC
-          event_id: 01F535Y1FVY8WZHE763HCNS8SZ
-          idempotency_key: 72bdf18f-7410-43ec-b4e8-b6e41c5c0160
-          idempotency_key_type: single
-          journal_id: 2f144d2a-91e6-46ff-8e37-959a701cc58d
-          status_from: queued
-          status_to: executed
     JournalStatusFrom:
       description: Previous journal status in stream status-change events. Empty string is used for the initial status-change event when there is no previous status.
       type: string
@@ -6923,34 +7781,90 @@ components:
         - correct
         - ''
     KYCResultType:
-      description: "IDENTITY_VERIFICATION\tIdentity needs to be verified\n\nTAX_IDENTIFICATION\tTax ID number needs to be verified\n\nADDRESS_VERIFICATION\tAddress needs to be verified\n\nDATE_OF_BIRTH\t\
-        Date of birth needs to be verified\n\nINVALID_IDENTITY_PASSPORT\tIdentity needs to be verified via a \ngovernment issued ID. This is commonly used in conjuction with OTHER to describe the exact\
-        \ document needed.\n\nSELFIE_VERIFICATION\tIdentity needs to be verified via a live selfie of the account owner\n\nPEP\tFurther information needs to be submitted if account owner is politically\
-        \ exposed person\n\nFAMILY_MEMBER_PEP\tFurther information needs to be submitted if family member is a politically exposed person\n\nCONTROL_PERSON\tFurther information needs to be submitted if\
-        \ account owner is a control person\n\nAFFILIATED\tFurther information needs to be submitted if account owner is affiliated to finra or an exchange\n\nVISA_TYPE_OTHER\tFurther information needs\
-        \ to be submitted about account owner's visa\n\nW8BEN_CORRECTION\tIdenfitying information submitted by the user was incorrect so a new, corrected, W8BEN needs to be submitted\nCOUNTRY_NOT_SUPPORTED\t\
-        The account owner's country of tax residence is not supported by our KYC providers. In this case, we'll manully perform KYC on the user\n\nWATCHLIST_HIT\tResults from the watchlist screening need\
-        \ further investigation before account opening. No action is needed from the user\n\nOTHER\tA custom message will be sent to describe exactly what is needed from the account owner. The message will\
-        \ be displayed in the additional_information attribute.\n\nOTHER_PARTNER\tA custom message will be sent to relay information relevant only to the partner. The message will be displayed in the additional_information\
-        \ attribute."
+      description: A KYC reason identifier used as a property name in `KYCResultTypeSet`. The set is extensible, so integrations must tolerate and preserve unrecognized values.
+      examples:
+        - IDENTITY_VERIFICATION
+        - compromised_document
       title: KYCResultType
       type: string
+    KYCResultTypeSet:
+      additionalProperties:
+        maxProperties: 0
+        type: object
+      description: A nullable set of KYC reason identifiers represented as property names with empty object values. See `KYCResults` for documented identifiers and interpretation guidance.
+      examples:
+        - null
+        - {}
+        - IDENTITY_VERIFICATION: {}
+          WATCHLIST_HIT: {}
+      propertyNames:
+        $ref: '#/components/schemas/KYCResultType'
+      title: KYCResultTypeSet
+      type:
+        - object
+        - 'null'
     KYCResults:
-      description: Hold information about the result of KYC. Please see the documentation [here](https://alpaca.markets/docs/api-references/broker-api/events/#kyc-results) for more indepth details
+      description: |
+        Holds information about the result of KYC.
+
+        `accept`, `indeterminate`, and `reject` are nullable sets represented as objects. Each property name is a KYC reason identifier, and every property value is always an empty object (`{}`) carrying no nested data. For example:
+
+        ```json
+        {
+          "IDENTITY_VERIFICATION": {},
+          "WATCHLIST_HIT": {}
+        }
+        ```
+
+        Interpret each reason together with its enclosing result category and `additional_information`.
+
+        Documented reason identifiers:
+        - `IDENTITY_VERIFICATION`: A government-issued identity document is required to verify the account owner's identity.
+        - `TAX_IDENTIFICATION`: A tax identification document is required to verify the account owner's tax identification number.
+        - `ADDRESS_VERIFICATION`: Additional documentation, such as a government-issued ID or statement, may be required to verify the account owner's residential address.
+        - `DATE_OF_BIRTH`: A government-issued identity document is required to verify the account owner's date of birth.
+        - `SELFIE_VERIFICATION`: A live selfie of the account owner is required to verify identity.
+        - `PEP`: The account owner disclosed politically exposed person status, and additional information may be required.
+        - `FAMILY_MEMBER_PEP`: The account owner disclosed that an immediate family member is politically exposed, and additional information may be required.
+        - `CONTROL_PERSON`: Additional company information may be required because the account owner disclosed a control position.
+        - `AFFILIATED`: Additional firm information may be required because the account owner disclosed an affiliation with FINRA or an exchange.
+        - `VISA_TYPE_OTHER`: The account owner's visa type and expiration date may be required because the submitted visa type was "other."
+        - `W8BEN_CORRECTION`: A new W-8BEN with corrected identifying information is required.
+        - `COUNTRY_NOT_SUPPORTED`: The account owner's country of tax residence or legal residence is not supported for this account.
+        - `WATCHLIST_HIT`: Watchlist screening returned a result that requires further review; no action is needed from the account owner unless separately requested.
+        - `OTHER`: See `additional_information` for a custom message describing what is required from the account owner.
+        - `OTHER_PARTNER`: See `additional_information` for a custom message intended for the Broker API partner.
+        - `CITIZENSHIP_COUNTRY_NOT_SUPPORTED`: The account owner's country of citizenship is not supported for this account.
+        - `DIFFERING_COUNTRY`: A submitted identity document was issued by a country different from the account owner's country of tax residence.
+        - `WL_PEP_SCREENING`: Watchlist screening returned a result related to possible political exposure.
+        - `WL_LEGAL_REGULATORY_WARNING`: Watchlist screening returned a legal or regulatory warning result.
+        - `UNDER_MINIMUM_AGE`: The account owner does not meet the minimum age requirement for this account.
+        - `PEP_FOREIGN`: The account owner disclosed foreign politically exposed person status, and additional information may be required.
+        - `FAMILY_MEMBER_PEP_FOREIGN`: The account owner disclosed that an immediate family member has foreign politically exposed person status, and additional information may be required.
+        - `DISCRETIONARY`: The account is designated for discretionary trading by a registered investment adviser and requires review.
+        - `HIO`: Additional information and a declaration form may be required because the account owner disclosed being the head of an international organization.
+        - `INTERNAL_CHECK`: A non-specific account-opening check contributed to the KYC outcome; no more specific reason is available.
+        - `compromised_document`: The identity document check indicated that the document may be compromised.
+        - `data_comparison`: Data extracted from the identity document did not pass comparison checks and requires review.
+        - `image_integrity`: A document or selfie image did not pass image-integrity checks and requires review.
+
+        The set of reason identifiers is extensible, so integrations must tolerate and preserve unrecognized values.
       properties:
         accept:
-          $ref: '#/components/schemas/KYCResultType'
+          $ref: '#/components/schemas/KYCResultTypeSet'
         additional_information:
           description: Used to display a custom message.
           type: string
         indeterminate:
-          $ref: '#/components/schemas/KYCResultType'
+          $ref: '#/components/schemas/KYCResultTypeSet'
         reject:
-          $ref: '#/components/schemas/KYCResultType'
+          $ref: '#/components/schemas/KYCResultTypeSet'
         summary:
           description: Either `pass` or `fail`. Used to indicate if KYC has completed and passed or not. This field is used for internal purposes only.
           type: string
-      type: object
+      type:
+        - object
+        - 'null'
     ListAPRTiersResponse:
       description: |
         Response to a successful request for a list of APR tiers.
@@ -7140,6 +8054,32 @@ components:
       type: object
     NonTradeActivityEvent:
       description: Represents a non-trade activity SSE event
+      examples:
+        - account_id: 8e00606a-c9ac-409a-ba45-f55e8f77984a
+          at: '2024-11-26T15:25:17.803914Z'
+          description: ''
+          entry_type: JNLC
+          event_ulid: 01JDMH7BKCCB4XY5F11HN63NZX
+          id: afb78fa2-7e4c-4e0a-bca2-2e0d26a87f88
+          net_amount: 10
+          qty: 0
+          settle_date: '2024-11-26'
+          status: executed
+          symbol: ''
+          system_date: '2024-11-26'
+        - account_id: 11629972-5fd6-4e14-ad9e-0f0cabd2777f
+          at: '2024-11-12T01:15:53.132425Z'
+          description: TAF fee for proceed of 0.010052895 shares (1 trades) on 2024-11-11 by 613651765
+          entry_sub_type: TAF
+          entry_type: FEE
+          event_ulid: 01JCEZ1ZDCE44GFX6WZ75N4199
+          id: d96cea8a-6a77-46cd-bb7b-df6d74442653
+          net_amount: -0.01
+          qty: 0
+          settle_date: '2024-11-12'
+          status: executed
+          symbol: ''
+          system_date: '2024-11-11'
       properties:
         account_id:
           description: Account UUID
@@ -7225,34 +8165,6 @@ components:
         - description
       title: NonTradeActivityEvent
       type: object
-      x-examples:
-        example-1:
-          account_id: 8e00606a-c9ac-409a-ba45-f55e8f77984a
-          at: '2024-11-26T15:25:17.803914Z'
-          description: null
-          entry_type: JNLC
-          event_ulid: 01JDMH7BKCCB4XY5F11HN63NZX
-          id: afb78fa2-7e4c-4e0a-bca2-2e0d26a87f88
-          net_amount: 10
-          qty: 0
-          settle_date: '2024-11-26'
-          status: executed
-          symbol: null
-          system_date: '2024-11-26'
-        example-2:
-          account_id: 11629972-5fd6-4e14-ad9e-0f0cabd2777f
-          at: '2024-11-12T01:15:53.132425Z'
-          description: TAF fee for proceed of 0.010052895 shares (1 trades) on 2024-11-11 by 613651765
-          entry_sub_type: TAF
-          entry_type: FEE
-          event_ulid: 01JCEZ1ZDCE44GFX6WZ75N4199
-          id: d96cea8a-6a77-46cd-bb7b-df6d74442653
-          net_amount: -0.01
-          qty: 0
-          settle_date: '2024-11-12'
-          status: executed
-          symbol: null
-          system_date: '2024-11-11'
     OAuthTokenRequest:
       description: This model is used for both the Issue and Authorize OAuth token routes
       example:
@@ -7308,6 +8220,11 @@ components:
         - $ref: '#/components/schemas/CommonOptionsActivityV2'
       description: Option assignment
       type: object
+    OPCSHActivityV2:
+      allOf:
+        - $ref: '#/components/schemas/CommonOptionsActivityV2'
+      description: Option cash deliverable for non-standard contracts
+      type: object
     OPEXCActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonOptionsActivityV2'
@@ -7335,6 +8252,17 @@ components:
         status: ACTIVE
         terms_of_use: ''
         url: http://test.com
+      examples:
+        - client_id: 7a3c52a910e1dc2abbb14da2b6b8e711
+          description: Sample description
+          live_trading_approved: true
+          name: TradingApp
+          privacy_policy: ''
+          redirect_uri:
+            - http://localhost
+          status: ACTIVE
+          terms_of_use: ''
+          url: http://test.com
       properties:
         client_id:
           description: OAuth client id
@@ -7368,18 +8296,6 @@ components:
           type: string
       title: OathClientResponse
       type: object
-      x-examples:
-        example-1:
-          client_id: 7a3c52a910e1dc2abbb14da2b6b8e711
-          description: Sample description
-          live_trading_approved: true
-          name: TradingApp
-          privacy_policy: ''
-          redirect_uri:
-            - http://localhost
-          status: ACTIVE
-          terms_of_use: ''
-          url: http://test.com
     OnfidoSDKOutcome:
       description: "\"NOT_STARTED\"\tThe user has not started the SDK flow yet. outcome is set to this default value upon token generation\n\"USER_EXITED\"\tThe user exited the SDK flow\n\"SDK_ERROR\"\t\
         An error occurred in the SDK flow\n\"USER_COMPLETED\"\tThe user completed the SDK flow"
@@ -8035,7 +8951,6 @@ components:
         - status
       title: OrderClosedResponse
       type: object
-      x-examples: {}
     OrderLeg:
       properties:
         asset_class:
@@ -8126,9 +9041,14 @@ components:
           format: uuid
           type: string
         legs:
-          description: Always null for an order leg; legs are not nested beyond one level.
+          description: Always null for an order leg; legs are not nested beyond one level. An empty array is accepted for generated-client compatibility.
           example: null
-          type: object
+          items:
+            type: object
+          maxItems: 0
+          type:
+            - array
+            - 'null'
         limit_price:
           description: Limit price
           example: '3.14'
@@ -8272,7 +9192,7 @@ components:
       description: |-
         The order types supported by Alpaca vary based on the order's security type. The following provides a comprehensive breakdown of the supported order types for each category:
          - Equity trading: market, limit, stop, stop_limit, trailing_stop.
-         - Options trading: market, limit.
+         - Options trading: market, limit, stop, stop_limit.
          - Options Multileg trading: market, limit.
          - Crypto trading: market, limit, stop_limit.
       enum:
@@ -8349,6 +9269,11 @@ components:
         document_sub_type: passport
         document_type: identity_verification
         mime_type: image/jpeg
+      examples:
+        - content: /9j/Cg==
+          document_sub_type: passport
+          document_type: identity_verification
+          mime_type: image/jpeg
       properties:
         content:
           contentEncoding: base64
@@ -8372,12 +9297,6 @@ components:
         - content
       title: OwnerDocumentUploadRequest
       type: object
-      x-examples:
-        example-1:
-          content: /9j/Cg==
-          document_sub_type: passport
-          document_type: identity_verification
-          mime_type: image/jpeg
     Portfolio:
       properties:
         cooldown_days:
@@ -8604,6 +9523,25 @@ components:
       title: PortfolioWeights
       type: object
     Position:
+      examples:
+        - asset_class: us_equity
+          asset_id: 93f58d0b-6c53-432d-b8ce-2bad264dbd94
+          asset_marginable: false
+          avg_entry_price: '172.08'
+          change_today: '0.0189483657034581'
+          cost_basis: '688.32'
+          current_price: '172.08'
+          exchange: NASDAQ
+          lastday_price: '168.88'
+          market_value: '688.32'
+          qty: '4'
+          qty_available: '4'
+          side: long
+          symbol: AAPL
+          unrealized_intraday_pl: '0'
+          unrealized_intraday_plpc: '0'
+          unrealized_pl: '0'
+          unrealized_plpc: '0'
       properties:
         asset_class:
           $ref: '#/components/schemas/AssetClass'
@@ -8717,48 +9655,13 @@ components:
         - lastday_price
         - change_today
       type: object
-      x-examples:
-        example-1:
-          asset_class: us_equity
-          asset_id: 93f58d0b-6c53-432d-b8ce-2bad264dbd94
-          asset_marginable: false
-          avg_entry_price: '172.08'
-          change_today: '0.0189483657034581'
-          cost_basis: '688.32'
-          current_price: '172.08'
-          exchange: NASDAQ
-          lastday_price: '168.88'
-          market_value: '688.32'
-          qty: '4'
-          qty_available: '4'
-          side: long
-          symbol: AAPL
-          unrealized_intraday_pl: '0'
-          unrealized_intraday_plpc: '0'
-          unrealized_pl: '0'
-          unrealized_plpc: '0'
     PositionClosedResponse:
       description: |-
         Represents the result of asking the api to close a position.
 
         `body` is the Order used to close out the position.
-      properties:
-        body:
-          $ref: '#/components/schemas/Order'
-        status:
-          description: Http status code for the attempt to close this position
-          type: integer
-        symbol:
-          description: Symbol name of the asset
-          type: string
-      required:
-        - symbol
-        - status
-      title: PositionClosedResponse
-      type: object
-      x-examples:
-        example-1:
-          body:
+      examples:
+        - body:
             asset_class: us_equity
             asset_id: b0b6dd9d-8b9b-48a9-ba46-b9d54906e415
             canceled_at: null
@@ -8794,6 +9697,20 @@ components:
             updated_at: '2022-02-04T16:53:29.53427917Z'
           status: 200
           symbol: AAPL
+      properties:
+        body:
+          $ref: '#/components/schemas/Order'
+        status:
+          description: Http status code for the attempt to close this position
+          type: integer
+        symbol:
+          description: Symbol name of the asset
+          type: string
+      required:
+        - symbol
+        - status
+      title: PositionClosedResponse
+      type: object
     PositionIntent:
       description: Represents the desired position strategy.
       enum:
@@ -8804,6 +9721,12 @@ components:
       example: buy_to_open
       title: PositionIntent
       type: string
+    REOActivityV2:
+      allOf:
+        - $ref: '#/components/schemas/CommonCaActivityV2'
+        - $ref: '#/components/schemas/CommonREOActivityV2'
+      description: Reorganization (REO)
+      type: object
     RebalancingConditions:
       properties:
         day:
@@ -8866,6 +9789,16 @@ components:
       title: RestrictToLiquidationReasons
       type: object
     ReverseBatchJournalRequest:
+      examples:
+        - entries:
+            - amount: '10'
+              from_account: 8e00606a-c9ac-409a-ba45-f55e8f77984a
+            - amount: '100'
+              from_account: b9b19618-22dd-4e80-8432-fc9e1ba0b27d
+            - amount: '100'
+              from_account: c96a5e16-7fca-425a-b67b-0814d064bfc0
+          entry_type: JNLC
+          to_account: 8f8c8cee-2591-4f83-be12-82c659b5e748
       properties:
         entries:
           items:
@@ -8890,17 +9823,6 @@ components:
           description: The destination of funds. Most likely is your Sweep Firm Account
           type: string
       type: object
-      x-examples:
-        Example 1:
-          entries:
-            - amount: '10'
-              from_account: 8e00606a-c9ac-409a-ba45-f55e8f77984a
-            - amount: '100'
-              from_account: b9b19618-22dd-4e80-8432-fc9e1ba0b27d
-            - amount: '100'
-              from_account: c96a5e16-7fca-425a-b67b-0814d064bfc0
-          entry_type: JNLC
-          to_account: 8f8c8cee-2591-4f83-be12-82c659b5e748
     ReverseSplitActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonSplitStockActivityV2'
@@ -9158,6 +10080,23 @@ components:
       type: object
     StatusFundingEvent:
       description: 'Represents a change in a Funding entity''s status, sent over the events streaming api. Currently, the suppported entities are: bank relationships, bank wires, transfers and funding wallets.'
+      examples:
+        - account_id: 8e00606a-c9ac-409a-ba45-f55e8f77984a
+          at: '2025-04-11T19:52:24.066998Z'
+          correspondent: LPCA
+          entity_id: c4ed4206-697b-4859-ab71-b9de6649859d
+          entity_type: BankRelationship
+          event_id: 01F7VQQ782DM57SJNWAYMD14J9
+          status_to: QUEUED
+        - account_id: 8e00606a-c9ac-409a-ba45-f55e8f77984a
+          at: '2025-04-11T19:52:24.066998Z'
+          correspondent: LPCA
+          entity_id: c4ed4206-697b-4859-ab71-b9de6649859d
+          entity_type: BankRelationship
+          event_id: 01F7VQQ782DM57SJNWAYMD14J9
+          reason: bank account owner name does not match brokerage account name
+          status_from: QUEUED
+          status_to: REJECTED
       properties:
         account_id:
           description: Account UUID
@@ -9269,32 +10208,18 @@ components:
         - status_to
       title: StatusFundingEvent
       type: object
-      x-examples:
-        example-1:
-          account_id: 8e00606a-c9ac-409a-ba45-f55e8f77984a
-          at: '2025-04-11T19:52:24.066998Z'
-          correspondent: LPCA
-          entity_id: c4ed4206-697b-4859-ab71-b9de6649859d
-          entity_type: BankRelationship
-          event_id: 01F7VQQ782DM57SJNWAYMD14J9
-          status_from: null
-          status_to: QUEUED
-        example-2:
-          account_id: 8e00606a-c9ac-409a-ba45-f55e8f77984a
-          at: '2025-04-11T19:52:24.066998Z'
-          correspondent: LPCA
-          entity_id: c4ed4206-697b-4859-ab71-b9de6649859d
-          entity_type: BankRelationship
-          event_id: 01F7VQQ782DM57SJNWAYMD14J9
-          reason: bank account owner name does not match brokerage account name
-          status_from: QUEUED
-          status_to: REJECTED
     StreetAddress:
       example: 20 N San Mateo Dr
       type: string
     SystemEventV2:
       description: |
         Represents that system event had occurred and sent over the events streaming api.
+      examples:
+        - at: '2026-01-05T10:28:23.163857Z'
+          description: End-of-day balances are now available.
+          event_id: 01F535Y1FVY8WZHE763HCNS8SZ
+          system_date: '2026-01-05'
+          type: eod_balances_ready
       properties:
         at:
           description: Timestamp of the event
@@ -9325,9 +10250,6 @@ components:
         - description
       title: SystemEvent
       type: object
-      x-examples:
-        example-1:
-          $ref: '#/components/examples/SystemEventV2'
     TaxIdType:
       description: |-
         Required if `tax_id` is set.
@@ -9525,7 +10447,7 @@ components:
       description: |-
         The Time-In-Force values supported by Alpaca vary based on the order's security type. Here is a breakdown of the supported TIFs for each specific security type:
         - Equity trading: day, gtc, opg, cls, ioc, fok.
-        - Options trading: day.
+        - Options trading: day, gtc.
         - Crypto trading: gtc, ioc.
 
         Below are the descriptions of each TIF:
@@ -9561,6 +10483,8 @@ components:
       enum:
         - xstocks
         - st0x
+        - binance
+        - coinbase
       example: xstocks
       title: TokenizationIssuer
       type: string
@@ -9668,6 +10592,8 @@ components:
         - ton
         - tron
         - mantle
+        - cronos
+        - hyperevm
       example: solana
       title: TokenizationNetwork
       type: string
@@ -9878,6 +10804,102 @@ components:
         This is an extended version of the Account model found [in the trading api](https://alpaca.markets/docs/api-references/trading-api/account/#account-entity).
 
         Extra data has been added that would be useful for brokers.
+      examples:
+        - account_blocked: false
+          account_number: '927584925'
+          accrued_fees: '0'
+          admin_configurations: {}
+          balance_asof: '2021-04-01'
+          buying_power: '103556.8572572922'
+          cash: '24861.91'
+          cash_transferable: '24861.91'
+          cash_withdrawable: '17861.91'
+          clearing_broker: VELOX
+          created_at: '2021-03-01T13:28:49.270232Z'
+          crypto_status: ACTIVE
+          currency: USD
+          effective_buying_power: '103556.8572572922'
+          equity: '28059.3882330664'
+          id: c8f1ef5d-edc0-4f23-9ee4-378f19cb92a4
+          initial_margin: '1598.7391165332'
+          intraday_adjustments: '0'
+          last_buying_power: '104433.9158860662'
+          last_cash: '23861.91'
+          last_equity: '26977.323677655'
+          last_initial_margin: '1557.7068388275'
+          last_long_market_value: '3115.413677655'
+          last_maintenance_margin: '934.6241032965'
+          last_options_buying_power: '25419.62'
+          last_regt_buying_power: '50839.233677655'
+          last_short_market_value: '0'
+          long_market_value: '3197.4782330664'
+          maintenance_margin: '959.24346991992'
+          multiplier: '2'
+          non_marginable_buying_power: '24861.91'
+          options_approved_level: 0
+          options_buying_power: '26460.65'
+          options_trading_level: 0
+          pending_reg_taf_fees: '0'
+          pending_transfer_out: '0'
+          portfolio_value: '28059.3882330664'
+          position_market_value: '3197.4782330664'
+          previous_close: '2021-04-01T19:00:00-04:00'
+          regt_buying_power: '52921.2982330664'
+          short_market_value: '0'
+          shorting_enabled: true
+          sma: '26758.0590204615'
+          status: ACTIVE
+          trade_suspended_by_user: false
+          trading_blocked: false
+          transfers_blocked: false
+        - account_blocked: false
+          account_number: '601612064'
+          accrued_fees: '0'
+          admin_configurations: {}
+          balance_asof: '2022-02-08'
+          buying_power: '83567.42'
+          cash: '83567.42'
+          cash_transferable: '41783.71'
+          cash_withdrawable: '0'
+          clearing_broker: VELOX
+          created_at: '2022-01-21T21:25:26.713802Z'
+          crypto_status: PAPER_ONLY
+          currency: USD
+          effective_buying_power: '83567.42'
+          equity: '83567.42'
+          id: 56712986-9ff7-4d8f-8e52-077e099e533e
+          initial_margin: '0'
+          intraday_adjustments: '0'
+          last_buying_power: '41783.71'
+          last_cash: '41783.71'
+          last_equity: '41783.71'
+          last_initial_margin: '0'
+          last_long_market_value: '0'
+          last_maintenance_margin: '0'
+          last_options_buying_power: '41783.71'
+          last_regt_buying_power: '41783.71'
+          last_short_market_value: '0'
+          long_market_value: '0'
+          maintenance_margin: '0'
+          multiplier: '1'
+          non_marginable_buying_power: '41783.71'
+          options_approved_level: 2
+          options_buying_power: '83567.42'
+          options_trading_level: 1
+          pending_reg_taf_fees: '0.01'
+          pending_transfer_in: '0'
+          pending_transfer_out: '0'
+          portfolio_value: '83567.42'
+          position_market_value: '0'
+          previous_close: '2022-02-08T19:00:00-05:00'
+          regt_buying_power: '83567.42'
+          short_market_value: '0'
+          shorting_enabled: false
+          sma: '0'
+          status: ACTIVE
+          trade_suspended_by_user: false
+          trading_blocked: false
+          transfers_blocked: false
       properties:
         account_blocked:
           description: If true, the account activity by user is prohibited.
@@ -10143,96 +11165,6 @@ components:
         - balance_asof
         - cash
       type: object
-      x-examples:
-        example-1:
-          account_blocked: false
-          account_number: '927584925'
-          accrued_fees: '0'
-          balance_asof: '2021-04-01'
-          buying_power: '103556.8572572922'
-          cash: '24861.91'
-          cash_transferable: '24861.91'
-          cash_withdrawable: '17861.91'
-          clearing_broker: VELOX
-          created_at: '2021-03-01T13:28:49.270232Z'
-          currency: USD
-          equity: '28059.3882330664'
-          id: c8f1ef5d-edc0-4f23-9ee4-378f19cb92a4
-          initial_margin: '1598.7391165332'
-          intraday_adjustments: '0'
-          last_buying_power: '104433.9158860662'
-          last_cash: '23861.91'
-          last_equity: '26977.323677655'
-          last_initial_margin: '1557.7068388275'
-          last_long_market_value: '3115.413677655'
-          last_maintenance_margin: '934.6241032965'
-          last_options_buying_power: '25419.62'
-          last_regt_buying_power: '50839.233677655'
-          last_short_market_value: '0'
-          long_market_value: '3197.4782330664'
-          maintenance_margin: '959.24346991992'
-          multiplier: '2'
-          options_approved_level: 0
-          options_buying_power: '26460.65'
-          options_trading_level: 0
-          pending_reg_taf_fees: '0'
-          pending_transfer_out: '0'
-          portfolio_value: '28059.3882330664'
-          previous_close: '2021-04-01T19:00:00-04:00'
-          regt_buying_power: '52921.2982330664'
-          short_market_value: '0'
-          shorting_enabled: true
-          sma: '26758.0590204615'
-          status: ACTIVE
-          trade_suspended_by_user: false
-          trading_blocked: false
-          transfers_blocked: false
-        example-2:
-          account_blocked: false
-          account_number: '601612064'
-          accrued_fees: '0'
-          balance_asof: '2022-02-08'
-          buying_power: '83567.42'
-          cash: '83567.42'
-          cash_transferable: '41783.71'
-          cash_withdrawable: '0'
-          clearing_broker: VELOX
-          created_at: '2022-01-21T21:25:26.713802Z'
-          crypto_status: PAPER_ONLY
-          currency: USD
-          equity: '83567.42'
-          id: 56712986-9ff7-4d8f-8e52-077e099e533e
-          initial_margin: '0'
-          intraday_adjustments: '0'
-          last_buying_power: '41783.71'
-          last_cash: '41783.71'
-          last_equity: '41783.71'
-          last_initial_margin: '0'
-          last_long_market_value: '0'
-          last_maintenance_margin: '0'
-          last_options_buying_power: '41783.71'
-          last_regt_buying_power: '41783.71'
-          last_short_market_value: '0'
-          long_market_value: '0'
-          maintenance_margin: '0'
-          multiplier: '1'
-          non_marginable_buying_power: '41783.71'
-          options_approved_level: 2
-          options_buying_power: '83567.42'
-          options_trading_level: 1
-          pending_reg_taf_fees: '0.01'
-          pending_transfer_in: '0'
-          pending_transfer_out: '0'
-          portfolio_value: '83567.42'
-          previous_close: '2022-02-08T19:00:00-05:00'
-          regt_buying_power: '83567.42'
-          short_market_value: '0'
-          shorting_enabled: false
-          sma: '0'
-          status: ACTIVE
-          trade_suspended_by_user: false
-          trading_blocked: false
-          transfers_blocked: false
     TradeActivity:
       properties:
         cum_qty:
@@ -10297,7 +11229,7 @@ components:
           - `timestamp`: The time at which the order was filled.
         - `partial_fill`: Sent when a number of shares less than the total remaining quantity on your order has been filled.
           - `timestamp`: The time at which the shares were filled.
-        - `canceled`: Sent when your requested cancellation of an order is processed.
+        - `canceled`: Sent when the order transitions to the `canceled` state. This can be triggered by a user-submitted cancel request, by Alpaca as part of automated processing (e.g. corporate-action sweeps, aged-GTC expiration, overnight-session lifecycle), or by an upstream execution venue. When Alpaca populates a machine-readable cause, it is exposed on the top-level `reason` field — see the `reason` property on `TradeUpdateEventV2` for known values (e.g. `CORPORATE_ACTION`).
           - `timestamp`: The time at which the order was canceled.
         - `expired`: Sent when an order has reached the end of its lifespan, as determined by the order's time in force value.
           - `timestamp`: The time at which the order expired.
@@ -10395,6 +11327,23 @@ components:
           description: Only present when event is either `fill`, `partial_fill`, `trade_bust` and `trade_correct`. The amount of shares this Trade order was for. <br /> For `trade_bust` events, the qty
             field may be negative, representing a reversal of the original quantity.
           type: string
+        reason:
+          description: |
+            Machine-readable code that explains **why** the event occurred. Only present when a reason applies; omitted from routine lifecycle events such as `new`, `fill`, and `partial_fill`.
+
+            Known values:
+
+            | Value | Event(s) | Meaning |
+            | --- | --- | --- |
+            | `CORPORATE_ACTION` | `canceled` | Alpaca canceled the order internally because the underlying is scheduled for a mandatory corporate action other than a cash dividend (e.g. reverse split, symbol/CUSIP change, merger, liquidation). Emitted by the overnight-session lifecycle and, where enabled by Alpaca, the daytime GTC corporate-action sweep. Not emitted when the cancel is routed to the upstream venue instead (e.g. day-session, `extended_hours=false`, agency- or mixed-capacity orders); those `canceled` events carry the venue's own text in `reason` if any. |
+            | `TOO_LATE_TO_CANCEL` | `order_cancel_rejected`, `order_replace_rejected` | The cancel or replace request arrived after the order had already reached a terminal state (typically `filled`). |
+            | `TRADE_BUST` | `trade_bust` | Alpaca operations replayed or synthesized a bust of a previously reported execution. Busts that originate from the upstream venue surface the venue's own text in `reason` (or omit it entirely), so consumers should not rely on `TRADE_BUST` alone to identify all busts — key on the `event` field (`trade_bust`) for that. |
+
+            Free-form strings may also appear in `reason`. In particular, `canceled`, `trade_bust`, and `trade_correct` events originating from the upstream venue carry the venue's own text field (when the venue provides one) rather than an Alpaca-defined code. Consumers should tolerate unknown values and, where they need to distinguish cases, key on `event` first and use `reason` as a secondary hint.
+          example: CORPORATE_ACTION
+          type:
+            - string
+            - 'null'
         settle_date:
           description: Settlement date of the trade in format `YYYY-MM-DD` for `fill` and `partial_fill` events
           example: '2026-03-03'
@@ -10440,6 +11389,16 @@ components:
       title: TradeUpdateEventV2Leg
       type: object
     Transaction:
+      examples:
+        - account_id: 06b9d76e-1733-460c-844e-48d1ae0f10c3
+          account_name: Just In Time Receivable - JITS
+          account_no: JTRJITS00
+          amount: '1'
+          balance: '4186.36'
+          contra_account_name: Just In Time Interest Income
+          description: debit balance = 4185.36, base_rate = 0.0375, spread = 0.05
+          entry_type: JNLC
+          system_date: '2022-06-10'
       properties:
         account_id:
           description: The ledger ID
@@ -10469,22 +11428,32 @@ components:
           description: Date of transaction
           type: string
       type: object
-      x-examples:
-        Example 1:
-          account_id: 06b9d76e-1733-460c-844e-48d1ae0f10c3
-          account_name: Just In Time Receivable - JITS
-          account_no: JTRJITS00
-          amount: '1'
-          balance: '4186.36'
-          contra_account_name: Just In Time Interest Income
-          description: debit balance = 4185.36, base_rate = 0.0375, spread = 0.05
-          entry_type: JNLC
-          system_date: '2022-06-10'
     Transfer:
       description: |-
         Transfers allow you to transfer money/balance into your end customers' account (deposits) or out (withdrawal).
 
         [Main docs here](https://alpaca.markets/docs/api-references/broker-api/funding/transfers/#the-transfer-object)
+      examples:
+        - account_id: 449e7a5c-69d3-4b8a-aaaf-5c9b713ebc65
+          additional_information: string
+          amount: string
+          bank_id: f1ae96de-94c1-468e-93a3-6b7213930ca8
+          created_at: '2019-08-24T14:15:22Z'
+          direction: INCOMING
+          expires_at: '2019-08-24T14:15:22Z'
+          id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+          ira:
+            distribution_reason: normal
+            fed_withholding_amount: '102.5'
+            fed_withholding_pct: '10.25'
+            state_withholding_amount: '97.5'
+            state_withholding_pct: '9.75'
+            tax_year: '2024'
+          reason: string
+          relationship_id: 81412018-ffa2-43f9-a3eb-d39f1c5e0f87
+          status: QUEUED
+          type: ach
+          updated_at: '2019-08-24T14:15:22Z'
       properties:
         account_id:
           description: The account ID
@@ -10568,28 +11537,6 @@ components:
         - created_at
       title: Transfer
       type: object
-      x-examples:
-        example-1:
-          account_id: 449e7a5c-69d3-4b8a-aaaf-5c9b713ebc65
-          additional_information: string
-          amount: string
-          bank_id: f1ae96de-94c1-468e-93a3-6b7213930ca8
-          created_at: '2019-08-24T14:15:22Z'
-          direction: INCOMING
-          expires_at: '2019-08-24T14:15:22Z'
-          id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
-          ira:
-            distribution_reason: normal
-            fed_withholding_amount: '102.5'
-            fed_withholding_pct: '10.25'
-            state_withholding_amount: '97.5'
-            state_withholding_pct: '9.75'
-            tax_year: '2024'
-          reason: string
-          relationship_id: 81412018-ffa2-43f9-a3eb-d39f1c5e0f87
-          status: QUEUED
-          type: ach
-          updated_at: '2019-08-24T14:15:22Z'
     TransferDirection:
       description: |
         - **INCOMING**
@@ -10694,6 +11641,21 @@ components:
       type: string
     TransferStatusEvent:
       description: Represents a change in a Transfer's status, sent over the events streaming api.
+      examples:
+        - account_id: 8e00606a-c9ac-409a-ba45-f55e8f77984a
+          at: '2021-06-10T19:52:24.066998Z'
+          event_id: 15961
+          event_ulid: 01F7VQQ782DM57SJNWAYMD14J9
+          status_from: QUEUED
+          status_to: SENT_TO_CLEARING
+          transfer_id: c4ed4206-697b-4859-ab71-b9de6649859d
+        - account_id: 8e00606a-c9ac-409a-ba45-f55e8f77984a
+          at: '2021-06-10T20:02:24.280178Z'
+          event_id: 15962
+          event_ulid: 01F7VQQ782DM57SJNWAYMD14JA
+          status_from: SENT_TO_CLEARING
+          status_to: COMPLETE
+          transfer_id: c4ed4206-697b-4859-ab71-b9de6649859d
       properties:
         account_id:
           description: Account UUID
@@ -10731,22 +11693,6 @@ components:
         - transfer_id
       title: TransferStatusEvent
       type: object
-      x-examples:
-        example-1:
-          account_id: 8e00606a-c9ac-409a-ba45-f55e8f77984a
-          at: '2021-06-10T19:52:24.066998Z'
-          event_id: 15961
-          event_ulid: 01F7VQQ782DM57SJNWAYMD14J9
-          status_from: QUEUED
-          status_to: SENT_TO_CLEARING
-          transfer_id: c4ed4206-697b-4859-ab71-b9de6649859d
-        example-2:
-          account_id: 8e00606a-c9ac-409a-ba45-f55e8f77984a
-          at: '2021-06-10T20:02:24.280178Z'
-          event_id: 15962
-          status_from: SENT_TO_CLEARING
-          status_to: COMPLETE
-          transfer_id: c4ed4206-697b-4859-ab71-b9de6649859d
     TransferStatusFrom:
       description: Previous transfer status in stream status-change events. Empty string is used for the initial status-change event when there is no previous status.
       type: string
@@ -11041,6 +11987,30 @@ components:
       type: object
     W8benDocument:
       description: Use this property (instead of the content property) to upload W-8 BEN data in JSON format.
+      examples:
+        - additional_conditions: None
+          country_citizen: Australia
+          date: '2021-06-14'
+          date_of_birth: '1970-01-01'
+          foreign_tax_id: 123 456 789
+          ftin_not_required: false
+          full_name: John Doe
+          income_type: interest
+          ip_address: 127.0.0.1
+          mailing_address_city_state: Adelaide, South Australia
+          mailing_address_country: Australia
+          mailing_address_street: 51 Main St
+          paragraph_number: '15'
+          percent_rate_withholding: 5
+          permanent_address_city_state: Adelaide, South Australia
+          permanent_address_country: Australia
+          permanent_address_street: 20 Main St
+          reference_number: abc123
+          residency: Australia
+          revision: 10-2021
+          signer_full_name: Mr. Signing User
+          tax_id_ssn: 123-00-456
+          timestamp: '2021-06-14T09:31:05Z'
       properties:
         additional_conditions:
           description: Any additional conditions to specify
@@ -11124,31 +12094,6 @@ components:
         - timestamp
         - signer_full_name
       type: object
-      x-examples:
-        Example 1:
-          additional_conditions: None
-          country_citizen: Australia
-          date: '2021-06-14'
-          date_of_birth: '1970-01-01'
-          foreign_tax_id: 123 456 789
-          ftin_not_required: false
-          full_name: John Doe
-          income_type: interest
-          ip_address: 127.0.0.1
-          mailing_address_city_state: Adelaide, South Australia
-          mailing_address_country: Australia
-          mailing_address_street: 51 Main St
-          paragraph_number: '15'
-          percent_rate_withholding: 5
-          permanent_address_city_state: Adelaide, South Australia
-          permanent_address_country: Australia
-          permanent_address_street: 20 Main St
-          reference_number: abc123
-          residency: Australia
-          revision: 10-2021
-          signer_full_name: Mr. Signing User
-          tax_id_ssn: 123-00-456
-          timestamp: '2021-06-14T09:31:05Z'
     WRMActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonCaActivityV2'
@@ -12357,6 +13302,410 @@ paths:
       summary: Create sandbox deposit transfer
       tags:
         - Funding Wallets
+  /v1beta1/acats:
+    get:
+      description: 'List all incoming and outgoing transfers, for all accounts. The list may include transfers not initiated using this API. The list is paginated: use the `page_token` query parameter with
+        the value returned in the response to continue listing transfers.'
+      operationId: listACATSTransfers
+      parameters:
+        - description: Filter by the account number associated with the transfer
+          in: query
+          name: account_number
+          required: false
+          schema:
+            type: string
+        - description: Filter by the type of the transfer
+          in: query
+          name: transfer_type
+          required: false
+          schema:
+            $ref: '#/components/schemas/AcatsDtccTransferType'
+        - description: Filter by the direction of the transfer
+          in: query
+          name: transfer_direction
+          required: false
+          schema:
+            $ref: '#/components/schemas/AcatsTransferDirection'
+        - description: Filter by the current status of the transfer
+          in: query
+          name: transfer_status
+          required: false
+          schema:
+            $ref: '#/components/schemas/AcatsTransferStatus'
+        - description: Filter by the current DTCC status of the transfer
+          in: query
+          name: dtcc_status
+          required: false
+          schema:
+            $ref: '#/components/schemas/AcatsDtccStatus'
+        - description: Filter by the contra broker number of the transfer
+          in: query
+          name: contra_broker_number
+          required: false
+          schema:
+            type: string
+        - description: List transfers created at or after this RFC-3339 timestamp (e.g. `2026-01-01T00:00:00Z`).
+          in: query
+          name: since
+          required: false
+          schema:
+            $ref: '#/components/schemas/AcatsTimestamp'
+        - description: List transfers created strictly before this RFC-3339 timestamp (exclusive -- e.g. `2026-01-01T00:00:00Z` excludes transfers created exactly at that instant).
+          in: query
+          name: until
+          required: false
+          schema:
+            $ref: '#/components/schemas/AcatsTimestamp'
+        - description: Specify whether transfers should be sorted by creation time in ascending or descending order
+          in: query
+          name: sort_direction
+          required: false
+          schema:
+            $ref: '#/components/schemas/AcatsSortDirection'
+        - description: Specify the field to sort by. Defaults to `created_at`.
+          in: query
+          name: sort_by
+          required: false
+          schema:
+            default: created_at
+            enum:
+              - account_number
+              - total_transfer_value
+              - created_at
+              - contra_account_number
+              - contra_broker_number
+              - external_transfer_id
+              - settled_at
+              - status
+              - transfer_type
+              - updated_at
+            type: string
+        - description: Maximum number of transfers to return on one page
+          in: query
+          name: limit
+          required: false
+          schema:
+            format: int32
+            type: integer
+        - description: Page token for the next or previous page, used to continue listing transfers
+          in: query
+          name: page_token
+          required: false
+          schema:
+            $ref: '#/components/schemas/AcatsPageToken'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsListTransfersResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Bad Request
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Forbidden
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Internal Server Error
+      summary: List transfers
+      tags:
+        - ACATS
+  /v1beta1/acats/{account_id}:
+    get:
+      description: List all incoming and outgoing transfers where the account was one of the parties. The list may include transfers not initiated using this API. By default, the response includes all transfers
+        for the account for backwards compatibility. To paginate results, provide the `limit` query parameter and use the `page_token` value returned in the response to continue listing transfers.
+      operationId: listACATSTransfersByAccount
+      parameters:
+        - description: Account ID associated with the ACATS transfer
+          in: path
+          name: account_id
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - description: Maximum number of transfers to return on one page
+          in: query
+          name: limit
+          required: false
+          schema:
+            format: int32
+            type: integer
+        - description: Page token for the next or previous page, used to continue listing transfers
+          in: query
+          name: page_token
+          required: false
+          schema:
+            $ref: '#/components/schemas/AcatsPageToken'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsListTransfersResponse'
+          description: OK
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Forbidden
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Internal Server Error
+      summary: List transfers for an account
+      tags:
+        - ACATS
+    post:
+      description: This endpoint allows you to create new incoming ACATS requests. We currently support full and partial transfer types, for US equities and cash. Note that after submitting a request, it
+        might take some time for the transfer to show up on the other endpoints. Transfers are not immediately sent to DTCC, and will appear in the `PENDING` state initially.
+      operationId: requestACATSTransfer
+      parameters:
+        - description: Account ID associated with the ACATS transfer
+          in: path
+          name: account_id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcatsInitiateTransferRequest'
+        description: Details of the incoming ACATS transfer to initiate.
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsInitiateTransferResponse'
+          description: Accepted
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Bad Request
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: |
+            Unprocessable Entity. Returned when:
+            - the cleansed contra account number contains no digit at all;
+            - `validate_account_number` is `true` and the contra account number matches none of the contra broker's enabled format rules;
+            - the calling correspondent is pending migration, in which case the account is treated as being in distribution.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Internal Server Error
+      summary: Initiate an incoming transfer
+      tags:
+        - ACATS
+      x-readme:
+        code-samples:
+          - code: |-
+              curl --request POST \
+                --url https://broker-api.alpaca.markets/v1beta1/acats/{account_id} \
+                -u "$BROKER_API_KEY:$BROKER_API_SECRET" \
+                --header 'content-type: application/json' \
+                --data '{
+                  "contra_account_details": {
+                    "broker_number": "0158",
+                    "account_number": "A00000123",
+                    "customer_name": "Jane Doe",
+                    "customer_tax_id": "123456789"
+                  },
+                  "transfer_details": {
+                    "type": "PARTIAL",
+                    "cash": [
+                      { "amount": "10000", "currency": "USD" }
+                    ],
+                    "securities": {
+                      "equities": [
+                        { "symbol": "AAPL", "qty": "2", "position": "LONG" },
+                        { "cusip": "123456789", "qty": "5", "position": "LONG" },
+                        { "symbol": "TSLA", "position": "SHORT" }
+                      ]
+                    }
+                  },
+                  "ip_address": "203.0.113.42",
+                  "signed_at": "2026-04-29T13:00:00Z"
+                }'
+            language: shell
+            name: Partial transfer (cash + equities)
+          - code: |-
+              curl --request POST \
+                --url https://broker-api.alpaca.markets/v1beta1/acats/{account_id} \
+                -u "$BROKER_API_KEY:$BROKER_API_SECRET" \
+                --header 'content-type: application/json' \
+                --data '{
+                  "contra_account_details": {
+                    "broker_number": "0158",
+                    "account_number": "A00000123",
+                    "customer_name": "Jane Doe",
+                    "customer_tax_id": "123456789"
+                  },
+                  "transfer_details": { "type": "FULL" },
+                  "ip_address": "203.0.113.42",
+                  "signed_at": "2026-04-29T13:00:00Z"
+                }'
+            language: shell
+            name: Full transfer (entire account)
+  /v1beta1/acats/{account_id}/{acats_id}:
+    get:
+      description: Includes the same information returned by the list transfers endpoints, but for just one transfer.
+      operationId: getACATSTransfer
+      parameters:
+        - description: Account ID associated with the ACATS transfer
+          in: path
+          name: account_id
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - description: The ID of the ACATS transfer
+          in: path
+          name: acats_id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsTransfer'
+          description: OK
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Not Found. No transfer with this `acats_id` exists for the given `account_id`.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Internal Server Error
+      summary: Get transfer details
+      tags:
+        - ACATS
+  /v1beta1/acats/{account_id}/{acats_id}/assets:
+    get:
+      description: Assets are only available for partial transfers and for transfers where the deliverer has already responded with the list of assets. The asset list may change as the transfer is updated
+        by the deliverer, all the way up until the transfer settles.
+      operationId: listACATSAssets
+      parameters:
+        - description: Account ID associated with the ACATS transfer
+          in: path
+          name: account_id
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - description: The ID of the ACATS transfer
+          in: path
+          name: acats_id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsListAssetsResponse'
+          description: OK
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Not Found. No transfer with this `acats_id` exists for the given `account_id`.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Internal Server Error
+      summary: List assets for a transfer
+      tags:
+        - ACATS
+  /v1beta1/acats/contrabrokers:
+    get:
+      description: This information is provided based on the latest ACATS Participant Master File, and contains the DTCC account numbers of valid contra brokers. Only participants that are either brokers
+        or banks are returned. These numbers are the valid values for the `broker_number` property that is required for initiating transfers.
+      operationId: listACATSContraBrokers
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                brokers:
+                  - name: Example Brokerage Inc.
+                    number: '0001'
+                    type: BROKER
+                  - name: Example Bank, N.A.
+                    number: '0002'
+                    type: BANK
+              schema:
+                $ref: '#/components/schemas/AcatsListContraBrokersResponse'
+          description: OK
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Forbidden
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcatsError'
+          description: Internal Server Error
+      summary: List contra brokers
+      tags:
+        - ACATS
   /v1beta1/logos/{symbol}:
     get:
       description: |-
@@ -12835,6 +14184,12 @@ paths:
       requestBody:
         content:
           application/json:
+            examples:
+              Example 1:
+                value:
+                  outcome: USER_EXITED
+                  reason: User denied consent
+                  token: header.payload.signature
             schema:
               properties:
                 outcome:
@@ -12849,11 +14204,6 @@ paths:
                 - outcome
                 - token
               type: object
-              x-examples:
-                Example 1:
-                  outcome: USER_EXITED
-                  reason: User denied consent
-                  token: header.payload.signature
       responses:
         '200':
           description: OK
@@ -12897,14 +14247,15 @@ paths:
         '200':
           content:
             application/json:
+              examples:
+                Example 1:
+                  value:
+                    token: header.payload.signature
               schema:
                 properties:
                   token:
                     type: string
                 type: object
-                x-examples:
-                  Example 1:
-                    token: header.payload.signature
           description: OK
         '422':
           description: Onfido applicant not yet created for account. If you haven't already contacted Alapca to enable Onfido, please do so.
@@ -15709,7 +17060,7 @@ paths:
         - Funding
     post:
       description: |
-        Creates a new JIT settlement, which will trigger the reconciliation process for all included accounts.
+        Creates a new JIT settlement, which will trigger the reconciliation process for all included accounts. There is a limit of 150,000 accounts per settlement. If more than 150,000 accounts need to be settled, they should be batched in multiple settlements.
       operationId: post-v1-jit-settlements
       requestBody:
         content:
@@ -16016,7 +17367,7 @@ paths:
         Note that if there is an invalid account_id the whole batch operation will be canceled.
         Every single request must be valid for the entire batch operation to succeed.
 
-        In the case of a successful request, the response will contain an array of journal objects with an extra attribute error_message in the case when a specific account fails to submit a journal.
+        A successful response contains an array of JNLC journal objects. If any account or entry is invalid, the whole batch operation is canceled and no per-item error result is returned.
       operationId: post-v1-journals-reverse_batch
       requestBody:
         content:
@@ -16029,7 +17380,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/BatchJournalResponse'
+                  $ref: '#/components/schemas/JNLC'
                 type: array
           description: OK
         '400':
@@ -17681,6 +19032,15 @@ paths:
       requestBody:
         content:
           application/json:
+            examples:
+              Example 1:
+                value:
+                  notional: '40'
+                  side: buy
+                  swap_fee_bps: 45
+                  symbol: AAPL
+                  time_in_force: day
+                  type: market
             schema:
               properties:
                 notional:
@@ -17696,14 +19056,6 @@ paths:
                 type:
                   $ref: '#/components/schemas/OrderType'
               type: object
-              x-examples:
-                Example 1:
-                  notional: '40'
-                  side: buy
-                  swap_fee_bps: 45
-                  symbol: AAPL
-                  time_in_force: day
-                  type: market
       responses:
         '200':
           content:
@@ -19122,6 +20474,7 @@ tags:
   - name: Cash Interest
   - name: FPSL Program
   - name: Tokenization
+  - name: ACATS
   - description: |
       Endpoints for discovering and tracking IPO (Initial Public Offering) lifecycle data. Use [`GET /v1/ipos`](#operation/listIPOOfferings) and [`GET /v1/ipos/{offering_reference}`](#operation/getIPOOffering) to query offerings on demand, and the [IPO Events Stream](#operation/subscribeToIPOEventsSSE) under the **Events** group to receive real-time and historical lifecycle updates (new offerings, prospectus, 60-minute mail, allocations, cancellations).
     name: IPO

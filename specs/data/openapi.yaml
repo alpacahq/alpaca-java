@@ -203,6 +203,7 @@ components:
           - rights_distribution
           - partial_call
           - reorganization
+          - capital_gains_distribution
       example: forward_split,reverse_split
       in: query
       name: types
@@ -266,13 +267,23 @@ components:
       name: currency_pairs
       required: true
       schema:
-        $ref: '#/components/schemas/forex_currency_pairs'
+        allOf:
+          - $ref: '#/components/schemas/forex_currency_pairs'
+        type: string
     forex_timeframe:
       in: query
       name: timeframe
       required: false
       schema:
         $ref: '#/components/schemas/forex_timeframe'
+    isins:
+      description: A comma-separated list of ISINs with a limit of 1000.
+      example: US912797KJ59,US912797KS58,US912797LB15
+      in: query
+      name: isins
+      required: true
+      schema:
+        type: string
     limit:
       description: |
         The maximum number of data points to return in the response page.
@@ -395,7 +406,9 @@ components:
       in: query
       name: sort
       schema:
-        $ref: '#/components/schemas/sort'
+        allOf:
+          - $ref: '#/components/schemas/sort'
+        type: string
     start:
       description: |
         The inclusive start of the interval. Format: RFC-3339 or YYYY-MM-DD.
@@ -527,6 +540,15 @@ components:
       required: true
       schema:
         type: string
+    trade_size:
+      description: |
+        Filters to best bid/ask where the minimum trade size is less than or equal to the given numeric value. For any negative value the best bid/ask will be returned for the smallest trade size on either side.
+      in: query
+      name: trade_size
+      required: false
+      schema:
+        format: int32
+        type: integer
   responses:
     '400':
       description: |
@@ -576,6 +598,47 @@ components:
         - id
         - process_date
       type: object
+    ca_event_capital_gains_distribution:
+      allOf:
+        - $ref: '#/components/schemas/ca_event_base'
+        - properties:
+            currency:
+              $ref: '#/components/schemas/currency'
+            cusip:
+              description: CUSIP of the security.
+              type: string
+            ex_date:
+              $ref: '#/components/schemas/ex_date'
+            isin:
+              $ref: '#/components/schemas/isin'
+            long_term_rate:
+              description: Long-term capital-gains payment per share, as a decimal string.
+              examples:
+                - '1.4372'
+              type: string
+            payable_date:
+              $ref: '#/components/schemas/payable_date'
+            record_date:
+              $ref: '#/components/schemas/record_date'
+            short_term_rate:
+              description: Short-term capital-gains payment per share, as a decimal string.
+              examples:
+                - '0.1051'
+              type: string
+            symbol:
+              description: Ticker paying the distribution.
+              type: string
+          required:
+            - symbol
+            - cusip
+            - ex_date
+          type: object
+      description: |
+        Capital-gains distribution payload delivered when
+        `event_type == capital_gains_distribution_corporateaction_event`. Every
+        decimal field is emitted as a JSON string to preserve precision on the
+        wire. At least one of `long_term_rate` / `short_term_rate` is present;
+        combined distributions carry both.
     ca_event_cash_dividend:
       allOf:
         - $ref: '#/components/schemas/ca_event_base'
@@ -604,7 +667,8 @@ components:
               $ref: '#/components/schemas/payable_date'
             rate:
               description: Cash paid per share, as a decimal string.
-              example: '0.24'
+              examples:
+                - '0.24'
               type: string
             record_date:
               $ref: '#/components/schemas/record_date'
@@ -665,7 +729,8 @@ components:
               $ref: '#/components/schemas/payable_date'
             rate:
               description: Cash paid per share of the acquired company, as a decimal string.
-              example: '42.50'
+              examples:
+                - '42.50'
               type: string
           required:
             - acquiree_symbol
@@ -691,7 +756,8 @@ components:
               type: string
             dividend_rate:
               description: Dividend rate associated with the called shares, as a decimal string.
-              example: '0.05'
+              examples:
+                - '0.05'
               type: string
             isin:
               $ref: '#/components/schemas/isin'
@@ -709,7 +775,8 @@ components:
               $ref: '#/components/schemas/payable_date'
             price:
               description: Price paid per called share, as a decimal string.
-              example: '15.00'
+              examples:
+                - '15.00'
               type: string
             record_date:
               $ref: '#/components/schemas/record_date'
@@ -749,11 +816,13 @@ components:
               $ref: '#/components/schemas/isin'
             new_rate:
               description: Shares after the split, as a decimal string.
-              example: '4'
+              examples:
+                - '4'
               type: string
             old_rate:
               description: Shares before the split, as a decimal string.
-              example: '1'
+              examples:
+                - '1'
               type: string
             payable_date:
               $ref: '#/components/schemas/payable_date'
@@ -824,7 +893,8 @@ components:
               $ref: '#/components/schemas/payable_date'
             rate:
               description: Cash paid per share, as a decimal string.
-              example: '25.00'
+              examples:
+                - '25.00'
               type: string
             symbol:
               description: Ticker being redeemed.
@@ -847,7 +917,8 @@ components:
         - properties:
             cash_rate:
               description: Cash paid per source share, as a decimal string.
-              example: '5.00'
+              examples:
+                - '5.00'
               type: string
             currency:
               $ref: '#/components/schemas/currency'
@@ -898,11 +969,13 @@ components:
           $ref: '#/components/schemas/isin'
         new_rate:
           description: Replacement shares delivered per `source_rate`, as a decimal string.
-          example: '1'
+          examples:
+            - '1'
           type: string
         source_rate:
           description: Source shares required for each `new_rate`, as a decimal string.
-          example: '10'
+          examples:
+            - '10'
           type: string
         symbol:
           description: Replacement ticker.
@@ -928,7 +1001,8 @@ components:
               $ref: '#/components/schemas/isin'
             new_rate:
               description: Shares after the split, as a decimal string.
-              example: '1'
+              examples:
+                - '1'
               type: string
             new_symbol:
               description: |
@@ -942,7 +1016,8 @@ components:
               $ref: '#/components/schemas/isin'
             old_rate:
               description: Shares before the split, as a decimal string.
-              example: '10'
+              examples:
+                - '10'
               type: string
             payable_date:
               $ref: '#/components/schemas/payable_date'
@@ -988,7 +1063,8 @@ components:
               $ref: '#/components/schemas/payable_date'
             rate:
               description: Rights given per share you own, as a decimal string.
-              example: '0.25'
+              examples:
+                - '0.25'
               type: string
             record_date:
               $ref: '#/components/schemas/record_date'
@@ -1033,7 +1109,8 @@ components:
               $ref: '#/components/schemas/isin'
             new_rate:
               description: New-company shares distributed per `source_rate` parent shares, as a decimal string.
-              example: '0.5'
+              examples:
+                - '0.5'
               type: string
             new_symbol:
               description: Ticker of the new spin-off company.
@@ -1049,7 +1126,8 @@ components:
               $ref: '#/components/schemas/isin'
             source_rate:
               description: Parent shares required per ratio unit, as a decimal string.
-              example: '1'
+              examples:
+                - '1'
               type: string
             source_symbol:
               description: Parent company's ticker.
@@ -1081,7 +1159,8 @@ components:
               $ref: '#/components/schemas/isin'
             acquiree_rate:
               description: Bought-side ratio, as a decimal string.
-              example: '1'
+              examples:
+                - '1'
               type: string
             acquiree_symbol:
               description: Ticker being bought (will disappear).
@@ -1093,14 +1172,16 @@ components:
               $ref: '#/components/schemas/isin'
             acquirer_rate:
               description: Buyer shares given per unit ratio, as a decimal string.
-              example: '0.5'
+              examples:
+                - '0.5'
               type: string
             acquirer_symbol:
               description: Buyer's ticker (the surviving company).
               type: string
             cash_rate:
               description: Extra cash paid per share of the acquired company, as a decimal string.
-              example: '10.00'
+              examples:
+                - '10.00'
               type: string
             currency:
               $ref: '#/components/schemas/currency'
@@ -1142,7 +1223,8 @@ components:
               $ref: '#/components/schemas/payable_date'
             rate:
               description: Extra shares received per share held, as a decimal string.
-              example: '0.05'
+              examples:
+                - '0.05'
               type: string
             record_date:
               $ref: '#/components/schemas/record_date'
@@ -1173,7 +1255,8 @@ components:
               $ref: '#/components/schemas/isin'
             acquiree_rate:
               description: Bought-side ratio, as a decimal string.
-              example: '1'
+              examples:
+                - '1'
               type: string
             acquiree_symbol:
               description: Ticker being bought (will disappear).
@@ -1185,7 +1268,8 @@ components:
               $ref: '#/components/schemas/isin'
             acquirer_rate:
               description: Buyer-side ratio, as a decimal string.
-              example: '0.75'
+              examples:
+                - '0.75'
               type: string
             acquirer_symbol:
               description: Buyer's ticker (the surviving company).
@@ -1223,7 +1307,8 @@ components:
               $ref: '#/components/schemas/isin'
             alternate_rate:
               description: Secondary-leg shares delivered per unit, as a decimal string.
-              example: '1'
+              examples:
+                - '1'
               type: string
             alternate_symbol:
               description: Ticker of the secondary leg (usually a warrant).
@@ -1239,7 +1324,8 @@ components:
               $ref: '#/components/schemas/isin'
             new_rate:
               description: Primary-leg shares delivered per unit, as a decimal string.
-              example: '1'
+              examples:
+                - '1'
               type: string
             new_symbol:
               description: Ticker of the primary leg (usually the common share).
@@ -1251,7 +1337,8 @@ components:
               $ref: '#/components/schemas/isin'
             old_rate:
               description: Units per ratio unit, as a decimal string.
-              example: '1'
+              examples:
+                - '1'
               type: string
             old_symbol:
               description: Ticker of the unit being split.
@@ -1304,19 +1391,70 @@ components:
       description: The internal Alpaca identifier of the corporate action.
       format: uuid
       type: string
+    capital_gains_distribution:
+      description: |
+        Capital gains distribution paid by a fund. A single event may carry a long-term
+        leg (`long_term_rate`), a short-term leg (`short_term_rate`), or both when
+        combined. At least one of the two rates is always present.
+      examples:
+        - currency: USD
+          cusip: 36261K509
+          ex_date: '2025-12-26'
+          id: 98c905a1-08c7-450c-8669-b8e7aee8b44d
+          isin: US36261K5090
+          long_term_rate: 0.45855
+          payable_date: '2026-01-09'
+          process_date: '2026-01-08'
+          record_date: '2025-12-29'
+          short_term_rate: 0.11019
+          symbol: GCAD
+      properties:
+        currency:
+          $ref: '#/components/schemas/currency'
+        cusip:
+          type: string
+        ex_date:
+          $ref: '#/components/schemas/ex_date'
+        id:
+          $ref: '#/components/schemas/ca_id'
+        isin:
+          $ref: '#/components/schemas/isin'
+        long_term_rate:
+          description: Long-term capital-gain payment per share.
+          format: double
+          type: number
+        payable_date:
+          $ref: '#/components/schemas/payable_date'
+        process_date:
+          $ref: '#/components/schemas/process_date'
+        record_date:
+          $ref: '#/components/schemas/record_date'
+        short_term_rate:
+          description: Short-term capital-gain payment per share.
+          format: double
+          type: number
+        symbol:
+          type: string
+      required:
+        - id
+        - symbol
+        - cusip
+        - process_date
+        - ex_date
+      type: object
     cash_dividend:
       description: Cash dividend.
-      example:
-        cusip: '319829107'
-        ex_date: '2023-05-04'
-        foreign: false
-        id: 11cfd108-292e-4cc6-bfbf-5999cdbc4029
-        payable_date: '2023-05-19'
-        process_date: '2023-05-19'
-        rate: 0.125
-        record_date: '2023-05-05'
-        special: false
-        symbol: FCF
+      examples:
+        - cusip: '319829107'
+          ex_date: '2023-05-04'
+          foreign: false
+          id: 11cfd108-292e-4cc6-bfbf-5999cdbc4029
+          payable_date: '2023-05-19'
+          process_date: '2023-05-19'
+          rate: 0.125
+          record_date: '2023-05-05'
+          special: false
+          symbol: FCF
       properties:
         currency:
           $ref: '#/components/schemas/currency'
@@ -1367,14 +1505,14 @@ components:
       type: object
     cash_merger:
       description: Cash merger.
-      example:
-        acquiree_cusip: Y2687W108
-        acquiree_symbol: GLOP
-        effective_date: '2023-07-17'
-        id: 3772bbd7-4ad5-44d4-9cc0-f69156a2f8f5
-        payable_date: '2023-07-17'
-        process_date: '2023-07-17'
-        rate: 5.37
+      examples:
+        - acquiree_cusip: Y2687W108
+          acquiree_symbol: GLOP
+          effective_date: '2023-07-17'
+          id: 3772bbd7-4ad5-44d4-9cc0-f69156a2f8f5
+          payable_date: '2023-07-17'
+          process_date: '2023-07-17'
+          rate: 5.37
       properties:
         acquiree_cusip:
           type: string
@@ -1424,6 +1562,7 @@ components:
         omitted from the JSON when empty; `null` is never emitted.
       discriminator:
         mapping:
+          capital_gains_distribution_corporateaction_event: '#/components/schemas/corporate_action_event_capital_gains_distribution'
           cash_dividend_corporateaction_event: '#/components/schemas/corporate_action_event_cash_dividend'
           cash_merger_corporateaction_event: '#/components/schemas/corporate_action_event_cash_merger'
           equity_partial_call_corporateaction_event: '#/components/schemas/corporate_action_event_equity_partial_call'
@@ -1441,6 +1580,7 @@ components:
           worthless_removal_corporateaction_event: '#/components/schemas/corporate_action_event_worthless_removal'
         propertyName: event_type
       oneOf:
+        - $ref: '#/components/schemas/corporate_action_event_capital_gains_distribution'
         - $ref: '#/components/schemas/corporate_action_event_cash_dividend'
         - $ref: '#/components/schemas/corporate_action_event_cash_merger'
         - $ref: '#/components/schemas/corporate_action_event_equity_partial_call'
@@ -1486,7 +1626,8 @@ components:
           $ref: '#/components/schemas/corporate_action_event_action'
         at:
           description: RFC-3339 timestamp when the streaming service emitted this event.
-          example: '2026-03-20T12:24:58.807230Z'
+          examples:
+            - '2026-03-20T12:24:58.807230Z'
           format: date-time
           type: string
         event_id:
@@ -1499,6 +1640,24 @@ components:
         - action
         - region
       type: object
+    corporate_action_event_capital_gains_distribution:
+      allOf:
+        - $ref: '#/components/schemas/corporate_action_event_base'
+        - properties:
+            ca:
+              $ref: '#/components/schemas/ca_event_capital_gains_distribution'
+            event_type:
+              enum:
+                - capital_gains_distribution_corporateaction_event
+              type: string
+          required:
+            - event_type
+            - ca
+          type: object
+      description: |
+        `corporate_action_event` envelope specialised to `event_type ==
+        capital_gains_distribution_corporateaction_event`. Emitted through
+        [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_cash_dividend:
       allOf:
         - $ref: '#/components/schemas/corporate_action_event_base'
@@ -1754,6 +1913,7 @@ components:
 
         | `event_type` | `ca` schema |
         | --- | --- |
+        | `capital_gains_distribution_corporateaction_event` | [`ca_event_capital_gains_distribution`](#/components/schemas/ca_event_capital_gains_distribution) |
         | `cash_dividend_corporateaction_event` | [`ca_event_cash_dividend`](#/components/schemas/ca_event_cash_dividend) |
         | `cash_merger_corporateaction_event` | [`ca_event_cash_merger`](#/components/schemas/ca_event_cash_merger) |
         | `equity_partial_call_corporateaction_event` | [`ca_event_equity_partial_call`](#/components/schemas/ca_event_equity_partial_call) |
@@ -1770,6 +1930,7 @@ components:
         | `unit_split_corporateaction_event` | [`ca_event_unit_split`](#/components/schemas/ca_event_unit_split) |
         | `worthless_removal_corporateaction_event` | [`ca_event_worthless_removal`](#/components/schemas/ca_event_worthless_removal) |
       enum:
+        - capital_gains_distribution_corporateaction_event
         - cash_dividend_corporateaction_event
         - cash_merger_corporateaction_event
         - equity_partial_call_corporateaction_event
@@ -1824,6 +1985,10 @@ components:
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_actions:
       properties:
+        capital_gains_distributions:
+          items:
+            $ref: '#/components/schemas/capital_gains_distribution'
+          type: array
         cash_dividends:
           items:
             $ref: '#/components/schemas/cash_dividend'
@@ -1897,15 +2062,15 @@ components:
       type: object
     crypto_bar:
       description: OHLC aggregate of all the trades in a given interval.
-      example:
-        c: 29003
-        h: 29003
-        l: 28999
-        n: 4
-        o: 28999
-        t: '2022-05-27T10:18:00Z'
-        v: 0.01
-        vw: 29001
+      examples:
+        - c: 29003
+          h: 29003
+          l: 28999
+          n: 4
+          o: 28999
+          t: '2022-05-27T10:18:00Z'
+          v: 0.01
+          vw: 29001
       properties:
         c:
           description: Closing price.
@@ -2017,18 +2182,18 @@ components:
       type: object
     crypto_orderbook:
       description: Snapshot of the orderbook.
-      example:
-        a:
-          - p: 20902
-            s: 0.0097
-          - p: 21444
-            s: 0
-        b:
-          - p: 20846
-            s: 0.1902
-          - p: 20350
-            s: 0
-        t: '2022-06-24T08:00:14.137774336Z'
+      examples:
+        - a:
+            - p: 20902
+              s: 0.0097
+            - p: 21444
+              s: 0
+          b:
+            - p: 20846
+              s: 0.1902
+            - p: 20350
+              s: 0
+          t: '2022-06-24T08:00:14.137774336Z'
       properties:
         a:
           items:
@@ -2047,9 +2212,9 @@ components:
       type: object
     crypto_orderbook_entry:
       description: A single entry in a crypto orderbook.
-      example:
-        p: 20846
-        s: 0.1902
+      examples:
+        - p: 20846
+          s: 0.1902
       properties:
         p:
           description: Price.
@@ -2065,12 +2230,12 @@ components:
       type: object
     crypto_quote:
       description: The best bid and ask information for a given security.
-      example:
-        ap: 29059
-        as: 3.252
-        bp: 29058
-        bs: 0.3544
-        t: '2022-05-26T11:47:18.44347136Z'
+      examples:
+        - ap: 29059
+          as: 3.252
+          bp: 29058
+          bs: 0.3544
+          t: '2022-05-26T11:47:18.44347136Z'
       properties:
         ap:
           description: Ask price.
@@ -2137,12 +2302,12 @@ components:
       type: object
     crypto_trade:
       description: A crypto trade.
-      example:
-        i: 31455277
-        p: 29798
-        s: 0.1209
-        t: '2022-05-18T12:00:05.225055Z'
-        tks: S
+      examples:
+        - i: 31455277
+          p: 29798
+          s: 0.1209
+          t: '2022-05-18T12:00:05.225055Z'
+          tks: S
       properties:
         i:
           description: Trade ID.
@@ -2224,7 +2389,8 @@ components:
         `event_id`. Because ULIDs sort in emission order, they can be used as
         resume cursors via `since_id`, `until_id`, or the standard `Last-Event-Id`
         reconnect header.
-      example: 01J9RPMV5TKB8WX3M4F1KZ7QH2
+      examples:
+        - 01J9RPMV5TKB8WX3M4F1KZ7QH2
       format: ulid
       pattern: ^[0-7][0-9A-HJKMNP-TV-Z]{25}$
       type: string
@@ -2235,9 +2401,126 @@ components:
     expiration_date:
       format: date
       type: string
+    fixed_income_latest_prices_resp:
+      properties:
+        prices:
+          additionalProperties:
+            $ref: '#/components/schemas/fixed_income_price'
+          type: object
+      required:
+        - prices
+      type: object
+    fixed_income_latest_quotes_resp:
+      properties:
+        quotes:
+          additionalProperties:
+            $ref: '#/components/schemas/fixed_income_quote'
+          type: object
+      required:
+        - quotes
+      type: object
+    fixed_income_price:
+      description: The price of the instrument as a percentage of its par value.
+      examples:
+        - p: 99.6459
+          t: '2025-02-14T20:58:00.648Z'
+          ytm: 4.249
+          ytw: 4.249
+      properties:
+        p:
+          description: Price
+          format: double
+          type: number
+        t:
+          $ref: '#/components/schemas/timestamp'
+        ytm:
+          description: Yield to maturity.
+          format: double
+          type: number
+        ytw:
+          description: Yield to worst.
+          format: double
+          type: number
+      required:
+        - t
+        - p
+      type: object
+    fixed_income_quote:
+      description: |
+        The best bid and ask information for a given fixed income security. A value of 0 means there is no active bid or ask for that field.
+      examples:
+        - ams: 1000
+          ap: 99.91958333
+          as: 1000000
+          aytm: 2.226923
+          aytw: 2.226923
+          bms: 1000
+          bp: 99.81091667
+          bs: 1000000
+          bytm: 5.236154
+          bytw: 5.236154
+          t: '2026-05-21T06:56:01.882466873Z'
+      properties:
+        ams:
+          description: Best ask minimum trade size in par value.
+          format: int64
+          type: integer
+        ap:
+          description: Best ask price. 0 means there is no active ask.
+          format: double
+          type: number
+        as:
+          description: Best ask size in par value. 0 means there is no active ask.
+          format: int64
+          type: integer
+        aytm:
+          description: Best ask yield to maturity.
+          format: double
+          type: number
+        aytw:
+          description: Best ask yield to worst.
+          format: double
+          type: number
+        bms:
+          description: Best bid minimum trade size in par value.
+          format: int64
+          type: integer
+        bp:
+          description: Best bid price. 0 means there is no active bid.
+          format: double
+          type: number
+        bs:
+          description: Best bid size in par value. 0 means there is no active bid.
+          format: int64
+          type: integer
+        bytm:
+          description: Best bid yield to maturity.
+          format: double
+          type: number
+        bytw:
+          description: Best bid yield to worst.
+          format: double
+          type: number
+        t:
+          $ref: '#/components/schemas/timestamp'
+      required:
+        - t
+        - bp
+        - bs
+        - bms
+        - bytm
+        - bytw
+        - ap
+        - as
+        - ams
+        - aytm
+        - aytw
+      type: object
     forex_currency_pairs:
       description: A comma-separated string with currency pairs.
-      example: USDJPY,USDMXN
+      examples:
+        - USDJPY
+        - USDMXN
       type: string
     forex_latest_rates_resp:
       description: The response object of the latest forex rates.
@@ -2251,11 +2534,11 @@ components:
       type: object
     forex_rate:
       description: A foreign exchange rate between two currencies at a given time.
-      example:
-        ap: 127.763
-        bp: 127.702
-        mp: 127.757
-        t: '2022-04-20T18:23:00Z'
+      examples:
+        - ap: 127.763
+          bp: 127.702
+          mp: 127.757
+          t: '2022-04-20T18:23:00Z'
       properties:
         ap:
           description: The last ask price value of the currency at the end of the timeframe.
@@ -2304,17 +2587,17 @@ components:
       type: string
     forward_split:
       description: Forward split.
-      example:
-        cusip: '816851109'
-        due_bill_redemption_date: '2023-08-23'
-        ex_date: '2023-08-22'
-        id: 189bd849-ab9f-4b4d-aaaa-a6d415fd976d
-        new_rate: 2
-        old_rate: 1
-        payable_date: '2023-08-21'
-        process_date: '2023-08-22'
-        record_date: '2023-08-14'
-        symbol: SRE
+      examples:
+        - cusip: '816851109'
+          due_bill_redemption_date: '2023-08-23'
+          ex_date: '2023-08-22'
+          id: 189bd849-ab9f-4b4d-aaaa-a6d415fd976d
+          new_rate: 2
+          old_rate: 1
+          payable_date: '2023-08-21'
+          process_date: '2023-08-22'
+          record_date: '2023-08-14'
+          symbol: SRE
       properties:
         currency:
           $ref: '#/components/schemas/currency'
@@ -2364,10 +2647,10 @@ components:
       type: string
     most_active:
       description: A stock that is most active by either volume or trade count.
-      example:
-        symbol: AAPL
-        trade_count: 639626
-        volume: 122709184
+      examples:
+        - symbol: AAPL
+          trade_count: 639626
+          volume: 122709184
       properties:
         symbol:
           type: string
@@ -2401,11 +2684,11 @@ components:
       type: object
     mover:
       description: A symbol whose price moved significantly.
-      example:
-        change: 2.46
-        percent_change: 145.56
-        price: 4.15
-        symbol: AGRI
+      examples:
+        - change: 2.46
+          percent_change: 145.56
+          price: 4.15
+          symbol: AGRI
       properties:
         change:
           description: Difference in change for the day.
@@ -2456,13 +2739,13 @@ components:
       type: object
     name_change:
       description: Name change.
-      example:
-        id: 5a774c35-edec-4532-a812-a56d0bbb623a
-        new_cusip: Y9390M103
-        new_symbol: VFS
-        old_cusip: G11537100
-        old_symbol: BSAQ
-        process_date: '2023-08-15'
+      examples:
+        - id: 5a774c35-edec-4532-a812-a56d0bbb623a
+          new_cusip: Y9390M103
+          new_symbol: VFS
+          old_cusip: G11537100
+          old_symbol: BSAQ
+          process_date: '2023-08-15'
       properties:
         currency:
           $ref: '#/components/schemas/currency'
@@ -2539,8 +2822,9 @@ components:
         url:
           description: URL of article (if applicable).
           format: uri
-          nullable: true
-          type: string
+          type:
+            - string
+            - 'null'
       required:
         - id
         - headline
@@ -2562,7 +2846,8 @@ components:
             - thumb
             - small
             - large
-          example: thumb
+          examples:
+            - thumb
           minLength: 1
           type: string
         url:
@@ -2588,19 +2873,20 @@ components:
       type: object
     next_page_token:
       description: Pagination token for the next page.
-      nullable: true
-      type: string
+      type:
+        - string
+        - 'null'
     option_bar:
       description: OHLC aggregate of all the trades in a given interval.
-      example:
-        c: 0.23
-        h: 0.28
-        l: 0.23
-        n: 26
-        o: 0.28
-        t: '2024-01-18T05:00:00Z'
-        v: 224
-        vw: 0.245045
+      examples:
+        - c: 0.23
+          h: 0.28
+          l: 0.23
+          n: 26
+          o: 0.28
+          t: '2024-01-18T05:00:00Z'
+          v: 224
+          vw: 0.245045
       properties:
         c:
           description: Closing price.
@@ -2661,17 +2947,17 @@ components:
     option_conditions:
       additionalProperties:
         type: string
-      example:
-        a: SLAN - Single Leg Auction Non ISO
-        e: SLFT - Single Leg Floor Trade
-        g: MLAT - Multi Leg Auction
+      examples:
+        - a: SLAN - Single Leg Auction Non ISO
+          e: SLFT - Single Leg Floor Trade
+          g: MLAT - Multi Leg Auction
       type: object
     option_exchanges:
       additionalProperties:
         type: string
-      example:
-        A: NYSE American Options
-        Q: Nasdaq Options
+      examples:
+        - A: NYSE American Options
+          Q: Nasdaq Options
       type: object
     option_feed:
       default: opra
@@ -2725,15 +3011,15 @@ components:
     option_quote:
       description: |
         The best bid and ask information for a given option.
-      example:
-        ap: 0.16
-        as: 669
-        ax: w
-        bp: 0.15
-        bs: 164
-        bx: W
-        c: A
-        t: '2024-02-28T15:30:28.046330624Z'
+      examples:
+        - ap: 0.16
+          as: 669
+          ax: w
+          bp: 0.15
+          bs: 164
+          bx: W
+          c: A
+          t: '2024-02-28T15:30:28.046330624Z'
       properties:
         ap:
           description: Ask price.
@@ -2806,12 +3092,12 @@ components:
       type: object
     option_trade:
       description: An option trade.
-      example:
-        c: I
-        p: 0.37
-        s: 1
-        t: '2024-01-18T15:03:44.56339456Z'
-        x: B
+      examples:
+        - c: I
+          p: 0.37
+          s: 1
+          t: '2024-01-18T15:03:44.56339456Z'
+          x: B
       properties:
         c:
           description: Trade condition.
@@ -2907,13 +3193,13 @@ components:
       type: string
     redemption:
       description: Redemption.
-      example:
-        cusip: '687305102'
-        id: 395da031-0e57-4918-a6fb-64a7c713aca4
-        payable_date: '2023-06-13'
-        process_date: '2023-06-13'
-        rate: 0.141134
-        symbol: ORPHY
+      examples:
+        - cusip: '687305102'
+          id: 395da031-0e57-4918-a6fb-64a7c713aca4
+          payable_date: '2023-06-13'
+          process_date: '2023-06-13'
+          rate: 0.141134
+          symbol: ORPHY
       properties:
         currency:
           $ref: '#/components/schemas/currency'
@@ -3008,16 +3294,16 @@ components:
       type: object
     reverse_split:
       description: Reverse split.
-      example:
-        ex_date: '2023-08-24'
-        id: 913de862-c02c-46dc-a89c-fc8779a50d30
-        new_cusip: '60879E200'
-        new_rate: 1
-        old_cusip: '60879E101'
-        old_rate: 50
-        process_date: '2023-08-24'
-        record_date: '2023-08-24'
-        symbol: MNTS
+      examples:
+        - ex_date: '2023-08-24'
+          id: 913de862-c02c-46dc-a89c-fc8779a50d30
+          new_cusip: '60879E200'
+          new_rate: 1
+          old_cusip: '60879E101'
+          old_rate: 50
+          process_date: '2023-08-24'
+          record_date: '2023-08-24'
+          symbol: MNTS
       properties:
         currency:
           $ref: '#/components/schemas/currency'
@@ -3065,18 +3351,18 @@ components:
       type: object
     rights_distribution:
       description: Rights distribution.
-      example:
-        ex_date: '2024-04-17'
-        expiration_date: '2024-05-14'
-        id: 69794cfd-0adc-4e11-9211-9210a9cf8932
-        new_cusip: '454089111'
-        new_symbol: IFN.RTWI
-        payable_date: '2024-04-19'
-        process_date: '2024-04-19'
-        rate: 1
-        record_date: '2024-04-18'
-        source_cusip: '454089103'
-        source_symbol: IFN
+      examples:
+        - ex_date: '2024-04-17'
+          expiration_date: '2024-05-14'
+          id: 69794cfd-0adc-4e11-9211-9210a9cf8932
+          new_cusip: '454089111'
+          new_symbol: IFN.RTWI
+          payable_date: '2024-04-19'
+          process_date: '2024-04-19'
+          rate: 1
+          record_date: '2024-04-18'
+          source_cusip: '454089103'
+          source_symbol: IFN
       properties:
         currency:
           $ref: '#/components/schemas/currency'
@@ -3127,17 +3413,17 @@ components:
       type: string
     spin_off:
       description: Spin-off.
-      example:
-        ex_date: '2023-08-15'
-        id: 82e602f6-35bc-4651-a5dd-f6d88ff37c55
-        new_cusip: 85237B101
-        new_rate: 1
-        new_symbol: SRM
-        process_date: '2023-08-15'
-        record_date: '2023-08-15'
-        source_cusip: 48208F105
-        source_rate: 19.35
-        source_symbol: JUPW
+      examples:
+        - ex_date: '2023-08-15'
+          id: 82e602f6-35bc-4651-a5dd-f6d88ff37c55
+          new_cusip: 85237B101
+          new_rate: 1
+          new_symbol: SRM
+          process_date: '2023-08-15'
+          record_date: '2023-08-15'
+          source_cusip: 48208F105
+          source_rate: 19.35
+          source_symbol: JUPW
       properties:
         currency:
           $ref: '#/components/schemas/currency'
@@ -3184,18 +3470,18 @@ components:
       type: object
     stock_and_cash_merger:
       description: Stock and cash merger.
-      example:
-        acquiree_cusip: '561409103'
-        acquiree_rate: 1
-        acquiree_symbol: MLVF
-        acquirer_cusip: 31931U102
-        acquirer_rate: 0.7733
-        acquirer_symbol: FRBA
-        cash_rate: 7.8
-        effective_date: '2023-07-18'
-        id: e5248356-2c06-42cf-aeb9-1595bd616cdb
-        payable_date: '2023-07-18'
-        process_date: '2023-07-18'
+      examples:
+        - acquiree_cusip: '561409103'
+          acquiree_rate: 1
+          acquiree_symbol: MLVF
+          acquirer_cusip: 31931U102
+          acquirer_rate: 0.7733
+          acquirer_symbol: FRBA
+          cash_rate: 7.8
+          effective_date: '2023-07-18'
+          id: e5248356-2c06-42cf-aeb9-1595bd616cdb
+          payable_date: '2023-07-18'
+          process_date: '2023-07-18'
       properties:
         acquiree_cusip:
           type: string
@@ -3243,11 +3529,11 @@ components:
     stock_auction:
       description: |
         An auction
-      example:
-        c: O
-        p: 135
-        t: '2022-10-13T13:30:01.688322951Z'
-        x: Q
+      examples:
+        - c: O
+          p: 135
+          t: '2022-10-13T13:30:01.688322951Z'
+          x: Q
       properties:
         c:
           description: |
@@ -3311,15 +3597,15 @@ components:
     stock_bar:
       description: |
         OHLC aggregate of all the trades in a given interval.
-      example:
-        c: 178.08
-        h: 178.34
-        l: 177.76
-        n: 1727
-        o: 178.26
-        t: '2022-01-03T09:00:00Z'
-        v: 60937
-        vw: 177.954244
+      examples:
+        - c: 178.08
+          h: 178.34
+          l: 177.76
+          n: 1727
+          o: 178.26
+          t: '2022-01-03T09:00:00Z'
+          v: 60937
+          vw: 177.954244
       properties:
         c:
           description: Closing price.
@@ -3397,10 +3683,10 @@ components:
     stock_conditions:
       additionalProperties:
         type: string
-      example:
-        '@': Regular Sale
-        A: Acquisition
-        B: Bunched Trade
+      examples:
+        - '@': Regular Sale
+          A: Acquisition
+          B: Bunched Trade
       type: object
     stock_daily_auctions:
       description: |
@@ -3425,15 +3711,15 @@ components:
       type: object
     stock_dividend:
       description: Stock dividend.
-      example:
-        cusip: '605015106'
-        ex_date: '2023-05-19'
-        id: 3ae94c30-2d37-473a-bf29-5f7b4ab6d3ca
-        payable_date: '2023-05-05'
-        process_date: '2023-05-19'
-        rate: 0.05
-        record_date: '2023-05-22'
-        symbol: MSBC
+      examples:
+        - cusip: '605015106'
+          ex_date: '2023-05-19'
+          id: 3ae94c30-2d37-473a-bf29-5f7b4ab6d3ca
+          payable_date: '2023-05-05'
+          process_date: '2023-05-19'
+          rate: 0.05
+          record_date: '2023-05-22'
+          symbol: MSBC
       properties:
         currency:
           $ref: '#/components/schemas/currency'
@@ -3467,9 +3753,9 @@ components:
     stock_exchanges:
       additionalProperties:
         type: string
-      example:
-        N: New York Stock Exchange
-        V: IEX
+      examples:
+        - N: New York Stock Exchange
+          V: IEX
       type: object
     stock_historical_feed:
       default: sip
@@ -3559,17 +3845,17 @@ components:
       type: object
     stock_merger:
       description: Stock merger.
-      example:
-        acquiree_cusip: 53223X107
-        acquiree_rate: 1
-        acquiree_symbol: LSI
-        acquirer_cusip: 30225T102
-        acquirer_rate: 0.895
-        acquirer_symbol: EXR
-        effective_date: '2023-07-20'
-        id: 728f8cb2-a00e-4bc7-ad14-d15fe82bbcff
-        payable_date: '2023-07-20'
-        process_date: '2023-07-20'
+      examples:
+        - acquiree_cusip: 53223X107
+          acquiree_rate: 1
+          acquiree_symbol: LSI
+          acquirer_cusip: 30225T102
+          acquirer_rate: 0.895
+          acquirer_symbol: EXR
+          effective_date: '2023-07-20'
+          id: 728f8cb2-a00e-4bc7-ad14-d15fe82bbcff
+          payable_date: '2023-07-20'
+          process_date: '2023-07-20'
       properties:
         acquiree_cusip:
           type: string
@@ -3612,17 +3898,17 @@ components:
       type: object
     stock_quote:
       description: The best bid and ask information for a given security.
-      example:
-        ap: 387.7
-        as: 1
-        ax: C
-        bp: 387.67
-        bs: 1
-        bx: N
-        c:
-          - R
-        t: '2021-02-06T13:35:08.946977536Z'
-        z: C
+      examples:
+        - ap: 387.7
+          as: 1
+          ax: C
+          bp: 387.67
+          bs: 1
+          bx: N
+          c:
+            - R
+          t: '2021-02-06T13:35:08.946977536Z'
+          z: C
       properties:
         ap:
           description: Ask price. 0 means the security has no active ask.
@@ -3744,16 +4030,16 @@ components:
       type: string
     stock_trade:
       description: A stock trade.
-      example:
-        c:
-          - '@'
-          - T
-        i: 1
-        p: 178.26
-        s: 246
-        t: '2022-01-03T09:00:00.086175744Z'
-        x: P
-        z: C
+      examples:
+        - c:
+            - '@'
+            - T
+          i: 1
+          p: 178.26
+          s: 246
+          t: '2022-01-03T09:00:00.086175744Z'
+          x: P
+          z: C
       properties:
         c:
           description: Condition flags. See `v2/stocks/meta/conditions/trade` for more details.
@@ -3834,19 +4120,19 @@ components:
       type: string
     unit_split:
       description: Unit split.
-      example:
-        alternate_cusip: G5391L110
-        alternate_rate: 0.3333
-        alternate_symbol: LVROW
-        effective_date: '2023-03-01'
-        id: 3e68e87e-ae95-4d68-91d1-715d52ef143a
-        new_cusip: G5391L102
-        new_rate: 1
-        new_symbol: LVRO
-        old_cusip: G8990L119
-        old_rate: 1
-        old_symbol: TPBAU
-        process_date: '2023-03-01'
+      examples:
+        - alternate_cusip: G5391L110
+          alternate_rate: 0.3333
+          alternate_symbol: LVROW
+          effective_date: '2023-03-01'
+          id: 3e68e87e-ae95-4d68-91d1-715d52ef143a
+          new_cusip: G5391L102
+          new_rate: 1
+          new_symbol: LVRO
+          old_cusip: G8990L119
+          old_rate: 1
+          old_symbol: TPBAU
+          process_date: '2023-03-01'
       properties:
         alternate_cusip:
           type: string
@@ -3901,11 +4187,11 @@ components:
       type: object
     worthless_removal:
       description: Worthless removal.
-      example:
-        cusip: '078771300'
-        id: 106c2149-ee04-4d2e-a943-98dbb4d21a3c
-        process_date: '2024-12-19'
-        symbol: BLPH
+      examples:
+        - cusip: '078771300'
+          id: 106c2149-ee04-4d2e-a943-98dbb4d21a3c
+          process_date: '2024-12-19'
+          symbol: BLPH
       properties:
         currency:
           $ref: '#/components/schemas/currency'
@@ -3926,6 +4212,9 @@ components:
         - process_date
       type: object
   securitySchemes:
+    BasicAuth:
+      scheme: basic
+      type: http
     apiKey:
       in: header
       name: APCA-API-KEY-ID
@@ -3940,19 +4229,19 @@ info:
     name: Alpaca Support
     url: https://alpaca.markets/support
   description: |
-    Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News.
+    Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News.
   license:
     name: Creative Commons Attribution Share Alike 4.0 International
     url: https://spdx.org/licenses/CC-BY-SA-4.0.html
   termsOfService: https://s3.amazonaws.com/files.alpaca.markets/disclosures/library/TermsAndConditions.pdf
   title: Market Data API
   version: '1.1'
-openapi: 3.0.0
+openapi: 3.1.2
 paths:
   /v1beta1/events/corporate-actions:
     get:
       description: |
-        Server-Sent Events (SSE) stream that delivers every corporate-action mutation (`insert` / `update` / `delete`) across all 15 CA types on a single long-lived `text/event-stream` connection. When `since`, `since_id`, or the `Last-Event-Id` reconnect header is provided, historical events are replayed first; otherwise only live events are pushed.
+        Server-Sent Events (SSE) stream that delivers every corporate-action mutation (`insert` / `update` / `delete`) across all supported CA types on a single long-lived `text/event-stream` connection. When `since`, `since_id`, or the `Last-Event-Id` reconnect header is provided, historical events are replayed first; otherwise only live events are pushed.
 
         Each event carries an `event_type` discriminator that selects the shape of the `ca` payload -- see the [`corporate_action_event`](#/components/schemas/corporate_action_event) schema for the mapping to each per-type schema. The same underlying data is available on demand via [`GET /v1/corporate-actions`](#operation/CorporateActions).
       operationId: SubscribeToCorporateActionsEventsSSE
@@ -3969,6 +4258,31 @@ paths:
           content:
             text/event-stream:
               examples:
+                CapitalGainsDistribution:
+                  description: |
+                    Example SSE payload delivered when
+                    `event_type == capital_gains_distribution_corporateaction_event`.
+                    Combined long-term + short-term distribution; single-leg events
+                    carry only the applicable `long_term_rate` or `short_term_rate`.
+                  summary: Capital gains distribution inserted (US)
+                  value:
+                    - action: insert
+                      at: '2026-03-20T18:00:00.000000Z'
+                      ca:
+                        currency: USD
+                        cusip: 36261K509
+                        ex_date: '2025-12-26'
+                        id: 98c905a1-08c7-450c-8669-b8e7aee8b44d
+                        isin: US36261K5090
+                        long_term_rate: '0.45855'
+                        payable_date: '2026-01-09'
+                        process_date: '2026-01-08'
+                        record_date: '2025-12-29'
+                        short_term_rate: '0.11019'
+                        symbol: GCAD
+                      event_id: 01KMAGXP2FCJ4NR1TDX8ZWKR6E
+                      event_type: capital_gains_distribution_corporateaction_event
+                      region: us
                 CashDividend:
                   description: Example SSE payload delivered when `event_type == cash_dividend_corporateaction_event`.
                   summary: Cash dividend inserted (US)
@@ -4298,6 +4612,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       servers:
         - description: Production
           url: https://stream.data.alpaca.markets
@@ -4308,6 +4626,136 @@ paths:
       summary: Subscribe to Corporate Actions Events (SSE)
       tags:
         - Corporate actions
+  /v1beta1/fixed_income/latest/prices:
+    get:
+      description: |
+        This endpoint returns the latest prices for the given fixed income securities.
+      operationId: FixedIncomeLatestPrices
+      parameters:
+        - $ref: '#/components/parameters/isins'
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                prices:
+                  value:
+                    prices:
+                      US912797KJ59:
+                        p: 99.6459
+                        t: '2025-02-14T20:58:00.648Z'
+                        ytm: 4.249
+                        ytw: 4.249
+                      US912797KS58:
+                        p: 99.3193
+                        t: '2025-02-14T20:58:00.648Z'
+                        ytm: 4.2245
+                        ytw: 4.2245
+                      US912797LB15:
+                        p: 98.9927
+                        t: '2025-02-14T20:58:00.648Z'
+                        ytm: 4.2165
+                        ytw: 4.2165
+              schema:
+                $ref: '#/components/schemas/fixed_income_latest_prices_resp'
+          description: OK
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/ratelimit_limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/ratelimit_remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/ratelimit_reset'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
+      summary: Latest prices
+      tags:
+        - Fixed income
+  /v1beta1/fixed_income/latest/quotes:
+    get:
+      description: |
+        This endpoint returns the latest quotes for the given fixed income securities.
+      operationId: FixedIncomeLatestQuotes
+      parameters:
+        - description: A comma-separated list of ISINs with a limit of 100.
+          example: US912797SX61,US912810SK51
+          in: query
+          name: isins
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/trade_size'
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                quotes:
+                  value:
+                    quotes:
+                      US912797SX61:
+                        ams: 1000
+                        ap: 99.91958333
+                        as: 1000000
+                        aytm: 2.226923
+                        aytw: 2.226923
+                        bms: 1000
+                        bp: 99.81091667
+                        bs: 1000000
+                        bytm: 5.236154
+                        bytw: 5.236154
+                        t: '2026-05-21T06:56:01.882466873Z'
+                      US912810SK51:
+                        ams: 1000
+                        ap: 63.06436526
+                        as: 1000000
+                        aytm: 5.08819
+                        aytw: 5.08819
+                        bms: 1000
+                        bp: 60.60009769
+                        bs: 1000000
+                        bytm: 5.338343
+                        bytw: 5.338343
+                        t: '2026-05-21T07:27:53.683424845Z'
+              schema:
+                $ref: '#/components/schemas/fixed_income_latest_quotes_resp'
+          description: OK
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/ratelimit_limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/ratelimit_remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/ratelimit_reset'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
+      summary: Latest quotes
+      tags:
+        - Fixed income
   /v1beta1/forex/latest/rates:
     get:
       description: |
@@ -4348,6 +4796,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - BasicAuth: []
+        - apiKey: []
+          apiSecret: []
       summary: Latest rates for currency pairs
       tags:
         - Forex
@@ -4406,6 +4858,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - BasicAuth: []
+        - apiKey: []
+          apiSecret: []
       summary: Historical rates for currency pairs
       tags:
         - Forex
@@ -4426,7 +4882,7 @@ paths:
           content:
             image/png:
               schema:
-                format: binary
+                contentMediaType: image/png
                 type: string
           description: OK
           headers:
@@ -4446,6 +4902,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Logos
       tags:
         - Logos
@@ -4517,6 +4977,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: News articles
       tags:
         - News
@@ -4576,6 +5040,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical bars
       tags:
         - Option
@@ -4617,6 +5085,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Condition codes
       tags:
         - Option
@@ -4648,6 +5120,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Exchange codes
       tags:
         - Option
@@ -4705,6 +5181,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Latest quotes
       tags:
         - Option
@@ -4771,6 +5251,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Snapshots
       tags:
         - Option
@@ -4881,6 +5365,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Option chain
       tags:
         - Option
@@ -4941,6 +5429,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical trades
       tags:
         - Option
@@ -4986,6 +5478,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Latest trades
       tags:
         - Option
@@ -5050,6 +5546,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Top market movers
       tags:
         - Screener
@@ -5085,6 +5585,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Most active stocks
       tags:
         - Screener
@@ -5140,7 +5644,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
-      security: []
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical bars
       tags:
         - Crypto
@@ -5189,7 +5696,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
-      security: []
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Latest bars
       tags:
         - Crypto
@@ -5241,7 +5751,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
-      security: []
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Latest orderbook
       tags:
         - Crypto
@@ -5293,7 +5806,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
-      security: []
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Latest quotes
       tags:
         - Crypto
@@ -5345,7 +5861,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
-      security: []
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Latest trades
       tags:
         - Crypto
@@ -5404,7 +5923,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
-      security: []
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical quotes
       tags:
         - Crypto
@@ -5484,7 +6006,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
-      security: []
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Snapshots
       tags:
         - Crypto
@@ -5547,7 +6072,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
-      security: []
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical trades
       tags:
         - Crypto
@@ -5598,6 +6126,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Corporate actions
       tags:
         - Corporate actions
@@ -5665,6 +6197,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical auctions (single)
       tags:
         - Stock
@@ -5722,6 +6258,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical bars (single symbol)
       tags:
         - Stock
@@ -5771,6 +6311,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Latest bar (single symbol)
       tags:
         - Stock
@@ -5838,6 +6382,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical quotes (single symbol)
       tags:
         - Stock
@@ -5889,6 +6437,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Latest quote (single symbol)
       tags:
         - Stock
@@ -5977,6 +6529,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Snapshot (single symbol)
       tags:
         - Stock
@@ -6042,6 +6598,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical trades (single symbol)
       tags:
         - Stock
@@ -6094,6 +6654,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Latest trade (single symbol)
       tags:
         - Stock
@@ -6239,6 +6803,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical auctions
       tags:
         - Stock
@@ -6301,6 +6869,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical bars
       tags:
         - Stock
@@ -6359,6 +6931,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Latest bars
       tags:
         - Stock
@@ -6410,6 +6986,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Condition codes
       tags:
         - Stock
@@ -6442,6 +7022,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Exchange codes
       tags:
         - Stock
@@ -6514,6 +7098,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical quotes
       tags:
         - Stock
@@ -6576,6 +7164,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Latest quotes
       tags:
         - Stock
@@ -6713,6 +7305,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Snapshots
       tags:
         - Stock
@@ -6785,6 +7381,10 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Historical trades
       tags:
         - Stock
@@ -6838,12 +7438,13 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
       summary: Latest trades
       tags:
         - Stock
-security:
-  - apiKey: []
-    apiSecret: []
 servers:
   - description: Production
     url: https://data.alpaca.markets
@@ -6858,6 +7459,8 @@ tags:
     name: Index
   - description: Endpoints for cryptocurrencies.
     name: Crypto
+  - description: Endpoints for fixed income data.
+    name: Fixed income
   - description: Endpoints for forex currency rates.
     name: Forex
   - description: Endpoints for getting company logo images.

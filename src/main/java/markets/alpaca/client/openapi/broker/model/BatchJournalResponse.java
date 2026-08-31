@@ -21,277 +21,264 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
-import markets.alpaca.client.openapi.broker.model.Journal;
+import java.util.UUID;
+import markets.alpaca.client.openapi.broker.model.BatchJournalResponseJNLC;
+import markets.alpaca.client.openapi.broker.model.BatchJournalResponseJNLS;
 import markets.alpaca.client.openapi.broker.model.JournalStatus;
 import markets.alpaca.client.openapi.broker.model.TransmitterInfo;
 import java.io.Serializable;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
 
-import java.util.HashMap;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParseException;
 
 import markets.alpaca.client.openapi.broker.http.JSON;
 
-/**
- * A Journal object with an extra attribute error_message in the case when a specific account fails to receive a journal.
- */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
-public class BatchJournalResponse extends Journal implements Serializable {
-  private static final long serialVersionUID = 1L;
+public class BatchJournalResponse extends AbstractOpenApiSchema implements Serializable {
+    private static final Logger log = Logger.getLogger(BatchJournalResponse.class.getName());
 
-  public static final String SERIALIZED_NAME_ERROR_MESSAGE = "error_message";
-  @SerializedName(SERIALIZED_NAME_ERROR_MESSAGE)
-  @javax.annotation.Nonnull
-  private String errorMessage;
+    public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+            if (!BatchJournalResponse.class.isAssignableFrom(type.getRawType())) {
+                return null; // this class only serializes 'BatchJournalResponse' and its subtypes
+            }
+            final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
+            final TypeAdapter<BatchJournalResponseJNLC> adapterBatchJournalResponseJNLC = gson.getDelegateAdapter(this, TypeToken.get(BatchJournalResponseJNLC.class));
+            final TypeAdapter<BatchJournalResponseJNLS> adapterBatchJournalResponseJNLS = gson.getDelegateAdapter(this, TypeToken.get(BatchJournalResponseJNLS.class));
 
-  public BatchJournalResponse() {
-    this.entryType = this.getClass().getSimpleName();
-  }
+            return (TypeAdapter<T>) new TypeAdapter<BatchJournalResponse>() {
+                @Override
+                public void write(JsonWriter out, BatchJournalResponse value) throws IOException {
+                    if (value == null || value.getActualInstance() == null) {
+                        elementAdapter.write(out, null);
+                        return;
+                    }
 
-  public BatchJournalResponse errorMessage(@javax.annotation.Nonnull String errorMessage) {
-    this.errorMessage = errorMessage;
-    return this;
-  }
+                    // check if the actual instance is of the type `BatchJournalResponseJNLC`
+                    if (value.getActualInstance() instanceof BatchJournalResponseJNLC) {
+                        JsonElement element = adapterBatchJournalResponseJNLC.toJsonTree((BatchJournalResponseJNLC)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `BatchJournalResponseJNLS`
+                    if (value.getActualInstance() instanceof BatchJournalResponseJNLS) {
+                        JsonElement element = adapterBatchJournalResponseJNLS.toJsonTree((BatchJournalResponseJNLS)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    throw new IOException("Failed to serialize as the type doesn't match oneOf schemas: BatchJournalResponseJNLC, BatchJournalResponseJNLS");
+                }
 
-  /**
-   * Description of why this journal transaction failed
-   * @return errorMessage
-   */
-  @javax.annotation.Nonnull
-  public String getErrorMessage() {
-    return errorMessage;
-  }
+                @Override
+                public BatchJournalResponse read(JsonReader in) throws IOException {
+                    Object deserialized = null;
+                    JsonElement jsonElement = elementAdapter.read(in);
 
-  public void setErrorMessage(@javax.annotation.Nonnull String errorMessage) {
-    this.errorMessage = errorMessage;
-  }
+                    int match = 0;
+                    ArrayList<String> errorMessages = new ArrayList<>();
+                    TypeAdapter actualAdapter = elementAdapter;
 
-  /**
-   * A container for additional, undeclared properties.
-   * This is a holder for any undeclared properties as specified with
-   * the 'additionalProperties' keyword in the OAS document.
-   */
-  private Map<String, Object> additionalProperties;
+                    // deserialize BatchJournalResponseJNLC
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        BatchJournalResponseJNLC.validateJsonElement(jsonElement);
+                        actualAdapter = adapterBatchJournalResponseJNLC;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'BatchJournalResponseJNLC'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for BatchJournalResponseJNLC failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'BatchJournalResponseJNLC'", e);
+                    }
+                    // deserialize BatchJournalResponseJNLS
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        BatchJournalResponseJNLS.validateJsonElement(jsonElement);
+                        actualAdapter = adapterBatchJournalResponseJNLS;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'BatchJournalResponseJNLS'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for BatchJournalResponseJNLS failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'BatchJournalResponseJNLS'", e);
+                    }
 
-  /**
-   * Set the additional (undeclared) property with the specified name and value.
-   * If the property does not already exist, create it otherwise replace it.
-   *
-   * @param key name of the property
-   * @param value value of the property
-   * @return the BatchJournalResponse instance itself
-   */
-  public BatchJournalResponse putAdditionalProperty(String key, Object value) {
-    if (this.additionalProperties == null) {
-        this.additionalProperties = new HashMap<String, Object>();
-    }
-    this.additionalProperties.put(key, value);
-    return this;
-  }
+                    if (match == 1) {
+                        BatchJournalResponse ret = new BatchJournalResponse();
+                        ret.setActualInstance(actualAdapter.fromJsonTree(jsonElement));
+                        return ret;
+                    }
 
-  /**
-   * Return the additional (undeclared) property.
-   *
-   * @return a map of objects
-   */
-  public Map<String, Object> getAdditionalProperties() {
-    return additionalProperties;
-  }
-
-  /**
-   * Return the additional (undeclared) property with the specified name.
-   *
-   * @param key name of the property
-   * @return an object
-   */
-  public Object getAdditionalProperty(String key) {
-    if (this.additionalProperties == null) {
-        return null;
-    }
-    return this.additionalProperties.get(key);
-  }
-
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    BatchJournalResponse batchJournalResponse = (BatchJournalResponse) o;
-    return Objects.equals(this.errorMessage, batchJournalResponse.errorMessage)&&
-        Objects.equals(this.additionalProperties, batchJournalResponse.additionalProperties) &&
-        super.equals(o);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(errorMessage, super.hashCode(), additionalProperties);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class BatchJournalResponse {\n");
-    sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-    sb.append("    errorMessage: ").append(toIndentedString(errorMessage)).append("\n");
-    sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    return o == null ? "null" : o.toString().replace("\n", "\n    ");
-  }
-
-
-  public static HashSet<String> openapiFields;
-  public static HashSet<String> openapiRequiredFields;
-
-  static {
-    // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("created_at", "entry_type", "from_account", "id", "settle_date", "status", "to_account", "transmitter_info", "currency", "description", "price", "qty", "symbol", "system_date", "net_amount", "transmitter_account_number", "transmitter_address", "transmitter_financial_institution", "transmitter_name", "transmitter_timestamp", "error_message"));
-
-    // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("error_message", "entry_type", "from_account", "id", "to_account", "net_amount"));
-  }
-
-  /**
-   * Validates the JSON Element and throws an exception if issues found
-   *
-   * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to BatchJournalResponse
-   */
-  public static void validateJsonElement(JsonElement jsonElement) throws IOException {
-      if (jsonElement == null) {
-        if (!BatchJournalResponse.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in BatchJournalResponse is not found in the empty JSON string", BatchJournalResponse.openapiRequiredFields.toString()));
+                    throw new IOException(String.format(java.util.Locale.ROOT, "Failed deserialization for BatchJournalResponse: %d classes match result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", match, errorMessages, jsonElement.toString()));
+                }
+            }.nullSafe();
         }
-      }
+    }
 
-      // check to make sure all required properties/fields are present in the JSON string
-      for (String requiredField : BatchJournalResponse.openapiRequiredFields) {
-        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+    // store a list of schema names defined in oneOf
+    public static final Map<String, Class<?>> schemas = new HashMap<String, Class<?>>();
+
+    public BatchJournalResponse() {
+        super("oneOf", Boolean.FALSE);
+    }
+
+    public BatchJournalResponse(Object o) {
+        super("oneOf", Boolean.FALSE);
+        setActualInstance(o);
+    }
+
+    static {
+        schemas.put("BatchJournalResponseJNLC", BatchJournalResponseJNLC.class);
+        schemas.put("BatchJournalResponseJNLS", BatchJournalResponseJNLS.class);
+    }
+
+    @Override
+    public Map<String, Class<?>> getSchemas() {
+        return BatchJournalResponse.schemas;
+    }
+
+    /**
+     * Set the instance that matches the oneOf child schema, check
+     * the instance parameter is valid against the oneOf child schemas:
+     * BatchJournalResponseJNLC, BatchJournalResponseJNLS
+     *
+     * It could be an instance of the 'oneOf' schemas.
+     */
+    @Override
+    public void setActualInstance(Object instance) {
+        if (instance instanceof BatchJournalResponseJNLC) {
+            super.setActualInstance(instance);
+            return;
         }
-      }
-  }
 
-  public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
+        if (instance instanceof BatchJournalResponseJNLS) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        throw new RuntimeException("Invalid instance type. Must be BatchJournalResponseJNLC, BatchJournalResponseJNLS");
+    }
+
+    /**
+     * Get the actual instance, which can be the following:
+     * BatchJournalResponseJNLC, BatchJournalResponseJNLS
+     *
+     * @return The actual instance (BatchJournalResponseJNLC, BatchJournalResponseJNLS)
+     */
     @SuppressWarnings("unchecked")
     @Override
-    public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!BatchJournalResponse.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'BatchJournalResponse' and its subtypes
-       }
-       final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<BatchJournalResponse> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(BatchJournalResponse.class));
-
-       return (TypeAdapter<T>) new TypeAdapter<BatchJournalResponse>() {
-           @Override
-           public void write(JsonWriter out, BatchJournalResponse value) throws IOException {
-             JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
-             obj.remove("additionalProperties");
-             // serialize additional properties
-             if (value.getAdditionalProperties() != null) {
-               for (Map.Entry<String, Object> entry : value.getAdditionalProperties().entrySet()) {
-                 if (entry.getValue() instanceof String)
-                   obj.addProperty(entry.getKey(), (String) entry.getValue());
-                 else if (entry.getValue() instanceof Number)
-                   obj.addProperty(entry.getKey(), (Number) entry.getValue());
-                 else if (entry.getValue() instanceof Boolean)
-                   obj.addProperty(entry.getKey(), (Boolean) entry.getValue());
-                 else if (entry.getValue() instanceof Character)
-                   obj.addProperty(entry.getKey(), (Character) entry.getValue());
-                 else {
-                   JsonElement jsonElement = gson.toJsonTree(entry.getValue());
-                   if (jsonElement.isJsonArray()) {
-                     obj.add(entry.getKey(), jsonElement.getAsJsonArray());
-                   } else {
-                     obj.add(entry.getKey(), jsonElement.getAsJsonObject());
-                   }
-                 }
-               }
-             }
-             elementAdapter.write(out, obj);
-           }
-
-           @Override
-           public BatchJournalResponse read(JsonReader in) throws IOException {
-             JsonElement jsonElement = elementAdapter.read(in);
-             validateJsonElement(jsonElement);
-             JsonObject jsonObj = jsonElement.getAsJsonObject();
-             // store additional fields in the deserialized instance
-             BatchJournalResponse instance = thisAdapter.fromJsonTree(jsonObj);
-             for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
-               if (!openapiFields.contains(entry.getKey())) {
-                 if (entry.getValue().isJsonPrimitive()) { // primitive type
-                   if (entry.getValue().getAsJsonPrimitive().isString())
-                     instance.putAdditionalProperty(entry.getKey(), entry.getValue().getAsString());
-                   else if (entry.getValue().getAsJsonPrimitive().isNumber())
-                     instance.putAdditionalProperty(entry.getKey(), entry.getValue().getAsNumber());
-                   else if (entry.getValue().getAsJsonPrimitive().isBoolean())
-                     instance.putAdditionalProperty(entry.getKey(), entry.getValue().getAsBoolean());
-                   else
-                     throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` has unknown primitive type. Value: %s", entry.getKey(), entry.getValue().toString()));
-                 } else if (entry.getValue().isJsonArray()) {
-                     instance.putAdditionalProperty(entry.getKey(), gson.fromJson(entry.getValue(), List.class));
-                 } else { // JSON object
-                     instance.putAdditionalProperty(entry.getKey(), gson.fromJson(entry.getValue(), HashMap.class));
-                 }
-               }
-             }
-             return instance;
-           }
-
-       }.nullSafe();
+    public Object getActualInstance() {
+        return super.getActualInstance();
     }
-  }
 
-  /**
-   * Create an instance of BatchJournalResponse given an JSON string
-   *
-   * @param jsonString JSON string
-   * @return An instance of BatchJournalResponse
-   * @throws IOException if the JSON string is invalid with respect to BatchJournalResponse
-   */
-  public static BatchJournalResponse fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, BatchJournalResponse.class);
-  }
+    /**
+     * Get the actual instance of `BatchJournalResponseJNLC`. If the actual instance is not `BatchJournalResponseJNLC`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `BatchJournalResponseJNLC`
+     * @throws ClassCastException if the instance is not `BatchJournalResponseJNLC`
+     */
+    @SuppressWarnings("unchecked")
+    public BatchJournalResponseJNLC getBatchJournalResponseJNLC() throws ClassCastException {
+        return (BatchJournalResponseJNLC)super.getActualInstance();
+    }
 
-  /**
-   * Convert an instance of BatchJournalResponse to an JSON string
-   *
-   * @return JSON string
-   */
-  public String toJson() {
-    return JSON.getGson().toJson(this);
-  }
+    /**
+     * Get the actual instance of `BatchJournalResponseJNLS`. If the actual instance is not `BatchJournalResponseJNLS`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `BatchJournalResponseJNLS`
+     * @throws ClassCastException if the instance is not `BatchJournalResponseJNLS`
+     */
+    @SuppressWarnings("unchecked")
+    public BatchJournalResponseJNLS getBatchJournalResponseJNLS() throws ClassCastException {
+        return (BatchJournalResponseJNLS)super.getActualInstance();
+    }
+
+    /**
+     * Validates the JSON Element and throws an exception if issues found
+     *
+     * @param jsonElement JSON Element
+     * @throws IOException if the JSON Element is invalid with respect to BatchJournalResponse
+     */
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+        // validate oneOf schemas one by one
+        int validCount = 0;
+        ArrayList<String> errorMessages = new ArrayList<>();
+        // validate the json string with BatchJournalResponseJNLC
+        try {
+            BatchJournalResponseJNLC.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for BatchJournalResponseJNLC failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with BatchJournalResponseJNLS
+        try {
+            BatchJournalResponseJNLS.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for BatchJournalResponseJNLS failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        if (validCount != 1) {
+            throw new IOException(String.format(java.util.Locale.ROOT, "The JSON string is invalid for BatchJournalResponse with oneOf schemas: BatchJournalResponseJNLC, BatchJournalResponseJNLS. %d class(es) match the result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", validCount, errorMessages, jsonElement.toString()));
+        }
+    }
+
+    /**
+     * Create an instance of BatchJournalResponse given an JSON string
+     *
+     * @param jsonString JSON string
+     * @return An instance of BatchJournalResponse
+     * @throws IOException if the JSON string is invalid with respect to BatchJournalResponse
+     */
+    public static BatchJournalResponse fromJson(String jsonString) throws IOException {
+        return JSON.getGson().fromJson(jsonString, BatchJournalResponse.class);
+    }
+
+    /**
+     * Convert an instance of BatchJournalResponse to an JSON string
+     *
+     * @return JSON string
+     */
+    public String toJson() {
+        return JSON.getGson().toJson(this);
+    }
 }
 

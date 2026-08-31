@@ -93,62 +93,6 @@ public class CreateTransferRequest implements Serializable {
   @javax.annotation.Nullable
   private UUID relationshipId;
 
-  /**
-   * Deprecated. Not honored by the API; values sent are silently ignored and this field will be removed.
-   */
-  @JsonAdapter(TimingEnum.Adapter.class)
-  public enum TimingEnum {
-    IMMEDIATE("immediate");
-
-    private String value;
-
-    TimingEnum(String value) {
-      this.value = value;
-    }
-
-    public String getValue() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    public static TimingEnum fromValue(String value) {
-      for (TimingEnum b : TimingEnum.values()) {
-        if (b.value.equals(value)) {
-          return b;
-        }
-      }
-      throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-
-    public static class Adapter extends TypeAdapter<TimingEnum> {
-      @Override
-      public void write(final JsonWriter jsonWriter, final TimingEnum enumeration) throws IOException {
-        jsonWriter.value(enumeration.getValue());
-      }
-
-      @Override
-      public TimingEnum read(final JsonReader jsonReader) throws IOException {
-        String value =  jsonReader.nextString();
-        return TimingEnum.fromValue(value);
-      }
-    }
-
-    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
-      String value = jsonElement.getAsString();
-      TimingEnum.fromValue(value);
-    }
-  }
-
-  public static final String SERIALIZED_NAME_TIMING = "timing";
-  @Deprecated
-  @SerializedName(SERIALIZED_NAME_TIMING)
-  @javax.annotation.Nullable
-  private TimingEnum timing;
-
   public static final String SERIALIZED_NAME_TRANSFER_TYPE = "transfer_type";
   @SerializedName(SERIALIZED_NAME_TRANSFER_TYPE)
   @javax.annotation.Nonnull
@@ -290,29 +234,6 @@ public class CreateTransferRequest implements Serializable {
   }
 
 
-  @Deprecated
-  public CreateTransferRequest timing(@javax.annotation.Nullable TimingEnum timing) {
-    this.timing = timing;
-    return this;
-  }
-
-  /**
-   * Deprecated. Not honored by the API; values sent are silently ignored and this field will be removed.
-   * @return timing
-   * @deprecated
-   */
-  @Deprecated
-  @javax.annotation.Nullable
-  public TimingEnum getTiming() {
-    return timing;
-  }
-
-  @Deprecated
-  public void setTiming(@javax.annotation.Nullable TimingEnum timing) {
-    this.timing = timing;
-  }
-
-
   public CreateTransferRequest transferType(@javax.annotation.Nonnull TransferType transferType) {
     this.transferType = transferType;
     return this;
@@ -393,14 +314,13 @@ public class CreateTransferRequest implements Serializable {
         Objects.equals(this.feePaymentMethod, createTransferRequest.feePaymentMethod) &&
         Objects.equals(this.ira, createTransferRequest.ira) &&
         Objects.equals(this.relationshipId, createTransferRequest.relationshipId) &&
-        Objects.equals(this.timing, createTransferRequest.timing) &&
         Objects.equals(this.transferType, createTransferRequest.transferType)&&
         Objects.equals(this.additionalProperties, createTransferRequest.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(additionalInformation, amount, bankId, direction, feePaymentMethod, ira, relationshipId, timing, transferType, additionalProperties);
+    return Objects.hash(additionalInformation, amount, bankId, direction, feePaymentMethod, ira, relationshipId, transferType, additionalProperties);
   }
 
   @Override
@@ -414,7 +334,6 @@ public class CreateTransferRequest implements Serializable {
     sb.append("    feePaymentMethod: ").append(toIndentedString(feePaymentMethod)).append("\n");
     sb.append("    ira: ").append(toIndentedString(ira)).append("\n");
     sb.append("    relationshipId: ").append(toIndentedString(relationshipId)).append("\n");
-    sb.append("    timing: ").append(toIndentedString(timing)).append("\n");
     sb.append("    transferType: ").append(toIndentedString(transferType)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
@@ -435,7 +354,7 @@ public class CreateTransferRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("additional_information", "amount", "bank_id", "direction", "fee_payment_method", "ira", "relationship_id", "timing", "transfer_type"));
+    openapiFields = new HashSet<String>(Arrays.asList("additional_information", "amount", "bank_id", "direction", "fee_payment_method", "ira", "relationship_id", "transfer_type"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("amount", "direction", "transfer_type"));
@@ -481,13 +400,6 @@ public class CreateTransferRequest implements Serializable {
       }
       if ((jsonObj.get("relationship_id") != null && !jsonObj.get("relationship_id").isJsonNull()) && !jsonObj.get("relationship_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `relationship_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("relationship_id").toString()));
-      }
-      if ((jsonObj.get("timing") != null && !jsonObj.get("timing").isJsonNull()) && !jsonObj.get("timing").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `timing` to be a primitive type in the JSON string but got `%s`", jsonObj.get("timing").toString()));
-      }
-      // validate the optional field `timing`
-      if (jsonObj.get("timing") != null && !jsonObj.get("timing").isJsonNull()) {
-        TimingEnum.validateJsonElement(jsonObj.get("timing"));
       }
       // validate the required field `transfer_type`
       TransferType.validateJsonElement(jsonObj.get("transfer_type"));

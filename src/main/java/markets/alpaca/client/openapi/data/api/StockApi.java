@@ -1,6 +1,6 @@
 /*
  * Market Data API
- * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News. 
+ * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News. 
  *
  * The version of the OpenAPI document: 1.1
  * Contact: support@alpaca.markets
@@ -150,7 +150,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -239,7 +239,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -265,7 +265,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockAuctionsRespSingle
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -296,7 +296,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockAuctionsRespSingle&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -328,7 +328,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -361,7 +361,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -453,7 +453,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -479,7 +479,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockAuctionsResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -510,7 +510,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockAuctionsResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -542,7 +542,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -577,7 +577,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -674,7 +674,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -707,7 +707,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockBarsRespSingle
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -740,7 +740,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockBarsRespSingle&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -774,7 +774,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -809,7 +809,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -909,7 +909,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -942,7 +942,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockBarsResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -975,7 +975,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockBarsResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1009,7 +1009,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -1101,7 +1101,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1267,7 +1267,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1430,7 +1430,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1596,7 +1596,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1759,7 +1759,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1925,7 +1925,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -2083,7 +2083,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -2236,7 +2236,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -2326,7 +2326,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -2415,7 +2415,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -2441,7 +2441,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockQuotesRespSingle
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -2472,7 +2472,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockQuotesRespSingle&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -2504,7 +2504,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -2537,7 +2537,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -2629,7 +2629,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -2655,7 +2655,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockQuotesResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -2686,7 +2686,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockQuotesResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -2718,7 +2718,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -2810,7 +2810,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -2976,7 +2976,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -3080,7 +3080,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -3169,7 +3169,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -3195,7 +3195,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockTradesRespSingle
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -3226,7 +3226,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockTradesRespSingle&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -3258,7 +3258,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -3291,7 +3291,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -3383,7 +3383,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -3409,7 +3409,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockTradesResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -3440,7 +3440,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockTradesResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -3472,7 +3472,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object

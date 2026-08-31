@@ -7,7 +7,7 @@
  *
  * <p>Generated from the configured OpenAPI spec: <b>Market Data API</b>, version
  * <b>1.1</b>.</p>
- * <p>Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News.</p>
+ * <p>Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News.</p>
  *
  * <p>The {@code api} package contains endpoint clients, {@code model} contains
  * request/response DTOs and enums, and {@code http} contains the generated transport,

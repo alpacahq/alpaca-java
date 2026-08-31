@@ -110,10 +110,62 @@ public class DIVSPDActivityV2 implements Serializable {
   @javax.annotation.Nullable
   private LocalDate exDate;
 
+  /**
+   * Indicates if related to a non-US security. Serialized as the JSON strings &#x60;\&quot;true\&quot;&#x60; or &#x60;\&quot;false\&quot;&#x60;, not a JSON boolean.
+   */
+  @JsonAdapter(ForeignEnum.Adapter.class)
+  public enum ForeignEnum {
+    TRUE("true"),
+    
+    FALSE("false");
+
+    private String value;
+
+    ForeignEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static ForeignEnum fromValue(String value) {
+      for (ForeignEnum b : ForeignEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<ForeignEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final ForeignEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public ForeignEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return ForeignEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      ForeignEnum.fromValue(value);
+    }
+  }
+
   public static final String SERIALIZED_NAME_FOREIGN = "foreign";
   @SerializedName(SERIALIZED_NAME_FOREIGN)
   @javax.annotation.Nonnull
-  private Boolean foreign;
+  private ForeignEnum foreign;
 
   public static final String SERIALIZED_NAME_ISIN = "isin";
   @SerializedName(SERIALIZED_NAME_ISIN)
@@ -135,10 +187,62 @@ public class DIVSPDActivityV2 implements Serializable {
   @javax.annotation.Nullable
   private LocalDate recordDate;
 
+  /**
+   * Indicates if this is a special dividend. Serialized as the JSON strings &#x60;\&quot;true\&quot;&#x60; or &#x60;\&quot;false\&quot;&#x60;, not a JSON boolean.
+   */
+  @JsonAdapter(SpecialEnum.Adapter.class)
+  public enum SpecialEnum {
+    TRUE("true"),
+    
+    FALSE("false");
+
+    private String value;
+
+    SpecialEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static SpecialEnum fromValue(String value) {
+      for (SpecialEnum b : SpecialEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<SpecialEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final SpecialEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public SpecialEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return SpecialEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      SpecialEnum.fromValue(value);
+    }
+  }
+
   public static final String SERIALIZED_NAME_SPECIAL = "special";
   @SerializedName(SERIALIZED_NAME_SPECIAL)
   @javax.annotation.Nonnull
-  private Boolean special;
+  private SpecialEnum special;
 
   public static final String SERIALIZED_NAME_SYMBOL = "symbol";
   @SerializedName(SERIALIZED_NAME_SYMBOL)
@@ -357,21 +461,21 @@ public class DIVSPDActivityV2 implements Serializable {
   }
 
 
-  public DIVSPDActivityV2 foreign(@javax.annotation.Nonnull Boolean foreign) {
+  public DIVSPDActivityV2 foreign(@javax.annotation.Nonnull ForeignEnum foreign) {
     this.foreign = foreign;
     return this;
   }
 
   /**
-   * Indicates if related to a non-US security
+   * Indicates if related to a non-US security. Serialized as the JSON strings &#x60;\&quot;true\&quot;&#x60; or &#x60;\&quot;false\&quot;&#x60;, not a JSON boolean.
    * @return foreign
    */
   @javax.annotation.Nonnull
-  public Boolean getForeign() {
+  public ForeignEnum getForeign() {
     return foreign;
   }
 
-  public void setForeign(@javax.annotation.Nonnull Boolean foreign) {
+  public void setForeign(@javax.annotation.Nonnull ForeignEnum foreign) {
     this.foreign = foreign;
   }
 
@@ -452,21 +556,21 @@ public class DIVSPDActivityV2 implements Serializable {
   }
 
 
-  public DIVSPDActivityV2 special(@javax.annotation.Nonnull Boolean special) {
+  public DIVSPDActivityV2 special(@javax.annotation.Nonnull SpecialEnum special) {
     this.special = special;
     return this;
   }
 
   /**
-   * Indicates if this is a special dividend
+   * Indicates if this is a special dividend. Serialized as the JSON strings &#x60;\&quot;true\&quot;&#x60; or &#x60;\&quot;false\&quot;&#x60;, not a JSON boolean.
    * @return special
    */
   @javax.annotation.Nonnull
-  public Boolean getSpecial() {
+  public SpecialEnum getSpecial() {
     return special;
   }
 
-  public void setSpecial(@javax.annotation.Nonnull Boolean special) {
+  public void setSpecial(@javax.annotation.Nonnull SpecialEnum special) {
     this.special = special;
   }
 
@@ -655,12 +759,22 @@ public class DIVSPDActivityV2 implements Serializable {
       if (!jsonObj.get("entitled_qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `entitled_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("entitled_qty").toString()));
       }
+      if (!jsonObj.get("foreign").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `foreign` to be a primitive type in the JSON string but got `%s`", jsonObj.get("foreign").toString()));
+      }
+      // validate the required field `foreign`
+      ForeignEnum.validateJsonElement(jsonObj.get("foreign"));
       if ((jsonObj.get("isin") != null && !jsonObj.get("isin").isJsonNull()) && !jsonObj.get("isin").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("isin").toString()));
       }
       if (!jsonObj.get("rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("rate").toString()));
       }
+      if (!jsonObj.get("special").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `special` to be a primitive type in the JSON string but got `%s`", jsonObj.get("special").toString()));
+      }
+      // validate the required field `special`
+      SpecialEnum.validateJsonElement(jsonObj.get("special"));
       if (!jsonObj.get("symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
       }

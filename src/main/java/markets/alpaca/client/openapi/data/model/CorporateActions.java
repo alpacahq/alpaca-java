@@ -1,6 +1,6 @@
 /*
  * Market Data API
- * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News. 
+ * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News. 
  *
  * The version of the OpenAPI document: 1.1
  * Contact: support@alpaca.markets
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import markets.alpaca.client.openapi.data.model.CapitalGainsDistribution;
 import markets.alpaca.client.openapi.data.model.CashDividend;
 import markets.alpaca.client.openapi.data.model.CashMerger;
 import markets.alpaca.client.openapi.data.model.ForwardSplit;
@@ -69,6 +70,11 @@ import markets.alpaca.client.openapi.data.http.JSON;
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class CorporateActions implements Serializable {
   private static final long serialVersionUID = 1L;
+
+  public static final String SERIALIZED_NAME_CAPITAL_GAINS_DISTRIBUTIONS = "capital_gains_distributions";
+  @SerializedName(SERIALIZED_NAME_CAPITAL_GAINS_DISTRIBUTIONS)
+  @javax.annotation.Nullable
+  private List<CapitalGainsDistribution> capitalGainsDistributions = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_CASH_DIVIDENDS = "cash_dividends";
   @SerializedName(SERIALIZED_NAME_CASH_DIVIDENDS)
@@ -147,6 +153,33 @@ public class CorporateActions implements Serializable {
 
   public CorporateActions() {
   }
+
+  public CorporateActions capitalGainsDistributions(@javax.annotation.Nullable List<CapitalGainsDistribution> capitalGainsDistributions) {
+    this.capitalGainsDistributions = capitalGainsDistributions;
+    return this;
+  }
+
+  public CorporateActions addCapitalGainsDistributionsItem(CapitalGainsDistribution capitalGainsDistributionsItem) {
+    if (this.capitalGainsDistributions == null) {
+      this.capitalGainsDistributions = new ArrayList<>();
+    }
+    this.capitalGainsDistributions.add(capitalGainsDistributionsItem);
+    return this;
+  }
+
+  /**
+   * Get capitalGainsDistributions
+   * @return capitalGainsDistributions
+   */
+  @javax.annotation.Nullable
+  public List<CapitalGainsDistribution> getCapitalGainsDistributions() {
+    return capitalGainsDistributions;
+  }
+
+  public void setCapitalGainsDistributions(@javax.annotation.Nullable List<CapitalGainsDistribution> capitalGainsDistributions) {
+    this.capitalGainsDistributions = capitalGainsDistributions;
+  }
+
 
   public CorporateActions cashDividends(@javax.annotation.Nullable List<CashDividend> cashDividends) {
     this.cashDividends = cashDividends;
@@ -607,7 +640,8 @@ public class CorporateActions implements Serializable {
       return false;
     }
     CorporateActions corporateActions = (CorporateActions) o;
-    return Objects.equals(this.cashDividends, corporateActions.cashDividends) &&
+    return Objects.equals(this.capitalGainsDistributions, corporateActions.capitalGainsDistributions) &&
+        Objects.equals(this.cashDividends, corporateActions.cashDividends) &&
         Objects.equals(this.cashMergers, corporateActions.cashMergers) &&
         Objects.equals(this.forwardSplits, corporateActions.forwardSplits) &&
         Objects.equals(this.nameChanges, corporateActions.nameChanges) &&
@@ -627,13 +661,14 @@ public class CorporateActions implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(cashDividends, cashMergers, forwardSplits, nameChanges, partialCalls, redemptions, reorganizations, reverseSplits, rightsDistributions, spinOffs, stockAndCashMergers, stockDividends, stockMergers, unitSplits, worthlessRemovals, additionalProperties);
+    return Objects.hash(capitalGainsDistributions, cashDividends, cashMergers, forwardSplits, nameChanges, partialCalls, redemptions, reorganizations, reverseSplits, rightsDistributions, spinOffs, stockAndCashMergers, stockDividends, stockMergers, unitSplits, worthlessRemovals, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class CorporateActions {\n");
+    sb.append("    capitalGainsDistributions: ").append(toIndentedString(capitalGainsDistributions)).append("\n");
     sb.append("    cashDividends: ").append(toIndentedString(cashDividends)).append("\n");
     sb.append("    cashMergers: ").append(toIndentedString(cashMergers)).append("\n");
     sb.append("    forwardSplits: ").append(toIndentedString(forwardSplits)).append("\n");
@@ -668,7 +703,7 @@ public class CorporateActions implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("cash_dividends", "cash_mergers", "forward_splits", "name_changes", "partial_calls", "redemptions", "reorganizations", "reverse_splits", "rights_distributions", "spin_offs", "stock_and_cash_mergers", "stock_dividends", "stock_mergers", "unit_splits", "worthless_removals"));
+    openapiFields = new HashSet<String>(Arrays.asList("capital_gains_distributions", "cash_dividends", "cash_mergers", "forward_splits", "name_changes", "partial_calls", "redemptions", "reorganizations", "reverse_splits", "rights_distributions", "spin_offs", "stock_and_cash_mergers", "stock_dividends", "stock_mergers", "unit_splits", "worthless_removals"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -687,6 +722,20 @@ public class CorporateActions implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if (jsonObj.get("capital_gains_distributions") != null && !jsonObj.get("capital_gains_distributions").isJsonNull()) {
+        JsonArray jsonArraycapitalGainsDistributions = jsonObj.getAsJsonArray("capital_gains_distributions");
+        if (jsonArraycapitalGainsDistributions != null) {
+          // ensure the json data is an array
+          if (!jsonObj.get("capital_gains_distributions").isJsonArray()) {
+            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `capital_gains_distributions` to be an array in the JSON string but got `%s`", jsonObj.get("capital_gains_distributions").toString()));
+          }
+
+          // validate the optional field `capital_gains_distributions` (array)
+          for (int i = 0; i < jsonArraycapitalGainsDistributions.size(); i++) {
+            CapitalGainsDistribution.validateJsonElement(jsonArraycapitalGainsDistributions.get(i));
+          };
+        }
+      }
       if (jsonObj.get("cash_dividends") != null && !jsonObj.get("cash_dividends").isJsonNull()) {
         JsonArray jsonArraycashDividends = jsonObj.getAsJsonArray("cash_dividends");
         if (jsonArraycashDividends != null) {

@@ -21,8 +21,12 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
+import java.util.UUID;
+import markets.alpaca.client.openapi.broker.model.JournalStatus;
+import markets.alpaca.client.openapi.broker.model.TransmitterInfo;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -49,31 +53,136 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * Journal information specific to cash transfers. This field is required for &#x60;Journal&#x60;s with an &#x60;entry_type&#x60; of &#x60;jnlc&#x60; (cash transfers), but will be null for those with &#x60;jnls&#x60; (securities transfers).
+ * A cash journal response with all shared Journal fields.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class JNLC implements Serializable {
   private static final long serialVersionUID = 1L;
 
+  public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
+  @SerializedName(SERIALIZED_NAME_CREATED_AT)
+  @javax.annotation.Nullable
+  private OffsetDateTime createdAt;
+
   public static final String SERIALIZED_NAME_CURRENCY = "currency";
   @SerializedName(SERIALIZED_NAME_CURRENCY)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String currency;
 
   public static final String SERIALIZED_NAME_DESCRIPTION = "description";
   @SerializedName(SERIALIZED_NAME_DESCRIPTION)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String description;
 
-  public static final String SERIALIZED_NAME_ENTRY_TYPE = "entry_type";
-  @SerializedName(SERIALIZED_NAME_ENTRY_TYPE)
+  public static final String SERIALIZED_NAME_FROM_ACCOUNT = "from_account";
+  @SerializedName(SERIALIZED_NAME_FROM_ACCOUNT)
   @javax.annotation.Nonnull
-  private String entryType;
+  private UUID fromAccount;
+
+  public static final String SERIALIZED_NAME_ID = "id";
+  @SerializedName(SERIALIZED_NAME_ID)
+  @javax.annotation.Nonnull
+  private UUID id;
 
   public static final String SERIALIZED_NAME_NET_AMOUNT = "net_amount";
   @SerializedName(SERIALIZED_NAME_NET_AMOUNT)
   @javax.annotation.Nonnull
   private BigDecimal netAmount;
+
+  public static final String SERIALIZED_NAME_PRICE = "price";
+  @SerializedName(SERIALIZED_NAME_PRICE)
+  @javax.annotation.Nonnull
+  private BigDecimal price;
+
+  public static final String SERIALIZED_NAME_QTY = "qty";
+  @SerializedName(SERIALIZED_NAME_QTY)
+  @javax.annotation.Nonnull
+  private BigDecimal qty;
+
+  public static final String SERIALIZED_NAME_SETTLE_DATE = "settle_date";
+  @SerializedName(SERIALIZED_NAME_SETTLE_DATE)
+  @javax.annotation.Nonnull
+  private LocalDate settleDate;
+
+  public static final String SERIALIZED_NAME_STATUS = "status";
+  @SerializedName(SERIALIZED_NAME_STATUS)
+  @javax.annotation.Nonnull
+  private JournalStatus status;
+
+  public static final String SERIALIZED_NAME_SYMBOL = "symbol";
+  @SerializedName(SERIALIZED_NAME_SYMBOL)
+  @javax.annotation.Nonnull
+  private String symbol;
+
+  public static final String SERIALIZED_NAME_SYSTEM_DATE = "system_date";
+  @SerializedName(SERIALIZED_NAME_SYSTEM_DATE)
+  @javax.annotation.Nonnull
+  private LocalDate systemDate;
+
+  public static final String SERIALIZED_NAME_TO_ACCOUNT = "to_account";
+  @SerializedName(SERIALIZED_NAME_TO_ACCOUNT)
+  @javax.annotation.Nonnull
+  private UUID toAccount;
+
+  public static final String SERIALIZED_NAME_TRANSMITTER_INFO = "transmitter_info";
+  @SerializedName(SERIALIZED_NAME_TRANSMITTER_INFO)
+  @javax.annotation.Nullable
+  private TransmitterInfo transmitterInfo;
+
+  /**
+   * Cash journal discriminator value.
+   */
+  @JsonAdapter(EntryTypeEnum.Adapter.class)
+  public enum EntryTypeEnum {
+    JNLC("JNLC");
+
+    private String value;
+
+    EntryTypeEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static EntryTypeEnum fromValue(String value) {
+      for (EntryTypeEnum b : EntryTypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<EntryTypeEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final EntryTypeEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public EntryTypeEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return EntryTypeEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      EntryTypeEnum.fromValue(value);
+    }
+  }
+
+  public static final String SERIALIZED_NAME_ENTRY_TYPE = "entry_type";
+  @SerializedName(SERIALIZED_NAME_ENTRY_TYPE)
+  @javax.annotation.Nonnull
+  private EntryTypeEnum entryType;
 
   public static final String SERIALIZED_NAME_TRANSMITTER_ACCOUNT_NUMBER = "transmitter_account_number";
   @SerializedName(SERIALIZED_NAME_TRANSMITTER_ACCOUNT_NUMBER)
@@ -103,60 +212,98 @@ public class JNLC implements Serializable {
   public JNLC() {
   }
 
-  public JNLC currency(@javax.annotation.Nullable String currency) {
+  public JNLC createdAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+    this.createdAt = createdAt;
+    return this;
+  }
+
+  /**
+   * The creation time when supplied by the endpoint.
+   * @return createdAt
+   */
+  @javax.annotation.Nullable
+  public OffsetDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
+
+  public JNLC currency(@javax.annotation.Nonnull String currency) {
     this.currency = currency;
     return this;
   }
 
   /**
-   * Currency denomination of the journal. USD by default.
+   * Currency denomination of the journal.
    * @return currency
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getCurrency() {
     return currency;
   }
 
-  public void setCurrency(@javax.annotation.Nullable String currency) {
+  public void setCurrency(@javax.annotation.Nonnull String currency) {
     this.currency = currency;
   }
 
 
-  public JNLC description(@javax.annotation.Nullable String description) {
+  public JNLC description(@javax.annotation.Nonnull String description) {
     this.description = description;
     return this;
   }
 
   /**
-   * ID the amount goes to. Only valid for JNLC journals. Null for JNLS.
+   * The journal description.
    * @return description
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getDescription() {
     return description;
   }
 
-  public void setDescription(@javax.annotation.Nullable String description) {
+  public void setDescription(@javax.annotation.Nonnull String description) {
     this.description = description;
   }
 
 
-  public JNLC entryType(@javax.annotation.Nonnull String entryType) {
-    this.entryType = entryType;
+  public JNLC fromAccount(@javax.annotation.Nonnull UUID fromAccount) {
+    this.fromAccount = fromAccount;
     return this;
   }
 
   /**
-   * JNLC
-   * @return entryType
+   * The account ID that initiated the journal.
+   * @return fromAccount
    */
   @javax.annotation.Nonnull
-  public String getEntryType() {
-    return entryType;
+  public UUID getFromAccount() {
+    return fromAccount;
   }
 
-  public void setEntryType(@javax.annotation.Nonnull String entryType) {
-    this.entryType = entryType;
+  public void setFromAccount(@javax.annotation.Nonnull UUID fromAccount) {
+    this.fromAccount = fromAccount;
+  }
+
+
+  public JNLC id(@javax.annotation.Nonnull UUID id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * The journal ID.
+   * @return id
+   */
+  @javax.annotation.Nonnull
+  public UUID getId() {
+    return id;
+  }
+
+  public void setId(@javax.annotation.Nonnull UUID id) {
+    this.id = id;
   }
 
 
@@ -166,7 +313,7 @@ public class JNLC implements Serializable {
   }
 
   /**
-   * Only valid for JNLC journals. Null for JNLS.
+   * The cash amount, or null when not applicable.
    * @return netAmount
    */
   @javax.annotation.Nonnull
@@ -179,13 +326,184 @@ public class JNLC implements Serializable {
   }
 
 
+  public JNLC price(@javax.annotation.Nonnull BigDecimal price) {
+    this.price = price;
+    return this;
+  }
+
+  /**
+   * The journaled security price, or null when not applicable.
+   * @return price
+   */
+  @javax.annotation.Nonnull
+  public BigDecimal getPrice() {
+    return price;
+  }
+
+  public void setPrice(@javax.annotation.Nonnull BigDecimal price) {
+    this.price = price;
+  }
+
+
+  public JNLC qty(@javax.annotation.Nonnull BigDecimal qty) {
+    this.qty = qty;
+    return this;
+  }
+
+  /**
+   * The journaled security quantity, or null when not applicable.
+   * @return qty
+   */
+  @javax.annotation.Nonnull
+  public BigDecimal getQty() {
+    return qty;
+  }
+
+  public void setQty(@javax.annotation.Nonnull BigDecimal qty) {
+    this.qty = qty;
+  }
+
+
+  public JNLC settleDate(@javax.annotation.Nonnull LocalDate settleDate) {
+    this.settleDate = settleDate;
+    return this;
+  }
+
+  /**
+   * The settlement date, or null until one is assigned.
+   * @return settleDate
+   */
+  @javax.annotation.Nonnull
+  public LocalDate getSettleDate() {
+    return settleDate;
+  }
+
+  public void setSettleDate(@javax.annotation.Nonnull LocalDate settleDate) {
+    this.settleDate = settleDate;
+  }
+
+
+  public JNLC status(@javax.annotation.Nonnull JournalStatus status) {
+    this.status = status;
+    return this;
+  }
+
+  /**
+   * Get status
+   * @return status
+   */
+  @javax.annotation.Nonnull
+  public JournalStatus getStatus() {
+    return status;
+  }
+
+  public void setStatus(@javax.annotation.Nonnull JournalStatus status) {
+    this.status = status;
+  }
+
+
+  public JNLC symbol(@javax.annotation.Nonnull String symbol) {
+    this.symbol = symbol;
+    return this;
+  }
+
+  /**
+   * The journaled security symbol, or null for a cash journal.
+   * @return symbol
+   */
+  @javax.annotation.Nonnull
+  public String getSymbol() {
+    return symbol;
+  }
+
+  public void setSymbol(@javax.annotation.Nonnull String symbol) {
+    this.symbol = symbol;
+  }
+
+
+  public JNLC systemDate(@javax.annotation.Nonnull LocalDate systemDate) {
+    this.systemDate = systemDate;
+    return this;
+  }
+
+  /**
+   * The booking-system date, or null until one is assigned.
+   * @return systemDate
+   */
+  @javax.annotation.Nonnull
+  public LocalDate getSystemDate() {
+    return systemDate;
+  }
+
+  public void setSystemDate(@javax.annotation.Nonnull LocalDate systemDate) {
+    this.systemDate = systemDate;
+  }
+
+
+  public JNLC toAccount(@javax.annotation.Nonnull UUID toAccount) {
+    this.toAccount = toAccount;
+    return this;
+  }
+
+  /**
+   * The account ID that received the journal.
+   * @return toAccount
+   */
+  @javax.annotation.Nonnull
+  public UUID getToAccount() {
+    return toAccount;
+  }
+
+  public void setToAccount(@javax.annotation.Nonnull UUID toAccount) {
+    this.toAccount = toAccount;
+  }
+
+
+  public JNLC transmitterInfo(@javax.annotation.Nullable TransmitterInfo transmitterInfo) {
+    this.transmitterInfo = transmitterInfo;
+    return this;
+  }
+
+  /**
+   * Get transmitterInfo
+   * @return transmitterInfo
+   */
+  @javax.annotation.Nullable
+  public TransmitterInfo getTransmitterInfo() {
+    return transmitterInfo;
+  }
+
+  public void setTransmitterInfo(@javax.annotation.Nullable TransmitterInfo transmitterInfo) {
+    this.transmitterInfo = transmitterInfo;
+  }
+
+
+  public JNLC entryType(@javax.annotation.Nonnull EntryTypeEnum entryType) {
+    this.entryType = entryType;
+    return this;
+  }
+
+  /**
+   * Cash journal discriminator value.
+   * @return entryType
+   */
+  @javax.annotation.Nonnull
+  public EntryTypeEnum getEntryType() {
+    return entryType;
+  }
+
+  public void setEntryType(@javax.annotation.Nonnull EntryTypeEnum entryType) {
+    this.entryType = entryType;
+  }
+
+
   public JNLC transmitterAccountNumber(@javax.annotation.Nullable String transmitterAccountNumber) {
     this.transmitterAccountNumber = transmitterAccountNumber;
     return this;
   }
 
   /**
-   * Only valid for JNLC journals. Null for JNLS.max 255 characters
+   * Optional for JNLC journals. Maximum 255 characters. See more details about [Travel Rule](https://alpaca.markets/docs/broker/integration/funding/#travel-rule) in our main documentation.
    * @return transmitterAccountNumber
    */
   @javax.annotation.Nullable
@@ -204,7 +522,7 @@ public class JNLC implements Serializable {
   }
 
   /**
-   * Only valid for JNLC journals. Null for JNLS.max 255 characters
+   * Optional for JNLC journals. Maximum 255 characters. See more details about [Travel Rule](https://alpaca.markets/docs/broker/integration/funding/#travel-rule) in our main documentation.
    * @return transmitterAddress
    */
   @javax.annotation.Nullable
@@ -223,7 +541,7 @@ public class JNLC implements Serializable {
   }
 
   /**
-   * Only valid for JNLC journals. Null for JNLS.max 255 characters
+   * Optional for JNLC journals. Maximum 255 characters. See more details about [Travel Rule](https://alpaca.markets/docs/broker/integration/funding/#travel-rule) in our main documentation.
    * @return transmitterFinancialInstitution
    */
   @javax.annotation.Nullable
@@ -242,7 +560,7 @@ public class JNLC implements Serializable {
   }
 
   /**
-   * Only valid for JNLC journals. Null for JNLS. Max 255 characters.
+   * Optional for JNLC journals. Maximum 255 characters. See more details about [Travel Rule](https://alpaca.markets/docs/broker/integration/funding/#travel-rule) in our main documentation.
    * @return transmitterName
    */
   @javax.annotation.Nullable
@@ -261,7 +579,7 @@ public class JNLC implements Serializable {
   }
 
   /**
-   * Only valid for JNLC journals. Null for JNLS.
+   * Optional for JNLC journals. RFC 3339 format. See more details about [Travel Rule](https://alpaca.markets/docs/broker/integration/funding/#travel-rule) in our main documentation.
    * @return transmitterTimestamp
    */
   @javax.annotation.Nullable
@@ -328,10 +646,21 @@ public class JNLC implements Serializable {
       return false;
     }
     JNLC JNLC = (JNLC) o;
-    return Objects.equals(this.currency, JNLC.currency) &&
+    return Objects.equals(this.createdAt, JNLC.createdAt) &&
+        Objects.equals(this.currency, JNLC.currency) &&
         Objects.equals(this.description, JNLC.description) &&
-        Objects.equals(this.entryType, JNLC.entryType) &&
+        Objects.equals(this.fromAccount, JNLC.fromAccount) &&
+        Objects.equals(this.id, JNLC.id) &&
         Objects.equals(this.netAmount, JNLC.netAmount) &&
+        Objects.equals(this.price, JNLC.price) &&
+        Objects.equals(this.qty, JNLC.qty) &&
+        Objects.equals(this.settleDate, JNLC.settleDate) &&
+        Objects.equals(this.status, JNLC.status) &&
+        Objects.equals(this.symbol, JNLC.symbol) &&
+        Objects.equals(this.systemDate, JNLC.systemDate) &&
+        Objects.equals(this.toAccount, JNLC.toAccount) &&
+        Objects.equals(this.transmitterInfo, JNLC.transmitterInfo) &&
+        Objects.equals(this.entryType, JNLC.entryType) &&
         Objects.equals(this.transmitterAccountNumber, JNLC.transmitterAccountNumber) &&
         Objects.equals(this.transmitterAddress, JNLC.transmitterAddress) &&
         Objects.equals(this.transmitterFinancialInstitution, JNLC.transmitterFinancialInstitution) &&
@@ -342,17 +671,28 @@ public class JNLC implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(currency, description, entryType, netAmount, transmitterAccountNumber, transmitterAddress, transmitterFinancialInstitution, transmitterName, transmitterTimestamp, additionalProperties);
+    return Objects.hash(createdAt, currency, description, fromAccount, id, netAmount, price, qty, settleDate, status, symbol, systemDate, toAccount, transmitterInfo, entryType, transmitterAccountNumber, transmitterAddress, transmitterFinancialInstitution, transmitterName, transmitterTimestamp, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class JNLC {\n");
+    sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    currency: ").append(toIndentedString(currency)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    entryType: ").append(toIndentedString(entryType)).append("\n");
+    sb.append("    fromAccount: ").append(toIndentedString(fromAccount)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    netAmount: ").append(toIndentedString(netAmount)).append("\n");
+    sb.append("    price: ").append(toIndentedString(price)).append("\n");
+    sb.append("    qty: ").append(toIndentedString(qty)).append("\n");
+    sb.append("    settleDate: ").append(toIndentedString(settleDate)).append("\n");
+    sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
+    sb.append("    systemDate: ").append(toIndentedString(systemDate)).append("\n");
+    sb.append("    toAccount: ").append(toIndentedString(toAccount)).append("\n");
+    sb.append("    transmitterInfo: ").append(toIndentedString(transmitterInfo)).append("\n");
+    sb.append("    entryType: ").append(toIndentedString(entryType)).append("\n");
     sb.append("    transmitterAccountNumber: ").append(toIndentedString(transmitterAccountNumber)).append("\n");
     sb.append("    transmitterAddress: ").append(toIndentedString(transmitterAddress)).append("\n");
     sb.append("    transmitterFinancialInstitution: ").append(toIndentedString(transmitterFinancialInstitution)).append("\n");
@@ -377,10 +717,10 @@ public class JNLC implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("currency", "description", "entry_type", "net_amount", "transmitter_account_number", "transmitter_address", "transmitter_financial_institution", "transmitter_name", "transmitter_timestamp"));
+    openapiFields = new HashSet<String>(Arrays.asList("created_at", "currency", "description", "from_account", "id", "net_amount", "price", "qty", "settle_date", "status", "symbol", "system_date", "to_account", "transmitter_info", "entry_type", "transmitter_account_number", "transmitter_address", "transmitter_financial_institution", "transmitter_name", "transmitter_timestamp"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("entry_type", "net_amount"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("currency", "description", "from_account", "id", "net_amount", "price", "qty", "settle_date", "status", "symbol", "system_date", "to_account", "entry_type"));
   }
 
   /**
@@ -403,18 +743,44 @@ public class JNLC implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("currency") != null && !jsonObj.get("currency").isJsonNull()) && !jsonObj.get("currency").isJsonPrimitive()) {
+      if (!jsonObj.get("currency").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `currency` to be a primitive type in the JSON string but got `%s`", jsonObj.get("currency").toString()));
       }
-      if ((jsonObj.get("description") != null && !jsonObj.get("description").isJsonNull()) && !jsonObj.get("description").isJsonPrimitive()) {
+      if (!jsonObj.get("description").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `description` to be a primitive type in the JSON string but got `%s`", jsonObj.get("description").toString()));
       }
-      if (!jsonObj.get("entry_type").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `entry_type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("entry_type").toString()));
+      if (!jsonObj.get("from_account").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `from_account` to be a primitive type in the JSON string but got `%s`", jsonObj.get("from_account").toString()));
+      }
+      if (!jsonObj.get("id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
       if (!jsonObj.get("net_amount").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `net_amount` to be a primitive type in the JSON string but got `%s`", jsonObj.get("net_amount").toString()));
       }
+      if (!jsonObj.get("price").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("price").toString()));
+      }
+      if (!jsonObj.get("qty").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("qty").toString()));
+      }
+      // validate the required field `status`
+      JournalStatus.validateJsonElement(jsonObj.get("status"));
+      if (!jsonObj.get("symbol").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
+      }
+      if (!jsonObj.get("to_account").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `to_account` to be a primitive type in the JSON string but got `%s`", jsonObj.get("to_account").toString()));
+      }
+      // validate the optional field `transmitter_info`
+      if (jsonObj.get("transmitter_info") != null && !jsonObj.get("transmitter_info").isJsonNull()) {
+        TransmitterInfo.validateJsonElement(jsonObj.get("transmitter_info"));
+      }
+      if (!jsonObj.get("entry_type").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `entry_type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("entry_type").toString()));
+      }
+      // validate the required field `entry_type`
+      EntryTypeEnum.validateJsonElement(jsonObj.get("entry_type"));
       if ((jsonObj.get("transmitter_account_number") != null && !jsonObj.get("transmitter_account_number").isJsonNull()) && !jsonObj.get("transmitter_account_number").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `transmitter_account_number` to be a primitive type in the JSON string but got `%s`", jsonObj.get("transmitter_account_number").toString()));
       }

@@ -22,7 +22,9 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import markets.alpaca.client.openapi.broker.model.AssetClass;
 import markets.alpaca.client.openapi.broker.model.CommissionType;
@@ -148,7 +150,7 @@ public class OrderLeg implements Serializable {
   public static final String SERIALIZED_NAME_LEGS = "legs";
   @SerializedName(SERIALIZED_NAME_LEGS)
   @javax.annotation.Nullable
-  private Object legs;
+  private List<Object> legs;
 
   public static final String SERIALIZED_NAME_LIMIT_PRICE = "limit_price";
   @SerializedName(SERIALIZED_NAME_LIMIT_PRICE)
@@ -571,21 +573,29 @@ public class OrderLeg implements Serializable {
   }
 
 
-  public OrderLeg legs(@javax.annotation.Nullable Object legs) {
+  public OrderLeg legs(@javax.annotation.Nullable List<Object> legs) {
     this.legs = legs;
     return this;
   }
 
+  public OrderLeg addLegsItem(Object legsItem) {
+    if (this.legs == null) {
+      this.legs = new ArrayList<>();
+    }
+    this.legs.add(legsItem);
+    return this;
+  }
+
   /**
-   * Always null for an order leg; legs are not nested beyond one level.
+   * Always null for an order leg; legs are not nested beyond one level. An empty array is accepted for generated-client compatibility.
    * @return legs
    */
   @javax.annotation.Nullable
-  public Object getLegs() {
+  public List<Object> getLegs() {
     return legs;
   }
 
-  public void setLegs(@javax.annotation.Nullable Object legs) {
+  public void setLegs(@javax.annotation.Nullable List<Object> legs) {
     this.legs = legs;
   }
 
@@ -1228,6 +1238,10 @@ public class OrderLeg implements Serializable {
       }
       if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
+      }
+      // ensure the optional json data is an array if present
+      if (jsonObj.get("legs") != null && !jsonObj.get("legs").isJsonNull() && !jsonObj.get("legs").isJsonArray()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `legs` to be an array in the JSON string but got `%s`", jsonObj.get("legs").toString()));
       }
       if ((jsonObj.get("limit_price") != null && !jsonObj.get("limit_price").isJsonNull()) && !jsonObj.get("limit_price").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `limit_price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("limit_price").toString()));
