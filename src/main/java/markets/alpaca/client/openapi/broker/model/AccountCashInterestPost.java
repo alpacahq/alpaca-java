@@ -31,6 +31,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -50,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * The configuration of the account&#39;s USD cash interest program when creating an account. If cash_interest is not provided and there is a default APR tier defined, that tier will be used. To enroll the account in a non-default APR tier, provide the cash_interest object with the desired apr_tier_name. The status should not be specified on enrollment. The response will contain a status of PENDING_CHANGE. An event showing the status change to ACTIVE will be generated when the enrollment is complete. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class AccountCashInterestPost implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -222,7 +223,9 @@ public class AccountCashInterestPost implements Serializable {
                    obj.addProperty(entry.getKey(), (Character) entry.getValue());
                  else {
                    JsonElement jsonElement = gson.toJsonTree(entry.getValue());
-                   if (jsonElement.isJsonArray()) {
+                   if (jsonElement.isJsonNull()) {
+                     obj.add(entry.getKey(), JsonNull.INSTANCE);
+                   } else if (jsonElement.isJsonArray()) {
                      obj.add(entry.getKey(), jsonElement.getAsJsonArray());
                    } else {
                      obj.add(entry.getKey(), jsonElement.getAsJsonObject());

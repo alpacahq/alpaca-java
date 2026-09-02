@@ -31,6 +31,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -50,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * The account&#39;s Fully Paid Securities Lending (FPSL) configuration. Use this property to change the account&#39;s configuration for the FPSL program. To enroll the account for a market, specify the tier_id. The status should not be specified on enrollment. To change the tier, specify the new tier_id. The status should not be specified on tier changes. To unenroll, set the status to INACTIVE. To re-enroll the account, set the status to ACTIVE. You can also specify the tier_id in case you want to change it. Currently only US market is supported. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class AccountFPSLPatch implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -222,7 +223,9 @@ public class AccountFPSLPatch implements Serializable {
                    obj.addProperty(entry.getKey(), (Character) entry.getValue());
                  else {
                    JsonElement jsonElement = gson.toJsonTree(entry.getValue());
-                   if (jsonElement.isJsonArray()) {
+                   if (jsonElement.isJsonNull()) {
+                     obj.add(entry.getKey(), JsonNull.INSTANCE);
+                   } else if (jsonElement.isJsonArray()) {
                      obj.add(entry.getKey(), jsonElement.getAsJsonArray());
                    } else {
                      obj.add(entry.getKey(), jsonElement.getAsJsonObject());

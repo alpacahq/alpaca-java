@@ -33,6 +33,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -52,7 +53,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * Common envelope fields shared by every variant of [&#x60;corporate_action_event&#x60;](#/components/schemas/corporate_action_event). This schema is not meant to be used directly by clients -- it exists so each per-&#x60;event_type&#x60; &#x60;oneOf&#x60; branch can &#x60;allOf&#x60;-compose the envelope basics (&#x60;event_id&#x60;, &#x60;at&#x60;, &#x60;action&#x60;, &#x60;region&#x60;) alongside its narrowed &#x60;event_type&#x60; / &#x60;ca&#x60; pair. Keeping these in one place is what makes the envelope&#39;s &#x60;discriminator&#x60; play nicely with strict OpenAPI validators. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class CorporateActionEventBase implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -312,7 +313,9 @@ public class CorporateActionEventBase implements Serializable {
                    obj.addProperty(entry.getKey(), (Character) entry.getValue());
                  else {
                    JsonElement jsonElement = gson.toJsonTree(entry.getValue());
-                   if (jsonElement.isJsonArray()) {
+                   if (jsonElement.isJsonNull()) {
+                     obj.add(entry.getKey(), JsonNull.INSTANCE);
+                   } else if (jsonElement.isJsonArray()) {
                      obj.add(entry.getKey(), jsonElement.getAsJsonArray());
                    } else {
                      obj.add(entry.getKey(), jsonElement.getAsJsonObject());

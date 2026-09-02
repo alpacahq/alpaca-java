@@ -34,6 +34,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -53,7 +54,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents a change to admin configurations, as broadcast over the **events** streaming API. Only fields whose value changed are included; unrelated update events will not include a flag that did not change.  Depending on the type of the Admin Configuration, the sent event will behave differently. For bool flags we are only sending the new value.  For example, the following payload means that the disable_shorting flag was set to true:  &#x60;&#x60;&#x60; {   \&quot;disable_shorting\&quot;: true } &#x60;&#x60;&#x60;  For other data types, we are embedding the old and new values into the payload. For example changing the max_margin_multiplier from 4 to 1 will yield this payload:  &#x60;&#x60;&#x60; {   \&quot;max_margin_multiplier\&quot;: {     \&quot;from\&quot;: 4,     \&quot;to\&quot;: 1   } } &#x60;&#x60;&#x60;  Introducing an override value from the default will yield a null value as &#x60;from&#x60;. For example restricting the max_margin_multiplier to 1 from default will yield the following payload:  &#x60;&#x60;&#x60; {   \&quot;max_margin_multiplier\&quot;: {     \&quot;from\&quot;: null,     \&quot;to\&quot;: 1   } } &#x60;&#x60;&#x60;
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class AdminConfigurationsEvent implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -549,7 +550,9 @@ public class AdminConfigurationsEvent implements Serializable {
                    obj.addProperty(entry.getKey(), (Character) entry.getValue());
                  else {
                    JsonElement jsonElement = gson.toJsonTree(entry.getValue());
-                   if (jsonElement.isJsonArray()) {
+                   if (jsonElement.isJsonNull()) {
+                     obj.add(entry.getKey(), JsonNull.INSTANCE);
+                   } else if (jsonElement.isJsonArray()) {
                      obj.add(entry.getKey(), jsonElement.getAsJsonArray());
                    } else {
                      obj.add(entry.getKey(), jsonElement.getAsJsonObject());

@@ -30,6 +30,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -49,7 +50,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * A single replacement-security leg of a [&#x60;ca_event_reorganization&#x60;](#/components/schemas/ca_event_reorganization) payload. All decimal fields are emitted as JSON strings to preserve precision on the wire. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class CaEventReorganizationStockMovement implements Serializable {
   private static final long serialVersionUID = 1L;
 

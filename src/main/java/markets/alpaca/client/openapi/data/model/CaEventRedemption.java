@@ -32,6 +32,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -51,7 +52,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * Full redemption payload delivered when &#x60;event_type &#x3D;&#x3D; redemption_corporateaction_event&#x60;. Corresponds to &#x60;redemptions&#x60; on the REST [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions) response, but every decimal field is emitted as a JSON string to preserve precision on the wire. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class CaEventRedemption implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -426,7 +427,9 @@ public class CaEventRedemption implements Serializable {
                    obj.addProperty(entry.getKey(), (Character) entry.getValue());
                  else {
                    JsonElement jsonElement = gson.toJsonTree(entry.getValue());
-                   if (jsonElement.isJsonArray()) {
+                   if (jsonElement.isJsonNull()) {
+                     obj.add(entry.getKey(), JsonNull.INSTANCE);
+                   } else if (jsonElement.isJsonArray()) {
                      obj.add(entry.getKey(), jsonElement.getAsJsonArray());
                    } else {
                      obj.add(entry.getKey(), jsonElement.getAsJsonObject());

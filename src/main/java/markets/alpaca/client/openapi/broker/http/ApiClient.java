@@ -385,6 +385,17 @@ public class ApiClient {
     }
 
     /**
+     * <p>Set LocalDateTimeFormat.</p>
+     *
+     * @param dateFormat a {@link java.time.format.DateTimeFormatter} object
+     * @return a {@link markets.alpaca.client.openapi.broker.http.ApiClient} object
+     */
+    public ApiClient setLocalDateTimeFormat(DateTimeFormatter dateFormat) {
+        JSON.setLocalDateTimeFormat(dateFormat);
+        return this;
+    }
+
+    /**
      * <p>Set LenientOnJson.</p>
      *
      * @param lenientOnJson a boolean

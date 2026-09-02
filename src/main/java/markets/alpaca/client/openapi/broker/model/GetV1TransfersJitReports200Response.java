@@ -62,7 +62,7 @@ import com.google.gson.JsonParseException;
 
 import markets.alpaca.client.openapi.broker.http.JSON;
 
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class GetV1TransfersJitReports200Response extends AbstractOpenApiSchema implements Serializable {
     private static final Logger log = Logger.getLogger(GetV1TransfersJitReports200Response.class.getName());
 
