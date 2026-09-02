@@ -121,6 +121,11 @@ public class TradeUpdateEventV2 implements Serializable {
   @javax.annotation.Nullable
   private String qty;
 
+  public static final String SERIALIZED_NAME_REASON = "reason";
+  @SerializedName(SERIALIZED_NAME_REASON)
+  @javax.annotation.Nullable
+  private String reason;
+
   public static final String SERIALIZED_NAME_SETTLE_DATE = "settle_date";
   @SerializedName(SERIALIZED_NAME_SETTLE_DATE)
   @javax.annotation.Nullable
@@ -375,6 +380,25 @@ public class TradeUpdateEventV2 implements Serializable {
   }
 
 
+  public TradeUpdateEventV2 reason(@javax.annotation.Nullable String reason) {
+    this.reason = reason;
+    return this;
+  }
+
+  /**
+   * Machine-readable code that explains **why** the event occurred. Only present when a reason applies; omitted from routine lifecycle events such as &#x60;new&#x60;, &#x60;fill&#x60;, and &#x60;partial_fill&#x60;.  Known values:  | Value | Event(s) | Meaning | | --- | --- | --- | | &#x60;CORPORATE_ACTION&#x60; | &#x60;canceled&#x60; | Alpaca canceled the order internally because the underlying is scheduled for a mandatory corporate action other than a cash dividend (e.g. reverse split, symbol/CUSIP change, merger, liquidation). Emitted by the overnight-session lifecycle and, where enabled by Alpaca, the daytime GTC corporate-action sweep. Not emitted when the cancel is routed to the upstream venue instead (e.g. day-session, &#x60;extended_hours&#x3D;false&#x60;, agency- or mixed-capacity orders); those &#x60;canceled&#x60; events carry the venue&#39;s own text in &#x60;reason&#x60; if any. | | &#x60;TOO_LATE_TO_CANCEL&#x60; | &#x60;order_cancel_rejected&#x60;, &#x60;order_replace_rejected&#x60; | The cancel or replace request arrived after the order had already reached a terminal state (typically &#x60;filled&#x60;). | | &#x60;TRADE_BUST&#x60; | &#x60;trade_bust&#x60; | Alpaca operations replayed or synthesized a bust of a previously reported execution. Busts that originate from the upstream venue surface the venue&#39;s own text in &#x60;reason&#x60; (or omit it entirely), so consumers should not rely on &#x60;TRADE_BUST&#x60; alone to identify all busts — key on the &#x60;event&#x60; field (&#x60;trade_bust&#x60;) for that. |  Free-form strings may also appear in &#x60;reason&#x60;. In particular, &#x60;canceled&#x60;, &#x60;trade_bust&#x60;, and &#x60;trade_correct&#x60; events originating from the upstream venue carry the venue&#39;s own text field (when the venue provides one) rather than an Alpaca-defined code. Consumers should tolerate unknown values and, where they need to distinguish cases, key on &#x60;event&#x60; first and use &#x60;reason&#x60; as a secondary hint. 
+   * @return reason
+   */
+  @javax.annotation.Nullable
+  public String getReason() {
+    return reason;
+  }
+
+  public void setReason(@javax.annotation.Nullable String reason) {
+    this.reason = reason;
+  }
+
+
   public TradeUpdateEventV2 settleDate(@javax.annotation.Nullable LocalDate settleDate) {
     this.settleDate = settleDate;
     return this;
@@ -498,6 +522,7 @@ public class TradeUpdateEventV2 implements Serializable {
         Objects.equals(this.previousExecutionId, tradeUpdateEventV2.previousExecutionId) &&
         Objects.equals(this.price, tradeUpdateEventV2.price) &&
         Objects.equals(this.qty, tradeUpdateEventV2.qty) &&
+        Objects.equals(this.reason, tradeUpdateEventV2.reason) &&
         Objects.equals(this.settleDate, tradeUpdateEventV2.settleDate) &&
         Objects.equals(this.swapRate, tradeUpdateEventV2.swapRate) &&
         Objects.equals(this.timestamp, tradeUpdateEventV2.timestamp)&&
@@ -506,7 +531,7 @@ public class TradeUpdateEventV2 implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(accountId, at, event, eventId, executionId, legs, order, positionQty, positionQtys, previousExecutionId, price, qty, settleDate, swapRate, timestamp, additionalProperties);
+    return Objects.hash(accountId, at, event, eventId, executionId, legs, order, positionQty, positionQtys, previousExecutionId, price, qty, reason, settleDate, swapRate, timestamp, additionalProperties);
   }
 
   @Override
@@ -525,6 +550,7 @@ public class TradeUpdateEventV2 implements Serializable {
     sb.append("    previousExecutionId: ").append(toIndentedString(previousExecutionId)).append("\n");
     sb.append("    price: ").append(toIndentedString(price)).append("\n");
     sb.append("    qty: ").append(toIndentedString(qty)).append("\n");
+    sb.append("    reason: ").append(toIndentedString(reason)).append("\n");
     sb.append("    settleDate: ").append(toIndentedString(settleDate)).append("\n");
     sb.append("    swapRate: ").append(toIndentedString(swapRate)).append("\n");
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
@@ -547,7 +573,7 @@ public class TradeUpdateEventV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("account_id", "at", "event", "event_id", "execution_id", "legs", "order", "position_qty", "position_qtys", "previous_execution_id", "price", "qty", "settle_date", "swap_rate", "timestamp"));
+    openapiFields = new HashSet<String>(Arrays.asList("account_id", "at", "event", "event_id", "execution_id", "legs", "order", "position_qty", "position_qtys", "previous_execution_id", "price", "qty", "reason", "settle_date", "swap_rate", "timestamp"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -611,6 +637,9 @@ public class TradeUpdateEventV2 implements Serializable {
       }
       if ((jsonObj.get("qty") != null && !jsonObj.get("qty").isJsonNull()) && !jsonObj.get("qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("qty").toString()));
+      }
+      if ((jsonObj.get("reason") != null && !jsonObj.get("reason").isJsonNull()) && !jsonObj.get("reason").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `reason` to be a primitive type in the JSON string but got `%s`", jsonObj.get("reason").toString()));
       }
       if ((jsonObj.get("swap_rate") != null && !jsonObj.get("swap_rate").isJsonNull()) && !jsonObj.get("swap_rate").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `swap_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("swap_rate").toString()));

@@ -220,12 +220,12 @@ public class Asset implements Serializable {
   public static final String SERIALIZED_NAME_MARGIN_REQUIREMENT_LONG = "margin_requirement_long";
   @SerializedName(SERIALIZED_NAME_MARGIN_REQUIREMENT_LONG)
   @javax.annotation.Nonnull
-  private String marginRequirementLong;
+  private BigDecimal marginRequirementLong;
 
   public static final String SERIALIZED_NAME_MARGIN_REQUIREMENT_SHORT = "margin_requirement_short";
   @SerializedName(SERIALIZED_NAME_MARGIN_REQUIREMENT_SHORT)
   @javax.annotation.Nonnull
-  private String marginRequirementShort;
+  private BigDecimal marginRequirementShort;
 
   public static final String SERIALIZED_NAME_MARGINABLE = "marginable";
   @SerializedName(SERIALIZED_NAME_MARGINABLE)
@@ -495,40 +495,40 @@ public class Asset implements Serializable {
   }
 
 
-  public Asset marginRequirementLong(@javax.annotation.Nonnull String marginRequirementLong) {
+  public Asset marginRequirementLong(@javax.annotation.Nonnull BigDecimal marginRequirementLong) {
     this.marginRequirementLong = marginRequirementLong;
     return this;
   }
 
   /**
-   * The margin requirement percentage for the asset&#39;s long positions (equities only).
+   * The margin requirement percentage for the asset&#39;s long positions (equities only), encoded as a decimal string.
    * @return marginRequirementLong
    */
   @javax.annotation.Nonnull
-  public String getMarginRequirementLong() {
+  public BigDecimal getMarginRequirementLong() {
     return marginRequirementLong;
   }
 
-  public void setMarginRequirementLong(@javax.annotation.Nonnull String marginRequirementLong) {
+  public void setMarginRequirementLong(@javax.annotation.Nonnull BigDecimal marginRequirementLong) {
     this.marginRequirementLong = marginRequirementLong;
   }
 
 
-  public Asset marginRequirementShort(@javax.annotation.Nonnull String marginRequirementShort) {
+  public Asset marginRequirementShort(@javax.annotation.Nonnull BigDecimal marginRequirementShort) {
     this.marginRequirementShort = marginRequirementShort;
     return this;
   }
 
   /**
-   * The margin requirement percentage for the asset&#39;s short positions (equities only).
+   * The margin requirement percentage for the asset&#39;s short positions (equities only), encoded as a decimal string.
    * @return marginRequirementShort
    */
   @javax.annotation.Nonnull
-  public String getMarginRequirementShort() {
+  public BigDecimal getMarginRequirementShort() {
     return marginRequirementShort;
   }
 
-  public void setMarginRequirementShort(@javax.annotation.Nonnull String marginRequirementShort) {
+  public void setMarginRequirementShort(@javax.annotation.Nonnull BigDecimal marginRequirementShort) {
     this.marginRequirementShort = marginRequirementShort;
   }
 

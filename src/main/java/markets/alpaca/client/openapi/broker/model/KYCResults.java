@@ -21,6 +21,8 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -47,7 +49,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * Hold information about the result of KYC. Please see the documentation [here](https://alpaca.markets/docs/api-references/broker-api/events/#kyc-results) for more indepth details
+ * Holds information about the result of KYC.  &#x60;accept&#x60;, &#x60;indeterminate&#x60;, and &#x60;reject&#x60; are nullable sets represented as objects. Each property name is a KYC reason identifier, and every property value is always an empty object (&#x60;{}&#x60;) carrying no nested data. For example:  &#x60;&#x60;&#x60;json {   \&quot;IDENTITY_VERIFICATION\&quot;: {},   \&quot;WATCHLIST_HIT\&quot;: {} } &#x60;&#x60;&#x60;  Interpret each reason together with its enclosing result category and &#x60;additional_information&#x60;.  Documented reason identifiers: - &#x60;IDENTITY_VERIFICATION&#x60;: A government-issued identity document is required to verify the account owner&#39;s identity. - &#x60;TAX_IDENTIFICATION&#x60;: A tax identification document is required to verify the account owner&#39;s tax identification number. - &#x60;ADDRESS_VERIFICATION&#x60;: Additional documentation, such as a government-issued ID or statement, may be required to verify the account owner&#39;s residential address. - &#x60;DATE_OF_BIRTH&#x60;: A government-issued identity document is required to verify the account owner&#39;s date of birth. - &#x60;SELFIE_VERIFICATION&#x60;: A live selfie of the account owner is required to verify identity. - &#x60;PEP&#x60;: The account owner disclosed politically exposed person status, and additional information may be required. - &#x60;FAMILY_MEMBER_PEP&#x60;: The account owner disclosed that an immediate family member is politically exposed, and additional information may be required. - &#x60;CONTROL_PERSON&#x60;: Additional company information may be required because the account owner disclosed a control position. - &#x60;AFFILIATED&#x60;: Additional firm information may be required because the account owner disclosed an affiliation with FINRA or an exchange. - &#x60;VISA_TYPE_OTHER&#x60;: The account owner&#39;s visa type and expiration date may be required because the submitted visa type was \&quot;other.\&quot; - &#x60;W8BEN_CORRECTION&#x60;: A new W-8BEN with corrected identifying information is required. - &#x60;COUNTRY_NOT_SUPPORTED&#x60;: The account owner&#39;s country of tax residence or legal residence is not supported for this account. - &#x60;WATCHLIST_HIT&#x60;: Watchlist screening returned a result that requires further review; no action is needed from the account owner unless separately requested. - &#x60;OTHER&#x60;: See &#x60;additional_information&#x60; for a custom message describing what is required from the account owner. - &#x60;OTHER_PARTNER&#x60;: See &#x60;additional_information&#x60; for a custom message intended for the Broker API partner. - &#x60;CITIZENSHIP_COUNTRY_NOT_SUPPORTED&#x60;: The account owner&#39;s country of citizenship is not supported for this account. - &#x60;DIFFERING_COUNTRY&#x60;: A submitted identity document was issued by a country different from the account owner&#39;s country of tax residence. - &#x60;WL_PEP_SCREENING&#x60;: Watchlist screening returned a result related to possible political exposure. - &#x60;WL_LEGAL_REGULATORY_WARNING&#x60;: Watchlist screening returned a legal or regulatory warning result. - &#x60;UNDER_MINIMUM_AGE&#x60;: The account owner does not meet the minimum age requirement for this account. - &#x60;PEP_FOREIGN&#x60;: The account owner disclosed foreign politically exposed person status, and additional information may be required. - &#x60;FAMILY_MEMBER_PEP_FOREIGN&#x60;: The account owner disclosed that an immediate family member has foreign politically exposed person status, and additional information may be required. - &#x60;DISCRETIONARY&#x60;: The account is designated for discretionary trading by a registered investment adviser and requires review. - &#x60;HIO&#x60;: Additional information and a declaration form may be required because the account owner disclosed being the head of an international organization. - &#x60;INTERNAL_CHECK&#x60;: A non-specific account-opening check contributed to the KYC outcome; no more specific reason is available. - &#x60;compromised_document&#x60;: The identity document check indicated that the document may be compromised. - &#x60;data_comparison&#x60;: Data extracted from the identity document did not pass comparison checks and requires review. - &#x60;image_integrity&#x60;: A document or selfie image did not pass image-integrity checks and requires review.  The set of reason identifiers is extensible, so integrations must tolerate and preserve unrecognized values. 
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
 public class KYCResults implements Serializable {
@@ -56,7 +58,7 @@ public class KYCResults implements Serializable {
   public static final String SERIALIZED_NAME_ACCEPT = "accept";
   @SerializedName(SERIALIZED_NAME_ACCEPT)
   @javax.annotation.Nullable
-  private String accept;
+  private Map<String, Object> accept = new HashMap<>();
 
   public static final String SERIALIZED_NAME_ADDITIONAL_INFORMATION = "additional_information";
   @SerializedName(SERIALIZED_NAME_ADDITIONAL_INFORMATION)
@@ -66,12 +68,12 @@ public class KYCResults implements Serializable {
   public static final String SERIALIZED_NAME_INDETERMINATE = "indeterminate";
   @SerializedName(SERIALIZED_NAME_INDETERMINATE)
   @javax.annotation.Nullable
-  private String indeterminate;
+  private Map<String, Object> indeterminate = new HashMap<>();
 
   public static final String SERIALIZED_NAME_REJECT = "reject";
   @SerializedName(SERIALIZED_NAME_REJECT)
   @javax.annotation.Nullable
-  private String reject;
+  private Map<String, Object> reject = new HashMap<>();
 
   public static final String SERIALIZED_NAME_SUMMARY = "summary";
   @SerializedName(SERIALIZED_NAME_SUMMARY)
@@ -81,21 +83,29 @@ public class KYCResults implements Serializable {
   public KYCResults() {
   }
 
-  public KYCResults accept(@javax.annotation.Nullable String accept) {
+  public KYCResults accept(@javax.annotation.Nullable Map<String, Object> accept) {
     this.accept = accept;
     return this;
   }
 
+  public KYCResults putAcceptItem(String key, Object acceptItem) {
+    if (this.accept == null) {
+      this.accept = new HashMap<>();
+    }
+    this.accept.put(key, acceptItem);
+    return this;
+  }
+
   /**
-   * IDENTITY_VERIFICATION Identity needs to be verified  TAX_IDENTIFICATION Tax ID number needs to be verified  ADDRESS_VERIFICATION Address needs to be verified  DATE_OF_BIRTH Date of birth needs to be verified  INVALID_IDENTITY_PASSPORT Identity needs to be verified via a  government issued ID. This is commonly used in conjuction with OTHER to describe the exact document needed.  SELFIE_VERIFICATION Identity needs to be verified via a live selfie of the account owner  PEP Further information needs to be submitted if account owner is politically exposed person  FAMILY_MEMBER_PEP Further information needs to be submitted if family member is a politically exposed person  CONTROL_PERSON Further information needs to be submitted if account owner is a control person  AFFILIATED Further information needs to be submitted if account owner is affiliated to finra or an exchange  VISA_TYPE_OTHER Further information needs to be submitted about account owner&#39;s visa  W8BEN_CORRECTION Idenfitying information submitted by the user was incorrect so a new, corrected, W8BEN needs to be submitted COUNTRY_NOT_SUPPORTED The account owner&#39;s country of tax residence is not supported by our KYC providers. In this case, we&#39;ll manully perform KYC on the user  WATCHLIST_HIT Results from the watchlist screening need further investigation before account opening. No action is needed from the user  OTHER A custom message will be sent to describe exactly what is needed from the account owner. The message will be displayed in the additional_information attribute.  OTHER_PARTNER A custom message will be sent to relay information relevant only to the partner. The message will be displayed in the additional_information attribute.
+   * A nullable set of KYC reason identifiers represented as property names with empty object values. See &#x60;KYCResults&#x60; for documented identifiers and interpretation guidance.
    * @return accept
    */
   @javax.annotation.Nullable
-  public String getAccept() {
+  public Map<String, Object> getAccept() {
     return accept;
   }
 
-  public void setAccept(@javax.annotation.Nullable String accept) {
+  public void setAccept(@javax.annotation.Nullable Map<String, Object> accept) {
     this.accept = accept;
   }
 
@@ -119,40 +129,56 @@ public class KYCResults implements Serializable {
   }
 
 
-  public KYCResults indeterminate(@javax.annotation.Nullable String indeterminate) {
+  public KYCResults indeterminate(@javax.annotation.Nullable Map<String, Object> indeterminate) {
     this.indeterminate = indeterminate;
     return this;
   }
 
+  public KYCResults putIndeterminateItem(String key, Object indeterminateItem) {
+    if (this.indeterminate == null) {
+      this.indeterminate = new HashMap<>();
+    }
+    this.indeterminate.put(key, indeterminateItem);
+    return this;
+  }
+
   /**
-   * IDENTITY_VERIFICATION Identity needs to be verified  TAX_IDENTIFICATION Tax ID number needs to be verified  ADDRESS_VERIFICATION Address needs to be verified  DATE_OF_BIRTH Date of birth needs to be verified  INVALID_IDENTITY_PASSPORT Identity needs to be verified via a  government issued ID. This is commonly used in conjuction with OTHER to describe the exact document needed.  SELFIE_VERIFICATION Identity needs to be verified via a live selfie of the account owner  PEP Further information needs to be submitted if account owner is politically exposed person  FAMILY_MEMBER_PEP Further information needs to be submitted if family member is a politically exposed person  CONTROL_PERSON Further information needs to be submitted if account owner is a control person  AFFILIATED Further information needs to be submitted if account owner is affiliated to finra or an exchange  VISA_TYPE_OTHER Further information needs to be submitted about account owner&#39;s visa  W8BEN_CORRECTION Idenfitying information submitted by the user was incorrect so a new, corrected, W8BEN needs to be submitted COUNTRY_NOT_SUPPORTED The account owner&#39;s country of tax residence is not supported by our KYC providers. In this case, we&#39;ll manully perform KYC on the user  WATCHLIST_HIT Results from the watchlist screening need further investigation before account opening. No action is needed from the user  OTHER A custom message will be sent to describe exactly what is needed from the account owner. The message will be displayed in the additional_information attribute.  OTHER_PARTNER A custom message will be sent to relay information relevant only to the partner. The message will be displayed in the additional_information attribute.
+   * A nullable set of KYC reason identifiers represented as property names with empty object values. See &#x60;KYCResults&#x60; for documented identifiers and interpretation guidance.
    * @return indeterminate
    */
   @javax.annotation.Nullable
-  public String getIndeterminate() {
+  public Map<String, Object> getIndeterminate() {
     return indeterminate;
   }
 
-  public void setIndeterminate(@javax.annotation.Nullable String indeterminate) {
+  public void setIndeterminate(@javax.annotation.Nullable Map<String, Object> indeterminate) {
     this.indeterminate = indeterminate;
   }
 
 
-  public KYCResults reject(@javax.annotation.Nullable String reject) {
+  public KYCResults reject(@javax.annotation.Nullable Map<String, Object> reject) {
     this.reject = reject;
     return this;
   }
 
+  public KYCResults putRejectItem(String key, Object rejectItem) {
+    if (this.reject == null) {
+      this.reject = new HashMap<>();
+    }
+    this.reject.put(key, rejectItem);
+    return this;
+  }
+
   /**
-   * IDENTITY_VERIFICATION Identity needs to be verified  TAX_IDENTIFICATION Tax ID number needs to be verified  ADDRESS_VERIFICATION Address needs to be verified  DATE_OF_BIRTH Date of birth needs to be verified  INVALID_IDENTITY_PASSPORT Identity needs to be verified via a  government issued ID. This is commonly used in conjuction with OTHER to describe the exact document needed.  SELFIE_VERIFICATION Identity needs to be verified via a live selfie of the account owner  PEP Further information needs to be submitted if account owner is politically exposed person  FAMILY_MEMBER_PEP Further information needs to be submitted if family member is a politically exposed person  CONTROL_PERSON Further information needs to be submitted if account owner is a control person  AFFILIATED Further information needs to be submitted if account owner is affiliated to finra or an exchange  VISA_TYPE_OTHER Further information needs to be submitted about account owner&#39;s visa  W8BEN_CORRECTION Idenfitying information submitted by the user was incorrect so a new, corrected, W8BEN needs to be submitted COUNTRY_NOT_SUPPORTED The account owner&#39;s country of tax residence is not supported by our KYC providers. In this case, we&#39;ll manully perform KYC on the user  WATCHLIST_HIT Results from the watchlist screening need further investigation before account opening. No action is needed from the user  OTHER A custom message will be sent to describe exactly what is needed from the account owner. The message will be displayed in the additional_information attribute.  OTHER_PARTNER A custom message will be sent to relay information relevant only to the partner. The message will be displayed in the additional_information attribute.
+   * A nullable set of KYC reason identifiers represented as property names with empty object values. See &#x60;KYCResults&#x60; for documented identifiers and interpretation guidance.
    * @return reject
    */
   @javax.annotation.Nullable
-  public String getReject() {
+  public Map<String, Object> getReject() {
     return reject;
   }
 
-  public void setReject(@javax.annotation.Nullable String reject) {
+  public void setReject(@javax.annotation.Nullable Map<String, Object> reject) {
     this.reject = reject;
   }
 
@@ -290,17 +316,8 @@ public class KYCResults implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("accept") != null && !jsonObj.get("accept").isJsonNull()) && !jsonObj.get("accept").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `accept` to be a primitive type in the JSON string but got `%s`", jsonObj.get("accept").toString()));
-      }
       if ((jsonObj.get("additional_information") != null && !jsonObj.get("additional_information").isJsonNull()) && !jsonObj.get("additional_information").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `additional_information` to be a primitive type in the JSON string but got `%s`", jsonObj.get("additional_information").toString()));
-      }
-      if ((jsonObj.get("indeterminate") != null && !jsonObj.get("indeterminate").isJsonNull()) && !jsonObj.get("indeterminate").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `indeterminate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("indeterminate").toString()));
-      }
-      if ((jsonObj.get("reject") != null && !jsonObj.get("reject").isJsonNull()) && !jsonObj.get("reject").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `reject` to be a primitive type in the JSON string but got `%s`", jsonObj.get("reject").toString()));
       }
       if ((jsonObj.get("summary") != null && !jsonObj.get("summary").isJsonNull()) && !jsonObj.get("summary").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `summary` to be a primitive type in the JSON string but got `%s`", jsonObj.get("summary").toString()));

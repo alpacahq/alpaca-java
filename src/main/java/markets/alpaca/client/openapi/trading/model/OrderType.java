@@ -25,7 +25,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * The order types supported by Alpaca vary based on the order&#39;s security type. The following provides a comprehensive breakdown of the supported order types for each category:  - Equity trading: market, limit, stop, stop_limit, trailing_stop.  - Options trading: market, limit.  - Multileg Options trading: market, limit.  - Crypto trading: market, limit, stop_limit.
+ * The order types supported by Alpaca vary based on the order&#39;s security type. The following provides a comprehensive breakdown of the supported order types for each category:  - Equity trading: market, limit, stop, stop_limit, trailing_stop.  - Options trading: market, limit, stop, stop_limit.  - Multileg Options trading: market, limit.  - Crypto trading: market, limit, stop_limit.
  */
 @JsonAdapter(OrderType.Adapter.class)
 public enum OrderType implements Serializable {

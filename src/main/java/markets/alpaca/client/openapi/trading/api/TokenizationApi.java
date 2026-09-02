@@ -29,6 +29,7 @@ import java.io.IOException;
 
 import markets.alpaca.client.openapi.trading.model.Error;
 import java.time.OffsetDateTime;
+import markets.alpaca.client.openapi.trading.model.TokenizationIssuer;
 import markets.alpaca.client.openapi.trading.model.TokenizationMintRequest;
 import markets.alpaca.client.openapi.trading.model.TokenizationMintResponse;
 import markets.alpaca.client.openapi.trading.model.TokenizationNetwork;
@@ -412,7 +413,7 @@ public class TokenizationApi {
         <tr><td> 422 </td><td> One or more request parameters are missing or invalid. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getTokenizationRequestsCall(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable String issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call getTokenizationRequestsCall(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable TokenizationIssuer issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -485,7 +486,7 @@ public class TokenizationApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call getTokenizationRequestsValidateBeforeCall(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable String issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call getTokenizationRequestsValidateBeforeCall(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable TokenizationIssuer issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before, final ApiCallback _callback) throws ApiException {
         return getTokenizationRequestsCall(type, status, underlyingSymbol, issuer, network, after, before, _callback);
 
     }
@@ -512,7 +513,7 @@ public class TokenizationApi {
         <tr><td> 422 </td><td> One or more request parameters are missing or invalid. </td><td>  -  </td></tr>
      </table>
      */
-    public List<TokenizationRequest> getTokenizationRequests(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable String issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before) throws ApiException {
+    public List<TokenizationRequest> getTokenizationRequests(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable TokenizationIssuer issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before) throws ApiException {
         ApiResponse<List<TokenizationRequest>> localVarResp = getTokenizationRequestsWithHttpInfo(type, status, underlyingSymbol, issuer, network, after, before);
         return localVarResp.getData();
     }
@@ -539,7 +540,7 @@ public class TokenizationApi {
         <tr><td> 422 </td><td> One or more request parameters are missing or invalid. </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<List<TokenizationRequest>> getTokenizationRequestsWithHttpInfo(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable String issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before) throws ApiException {
+    public ApiResponse<List<TokenizationRequest>> getTokenizationRequestsWithHttpInfo(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable TokenizationIssuer issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before) throws ApiException {
         okhttp3.Call localVarCall = getTokenizationRequestsValidateBeforeCall(type, status, underlyingSymbol, issuer, network, after, before, null);
         Type localVarReturnType = new TypeToken<List<TokenizationRequest>>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -568,7 +569,7 @@ public class TokenizationApi {
         <tr><td> 422 </td><td> One or more request parameters are missing or invalid. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getTokenizationRequestsAsync(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable String issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before, final ApiCallback<List<TokenizationRequest>> _callback) throws ApiException {
+    public okhttp3.Call getTokenizationRequestsAsync(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable TokenizationIssuer issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before, final ApiCallback<List<TokenizationRequest>> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = getTokenizationRequestsValidateBeforeCall(type, status, underlyingSymbol, issuer, network, after, before, _callback);
         Type localVarReturnType = new TypeToken<List<TokenizationRequest>>(){}.getType();

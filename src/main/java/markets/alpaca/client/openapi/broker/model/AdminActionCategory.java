@@ -30,6 +30,8 @@ import com.google.gson.stream.JsonWriter;
 @JsonAdapter(AdminActionCategory.Adapter.class)
 public enum AdminActionCategory implements Serializable {
   
+  ACCOUNTS("accounts"),
+  
   ORDER("order"),
   
   OTHER("other");

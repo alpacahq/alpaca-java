@@ -25,12 +25,14 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * Designates the current status of this account  Possible Values: - **INACTIVE** Account not set to trade given asset. - **ONBOARDING** An application is expected for this user, but has not been submitted yet. - **SUBMITTED** The application has been submitted and is being processed. - **SUBMISSION_FAILED** Used to display if failure on submission - **ACTION_REQUIRED** The application requires manual action. - **ACCOUNT_UPDATED** Used to display when Account has been modified by user - **APPROVAL_PENDING** Initial value. The application approval process is in progress. - **APPROVED** The account application has been approved, and waiting to be ACTIVE - **REJECTED** The account application is rejected for some reason - **ACTIVE** The account is fully active. Trading and funding are processed under this status. - **ACCOUNT_CLOSED** The account is closed. 
+ * Designates the current status of this account  Possible Values: - **INACTIVE** Account not set to trade given asset. - **PAPER_ONLY** The account is limited to paper trading. - **ONBOARDING** An application is expected for this user, but has not been submitted yet. - **SUBMITTED** The application has been submitted and is being processed. - **SUBMISSION_FAILED** Used to display if failure on submission - **ACTION_REQUIRED** The application requires manual action. - **ACCOUNT_UPDATED** Used to display when Account has been modified by user - **APPROVAL_PENDING** Initial value. The application approval process is in progress. - **APPROVED** The account application has been approved, and waiting to be ACTIVE - **REJECTED** The account application is rejected for some reason - **ACTIVE** The account is fully active. Trading and funding are processed under this status. - **ACCOUNT_CLOSED** The account is closed. 
  */
 @JsonAdapter(AccountStatus.Adapter.class)
 public enum AccountStatus implements Serializable {
   
   INACTIVE("INACTIVE"),
+  
+  PAPER_ONLY("PAPER_ONLY"),
   
   ONBOARDING("ONBOARDING"),
   

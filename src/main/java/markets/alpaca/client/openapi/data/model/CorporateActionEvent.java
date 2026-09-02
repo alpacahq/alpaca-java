@@ -1,6 +1,6 @@
 /*
  * Market Data API
- * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News. 
+ * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News. 
  *
  * The version of the OpenAPI document: 1.1
  * Contact: support@alpaca.markets
@@ -24,6 +24,7 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import markets.alpaca.client.openapi.data.model.CaEventWorthlessRemoval;
 import markets.alpaca.client.openapi.data.model.CorporateActionEventAction;
+import markets.alpaca.client.openapi.data.model.CorporateActionEventCapitalGainsDistribution;
 import markets.alpaca.client.openapi.data.model.CorporateActionEventCashDividend;
 import markets.alpaca.client.openapi.data.model.CorporateActionEventCashMerger;
 import markets.alpaca.client.openapi.data.model.CorporateActionEventEquityPartialCall;
@@ -89,6 +90,7 @@ public class CorporateActionEvent extends AbstractOpenApiSchema implements Seria
                 return null; // this class only serializes 'CorporateActionEvent' and its subtypes
             }
             final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
+            final TypeAdapter<CorporateActionEventCapitalGainsDistribution> adapterCorporateActionEventCapitalGainsDistribution = gson.getDelegateAdapter(this, TypeToken.get(CorporateActionEventCapitalGainsDistribution.class));
             final TypeAdapter<CorporateActionEventCashDividend> adapterCorporateActionEventCashDividend = gson.getDelegateAdapter(this, TypeToken.get(CorporateActionEventCashDividend.class));
             final TypeAdapter<CorporateActionEventCashMerger> adapterCorporateActionEventCashMerger = gson.getDelegateAdapter(this, TypeToken.get(CorporateActionEventCashMerger.class));
             final TypeAdapter<CorporateActionEventEquityPartialCall> adapterCorporateActionEventEquityPartialCall = gson.getDelegateAdapter(this, TypeToken.get(CorporateActionEventEquityPartialCall.class));
@@ -113,6 +115,12 @@ public class CorporateActionEvent extends AbstractOpenApiSchema implements Seria
                         return;
                     }
 
+                    // check if the actual instance is of the type `CorporateActionEventCapitalGainsDistribution`
+                    if (value.getActualInstance() instanceof CorporateActionEventCapitalGainsDistribution) {
+                        JsonElement element = adapterCorporateActionEventCapitalGainsDistribution.toJsonTree((CorporateActionEventCapitalGainsDistribution)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
                     // check if the actual instance is of the type `CorporateActionEventCashDividend`
                     if (value.getActualInstance() instanceof CorporateActionEventCashDividend) {
                         JsonElement element = adapterCorporateActionEventCashDividend.toJsonTree((CorporateActionEventCashDividend)value.getActualInstance());
@@ -203,7 +211,7 @@ public class CorporateActionEvent extends AbstractOpenApiSchema implements Seria
                         elementAdapter.write(out, element);
                         return;
                     }
-                    throw new IOException("Failed to serialize as the type doesn't match oneOf schemas: CorporateActionEventCashDividend, CorporateActionEventCashMerger, CorporateActionEventEquityPartialCall, CorporateActionEventForwardSplit, CorporateActionEventNameChange, CorporateActionEventRedemption, CorporateActionEventReorganization, CorporateActionEventReverseSplit, CorporateActionEventRightsDistribution, CorporateActionEventSpinOff, CorporateActionEventStockAndCashMerger, CorporateActionEventStockDividend, CorporateActionEventStockMerger, CorporateActionEventUnitSplit, CorporateActionEventWorthlessRemoval");
+                    throw new IOException("Failed to serialize as the type doesn't match oneOf schemas: CorporateActionEventCapitalGainsDistribution, CorporateActionEventCashDividend, CorporateActionEventCashMerger, CorporateActionEventEquityPartialCall, CorporateActionEventForwardSplit, CorporateActionEventNameChange, CorporateActionEventRedemption, CorporateActionEventReorganization, CorporateActionEventReverseSplit, CorporateActionEventRightsDistribution, CorporateActionEventSpinOff, CorporateActionEventStockAndCashMerger, CorporateActionEventStockDividend, CorporateActionEventStockMerger, CorporateActionEventUnitSplit, CorporateActionEventWorthlessRemoval");
                 }
 
                 @Override
@@ -215,6 +223,18 @@ public class CorporateActionEvent extends AbstractOpenApiSchema implements Seria
                     ArrayList<String> errorMessages = new ArrayList<>();
                     TypeAdapter actualAdapter = elementAdapter;
 
+                    // deserialize CorporateActionEventCapitalGainsDistribution
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        CorporateActionEventCapitalGainsDistribution.validateJsonElement(jsonElement);
+                        actualAdapter = adapterCorporateActionEventCapitalGainsDistribution;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'CorporateActionEventCapitalGainsDistribution'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for CorporateActionEventCapitalGainsDistribution failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'CorporateActionEventCapitalGainsDistribution'", e);
+                    }
                     // deserialize CorporateActionEventCashDividend
                     try {
                         // validate the JSON object to see if any exception is thrown
@@ -421,6 +441,7 @@ public class CorporateActionEvent extends AbstractOpenApiSchema implements Seria
     }
 
     static {
+        schemas.put("CorporateActionEventCapitalGainsDistribution", CorporateActionEventCapitalGainsDistribution.class);
         schemas.put("CorporateActionEventCashDividend", CorporateActionEventCashDividend.class);
         schemas.put("CorporateActionEventCashMerger", CorporateActionEventCashMerger.class);
         schemas.put("CorporateActionEventEquityPartialCall", CorporateActionEventEquityPartialCall.class);
@@ -446,12 +467,17 @@ public class CorporateActionEvent extends AbstractOpenApiSchema implements Seria
     /**
      * Set the instance that matches the oneOf child schema, check
      * the instance parameter is valid against the oneOf child schemas:
-     * CorporateActionEventCashDividend, CorporateActionEventCashMerger, CorporateActionEventEquityPartialCall, CorporateActionEventForwardSplit, CorporateActionEventNameChange, CorporateActionEventRedemption, CorporateActionEventReorganization, CorporateActionEventReverseSplit, CorporateActionEventRightsDistribution, CorporateActionEventSpinOff, CorporateActionEventStockAndCashMerger, CorporateActionEventStockDividend, CorporateActionEventStockMerger, CorporateActionEventUnitSplit, CorporateActionEventWorthlessRemoval
+     * CorporateActionEventCapitalGainsDistribution, CorporateActionEventCashDividend, CorporateActionEventCashMerger, CorporateActionEventEquityPartialCall, CorporateActionEventForwardSplit, CorporateActionEventNameChange, CorporateActionEventRedemption, CorporateActionEventReorganization, CorporateActionEventReverseSplit, CorporateActionEventRightsDistribution, CorporateActionEventSpinOff, CorporateActionEventStockAndCashMerger, CorporateActionEventStockDividend, CorporateActionEventStockMerger, CorporateActionEventUnitSplit, CorporateActionEventWorthlessRemoval
      *
      * It could be an instance of the 'oneOf' schemas.
      */
     @Override
     public void setActualInstance(Object instance) {
+        if (instance instanceof CorporateActionEventCapitalGainsDistribution) {
+            super.setActualInstance(instance);
+            return;
+        }
+
         if (instance instanceof CorporateActionEventCashDividend) {
             super.setActualInstance(instance);
             return;
@@ -527,19 +553,31 @@ public class CorporateActionEvent extends AbstractOpenApiSchema implements Seria
             return;
         }
 
-        throw new RuntimeException("Invalid instance type. Must be CorporateActionEventCashDividend, CorporateActionEventCashMerger, CorporateActionEventEquityPartialCall, CorporateActionEventForwardSplit, CorporateActionEventNameChange, CorporateActionEventRedemption, CorporateActionEventReorganization, CorporateActionEventReverseSplit, CorporateActionEventRightsDistribution, CorporateActionEventSpinOff, CorporateActionEventStockAndCashMerger, CorporateActionEventStockDividend, CorporateActionEventStockMerger, CorporateActionEventUnitSplit, CorporateActionEventWorthlessRemoval");
+        throw new RuntimeException("Invalid instance type. Must be CorporateActionEventCapitalGainsDistribution, CorporateActionEventCashDividend, CorporateActionEventCashMerger, CorporateActionEventEquityPartialCall, CorporateActionEventForwardSplit, CorporateActionEventNameChange, CorporateActionEventRedemption, CorporateActionEventReorganization, CorporateActionEventReverseSplit, CorporateActionEventRightsDistribution, CorporateActionEventSpinOff, CorporateActionEventStockAndCashMerger, CorporateActionEventStockDividend, CorporateActionEventStockMerger, CorporateActionEventUnitSplit, CorporateActionEventWorthlessRemoval");
     }
 
     /**
      * Get the actual instance, which can be the following:
-     * CorporateActionEventCashDividend, CorporateActionEventCashMerger, CorporateActionEventEquityPartialCall, CorporateActionEventForwardSplit, CorporateActionEventNameChange, CorporateActionEventRedemption, CorporateActionEventReorganization, CorporateActionEventReverseSplit, CorporateActionEventRightsDistribution, CorporateActionEventSpinOff, CorporateActionEventStockAndCashMerger, CorporateActionEventStockDividend, CorporateActionEventStockMerger, CorporateActionEventUnitSplit, CorporateActionEventWorthlessRemoval
+     * CorporateActionEventCapitalGainsDistribution, CorporateActionEventCashDividend, CorporateActionEventCashMerger, CorporateActionEventEquityPartialCall, CorporateActionEventForwardSplit, CorporateActionEventNameChange, CorporateActionEventRedemption, CorporateActionEventReorganization, CorporateActionEventReverseSplit, CorporateActionEventRightsDistribution, CorporateActionEventSpinOff, CorporateActionEventStockAndCashMerger, CorporateActionEventStockDividend, CorporateActionEventStockMerger, CorporateActionEventUnitSplit, CorporateActionEventWorthlessRemoval
      *
-     * @return The actual instance (CorporateActionEventCashDividend, CorporateActionEventCashMerger, CorporateActionEventEquityPartialCall, CorporateActionEventForwardSplit, CorporateActionEventNameChange, CorporateActionEventRedemption, CorporateActionEventReorganization, CorporateActionEventReverseSplit, CorporateActionEventRightsDistribution, CorporateActionEventSpinOff, CorporateActionEventStockAndCashMerger, CorporateActionEventStockDividend, CorporateActionEventStockMerger, CorporateActionEventUnitSplit, CorporateActionEventWorthlessRemoval)
+     * @return The actual instance (CorporateActionEventCapitalGainsDistribution, CorporateActionEventCashDividend, CorporateActionEventCashMerger, CorporateActionEventEquityPartialCall, CorporateActionEventForwardSplit, CorporateActionEventNameChange, CorporateActionEventRedemption, CorporateActionEventReorganization, CorporateActionEventReverseSplit, CorporateActionEventRightsDistribution, CorporateActionEventSpinOff, CorporateActionEventStockAndCashMerger, CorporateActionEventStockDividend, CorporateActionEventStockMerger, CorporateActionEventUnitSplit, CorporateActionEventWorthlessRemoval)
      */
     @SuppressWarnings("unchecked")
     @Override
     public Object getActualInstance() {
         return super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `CorporateActionEventCapitalGainsDistribution`. If the actual instance is not `CorporateActionEventCapitalGainsDistribution`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `CorporateActionEventCapitalGainsDistribution`
+     * @throws ClassCastException if the instance is not `CorporateActionEventCapitalGainsDistribution`
+     */
+    @SuppressWarnings("unchecked")
+    public CorporateActionEventCapitalGainsDistribution getCorporateActionEventCapitalGainsDistribution() throws ClassCastException {
+        return (CorporateActionEventCapitalGainsDistribution)super.getActualInstance();
     }
 
     /**
@@ -732,6 +770,14 @@ public class CorporateActionEvent extends AbstractOpenApiSchema implements Seria
         // validate oneOf schemas one by one
         int validCount = 0;
         ArrayList<String> errorMessages = new ArrayList<>();
+        // validate the json string with CorporateActionEventCapitalGainsDistribution
+        try {
+            CorporateActionEventCapitalGainsDistribution.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for CorporateActionEventCapitalGainsDistribution failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
         // validate the json string with CorporateActionEventCashDividend
         try {
             CorporateActionEventCashDividend.validateJsonElement(jsonElement);
@@ -853,7 +899,7 @@ public class CorporateActionEvent extends AbstractOpenApiSchema implements Seria
             // continue to the next one
         }
         if (validCount != 1) {
-            throw new IOException(String.format(java.util.Locale.ROOT, "The JSON string is invalid for CorporateActionEvent with oneOf schemas: CorporateActionEventCashDividend, CorporateActionEventCashMerger, CorporateActionEventEquityPartialCall, CorporateActionEventForwardSplit, CorporateActionEventNameChange, CorporateActionEventRedemption, CorporateActionEventReorganization, CorporateActionEventReverseSplit, CorporateActionEventRightsDistribution, CorporateActionEventSpinOff, CorporateActionEventStockAndCashMerger, CorporateActionEventStockDividend, CorporateActionEventStockMerger, CorporateActionEventUnitSplit, CorporateActionEventWorthlessRemoval. %d class(es) match the result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", validCount, errorMessages, jsonElement.toString()));
+            throw new IOException(String.format(java.util.Locale.ROOT, "The JSON string is invalid for CorporateActionEvent with oneOf schemas: CorporateActionEventCapitalGainsDistribution, CorporateActionEventCashDividend, CorporateActionEventCashMerger, CorporateActionEventEquityPartialCall, CorporateActionEventForwardSplit, CorporateActionEventNameChange, CorporateActionEventRedemption, CorporateActionEventReorganization, CorporateActionEventReverseSplit, CorporateActionEventRightsDistribution, CorporateActionEventSpinOff, CorporateActionEventStockAndCashMerger, CorporateActionEventStockDividend, CorporateActionEventStockMerger, CorporateActionEventUnitSplit, CorporateActionEventWorthlessRemoval. %d class(es) match the result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", validCount, errorMessages, jsonElement.toString()));
         }
     }
 

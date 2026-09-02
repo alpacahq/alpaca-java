@@ -21,705 +21,264 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
+import java.util.UUID;
+import markets.alpaca.client.openapi.broker.model.JNLC;
+import markets.alpaca.client.openapi.broker.model.JNLS;
 import markets.alpaca.client.openapi.broker.model.JournalStatus;
 import markets.alpaca.client.openapi.broker.model.TransmitterInfo;
 import java.io.Serializable;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
 
-import java.util.HashMap;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParseException;
 
 import markets.alpaca.client.openapi.broker.http.JSON;
 
-/**
- * Represents a cash or security transfer between accounts, as specified by the &#x60;entry_type&#x60; parameter.
- */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
-public class Journal implements Serializable {
-  private static final long serialVersionUID = 1L;
-
-  public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
-  @SerializedName(SERIALIZED_NAME_CREATED_AT)
-  @javax.annotation.Nullable
-  private OffsetDateTime createdAt;
-
-  public static final String SERIALIZED_NAME_ENTRY_TYPE = "entry_type";
-  @SerializedName(SERIALIZED_NAME_ENTRY_TYPE)
-  @javax.annotation.Nonnull
-  protected String entryType;
-
-  public static final String SERIALIZED_NAME_FROM_ACCOUNT = "from_account";
-  @SerializedName(SERIALIZED_NAME_FROM_ACCOUNT)
-  @javax.annotation.Nonnull
-  private String fromAccount;
-
-  public static final String SERIALIZED_NAME_ID = "id";
-  @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nonnull
-  private String id;
-
-  public static final String SERIALIZED_NAME_SETTLE_DATE = "settle_date";
-  @SerializedName(SERIALIZED_NAME_SETTLE_DATE)
-  @javax.annotation.Nullable
-  private String settleDate;
-
-  public static final String SERIALIZED_NAME_STATUS = "status";
-  @SerializedName(SERIALIZED_NAME_STATUS)
-  @javax.annotation.Nullable
-  private JournalStatus status;
-
-  public static final String SERIALIZED_NAME_TO_ACCOUNT = "to_account";
-  @SerializedName(SERIALIZED_NAME_TO_ACCOUNT)
-  @javax.annotation.Nonnull
-  private String toAccount;
-
-  public static final String SERIALIZED_NAME_TRANSMITTER_INFO = "transmitter_info";
-  @SerializedName(SERIALIZED_NAME_TRANSMITTER_INFO)
-  @javax.annotation.Nullable
-  private TransmitterInfo transmitterInfo;
-
-  public static final String SERIALIZED_NAME_CURRENCY = "currency";
-  @SerializedName(SERIALIZED_NAME_CURRENCY)
-  @javax.annotation.Nullable
-  private String currency;
-
-  public static final String SERIALIZED_NAME_DESCRIPTION = "description";
-  @SerializedName(SERIALIZED_NAME_DESCRIPTION)
-  @javax.annotation.Nullable
-  private String description;
-
-  public static final String SERIALIZED_NAME_PRICE = "price";
-  @SerializedName(SERIALIZED_NAME_PRICE)
-  @javax.annotation.Nullable
-  private String price;
-
-  public static final String SERIALIZED_NAME_QTY = "qty";
-  @SerializedName(SERIALIZED_NAME_QTY)
-  @javax.annotation.Nullable
-  private String qty;
-
-  public static final String SERIALIZED_NAME_SYMBOL = "symbol";
-  @SerializedName(SERIALIZED_NAME_SYMBOL)
-  @javax.annotation.Nullable
-  private String symbol;
-
-  public static final String SERIALIZED_NAME_SYSTEM_DATE = "system_date";
-  @SerializedName(SERIALIZED_NAME_SYSTEM_DATE)
-  @javax.annotation.Nullable
-  private String systemDate;
-
-  public static final String SERIALIZED_NAME_NET_AMOUNT = "net_amount";
-  @SerializedName(SERIALIZED_NAME_NET_AMOUNT)
-  @javax.annotation.Nonnull
-  private BigDecimal netAmount;
-
-  public static final String SERIALIZED_NAME_TRANSMITTER_ACCOUNT_NUMBER = "transmitter_account_number";
-  @SerializedName(SERIALIZED_NAME_TRANSMITTER_ACCOUNT_NUMBER)
-  @javax.annotation.Nullable
-  private String transmitterAccountNumber;
-
-  public static final String SERIALIZED_NAME_TRANSMITTER_ADDRESS = "transmitter_address";
-  @SerializedName(SERIALIZED_NAME_TRANSMITTER_ADDRESS)
-  @javax.annotation.Nullable
-  private String transmitterAddress;
-
-  public static final String SERIALIZED_NAME_TRANSMITTER_FINANCIAL_INSTITUTION = "transmitter_financial_institution";
-  @SerializedName(SERIALIZED_NAME_TRANSMITTER_FINANCIAL_INSTITUTION)
-  @javax.annotation.Nullable
-  private String transmitterFinancialInstitution;
-
-  public static final String SERIALIZED_NAME_TRANSMITTER_NAME = "transmitter_name";
-  @SerializedName(SERIALIZED_NAME_TRANSMITTER_NAME)
-  @javax.annotation.Nullable
-  private String transmitterName;
-
-  public static final String SERIALIZED_NAME_TRANSMITTER_TIMESTAMP = "transmitter_timestamp";
-  @SerializedName(SERIALIZED_NAME_TRANSMITTER_TIMESTAMP)
-  @javax.annotation.Nullable
-  private OffsetDateTime transmitterTimestamp;
-
-  public Journal() {
-    this.entryType = this.getClass().getSimpleName();
-  }
-
-  public Journal createdAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
-    this.createdAt = createdAt;
-    return this;
-  }
-
-  /**
-   * Get createdAt
-   * @return createdAt
-   */
-  @javax.annotation.Nullable
-  public OffsetDateTime getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
-    this.createdAt = createdAt;
-  }
-
-
-  public Journal entryType(@javax.annotation.Nonnull String entryType) {
-    this.entryType = entryType;
-    return this;
-  }
-
-  /**
-   * JNLC
-   * @return entryType
-   */
-  @javax.annotation.Nonnull
-  public String getEntryType() {
-    return entryType;
-  }
-
-  public void setEntryType(@javax.annotation.Nonnull String entryType) {
-    this.entryType = entryType;
-  }
-
-
-  public Journal fromAccount(@javax.annotation.Nonnull String fromAccount) {
-    this.fromAccount = fromAccount;
-    return this;
-  }
-
-  /**
-   * The account ID that initiates the journal - account_status must equal to ACTIVE or CLOSE
-   * @return fromAccount
-   */
-  @javax.annotation.Nonnull
-  public String getFromAccount() {
-    return fromAccount;
-  }
-
-  public void setFromAccount(@javax.annotation.Nonnull String fromAccount) {
-    this.fromAccount = fromAccount;
-  }
-
-
-  public Journal id(@javax.annotation.Nonnull String id) {
-    this.id = id;
-    return this;
-  }
-
-  /**
-   * The journal ID
-   * @return id
-   */
-  @javax.annotation.Nonnull
-  public String getId() {
-    return id;
-  }
-
-  public void setId(@javax.annotation.Nonnull String id) {
-    this.id = id;
-  }
-
-
-  public Journal settleDate(@javax.annotation.Nullable String settleDate) {
-    this.settleDate = settleDate;
-    return this;
-  }
-
-  /**
-   * Date string in \&quot;%Y-%m-%d\&quot; format
-   * @return settleDate
-   */
-  @javax.annotation.Nullable
-  public String getSettleDate() {
-    return settleDate;
-  }
-
-  public void setSettleDate(@javax.annotation.Nullable String settleDate) {
-    this.settleDate = settleDate;
-  }
-
-
-  public Journal status(@javax.annotation.Nullable JournalStatus status) {
-    this.status = status;
-    return this;
-  }
-
-  /**
-   * Get status
-   * @return status
-   */
-  @javax.annotation.Nullable
-  public JournalStatus getStatus() {
-    return status;
-  }
-
-  public void setStatus(@javax.annotation.Nullable JournalStatus status) {
-    this.status = status;
-  }
-
-
-  public Journal toAccount(@javax.annotation.Nonnull String toAccount) {
-    this.toAccount = toAccount;
-    return this;
-  }
-
-  /**
-   * The account ID that received the journal - account_status must equal to ACTIVE
-   * @return toAccount
-   */
-  @javax.annotation.Nonnull
-  public String getToAccount() {
-    return toAccount;
-  }
-
-  public void setToAccount(@javax.annotation.Nonnull String toAccount) {
-    this.toAccount = toAccount;
-  }
-
-
-  public Journal transmitterInfo(@javax.annotation.Nullable TransmitterInfo transmitterInfo) {
-    this.transmitterInfo = transmitterInfo;
-    return this;
-  }
-
-  /**
-   * Get transmitterInfo
-   * @return transmitterInfo
-   */
-  @javax.annotation.Nullable
-  public TransmitterInfo getTransmitterInfo() {
-    return transmitterInfo;
-  }
-
-  public void setTransmitterInfo(@javax.annotation.Nullable TransmitterInfo transmitterInfo) {
-    this.transmitterInfo = transmitterInfo;
-  }
-
-
-  public Journal currency(@javax.annotation.Nullable String currency) {
-    this.currency = currency;
-    return this;
-  }
-
-  /**
-   * Currency denomination of the journal. USD by default.
-   * @return currency
-   */
-  @javax.annotation.Nullable
-  public String getCurrency() {
-    return currency;
-  }
-
-  public void setCurrency(@javax.annotation.Nullable String currency) {
-    this.currency = currency;
-  }
-
-
-  public Journal description(@javax.annotation.Nullable String description) {
-    this.description = description;
-    return this;
-  }
-
-  /**
-   * ID the amount goes to. Only valid for JNLC journals. Null for JNLS.
-   * @return description
-   */
-  @javax.annotation.Nullable
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(@javax.annotation.Nullable String description) {
-    this.description = description;
-  }
-
-
-  public Journal price(@javax.annotation.Nullable String price) {
-    this.price = price;
-    return this;
-  }
-
-  /**
-   * The price of the security journaled
-   * @return price
-   */
-  @javax.annotation.Nullable
-  public String getPrice() {
-    return price;
-  }
-
-  public void setPrice(@javax.annotation.Nullable String price) {
-    this.price = price;
-  }
-
-
-  public Journal qty(@javax.annotation.Nullable String qty) {
-    this.qty = qty;
-    return this;
-  }
-
-  /**
-   * The quantity of the securities journaled
-   * @return qty
-   */
-  @javax.annotation.Nullable
-  public String getQty() {
-    return qty;
-  }
-
-  public void setQty(@javax.annotation.Nullable String qty) {
-    this.qty = qty;
-  }
-
-
-  public Journal symbol(@javax.annotation.Nullable String symbol) {
-    this.symbol = symbol;
-    return this;
-  }
-
-  /**
-   * The symbol of the security journaled
-   * @return symbol
-   */
-  @javax.annotation.Nullable
-  public String getSymbol() {
-    return symbol;
-  }
-
-  public void setSymbol(@javax.annotation.Nullable String symbol) {
-    this.symbol = symbol;
-  }
-
-
-  public Journal systemDate(@javax.annotation.Nullable String systemDate) {
-    this.systemDate = systemDate;
-    return this;
-  }
-
-  /**
-   * Date string in \&quot;%Y-%m-%d\&quot; format
-   * @return systemDate
-   */
-  @javax.annotation.Nullable
-  public String getSystemDate() {
-    return systemDate;
-  }
-
-  public void setSystemDate(@javax.annotation.Nullable String systemDate) {
-    this.systemDate = systemDate;
-  }
-
-
-  public Journal netAmount(@javax.annotation.Nonnull BigDecimal netAmount) {
-    this.netAmount = netAmount;
-    return this;
-  }
-
-  /**
-   * Only valid for JNLC journals. Null for JNLS.
-   * @return netAmount
-   */
-  @javax.annotation.Nonnull
-  public BigDecimal getNetAmount() {
-    return netAmount;
-  }
-
-  public void setNetAmount(@javax.annotation.Nonnull BigDecimal netAmount) {
-    this.netAmount = netAmount;
-  }
-
-
-  public Journal transmitterAccountNumber(@javax.annotation.Nullable String transmitterAccountNumber) {
-    this.transmitterAccountNumber = transmitterAccountNumber;
-    return this;
-  }
-
-  /**
-   * Only valid for JNLC journals. Null for JNLS.max 255 characters
-   * @return transmitterAccountNumber
-   */
-  @javax.annotation.Nullable
-  public String getTransmitterAccountNumber() {
-    return transmitterAccountNumber;
-  }
-
-  public void setTransmitterAccountNumber(@javax.annotation.Nullable String transmitterAccountNumber) {
-    this.transmitterAccountNumber = transmitterAccountNumber;
-  }
-
-
-  public Journal transmitterAddress(@javax.annotation.Nullable String transmitterAddress) {
-    this.transmitterAddress = transmitterAddress;
-    return this;
-  }
-
-  /**
-   * Only valid for JNLC journals. Null for JNLS.max 255 characters
-   * @return transmitterAddress
-   */
-  @javax.annotation.Nullable
-  public String getTransmitterAddress() {
-    return transmitterAddress;
-  }
-
-  public void setTransmitterAddress(@javax.annotation.Nullable String transmitterAddress) {
-    this.transmitterAddress = transmitterAddress;
-  }
-
-
-  public Journal transmitterFinancialInstitution(@javax.annotation.Nullable String transmitterFinancialInstitution) {
-    this.transmitterFinancialInstitution = transmitterFinancialInstitution;
-    return this;
-  }
-
-  /**
-   * Only valid for JNLC journals. Null for JNLS.max 255 characters
-   * @return transmitterFinancialInstitution
-   */
-  @javax.annotation.Nullable
-  public String getTransmitterFinancialInstitution() {
-    return transmitterFinancialInstitution;
-  }
-
-  public void setTransmitterFinancialInstitution(@javax.annotation.Nullable String transmitterFinancialInstitution) {
-    this.transmitterFinancialInstitution = transmitterFinancialInstitution;
-  }
-
-
-  public Journal transmitterName(@javax.annotation.Nullable String transmitterName) {
-    this.transmitterName = transmitterName;
-    return this;
-  }
-
-  /**
-   * Only valid for JNLC journals. Null for JNLS. Max 255 characters.
-   * @return transmitterName
-   */
-  @javax.annotation.Nullable
-  public String getTransmitterName() {
-    return transmitterName;
-  }
-
-  public void setTransmitterName(@javax.annotation.Nullable String transmitterName) {
-    this.transmitterName = transmitterName;
-  }
-
-
-  public Journal transmitterTimestamp(@javax.annotation.Nullable OffsetDateTime transmitterTimestamp) {
-    this.transmitterTimestamp = transmitterTimestamp;
-    return this;
-  }
-
-  /**
-   * Only valid for JNLC journals. Null for JNLS.
-   * @return transmitterTimestamp
-   */
-  @javax.annotation.Nullable
-  public OffsetDateTime getTransmitterTimestamp() {
-    return transmitterTimestamp;
-  }
-
-  public void setTransmitterTimestamp(@javax.annotation.Nullable OffsetDateTime transmitterTimestamp) {
-    this.transmitterTimestamp = transmitterTimestamp;
-  }
-
-  /**
-   * A container for additional, undeclared properties.
-   * This is a holder for any undeclared properties as specified with
-   * the 'additionalProperties' keyword in the OAS document.
-   */
-  private Map<String, Object> additionalProperties;
-
-  /**
-   * Set the additional (undeclared) property with the specified name and value.
-   * If the property does not already exist, create it otherwise replace it.
-   *
-   * @param key name of the property
-   * @param value value of the property
-   * @return the Journal instance itself
-   */
-  public Journal putAdditionalProperty(String key, Object value) {
-    if (this.additionalProperties == null) {
-        this.additionalProperties = new HashMap<String, Object>();
-    }
-    this.additionalProperties.put(key, value);
-    return this;
-  }
-
-  /**
-   * Return the additional (undeclared) property.
-   *
-   * @return a map of objects
-   */
-  public Map<String, Object> getAdditionalProperties() {
-    return additionalProperties;
-  }
-
-  /**
-   * Return the additional (undeclared) property with the specified name.
-   *
-   * @param key name of the property
-   * @return an object
-   */
-  public Object getAdditionalProperty(String key) {
-    if (this.additionalProperties == null) {
-        return null;
-    }
-    return this.additionalProperties.get(key);
-  }
-
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    Journal journal = (Journal) o;
-    return Objects.equals(this.createdAt, journal.createdAt) &&
-        Objects.equals(this.entryType, journal.entryType) &&
-        Objects.equals(this.fromAccount, journal.fromAccount) &&
-        Objects.equals(this.id, journal.id) &&
-        Objects.equals(this.settleDate, journal.settleDate) &&
-        Objects.equals(this.status, journal.status) &&
-        Objects.equals(this.toAccount, journal.toAccount) &&
-        Objects.equals(this.transmitterInfo, journal.transmitterInfo) &&
-        Objects.equals(this.currency, journal.currency) &&
-        Objects.equals(this.description, journal.description) &&
-        Objects.equals(this.price, journal.price) &&
-        Objects.equals(this.qty, journal.qty) &&
-        Objects.equals(this.symbol, journal.symbol) &&
-        Objects.equals(this.systemDate, journal.systemDate) &&
-        Objects.equals(this.netAmount, journal.netAmount) &&
-        Objects.equals(this.transmitterAccountNumber, journal.transmitterAccountNumber) &&
-        Objects.equals(this.transmitterAddress, journal.transmitterAddress) &&
-        Objects.equals(this.transmitterFinancialInstitution, journal.transmitterFinancialInstitution) &&
-        Objects.equals(this.transmitterName, journal.transmitterName) &&
-        Objects.equals(this.transmitterTimestamp, journal.transmitterTimestamp)&&
-        Objects.equals(this.additionalProperties, journal.additionalProperties);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(createdAt, entryType, fromAccount, id, settleDate, status, toAccount, transmitterInfo, currency, description, price, qty, symbol, systemDate, netAmount, transmitterAccountNumber, transmitterAddress, transmitterFinancialInstitution, transmitterName, transmitterTimestamp, additionalProperties);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class Journal {\n");
-    sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
-    sb.append("    entryType: ").append(toIndentedString(entryType)).append("\n");
-    sb.append("    fromAccount: ").append(toIndentedString(fromAccount)).append("\n");
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    settleDate: ").append(toIndentedString(settleDate)).append("\n");
-    sb.append("    status: ").append(toIndentedString(status)).append("\n");
-    sb.append("    toAccount: ").append(toIndentedString(toAccount)).append("\n");
-    sb.append("    transmitterInfo: ").append(toIndentedString(transmitterInfo)).append("\n");
-    sb.append("    currency: ").append(toIndentedString(currency)).append("\n");
-    sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    price: ").append(toIndentedString(price)).append("\n");
-    sb.append("    qty: ").append(toIndentedString(qty)).append("\n");
-    sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
-    sb.append("    systemDate: ").append(toIndentedString(systemDate)).append("\n");
-    sb.append("    netAmount: ").append(toIndentedString(netAmount)).append("\n");
-    sb.append("    transmitterAccountNumber: ").append(toIndentedString(transmitterAccountNumber)).append("\n");
-    sb.append("    transmitterAddress: ").append(toIndentedString(transmitterAddress)).append("\n");
-    sb.append("    transmitterFinancialInstitution: ").append(toIndentedString(transmitterFinancialInstitution)).append("\n");
-    sb.append("    transmitterName: ").append(toIndentedString(transmitterName)).append("\n");
-    sb.append("    transmitterTimestamp: ").append(toIndentedString(transmitterTimestamp)).append("\n");
-    sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    return o == null ? "null" : o.toString().replace("\n", "\n    ");
-  }
-
-
-  public static HashSet<String> openapiFields;
-  public static HashSet<String> openapiRequiredFields;
-
-  static {
-    // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("created_at", "entry_type", "from_account", "id", "settle_date", "status", "to_account", "transmitter_info", "currency", "description", "price", "qty", "symbol", "system_date", "net_amount", "transmitter_account_number", "transmitter_address", "transmitter_financial_institution", "transmitter_name", "transmitter_timestamp"));
-
-    // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("entry_type", "from_account", "id", "to_account", "net_amount"));
-  }
-
-  /**
-   * Validates the JSON Element and throws an exception if issues found
-   *
-   * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to Journal
-   */
-  public static void validateJsonElement(JsonElement jsonElement) throws IOException {
-      if (jsonElement == null) {
-        if (!Journal.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in Journal is not found in the empty JSON string", Journal.openapiRequiredFields.toString()));
+public class Journal extends AbstractOpenApiSchema implements Serializable {
+    private static final Logger log = Logger.getLogger(Journal.class.getName());
+
+    public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+            if (!Journal.class.isAssignableFrom(type.getRawType())) {
+                return null; // this class only serializes 'Journal' and its subtypes
+            }
+            final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
+            final TypeAdapter<JNLC> adapterJNLC = gson.getDelegateAdapter(this, TypeToken.get(JNLC.class));
+            final TypeAdapter<JNLS> adapterJNLS = gson.getDelegateAdapter(this, TypeToken.get(JNLS.class));
+
+            return (TypeAdapter<T>) new TypeAdapter<Journal>() {
+                @Override
+                public void write(JsonWriter out, Journal value) throws IOException {
+                    if (value == null || value.getActualInstance() == null) {
+                        elementAdapter.write(out, null);
+                        return;
+                    }
+
+                    // check if the actual instance is of the type `JNLC`
+                    if (value.getActualInstance() instanceof JNLC) {
+                        JsonElement element = adapterJNLC.toJsonTree((JNLC)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `JNLS`
+                    if (value.getActualInstance() instanceof JNLS) {
+                        JsonElement element = adapterJNLS.toJsonTree((JNLS)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    throw new IOException("Failed to serialize as the type doesn't match oneOf schemas: JNLC, JNLS");
+                }
+
+                @Override
+                public Journal read(JsonReader in) throws IOException {
+                    Object deserialized = null;
+                    JsonElement jsonElement = elementAdapter.read(in);
+
+                    int match = 0;
+                    ArrayList<String> errorMessages = new ArrayList<>();
+                    TypeAdapter actualAdapter = elementAdapter;
+
+                    // deserialize JNLC
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        JNLC.validateJsonElement(jsonElement);
+                        actualAdapter = adapterJNLC;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'JNLC'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for JNLC failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'JNLC'", e);
+                    }
+                    // deserialize JNLS
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        JNLS.validateJsonElement(jsonElement);
+                        actualAdapter = adapterJNLS;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'JNLS'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for JNLS failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'JNLS'", e);
+                    }
+
+                    if (match == 1) {
+                        Journal ret = new Journal();
+                        ret.setActualInstance(actualAdapter.fromJsonTree(jsonElement));
+                        return ret;
+                    }
+
+                    throw new IOException(String.format(java.util.Locale.ROOT, "Failed deserialization for Journal: %d classes match result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", match, errorMessages, jsonElement.toString()));
+                }
+            }.nullSafe();
         }
-      }
+    }
 
-      String discriminatorValue = jsonElement.getAsJsonObject().get("entry_type").getAsString();
-      switch (discriminatorValue) {
-        case "JNLC":
-          JNLC.validateJsonElement(jsonElement);
-          break;
-        case "JNLS":
-          JNLS.validateJsonElement(jsonElement);
-          break;
-        case "BatchJournalResponse":
-          BatchJournalResponse.validateJsonElement(jsonElement);
-          break;
-        default:
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The value of the `entry_type` field `%s` does not match any key defined in the discriminator's mapping.", discriminatorValue));
-      }
-  }
+    // store a list of schema names defined in oneOf
+    public static final Map<String, Class<?>> schemas = new HashMap<String, Class<?>>();
 
+    public Journal() {
+        super("oneOf", Boolean.FALSE);
+    }
 
-  /**
-   * Create an instance of Journal given an JSON string
-   *
-   * @param jsonString JSON string
-   * @return An instance of Journal
-   * @throws IOException if the JSON string is invalid with respect to Journal
-   */
-  public static Journal fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, Journal.class);
-  }
+    public Journal(Object o) {
+        super("oneOf", Boolean.FALSE);
+        setActualInstance(o);
+    }
 
-  /**
-   * Convert an instance of Journal to an JSON string
-   *
-   * @return JSON string
-   */
-  public String toJson() {
-    return JSON.getGson().toJson(this);
-  }
+    static {
+        schemas.put("JNLC", JNLC.class);
+        schemas.put("JNLS", JNLS.class);
+    }
+
+    @Override
+    public Map<String, Class<?>> getSchemas() {
+        return Journal.schemas;
+    }
+
+    /**
+     * Set the instance that matches the oneOf child schema, check
+     * the instance parameter is valid against the oneOf child schemas:
+     * JNLC, JNLS
+     *
+     * It could be an instance of the 'oneOf' schemas.
+     */
+    @Override
+    public void setActualInstance(Object instance) {
+        if (instance instanceof JNLC) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof JNLS) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        throw new RuntimeException("Invalid instance type. Must be JNLC, JNLS");
+    }
+
+    /**
+     * Get the actual instance, which can be the following:
+     * JNLC, JNLS
+     *
+     * @return The actual instance (JNLC, JNLS)
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public Object getActualInstance() {
+        return super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `JNLC`. If the actual instance is not `JNLC`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `JNLC`
+     * @throws ClassCastException if the instance is not `JNLC`
+     */
+    @SuppressWarnings("unchecked")
+    public JNLC getJNLC() throws ClassCastException {
+        return (JNLC)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `JNLS`. If the actual instance is not `JNLS`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `JNLS`
+     * @throws ClassCastException if the instance is not `JNLS`
+     */
+    @SuppressWarnings("unchecked")
+    public JNLS getJNLS() throws ClassCastException {
+        return (JNLS)super.getActualInstance();
+    }
+
+    /**
+     * Validates the JSON Element and throws an exception if issues found
+     *
+     * @param jsonElement JSON Element
+     * @throws IOException if the JSON Element is invalid with respect to Journal
+     */
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+        // validate oneOf schemas one by one
+        int validCount = 0;
+        ArrayList<String> errorMessages = new ArrayList<>();
+        // validate the json string with JNLC
+        try {
+            JNLC.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for JNLC failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with JNLS
+        try {
+            JNLS.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for JNLS failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        if (validCount != 1) {
+            throw new IOException(String.format(java.util.Locale.ROOT, "The JSON string is invalid for Journal with oneOf schemas: JNLC, JNLS. %d class(es) match the result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", validCount, errorMessages, jsonElement.toString()));
+        }
+    }
+
+    /**
+     * Create an instance of Journal given an JSON string
+     *
+     * @param jsonString JSON string
+     * @return An instance of Journal
+     * @throws IOException if the JSON string is invalid with respect to Journal
+     */
+    public static Journal fromJson(String jsonString) throws IOException {
+        return JSON.getGson().fromJson(jsonString, Journal.class);
+    }
+
+    /**
+     * Convert an instance of Journal to an JSON string
+     *
+     * @return JSON string
+     */
+    public String toJson() {
+        return JSON.getGson().toJson(this);
+    }
 }
 
