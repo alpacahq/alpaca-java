@@ -32,6 +32,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -51,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents an IPO offering lifecycle event delivered over the IPO events streaming API (&#x60;/v2/events/ipos&#x60;).  IPO events come in six &#x60;verb&#x60; types: - **&#x60;Offering&#x60;** - initial publication of an offering. The &#x60;payload&#x60; carries &#x60;name&#x60;, &#x60;available_to_order&#x60;, &#x60;ticker_symbol&#x60;, &#x60;min_price&#x60;, &#x60;max_price&#x60; (and optional &#x60;source&#x60;). - **&#x60;OfferingUpdate&#x60;** - update to a previously published offering. The &#x60;payload&#x60; shape is identical to &#x60;Offering&#x60;. - **&#x60;Prospectus&#x60;** - prospectus document is now available. The &#x60;payload&#x60; carries &#x60;prospectus_url&#x60; and &#x60;subject&#x60;. - **&#x60;SixtyMinMail&#x60;** - 60-minute pricing window has opened, no new orders accepted. The &#x60;payload&#x60; carries &#x60;sixty_minute_expiration_time&#x60; and &#x60;subject&#x60;. - **&#x60;Allocation&#x60;** - final allocation result for a specific account. The &#x60;payload&#x60; carries &#x60;cusip_id&#x60;, &#x60;final_price&#x60;, &#x60;allocated_shares&#x60;, &#x60;allocated_amount&#x60;, &#x60;subject&#x60;. **This is the only verb that is account-scoped**: &#x60;account_id&#x60; and &#x60;correspondent&#x60; are populated. - **&#x60;OfferingCancellation&#x60;** - offering was cancelled. **No &#x60;payload&#x60; is present.**  See the example payloads below for a concrete example per verb. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class IPOEvent implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -485,7 +486,9 @@ public class IPOEvent implements Serializable {
                    obj.addProperty(entry.getKey(), (Character) entry.getValue());
                  else {
                    JsonElement jsonElement = gson.toJsonTree(entry.getValue());
-                   if (jsonElement.isJsonArray()) {
+                   if (jsonElement.isJsonNull()) {
+                     obj.add(entry.getKey(), JsonNull.INSTANCE);
+                   } else if (jsonElement.isJsonArray()) {
                      obj.add(entry.getKey(), jsonElement.getAsJsonArray());
                    } else {
                      obj.add(entry.getKey(), jsonElement.getAsJsonObject());

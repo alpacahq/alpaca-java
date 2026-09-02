@@ -31,6 +31,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -50,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Use this property to change the account&#39;s configuration for the USD cash interest program. To enroll the account, specify the apr_tier_name. The status should not be specified on enrollment. To change the APR tier, specify the new apr_tier_name. The status should not be specified on tier changes. The unenroll, set the status to INACTIVE. After any change, the response will contain a status of PENDING_CHANGE. An event showing the status change to ACTIVE (for enrollment or tier changes) or INACTIVE (for unenrollment) will be generated when the change is complete. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class AccountCashInterestPatch implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -222,7 +223,9 @@ public class AccountCashInterestPatch implements Serializable {
                    obj.addProperty(entry.getKey(), (Character) entry.getValue());
                  else {
                    JsonElement jsonElement = gson.toJsonTree(entry.getValue());
-                   if (jsonElement.isJsonArray()) {
+                   if (jsonElement.isJsonNull()) {
+                     obj.add(entry.getKey(), JsonNull.INSTANCE);
+                   } else if (jsonElement.isJsonArray()) {
                      obj.add(entry.getKey(), jsonElement.getAsJsonArray());
                    } else {
                      obj.add(entry.getKey(), jsonElement.getAsJsonObject());

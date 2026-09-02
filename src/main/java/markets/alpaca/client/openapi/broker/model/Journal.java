@@ -34,6 +34,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -53,7 +54,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents a cash or security transfer between accounts, as specified by the &#x60;entry_type&#x60; parameter.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class Journal implements Serializable {
   private static final long serialVersionUID = 1L;
 

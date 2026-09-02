@@ -32,6 +32,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -51,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * These configurations show account properties that are overriden either by Alpaca Broker Operations or an automated process.  These values cannot be modified by the Broker Partners.  This schema represents the current, effective value of each configuration (e.g. as returned by the get trading account endpoint). For the shape of the payloads broadcast by the **events** streaming API when these values change, see [AdminConfigurationsEvent](#/components/schemas/AdminConfigurationsEvent).
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.24.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class AdminConfigurations implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -601,7 +602,9 @@ public class AdminConfigurations implements Serializable {
                    obj.addProperty(entry.getKey(), (Character) entry.getValue());
                  else {
                    JsonElement jsonElement = gson.toJsonTree(entry.getValue());
-                   if (jsonElement.isJsonArray()) {
+                   if (jsonElement.isJsonNull()) {
+                     obj.add(entry.getKey(), JsonNull.INSTANCE);
+                   } else if (jsonElement.isJsonArray()) {
                      obj.add(entry.getKey(), jsonElement.getAsJsonArray());
                    } else {
                      obj.add(entry.getKey(), jsonElement.getAsJsonObject());

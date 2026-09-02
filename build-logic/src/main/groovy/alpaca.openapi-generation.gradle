@@ -285,17 +285,35 @@ tasks.register('checkGenerated') {
     description = 'Regenerates from pinned specs and fails if specs/ or generated OpenAPI sources drift'
     dependsOn 'generateApis'
     doLast {
-        def proc = new ProcessBuilder(
-            'git', 'status', '--porcelain', '--',
+        // OpenAPI Generator updates this annotation's version on every generator upgrade.
+        // -I ignores only hunks where every added/removed line matches, so real changes in
+        // the same file remain visible to the drift check.
+        def generatorVersionAnnotationRegex = '@javax\\.annotation\\.Generated\\(value = "org\\.openapitools\\.codegen\\.languages\\.JavaClientCodegen", comments = "Generator version: [0-9]+(\\.[0-9]+)*"\\)'
+        def diffProc = new ProcessBuilder(
+            'git', 'diff', "--ignore-matching-lines=${generatorVersionAnnotationRegex}", '--name-only', 'HEAD', '--',
             'specs', 'src/main/java/markets/alpaca/client/openapi')
             .directory(rootProject.projectDir)
             .redirectErrorStream(true)
             .start()
-        def out = new String(proc.inputStream.readAllBytes()).trim()
-        def exit = proc.waitFor()
-        if (exit != 0) {
-            throw new GradleException("git status failed while checking generated outputs:\n${out}")
+        def diffOut = new String(diffProc.inputStream.readAllBytes()).trim()
+        def diffExit = diffProc.waitFor()
+        if (diffExit != 0) {
+            throw new GradleException("git diff failed while checking generated outputs:\n${diffOut}")
         }
+
+        def untrackedProc = new ProcessBuilder(
+            'git', 'ls-files', '--others', '--exclude-standard', '--',
+            'specs', 'src/main/java/markets/alpaca/client/openapi')
+            .directory(rootProject.projectDir)
+            .redirectErrorStream(true)
+            .start()
+        def untrackedOut = new String(untrackedProc.inputStream.readAllBytes()).trim()
+        def untrackedExit = untrackedProc.waitFor()
+        if (untrackedExit != 0) {
+            throw new GradleException("git ls-files failed while checking generated outputs:\n${untrackedOut}")
+        }
+
+        def out = [diffOut, untrackedOut].findAll { it }.join('\n')
         if (out) {
             throw new GradleException(
                 "Generated OpenAPI outputs are out of date:\n${out}\n" +
