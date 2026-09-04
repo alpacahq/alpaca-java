@@ -84,13 +84,68 @@ jobs:
             echo "::warning::adopt exited $adopt_exit; publishing the partial result as a draft PR"
           fi
 
+      - name: Classify generated Java SDK compatibility
+        id: sdk_compat
+        if: always() && steps.adopt.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          # HEAD is main as checked out above. The adopt step regenerated the working
+          # tree from its candidate specs, so compare the SDK consumers compile against
+          # rather than treating every upstream OpenAPI contract change as an SDK break.
+          python3 scripts/sdk_api_diff.py \
+            --base-ref HEAD \
+            --new-root src/main/java/markets/alpaca/client/openapi \
+            --report build/sdk-api-compatibility-report.md \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Validate adopted Java SDK build
+        id: sdk_build
+        if: always() && steps.adopt.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          log_file=build/openapi-sdk-build.log
+          report_file=build/sdk-build-report.md
+
+          if ./gradlew build 2>&1 | tee "$log_file"; then
+            echo "failed=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "## SDK build validation"
+              echo
+              echo "\`./gradlew build\` passed against the adopted specs and generated sources."
+            } > "$report_file"
+            exit 0
+          fi
+
+          echo "failed=true" >> "$GITHUB_OUTPUT"
+          {
+            echo "## SDK build validation"
+            echo
+            echo "> [!CAUTION]"
+            echo "> \`./gradlew build\` failed against the adopted specs and generated sources."
+            echo "> This PR cannot be merged until the reported SDK compilation or test failures are resolved."
+            echo
+            echo "### Failure excerpt"
+            echo
+            echo "\`\`\`text"
+            # Java compiler diagnostics identify the handwritten callers or tests that
+            # must be adapted to the regenerated API. Include task failures too, so a
+            # non-compiler Gradle failure remains actionable from the PR description.
+            grep -E '(^.*\.java:[0-9]+: error:|^> Task .* FAILED|^FAILURE:|^\* What went wrong:)' "$log_file" \
+              | head -n 80 || true
+            echo "\`\`\`"
+            echo
+            echo "See this workflow run's **Validate adopted Java SDK build** step for the complete log."
+          } > "$report_file"
+
       - name: Open or update adopt pull request
         id: pr
         if: always() && steps.adopt.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          BREAKING: ${{ steps.adopt.outputs.breaking }}
+          BREAKING: ${{ steps.sdk_compat.outputs.breaking }}
+          OPENAPI_BREAKING: ${{ steps.adopt.outputs.breaking }}
           ADOPT_FAILED: ${{ steps.adopt.outputs.adopt_failed }}
+          SDK_BUILD_FAILED: ${{ steps.sdk_build.outputs.failed }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -105,8 +160,8 @@ jobs:
           git commit -m "chore(openapi): adopt upstream OpenAPI specs"
           git push -u origin bot/openapi-adopt --force
 
-          # A failed adopt cannot produce a mergeable PR, so it is reviewed as a draft too.
-          if [[ "$BREAKING" == "true" || "$ADOPT_FAILED" == "true" ]]; then
+          # A failed adopt or SDK build cannot produce a mergeable PR, so it is reviewed as a draft too.
+          if [[ "$BREAKING" == "true" || "$ADOPT_FAILED" == "true" || "$SDK_BUILD_FAILED" == "true" ]]; then
             draft=true
           else
             draft=false
@@ -115,16 +170,24 @@ jobs:
           body_file="$(mktemp)"
           {
             if [[ "$BREAKING" == "true" ]]; then
-              echo "Automated OpenAPI adopt with **breaking** classifier findings."
+              echo "Automated OpenAPI adopt with **breaking Java SDK compatibility changes**."
             else
-              echo "Automated OpenAPI adopt (additive / equivalent changes only)."
+              echo "Automated OpenAPI adopt with no breaking Java SDK compatibility changes."
             fi
             echo
+            if [[ "$OPENAPI_BREAKING" == "true" ]]; then
+              echo "The upstream OpenAPI classifier also found contract changes; it is included below as diagnostic context."
+              echo
+            fi
             if [[ "$ADOPT_FAILED" == "true" ]]; then
               echo "> [!WARNING]"
               echo "> The nested \`./gradlew generateApis test\` run **failed** during adopt."
               echo "> The pins and generated sources on this branch are the partial result;"
               echo "> see the failed workflow run for the build/test output."
+              echo
+            fi
+            if [[ -f build/sdk-build-report.md ]]; then
+              cat build/sdk-build-report.md
               echo
             fi
             if [[ "$draft" == "true" ]]; then
@@ -135,6 +198,10 @@ jobs:
             echo
             if [[ -f build/openapi-adopt-report.md ]]; then
               cat build/openapi-adopt-report.md
+            fi
+            if [[ -f build/sdk-api-compatibility-report.md ]]; then
+              echo
+              cat build/sdk-api-compatibility-report.md
             fi
           } > "$body_file"
 
@@ -176,7 +243,8 @@ jobs:
           }
           ensure_label openapi-drift "0E8A16" "OpenAPI pin/generated drift adopt"
           ensure_label openapi-adopt "1D76DB" "Automated OpenAPI adopt PR"
-          ensure_label breaking "D93F0B" "Classifier reported breaking OpenAPI surface changes"
+          ensure_label breaking "D93F0B" "Generated Java SDK compatibility changes detected"
+          ensure_label sdk-build-failure "B60205" "Adopted SDK does not compile or pass tests"
 
           gh pr edit "$number" --add-label openapi-drift --add-label openapi-adopt
           if [[ "$BREAKING" == "true" ]]; then
@@ -185,9 +253,14 @@ jobs:
             # remove-label fails when the label was never present; that is fine.
             gh pr edit "$number" --remove-label breaking || true
           fi
+          if [[ "$SDK_BUILD_FAILED" == "true" ]]; then
+            gh pr edit "$number" --add-label sdk-build-failure
+          else
+            gh pr edit "$number" --remove-label sdk-build-failure || true
+          fi
 
       - name: Fail the run when adopt did not complete cleanly
-        if: always() && steps.adopt.outputs.adopt_failed == 'true' && steps.adopt.outputs.changed == 'true'
+        if: always() && steps.adopt.outputs.changed == 'true' && (steps.adopt.outputs.adopt_failed == 'true' || steps.sdk_build.outputs.failed == 'true')
         run: |
-          echo "::error::adopt exited non-zero; the branch holds the partial result for review"
+          echo "::error::adopt or SDK build failed; the branch holds the result for review"
           exit 1
