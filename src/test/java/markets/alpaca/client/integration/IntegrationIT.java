@@ -13,7 +13,6 @@ import markets.alpaca.client.openapi.data.api.NewsApi;
 import markets.alpaca.client.openapi.data.api.StockApi;
 import markets.alpaca.client.openapi.data.model.CryptoHistoricalLoc;
 import markets.alpaca.client.openapi.data.model.CryptoLatestLoc;
-import markets.alpaca.client.openapi.data.model.Sort;
 import markets.alpaca.client.openapi.trading.api.AccountsApi;
 import markets.alpaca.client.openapi.trading.api.AssetsApi;
 import markets.alpaca.client.openapi.trading.api.OrdersApi;
@@ -186,7 +185,7 @@ class IntegrationIT {
     var start = end.minusDays(5);
     var resp =
         api.stockBarSingle(
-            "AAPL", "1Day", start, end, 5, null, null, null, null, null, Sort.fromValue("asc"));
+            "AAPL", "1Day", start, end, 5, null, null, null, null, null, "asc");
 
     assertNotNull(resp, "response must not be null");
     assertNotNull(resp.getBars(), "bars list must not be null");
@@ -228,7 +227,7 @@ class IntegrationIT {
             OffsetDateTime.now().minusMinutes(5),
             10,
             null,
-            Sort.fromValue("asc"));
+            "asc");
 
     assertNotNull(resp, "response must not be null");
     assertNotNull(resp.getBars(), "bars map must not be null");
