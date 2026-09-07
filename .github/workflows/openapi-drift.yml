@@ -49,7 +49,7 @@ jobs:
           set -euo pipefail
           # Always allow breaking on the bot branch; draft PR is the review gate.
           adopt_exit=0
-          python3 scripts/adopt_openapi.py --yes --allow-breaking || adopt_exit=$?
+          python3 scripts/adopt_openapi.py --yes --allow-breaking --keep-failed-adopt || adopt_exit=$?
 
           status_file=build/openapi-adopt-status.json
           if [[ ! -f "$status_file" ]]; then
@@ -139,26 +139,44 @@ jobs:
 
       - name: Open or update adopt pull request
         id: pr
-        if: always() && steps.adopt.outputs.changed == 'true'
+        # Keep a visible draft PR for a failed adopt so the retained candidate pins and
+        # generated sources are triaged instead of disappearing behind a scheduled run.
+        if: always() && (steps.adopt.outputs.changed == 'true' || steps.adopt.outputs.adopt_failed == 'true')
         env:
           GH_TOKEN: ${{ github.token }}
           BREAKING: ${{ steps.sdk_compat.outputs.breaking }}
           OPENAPI_BREAKING: ${{ steps.adopt.outputs.breaking }}
           ADOPT_FAILED: ${{ steps.adopt.outputs.adopt_failed }}
           SDK_BUILD_FAILED: ${{ steps.sdk_build.outputs.failed }}
+          CHANGED: ${{ steps.adopt.outputs.changed }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B bot/openapi-adopt
-          git add -A specs src/main/java/markets/alpaca/client/openapi
-          if git diff --cached --quiet; then
-            # Adopt restored the pins after a failed regenerate, so there is nothing to review.
-            echo "::notice::adopt left no spec or generated changes to commit; skipping PR"
+          if [[ "$CHANGED" == "true" ]]; then
+            git checkout -B bot/openapi-adopt
+            git add -A specs src/main/java/markets/alpaca/client/openapi
+            if git diff --cached --quiet; then
+              echo "::error::adopt reported changes but left no spec or generated changes to commit"
+              exit 1
+            fi
+            git commit -m "chore(openapi): adopt upstream OpenAPI specs"
+            git push -u origin bot/openapi-adopt --force
+          elif [[ "$ADOPT_FAILED" == "true" ]]; then
+            # Preserve an existing adoption branch and PR. If this is the first
+            # failure, create an empty commit solely to provide a reviewable PR.
+            if git fetch origin bot/openapi-adopt; then
+              git checkout -B bot/openapi-adopt origin/bot/openapi-adopt
+            else
+              git checkout -B bot/openapi-adopt
+              git commit --allow-empty -m "chore(openapi): record failed adopt"
+              git push -u origin bot/openapi-adopt
+            fi
+            echo "::warning::adopt failed with no spec/generated diff; preserving a broken draft PR for triage"
+          else
+            echo "::notice::no OpenAPI changes to publish"
             exit 0
           fi
-          git commit -m "chore(openapi): adopt upstream OpenAPI specs"
-          git push -u origin bot/openapi-adopt --force
 
           # A failed adopt or SDK build cannot produce a mergeable PR, so it is reviewed as a draft too.
           if [[ "$BREAKING" == "true" || "$ADOPT_FAILED" == "true" || "$SDK_BUILD_FAILED" == "true" ]]; then
@@ -205,7 +223,9 @@ jobs:
             fi
           } > "$body_file"
 
-          if [[ "$draft" == "true" ]]; then
+          if [[ "$ADOPT_FAILED" == "true" ]]; then
+            title="chore(openapi): adopt upstream OpenAPI specs (broken — needs repair)"
+          elif [[ "$draft" == "true" ]]; then
             title="chore(openapi): adopt upstream OpenAPI specs (draft — needs review)"
           else
             title="chore(openapi): adopt upstream OpenAPI specs"
@@ -245,8 +265,14 @@ jobs:
           ensure_label openapi-adopt "1D76DB" "Automated OpenAPI adopt PR"
           ensure_label breaking "D93F0B" "Generated Java SDK compatibility changes detected"
           ensure_label sdk-build-failure "B60205" "Adopted SDK does not compile or pass tests"
+          ensure_label openapi-adopt-failed "B60205" "OpenAPI adoption failed compatibility checks"
 
           gh pr edit "$number" --add-label openapi-drift --add-label openapi-adopt
+          if [[ "$ADOPT_FAILED" == "true" ]]; then
+            gh pr edit "$number" --add-label openapi-adopt-failed
+          else
+            gh pr edit "$number" --remove-label openapi-adopt-failed || true
+          fi
           if [[ "$BREAKING" == "true" ]]; then
             gh pr edit "$number" --add-label breaking
           else
