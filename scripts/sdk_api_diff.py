@@ -18,11 +18,18 @@ import subprocess
 
 JAVA_SUFFIX = ".java"
 ANNOTATION = re.compile(r"@[A-Za-z_$][\w.$]*(?:\([^)]*\))?\s*")
+TYPE_MODIFIERS = r"(?:(?:static|final|abstract)\s+)*"
 TYPE_DECLARATION = re.compile(
-    r"\bpublic\s+(?:static\s+)?(?:final\s+)?(class|interface|enum)\s+([A-Za-z_$][\w$]*)([^\{]*)\{"
+    rf"\bpublic\s+{TYPE_MODIFIERS}(class|interface|enum)\s+([A-Za-z_$][\w$]*)([^\{{]*)\{{"
 )
+METHOD_MODIFIERS = r"(?:(?:static|final|abstract|default|synchronized|native)\s+)*"
 METHOD_DECLARATION = re.compile(
-    r"^public\s+(?:static\s+)?(.+?)\s+([A-Za-z_$][\w$]*)\((.*)\)\s*(?:throws\s+[^\{]+)?\{$"
+    rf"^public\s+{METHOD_MODIFIERS}(.+?)\s+([A-Za-z_$][\w$]*)\((.*)\)\s*(?:throws\s+[^\{{;]+)?\s*[\{{;]"
+)
+# Public interface methods are public even without the `public` keyword, and they
+# terminate with `;` rather than a method body.
+INTERFACE_METHOD_DECLARATION = re.compile(
+    rf"^(?:public\s+)?{METHOD_MODIFIERS}(.+?)\s+([A-Za-z_$][\w$]*)\((.*)\)\s*(?:throws\s+[^\{{;]+)?;$"
 )
 CONSTRUCTOR_DECLARATION = re.compile(
     r"^public\s+([A-Za-z_$][\w$]*)\((.*)\)\s*(?:throws\s+[^\{]+)?\{$"
@@ -110,6 +117,8 @@ def declarations_from_java(text: str, source: str) -> dict[tuple[str, str, str, 
             owner = ".".join((package, *(item[0] for item in stack)))
         elif stack:
             method_match = METHOD_DECLARATION.match(line)
+            if not method_match and stack[-1][2] == "interface":
+                method_match = INTERFACE_METHOD_DECLARATION.match(line)
             if method_match:
                 return_type, name, parameters = method_match.groups()
                 signature = f"{return_type} {name}({_parameter_types(parameters)})"

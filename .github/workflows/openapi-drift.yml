@@ -163,14 +163,19 @@ jobs:
             git commit -m "chore(openapi): adopt upstream OpenAPI specs"
             git push -u origin bot/openapi-adopt --force
           elif [[ "$ADOPT_FAILED" == "true" ]]; then
-            # Preserve an existing adoption branch and PR. If this is the first
-            # failure, create an empty commit solely to provide a reviewable PR.
-            if git fetch origin bot/openapi-adopt; then
+            # Reuse the shared bot branch only when an open PR still points at it.
+            # After merge, origin/bot/openapi-adopt may remain with commits already on
+            # main (or that only look unique on this job's shallow checkout). Creating
+            # a PR from that leftover fails with no comparison, so start from current
+            # main with an empty commit instead.
+            existing_pr="$(gh pr list --head bot/openapi-adopt --state open --json number --jq '.[0].number // empty')"
+            if [[ -n "$existing_pr" ]]; then
+              git fetch origin bot/openapi-adopt
               git checkout -B bot/openapi-adopt origin/bot/openapi-adopt
             else
               git checkout -B bot/openapi-adopt
               git commit --allow-empty -m "chore(openapi): record failed adopt"
-              git push -u origin bot/openapi-adopt
+              git push -u origin bot/openapi-adopt --force
             fi
             echo "::warning::adopt failed with no spec/generated diff; preserving a broken draft PR for triage"
           else
@@ -178,8 +183,16 @@ jobs:
             exit 0
           fi
 
-          # A failed adopt or SDK build cannot produce a mergeable PR, so it is reviewed as a draft too.
-          if [[ "$BREAKING" == "true" || "$ADOPT_FAILED" == "true" || "$SDK_BUILD_FAILED" == "true" ]]; then
+          # A failed adopt, failed SDK build, or incomplete compatibility classification
+          # cannot produce a mergeable PR, so it is reviewed as a draft too.
+          # BREAKING is only "true"/"false" when sdk_compat completed; any other value
+          # (skipped or crashed) must not fail open as a ready, non-breaking PR.
+          compat_incomplete=false
+          if [[ "$CHANGED" == "true" && "$BREAKING" != "true" && "$BREAKING" != "false" ]]; then
+            compat_incomplete=true
+            echo "::warning::Java SDK compatibility classification did not complete; opening as draft"
+          fi
+          if [[ "$BREAKING" == "true" || "$ADOPT_FAILED" == "true" || "$SDK_BUILD_FAILED" == "true" || "$compat_incomplete" == "true" ]]; then
             draft=true
           else
             draft=false
@@ -189,8 +202,12 @@ jobs:
           {
             if [[ "$BREAKING" == "true" ]]; then
               echo "Automated OpenAPI adopt with **breaking Java SDK compatibility changes**."
-            else
+            elif [[ "$BREAKING" == "false" ]]; then
               echo "Automated OpenAPI adopt with no breaking Java SDK compatibility changes."
+            elif [[ "$compat_incomplete" == "true" ]]; then
+              echo "Automated OpenAPI adopt; Java SDK compatibility classification **did not complete**."
+            else
+              echo "Automated OpenAPI adopt with no spec or generated Java changes to classify."
             fi
             echo
             if [[ "$OPENAPI_BREAKING" == "true" ]]; then

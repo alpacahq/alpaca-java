@@ -114,3 +114,95 @@ class DeclarationParsingTests(unittest.TestCase):
         self.assertIn("Breaking Java SDK compatibility", report)
         self.assertIn("String find(String)", report)
         self.assertIn("Remove method", report)
+
+    def test_records_abstract_class_and_abstract_method(self):
+        source = """
+            package sample;
+
+            public abstract class AbstractOpenApiSchema {
+              public abstract Map<String, Class<?>> getSchemas();
+              public Object getActualInstance() {return instance;}
+            }
+        """
+        declarations = sdk_api_diff.declarations_from_java(source, "AbstractOpenApiSchema.java")
+        self.assertIn(
+            (
+                "type",
+                "sample",
+                "AbstractOpenApiSchema",
+                "class AbstractOpenApiSchema",
+            ),
+            declarations,
+        )
+        self.assertIn(
+            (
+                "method",
+                "sample.AbstractOpenApiSchema",
+                "getSchemas",
+                "Map<String, Class<?>> getSchemas()",
+            ),
+            declarations,
+        )
+        self.assertIn(
+            (
+                "method",
+                "sample.AbstractOpenApiSchema",
+                "getActualInstance",
+                "Object getActualInstance()",
+            ),
+            declarations,
+        )
+
+    def test_reports_removed_abstract_declarations(self):
+        old_source = """
+            package sample;
+
+            public abstract class AbstractOpenApiSchema {
+              public abstract Map<String, Class<?>> getSchemas();
+            }
+        """
+        new_source = """
+            package sample;
+
+            public class Other {
+            }
+        """
+        changes = sdk_api_diff._compare_declarations(
+            sdk_api_diff.declarations_from_java(old_source, "AbstractOpenApiSchema.java"),
+            sdk_api_diff.declarations_from_java(new_source, "Other.java"),
+        )
+        self.assertEqual(
+            {
+                ("removed", "class AbstractOpenApiSchema"),
+                ("removed", "Map<String, Class<?>> getSchemas()"),
+            },
+            {(change, old.signature) for change, old, _ in changes},
+        )
+
+    def test_records_interface_methods_without_public_or_body(self):
+        source = """
+            package sample;
+
+            public interface Authentication {
+              void applyToParams(List<Pair> queryParams) throws ApiException;
+              public String named();
+            }
+        """
+        declarations = sdk_api_diff.declarations_from_java(source, "Authentication.java")
+        self.assertIn(
+            ("type", "sample", "Authentication", "interface Authentication"),
+            declarations,
+        )
+        self.assertIn(
+            (
+                "method",
+                "sample.Authentication",
+                "applyToParams",
+                "void applyToParams(List<Pair>)",
+            ),
+            declarations,
+        )
+        self.assertIn(
+            ("method", "sample.Authentication", "named", "String named()"),
+            declarations,
+        )
