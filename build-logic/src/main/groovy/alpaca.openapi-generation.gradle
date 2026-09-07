@@ -529,7 +529,7 @@ tasks.register('adoptOpenApiApplyPinsBreaking') {
 // pin write (mustRunAfter on the umbrella task does not order preprocess*Spec).
 tasks.register('adoptOpenApiRegenerate') {
     group = 'openapi tools'
-    description = 'Nested generateApis + test after adopt pin writes (fresh specs/ snapshot)'
+    description = 'Nested generateApis + test after adopt pin writes (fresh specs/ snapshot; -PkeepFailedOpenApiAdopt preserves failed output)'
     outputs.upToDateWhen { false }
     def execOps = objects.newInstance(markets.alpaca.gradle.InjectedExecOps).execOps
     def pinBackupSpecs = ['broker', 'data', 'trading'].collect { api ->
@@ -543,6 +543,9 @@ tasks.register('adoptOpenApiRegenerate') {
         ? 'gradlew.bat'
         : './gradlew'
     doLast {
+        def keepFailedAdopt = providers.gradleProperty('keepFailedOpenApiAdopt')
+            .map { it.toBoolean() }
+            .getOrElse(false)
         // Drop spec-source overrides and force pin paths so nested generateApis
         // reads the pins just written to specs/, not whatever redirected the parent.
         def forwardedProperties = gradle.startParameter.projectProperties
@@ -562,6 +565,11 @@ tasks.register('adoptOpenApiRegenerate') {
         // clearOpenApiPinBackup drops the marker only after compile succeeds; test failures
         // alone leave no backup and keep the adopted pins.
         if (pinBackupSpecs.every { it.get().asFile.isFile() }) {
+            if (keepFailedAdopt) {
+                throw new GradleException(
+                    'generateApis/compileJava failed after the adopt pin update; pinned specs ' +
+                        'and generated sources were retained for failed-adopt review.')
+            }
             runAdoptPython(execOps, ['--restore-pins'])
             // Generation syncs each API as it finishes, so a failed run can still have
             // rewritten some packages; rebuild and recompile them from the restored pins.
