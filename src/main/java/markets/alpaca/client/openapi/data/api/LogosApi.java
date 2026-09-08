@@ -1,6 +1,6 @@
 /*
  * Market Data API
- * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News. 
+ * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News. 
  *
  * The version of the OpenAPI document: 1.1
  * Contact: support@alpaca.markets
@@ -27,7 +27,6 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 
 
-import java.io.File;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -151,7 +150,7 @@ public class LogosApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -171,7 +170,7 @@ public class LogosApi {
      * Get the image of the company logo for the given symbol.
      * @param symbol A unique series of letters assigned to a security for trading purposes. (required)
      * @param placeholder If true, returns a placeholder image when no logo is available. Defaults to true. (optional, default to true)
-     * @return File
+     * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -185,8 +184,8 @@ public class LogosApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public File logos(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable Boolean placeholder) throws ApiException {
-        ApiResponse<File> localVarResp = logosWithHttpInfo(symbol, placeholder);
+    public String logos(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable Boolean placeholder) throws ApiException {
+        ApiResponse<String> localVarResp = logosWithHttpInfo(symbol, placeholder);
         return localVarResp.getData();
     }
 
@@ -195,7 +194,7 @@ public class LogosApi {
      * Get the image of the company logo for the given symbol.
      * @param symbol A unique series of letters assigned to a security for trading purposes. (required)
      * @param placeholder If true, returns a placeholder image when no logo is available. Defaults to true. (optional, default to true)
-     * @return ApiResponse&lt;File&gt;
+     * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -209,9 +208,9 @@ public class LogosApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<File> logosWithHttpInfo(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable Boolean placeholder) throws ApiException {
+    public ApiResponse<String> logosWithHttpInfo(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable Boolean placeholder) throws ApiException {
         okhttp3.Call localVarCall = logosValidateBeforeCall(symbol, placeholder, null);
-        Type localVarReturnType = new TypeToken<File>(){}.getType();
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
 
@@ -235,10 +234,10 @@ public class LogosApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call logosAsync(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable Boolean placeholder, final ApiCallback<File> _callback) throws ApiException {
+    public okhttp3.Call logosAsync(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable Boolean placeholder, final ApiCallback<String> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = logosValidateBeforeCall(symbol, placeholder, _callback);
-        Type localVarReturnType = new TypeToken<File>(){}.getType();
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
     }

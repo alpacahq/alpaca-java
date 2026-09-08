@@ -104,7 +104,7 @@ public class LocatesApi {
     /**
      * Build call for createLocates
      * @param createLocateRequest Locate request details. (required)
-     * @param idempotencyKey Optional idempotency key for safe retries. Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. We recommend always providing this header in production so timeouts, network errors, and 5xx responses can be safely retried without creating duplicate locates. Use a client-generated unique value, such as a UUID, for each logical locate.  (optional)
+     * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -183,9 +183,9 @@ public class LocatesApi {
 
     /**
      * Create Locate
-     * Creates a locate request for a short sale.
+     * Creates a locate request for a short sale.  **Idempotency**: Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. 
      * @param createLocateRequest Locate request details. (required)
-     * @param idempotencyKey Optional idempotency key for safe retries. Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. We recommend always providing this header in production so timeouts, network errors, and 5xx responses can be safely retried without creating duplicate locates. Use a client-generated unique value, such as a UUID, for each logical locate.  (optional)
+     * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @return Locate
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -207,9 +207,9 @@ public class LocatesApi {
 
     /**
      * Create Locate
-     * Creates a locate request for a short sale.
+     * Creates a locate request for a short sale.  **Idempotency**: Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. 
      * @param createLocateRequest Locate request details. (required)
-     * @param idempotencyKey Optional idempotency key for safe retries. Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. We recommend always providing this header in production so timeouts, network errors, and 5xx responses can be safely retried without creating duplicate locates. Use a client-generated unique value, such as a UUID, for each logical locate.  (optional)
+     * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @return ApiResponse&lt;Locate&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -232,9 +232,9 @@ public class LocatesApi {
 
     /**
      * Create Locate (asynchronously)
-     * Creates a locate request for a short sale.
+     * Creates a locate request for a short sale.  **Idempotency**: Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. 
      * @param createLocateRequest Locate request details. (required)
-     * @param idempotencyKey Optional idempotency key for safe retries. Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. We recommend always providing this header in production so timeouts, network errors, and 5xx responses can be safely retried without creating duplicate locates. Use a client-generated unique value, such as a UUID, for each logical locate.  (optional)
+     * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object

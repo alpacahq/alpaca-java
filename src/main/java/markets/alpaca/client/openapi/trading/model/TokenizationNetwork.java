@@ -44,7 +44,11 @@ public enum TokenizationNetwork implements Serializable {
   
   TRON("tron"),
   
-  MANTLE("mantle");
+  MANTLE("mantle"),
+  
+  CRONOS("cronos"),
+  
+  HYPEREVM("hyperevm");
 
   private String value;
 
