@@ -67,6 +67,8 @@ public class CountryInfo implements Serializable {
     
     HIGH("high"),
     
+    RESTRICTED("restricted"),
+    
     PROHIBITED("prohibited");
 
     private String value;
@@ -137,6 +139,8 @@ public class CountryInfo implements Serializable {
     MEDIUM("medium"),
     
     HIGH("high"),
+    
+    RESTRICTED("restricted"),
     
     PROHIBITED("prohibited");
 

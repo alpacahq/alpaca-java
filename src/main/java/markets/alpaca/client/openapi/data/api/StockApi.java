@@ -1,6 +1,6 @@
 /*
  * Market Data API
- * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News. 
+ * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News. 
  *
  * The version of the OpenAPI document: 1.1
  * Contact: support@alpaca.markets
@@ -28,7 +28,6 @@ import java.io.IOException;
 
 
 import java.time.OffsetDateTime;
-import markets.alpaca.client.openapi.data.model.Sort;
 import markets.alpaca.client.openapi.data.model.StockAuctionsResp;
 import markets.alpaca.client.openapi.data.model.StockAuctionsRespSingle;
 import markets.alpaca.client.openapi.data.model.StockBarsResp;
@@ -150,7 +149,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -166,7 +165,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockAuctionSingleCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call stockAuctionSingleCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -239,12 +238,12 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call stockAuctionSingleValidateBeforeCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call stockAuctionSingleValidateBeforeCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'symbol' is set
         if (symbol == null) {
             throw new ApiException("Missing the required parameter 'symbol' when calling stockAuctionSingle(Async)");
@@ -265,7 +264,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockAuctionsRespSingle
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -280,7 +279,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public StockAuctionsRespSingle stockAuctionSingle(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public StockAuctionsRespSingle stockAuctionSingle(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<StockAuctionsRespSingle> localVarResp = stockAuctionSingleWithHttpInfo(symbol, start, end, limit, asof, feed, currency, pageToken, sort);
         return localVarResp.getData();
     }
@@ -296,7 +295,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockAuctionsRespSingle&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -311,7 +310,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<StockAuctionsRespSingle> stockAuctionSingleWithHttpInfo(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<StockAuctionsRespSingle> stockAuctionSingleWithHttpInfo(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = stockAuctionSingleValidateBeforeCall(symbol, start, end, limit, asof, feed, currency, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<StockAuctionsRespSingle>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -328,7 +327,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -344,7 +343,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockAuctionSingleAsync(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<StockAuctionsRespSingle> _callback) throws ApiException {
+    public okhttp3.Call stockAuctionSingleAsync(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<StockAuctionsRespSingle> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = stockAuctionSingleValidateBeforeCall(symbol, start, end, limit, asof, feed, currency, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<StockAuctionsRespSingle>(){}.getType();
@@ -361,7 +360,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -377,7 +376,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockAuctionsCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call stockAuctionsCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -453,12 +452,12 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call stockAuctionsValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call stockAuctionsValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'symbols' is set
         if (symbols == null) {
             throw new ApiException("Missing the required parameter 'symbols' when calling stockAuctions(Async)");
@@ -479,7 +478,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockAuctionsResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -494,7 +493,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public StockAuctionsResp stockAuctions(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public StockAuctionsResp stockAuctions(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<StockAuctionsResp> localVarResp = stockAuctionsWithHttpInfo(symbols, start, end, limit, asof, feed, currency, pageToken, sort);
         return localVarResp.getData();
     }
@@ -510,7 +509,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockAuctionsResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -525,7 +524,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<StockAuctionsResp> stockAuctionsWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<StockAuctionsResp> stockAuctionsWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = stockAuctionsValidateBeforeCall(symbols, start, end, limit, asof, feed, currency, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<StockAuctionsResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -542,7 +541,7 @@ public class StockApi {
      * @param feed Only &#x60;sip&#x60; is valid for auctions. (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -558,7 +557,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockAuctionsAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<StockAuctionsResp> _callback) throws ApiException {
+    public okhttp3.Call stockAuctionsAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable String feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<StockAuctionsResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = stockAuctionsValidateBeforeCall(symbols, start, end, limit, asof, feed, currency, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<StockAuctionsResp>(){}.getType();
@@ -577,7 +576,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -593,7 +592,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockBarSingleCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call stockBarSingleCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -674,12 +673,12 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call stockBarSingleValidateBeforeCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call stockBarSingleValidateBeforeCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'symbol' is set
         if (symbol == null) {
             throw new ApiException("Missing the required parameter 'symbol' when calling stockBarSingle(Async)");
@@ -707,7 +706,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockBarsRespSingle
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -722,7 +721,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public StockBarsRespSingle stockBarSingle(@javax.annotation.Nonnull String symbol, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public StockBarsRespSingle stockBarSingle(@javax.annotation.Nonnull String symbol, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<StockBarsRespSingle> localVarResp = stockBarSingleWithHttpInfo(symbol, timeframe, start, end, limit, adjustment, asof, feed, currency, pageToken, sort);
         return localVarResp.getData();
     }
@@ -740,7 +739,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockBarsRespSingle&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -755,7 +754,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<StockBarsRespSingle> stockBarSingleWithHttpInfo(@javax.annotation.Nonnull String symbol, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<StockBarsRespSingle> stockBarSingleWithHttpInfo(@javax.annotation.Nonnull String symbol, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = stockBarSingleValidateBeforeCall(symbol, timeframe, start, end, limit, adjustment, asof, feed, currency, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<StockBarsRespSingle>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -774,7 +773,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -790,7 +789,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockBarSingleAsync(@javax.annotation.Nonnull String symbol, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<StockBarsRespSingle> _callback) throws ApiException {
+    public okhttp3.Call stockBarSingleAsync(@javax.annotation.Nonnull String symbol, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<StockBarsRespSingle> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = stockBarSingleValidateBeforeCall(symbol, timeframe, start, end, limit, adjustment, asof, feed, currency, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<StockBarsRespSingle>(){}.getType();
@@ -809,7 +808,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -825,7 +824,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockBarsCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call stockBarsCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -909,12 +908,12 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call stockBarsValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call stockBarsValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'symbols' is set
         if (symbols == null) {
             throw new ApiException("Missing the required parameter 'symbols' when calling stockBars(Async)");
@@ -942,7 +941,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockBarsResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -957,7 +956,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public StockBarsResp stockBars(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public StockBarsResp stockBars(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<StockBarsResp> localVarResp = stockBarsWithHttpInfo(symbols, timeframe, start, end, limit, adjustment, asof, feed, currency, pageToken, sort);
         return localVarResp.getData();
     }
@@ -975,7 +974,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockBarsResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -990,7 +989,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<StockBarsResp> stockBarsWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<StockBarsResp> stockBarsWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = stockBarsValidateBeforeCall(symbols, timeframe, start, end, limit, adjustment, asof, feed, currency, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<StockBarsResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -1009,7 +1008,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -1025,7 +1024,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockBarsAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<StockBarsResp> _callback) throws ApiException {
+    public okhttp3.Call stockBarsAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String adjustment, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<StockBarsResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = stockBarsValidateBeforeCall(symbols, timeframe, start, end, limit, adjustment, asof, feed, currency, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<StockBarsResp>(){}.getType();
@@ -1101,7 +1100,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1267,7 +1266,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1430,7 +1429,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1596,7 +1595,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1759,7 +1758,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1925,7 +1924,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -2083,7 +2082,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -2236,7 +2235,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -2326,7 +2325,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -2342,7 +2341,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockQuoteSingleCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call stockQuoteSingleCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -2415,12 +2414,12 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call stockQuoteSingleValidateBeforeCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call stockQuoteSingleValidateBeforeCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'symbol' is set
         if (symbol == null) {
             throw new ApiException("Missing the required parameter 'symbol' when calling stockQuoteSingle(Async)");
@@ -2441,7 +2440,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockQuotesRespSingle
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -2456,7 +2455,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public StockQuotesRespSingle stockQuoteSingle(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public StockQuotesRespSingle stockQuoteSingle(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<StockQuotesRespSingle> localVarResp = stockQuoteSingleWithHttpInfo(symbol, start, end, limit, asof, feed, currency, pageToken, sort);
         return localVarResp.getData();
     }
@@ -2472,7 +2471,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockQuotesRespSingle&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -2487,7 +2486,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<StockQuotesRespSingle> stockQuoteSingleWithHttpInfo(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<StockQuotesRespSingle> stockQuoteSingleWithHttpInfo(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = stockQuoteSingleValidateBeforeCall(symbol, start, end, limit, asof, feed, currency, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<StockQuotesRespSingle>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -2504,7 +2503,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -2520,7 +2519,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockQuoteSingleAsync(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<StockQuotesRespSingle> _callback) throws ApiException {
+    public okhttp3.Call stockQuoteSingleAsync(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<StockQuotesRespSingle> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = stockQuoteSingleValidateBeforeCall(symbol, start, end, limit, asof, feed, currency, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<StockQuotesRespSingle>(){}.getType();
@@ -2537,7 +2536,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -2553,7 +2552,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockQuotesCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call stockQuotesCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -2629,12 +2628,12 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call stockQuotesValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call stockQuotesValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'symbols' is set
         if (symbols == null) {
             throw new ApiException("Missing the required parameter 'symbols' when calling stockQuotes(Async)");
@@ -2655,7 +2654,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockQuotesResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -2670,7 +2669,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public StockQuotesResp stockQuotes(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public StockQuotesResp stockQuotes(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<StockQuotesResp> localVarResp = stockQuotesWithHttpInfo(symbols, start, end, limit, asof, feed, currency, pageToken, sort);
         return localVarResp.getData();
     }
@@ -2686,7 +2685,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockQuotesResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -2701,7 +2700,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<StockQuotesResp> stockQuotesWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<StockQuotesResp> stockQuotesWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = stockQuotesValidateBeforeCall(symbols, start, end, limit, asof, feed, currency, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<StockQuotesResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -2718,7 +2717,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -2734,7 +2733,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockQuotesAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<StockQuotesResp> _callback) throws ApiException {
+    public okhttp3.Call stockQuotesAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<StockQuotesResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = stockQuotesValidateBeforeCall(symbols, start, end, limit, asof, feed, currency, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<StockQuotesResp>(){}.getType();
@@ -2810,7 +2809,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -2976,7 +2975,7 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -3080,7 +3079,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -3096,7 +3095,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockTradeSingleCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call stockTradeSingleCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -3169,12 +3168,12 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call stockTradeSingleValidateBeforeCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call stockTradeSingleValidateBeforeCall(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'symbol' is set
         if (symbol == null) {
             throw new ApiException("Missing the required parameter 'symbol' when calling stockTradeSingle(Async)");
@@ -3195,7 +3194,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockTradesRespSingle
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -3210,7 +3209,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public StockTradesRespSingle stockTradeSingle(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public StockTradesRespSingle stockTradeSingle(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<StockTradesRespSingle> localVarResp = stockTradeSingleWithHttpInfo(symbol, start, end, limit, asof, feed, currency, pageToken, sort);
         return localVarResp.getData();
     }
@@ -3226,7 +3225,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockTradesRespSingle&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -3241,7 +3240,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<StockTradesRespSingle> stockTradeSingleWithHttpInfo(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<StockTradesRespSingle> stockTradeSingleWithHttpInfo(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = stockTradeSingleValidateBeforeCall(symbol, start, end, limit, asof, feed, currency, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<StockTradesRespSingle>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -3258,7 +3257,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -3274,7 +3273,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockTradeSingleAsync(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<StockTradesRespSingle> _callback) throws ApiException {
+    public okhttp3.Call stockTradeSingleAsync(@javax.annotation.Nonnull String symbol, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<StockTradesRespSingle> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = stockTradeSingleValidateBeforeCall(symbol, start, end, limit, asof, feed, currency, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<StockTradesRespSingle>(){}.getType();
@@ -3291,7 +3290,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -3307,7 +3306,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockTradesCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call stockTradesCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -3383,12 +3382,12 @@ public class StockApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call stockTradesValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call stockTradesValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'symbols' is set
         if (symbols == null) {
             throw new ApiException("Missing the required parameter 'symbols' when calling stockTrades(Async)");
@@ -3409,7 +3408,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return StockTradesResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -3424,7 +3423,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public StockTradesResp stockTrades(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public StockTradesResp stockTrades(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<StockTradesResp> localVarResp = stockTradesWithHttpInfo(symbols, start, end, limit, asof, feed, currency, pageToken, sort);
         return localVarResp.getData();
     }
@@ -3440,7 +3439,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;StockTradesResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -3455,7 +3454,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<StockTradesResp> stockTradesWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<StockTradesResp> stockTradesWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = stockTradesValidateBeforeCall(symbols, start, end, limit, asof, feed, currency, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<StockTradesResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -3472,7 +3471,7 @@ public class StockApi {
      * @param feed The source feed of the data.  - &#x60;sip&#x60;: all US exchanges  - &#x60;iex&#x60;: Investors EXchange  - &#x60;boats&#x60;: Blue Ocean ATS, overnight US trading data  - &#x60;otc&#x60;: over-the-counter exchanges  (optional, default to sip)
      * @param currency The currency of all prices in ISO 4217 format. Default: USD.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -3488,7 +3487,7 @@ public class StockApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call stockTradesAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<StockTradesResp> _callback) throws ApiException {
+    public okhttp3.Call stockTradesAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String asof, @javax.annotation.Nullable StockHistoricalFeed feed, @javax.annotation.Nullable String currency, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<StockTradesResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = stockTradesValidateBeforeCall(symbols, start, end, limit, asof, feed, currency, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<StockTradesResp>(){}.getType();

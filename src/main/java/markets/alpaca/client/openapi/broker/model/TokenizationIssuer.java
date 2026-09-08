@@ -32,7 +32,11 @@ public enum TokenizationIssuer implements Serializable {
   
   XSTOCKS("xstocks"),
   
-  ST0X("st0x");
+  ST0X("st0x"),
+  
+  BINANCE("binance"),
+  
+  COINBASE("coinbase");
 
   private String value;
 

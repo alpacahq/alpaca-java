@@ -76,7 +76,7 @@ import java.util.Map;
  * 
  *   <li><b>{@code postV1RebalancingPortfolios}</b>: Create Portfolio</li>
  * 
- *   <li><b>{@code postV1RebalancingRuns}</b>: Create Run (Manual rebalancing event)</li>
+ *   <li><b>{@code postV1RebalancingRuns}</b>: Create Run</li>
  * 
  *   <li><b>{@code postV1RebalancingSubscriptions}</b>: Create Subscription</li>
  * 
@@ -1593,7 +1593,7 @@ public class RebalancingApi {
     }
     /**
      * Build call for postV1RebalancingRuns
-     * @param postV1RebalancingRunsRequest  (optional)
+     * @param postV1RebalancingRunsRequest  (required)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -1604,7 +1604,7 @@ public class RebalancingApi {
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call postV1RebalancingRunsCall(@javax.annotation.Nullable PostV1RebalancingRunsRequest postV1RebalancingRunsRequest, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call postV1RebalancingRunsCall(@javax.annotation.Nonnull PostV1RebalancingRunsRequest postV1RebalancingRunsRequest, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -1649,15 +1649,20 @@ public class RebalancingApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call postV1RebalancingRunsValidateBeforeCall(@javax.annotation.Nullable PostV1RebalancingRunsRequest postV1RebalancingRunsRequest, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call postV1RebalancingRunsValidateBeforeCall(@javax.annotation.Nonnull PostV1RebalancingRunsRequest postV1RebalancingRunsRequest, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'postV1RebalancingRunsRequest' is set
+        if (postV1RebalancingRunsRequest == null) {
+            throw new ApiException("Missing the required parameter 'postV1RebalancingRunsRequest' when calling postV1RebalancingRuns(Async)");
+        }
+
         return postV1RebalancingRunsCall(postV1RebalancingRunsRequest, _callback);
 
     }
 
     /**
-     * Create Run (Manual rebalancing event)
-     * Manually creates a run.  The determination of a run&#39;s orders and the execution of a run take place during normal market hours  Runs can be initiated either by the system (when the system evaluates the rebalance conditions specified at the portfolio level) or by API call (manual run creation using POST /v1/rebalancing/runs). Runs can be initiated manually outside of the normal market hours but will remain in the QUEUED status until normal market hours  Only 1 run in a non-terminal status is allowed at any time.  Manually executing a run is currently only allowed for accounts who do not have an active subscription.
-     * @param postV1RebalancingRunsRequest  (optional)
+     * Create Run
+     * Creates a rebalance run.  Omit &#x60;weights&#x60; or provide an empty array to create a subscription-driven run using the account&#39;s active subscription. Provide a non-empty &#x60;weights&#x60; array to create a manual one-off run. A manual run is rejected if the account already has an active subscription.  The determination of a run&#39;s orders and the execution of a run take place during normal market hours. Runs can be initiated outside normal market hours but remain &#x60;QUEUED&#x60; until normal market hours.  Only one run in a non-terminal status is allowed at any time.
+     * @param postV1RebalancingRunsRequest  (required)
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -1666,14 +1671,14 @@ public class RebalancingApi {
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
      </table>
      */
-    public void postV1RebalancingRuns(@javax.annotation.Nullable PostV1RebalancingRunsRequest postV1RebalancingRunsRequest) throws ApiException {
+    public void postV1RebalancingRuns(@javax.annotation.Nonnull PostV1RebalancingRunsRequest postV1RebalancingRunsRequest) throws ApiException {
         postV1RebalancingRunsWithHttpInfo(postV1RebalancingRunsRequest);
     }
 
     /**
-     * Create Run (Manual rebalancing event)
-     * Manually creates a run.  The determination of a run&#39;s orders and the execution of a run take place during normal market hours  Runs can be initiated either by the system (when the system evaluates the rebalance conditions specified at the portfolio level) or by API call (manual run creation using POST /v1/rebalancing/runs). Runs can be initiated manually outside of the normal market hours but will remain in the QUEUED status until normal market hours  Only 1 run in a non-terminal status is allowed at any time.  Manually executing a run is currently only allowed for accounts who do not have an active subscription.
-     * @param postV1RebalancingRunsRequest  (optional)
+     * Create Run
+     * Creates a rebalance run.  Omit &#x60;weights&#x60; or provide an empty array to create a subscription-driven run using the account&#39;s active subscription. Provide a non-empty &#x60;weights&#x60; array to create a manual one-off run. A manual run is rejected if the account already has an active subscription.  The determination of a run&#39;s orders and the execution of a run take place during normal market hours. Runs can be initiated outside normal market hours but remain &#x60;QUEUED&#x60; until normal market hours.  Only one run in a non-terminal status is allowed at any time.
+     * @param postV1RebalancingRunsRequest  (required)
      * @return ApiResponse&lt;Void&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1683,15 +1688,15 @@ public class RebalancingApi {
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<Void> postV1RebalancingRunsWithHttpInfo(@javax.annotation.Nullable PostV1RebalancingRunsRequest postV1RebalancingRunsRequest) throws ApiException {
+    public ApiResponse<Void> postV1RebalancingRunsWithHttpInfo(@javax.annotation.Nonnull PostV1RebalancingRunsRequest postV1RebalancingRunsRequest) throws ApiException {
         okhttp3.Call localVarCall = postV1RebalancingRunsValidateBeforeCall(postV1RebalancingRunsRequest, null);
         return localVarApiClient.execute(localVarCall);
     }
 
     /**
-     * Create Run (Manual rebalancing event) (asynchronously)
-     * Manually creates a run.  The determination of a run&#39;s orders and the execution of a run take place during normal market hours  Runs can be initiated either by the system (when the system evaluates the rebalance conditions specified at the portfolio level) or by API call (manual run creation using POST /v1/rebalancing/runs). Runs can be initiated manually outside of the normal market hours but will remain in the QUEUED status until normal market hours  Only 1 run in a non-terminal status is allowed at any time.  Manually executing a run is currently only allowed for accounts who do not have an active subscription.
-     * @param postV1RebalancingRunsRequest  (optional)
+     * Create Run (asynchronously)
+     * Creates a rebalance run.  Omit &#x60;weights&#x60; or provide an empty array to create a subscription-driven run using the account&#39;s active subscription. Provide a non-empty &#x60;weights&#x60; array to create a manual one-off run. A manual run is rejected if the account already has an active subscription.  The determination of a run&#39;s orders and the execution of a run take place during normal market hours. Runs can be initiated outside normal market hours but remain &#x60;QUEUED&#x60; until normal market hours.  Only one run in a non-terminal status is allowed at any time.
+     * @param postV1RebalancingRunsRequest  (required)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -1702,7 +1707,7 @@ public class RebalancingApi {
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call postV1RebalancingRunsAsync(@javax.annotation.Nullable PostV1RebalancingRunsRequest postV1RebalancingRunsRequest, final ApiCallback<Void> _callback) throws ApiException {
+    public okhttp3.Call postV1RebalancingRunsAsync(@javax.annotation.Nonnull PostV1RebalancingRunsRequest postV1RebalancingRunsRequest, final ApiCallback<Void> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = postV1RebalancingRunsValidateBeforeCall(postV1RebalancingRunsRequest, _callback);
         localVarApiClient.executeAsync(localVarCall, _callback);
