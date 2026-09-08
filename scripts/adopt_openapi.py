@@ -236,6 +236,7 @@ def adopt(
     skip_generate: bool,
     skip_fetch: bool,
     skip_preprocess: bool,
+    keep_failed_adopt: bool = False,
 ) -> int:
     upstream_root = ROOT / "build" / "upstream"
     adopt_specs_root = ROOT / "build" / "specs-adopt"
@@ -371,6 +372,11 @@ def adopt(
             clear_pin_backup()
         except subprocess.CalledProcessError:
             if pin_backup_pending():
+                if keep_failed_adopt:
+                    raise SystemExit(
+                        "ERROR: generateApis/compileJava failed after the pin update; pins and "
+                        "generated sources were retained for failed-adopt review."
+                    ) from None
                 restore_pins()
                 # Generation syncs each API as it finishes, so a failed run can still have
                 # rewritten some packages; rebuild and recompile from the restored pins.
@@ -445,6 +451,14 @@ def main(argv: list[str] | None = None) -> int:
             "(run ./gradlew generateApis afterwards to resync generated sources)"
         ),
     )
+    parser.add_argument(
+        "--keep-failed-adopt",
+        action="store_true",
+        help=(
+            "Keep updated pins and any generated sources when generate/compile fails; "
+            "intended for automation that opens a broken review PR"
+        ),
+    )
     args = parser.parse_args(argv)
     if args.restore_pins:
         return restore_pins()
@@ -455,6 +469,7 @@ def main(argv: list[str] | None = None) -> int:
         skip_generate=args.skip_generate,
         skip_fetch=args.skip_fetch,
         skip_preprocess=args.skip_preprocess,
+        keep_failed_adopt=args.keep_failed_adopt,
     )
 
 

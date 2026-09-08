@@ -377,6 +377,36 @@ class PinBackupTests(unittest.TestCase):
                 )
             self.assertFalse((root / "build" / "specs-pin-backup").exists())
 
+    def test_adopt_retains_pins_when_requested_after_generate_fails(self):
+        import subprocess
+
+        with _adopt_workspace() as root:
+            with _patched_root(root), mock.patch.object(
+                adopt_openapi.openapi_tools, "load_spec", side_effect=_additive_load_spec
+            ), mock.patch.object(
+                adopt_openapi,
+                "_run",
+                side_effect=subprocess.CalledProcessError(1, "gradlew"),
+            ):
+                with self.assertRaises(SystemExit) as ctx:
+                    adopt_openapi.adopt(
+                        dry_run=False,
+                        yes=True,
+                        allow_breaking=False,
+                        skip_generate=False,
+                        skip_fetch=True,
+                        skip_preprocess=True,
+                        keep_failed_adopt=True,
+                    )
+
+            self.assertIn("retained for failed-adopt review", str(ctx.exception))
+            for api in adopt_openapi.APIS:
+                self.assertEqual(
+                    (root / "specs" / api / "openapi.yaml").read_text(encoding="utf-8"),
+                    f"upstream {api}\n",
+                )
+            self.assertTrue((root / "build" / "specs-pin-backup").exists())
+
     def test_adopt_reports_when_regenerating_restored_pins_also_fails(self):
         import subprocess
 

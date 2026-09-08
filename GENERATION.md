@@ -151,15 +151,18 @@ Or on CI images that allow user installs:
 - PR/`main` builds run `./gradlew build` (`check` → `checkGenerated`).
 - Snapshot and release freeze committed `specs/` (no live fetch at publish time).
 - Weekly `openapi-drift.yml`:
-  - Any drift → bot PR on `bot/openapi-adopt` (force-pushed). Additive/equivalent
-    changes open a ready PR; classifier-breaking changes open a **draft** PR with
-    pins and generated sources already updated for review. Local
-    `./gradlew adoptOpenApi` still refuses breaking writes without
-    `adoptOpenApiBreaking`.
-  - A breaking adopt usually fails its nested `generateApis test` run. The workflow
-    still commits whatever pins and generated sources survived, opens the PR as a
-    **draft** noting the failure, and only then fails the run. If adopt restored the
-    pins and left nothing to commit, the PR step is skipped with a notice.
+  - Any drift → bot PR on `bot/openapi-adopt` (force-pushed). The draft/ready gate
+    is generated Java SDK compatibility (`scripts/sdk_api_diff.py`): removed or
+    changed public generated Java opens a **draft** with the `breaking` label.
+    Upstream OpenAPI classifier findings stay in the PR body as diagnostics and do
+    not by themselves draft the PR. Local `./gradlew adoptOpenApi` still refuses
+    breaking OAS writes without `adoptOpenApiBreaking`.
+  - `./gradlew build` against the adopted pins must pass or the PR stays draft
+    (`sdk-build-failure`). A failed nested `generateApis test` during adopt still
+    commits surviving pins and generated sources, opens or updates a **draft**,
+    then fails the run. If adopt fails with no spec/generated diff, the workflow
+    still opens a triage draft (empty commit when `bot/openapi-adopt` has no open
+    PR). If Java compatibility classification does not complete, the PR stays draft.
 
 ## Spec resolution order
 
