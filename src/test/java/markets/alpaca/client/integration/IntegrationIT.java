@@ -184,8 +184,7 @@ class IntegrationIT {
     var end = OffsetDateTime.now().minusMinutes(20);
     var start = end.minusDays(5);
     var resp =
-        api.stockBarSingle(
-            "AAPL", "1Day", start, end, 5, null, null, null, null, null, "asc");
+        api.stockBarSingle("AAPL", "1Day", start, end, 5, null, null, null, null, null, "asc");
 
     assertNotNull(resp, "response must not be null");
     assertNotNull(resp.getBars(), "bars list must not be null");
