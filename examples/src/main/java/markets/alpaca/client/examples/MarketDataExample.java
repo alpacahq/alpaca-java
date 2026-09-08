@@ -58,7 +58,7 @@ public final class MarketDataExample {
             null,
             null,
             null,
-            Sort.fromValue("asc"));
+            "asc");
     bars.getBars().forEach(System.out::println);
 
     ExampleSupport.printSection("Latest Stock Quote");
@@ -92,7 +92,7 @@ public final class MarketDataExample {
             OffsetDateTime.now().minusMinutes(5),
             10,
             null,
-            Sort.fromValue("asc"));
+            "asc");
     cryptoBars
         .getBars()
         .forEach(
