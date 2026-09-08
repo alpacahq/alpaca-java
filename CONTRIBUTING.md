@@ -91,16 +91,29 @@ Useful focused checks:
 ./gradlew spotlessApply                 # apply formatter changes
 npm run build --prefix docs             # validate generated Docusaurus docs
 pre-commit run markdown-links --all-files  # validate non-Docusaurus Markdown links
+pre-commit run gradle-code-checks --all-files  # same Gradle code checks as CI
 ```
 
 Generated OpenAPI output under `src/main/java/markets/alpaca/client/openapi/` is excluded from
 formatting and static-analysis checks.
 
-To run non-Docusaurus Markdown link validation before each commit, install the local hook once. The
-hook uses the local `lychee` binary, matching the CI link checker.
+To run the same checks locally before each commit, install the hooks once:
 
 ```bash
 pre-commit install
+```
+
+This installs:
+
+- Markdown link validation (`lychee`), matching the CI link checker. Requires a local `lychee` binary.
+- Gradle code checks: `./gradlew spotlessCheck checkstyleMain checkstyleTest spotbugsMain`, matching
+  the CI code-checks step. The hook is check-only; apply formatter fixes with `./gradlew spotlessApply`
+  and commit again.
+
+To skip Gradle checks for a single commit:
+
+```bash
+SKIP=gradle-code-checks git commit ...
 ```
 
 ## PR Checklist
