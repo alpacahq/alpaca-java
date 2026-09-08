@@ -1217,7 +1217,7 @@ public class InstantFundingApi {
     /**
      * Build call for postV1InstantFunding
      * @param createIFTransferRequest details of the instant funding request (required)
-     * @param idempotencyKey Unique key for idempotent create. When supplied, duplicate requests (same key and body) return the original transfer instead of creating a new one. Use a client-generated value (e.g. UUID) per logical transfer. Strongly recommended for production to prevent duplicate transfers on retries.  (optional)
+     * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -1295,7 +1295,7 @@ public class InstantFundingApi {
      * Create an instant funding request
      * Creates an instant funding request. The request will be processed and the funds will be made available to the account in the form of a Memopost non trade activity. Upon settlement the Memoposted will be corrected to a CSD activity.  **Idempotency**: When the &#x60;Idempotency-Key&#x60; header is supplied, this endpoint is idempotent. Multiple requests with the same key and identical request body will create only one transfer. A subsequent request returns the previously created transfer with the same response (no duplicate is created). If the same key is used with a different request body, the API returns &#x60;422 Unprocessable Entity&#x60;.  **Recommended for production**: Always supply &#x60;Idempotency-Key&#x60; when creating transfers. This allows safe retries on timeouts, network errors, or 5xx responses without risking duplicate transfers. Use a client-generated unique value (e.g. UUID). 
      * @param createIFTransferRequest details of the instant funding request (required)
-     * @param idempotencyKey Unique key for idempotent create. When supplied, duplicate requests (same key and body) return the original transfer instead of creating a new one. Use a client-generated value (e.g. UUID) per logical transfer. Strongly recommended for production to prevent duplicate transfers on retries.  (optional)
+     * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @return InstantFunding
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1316,7 +1316,7 @@ public class InstantFundingApi {
      * Create an instant funding request
      * Creates an instant funding request. The request will be processed and the funds will be made available to the account in the form of a Memopost non trade activity. Upon settlement the Memoposted will be corrected to a CSD activity.  **Idempotency**: When the &#x60;Idempotency-Key&#x60; header is supplied, this endpoint is idempotent. Multiple requests with the same key and identical request body will create only one transfer. A subsequent request returns the previously created transfer with the same response (no duplicate is created). If the same key is used with a different request body, the API returns &#x60;422 Unprocessable Entity&#x60;.  **Recommended for production**: Always supply &#x60;Idempotency-Key&#x60; when creating transfers. This allows safe retries on timeouts, network errors, or 5xx responses without risking duplicate transfers. Use a client-generated unique value (e.g. UUID). 
      * @param createIFTransferRequest details of the instant funding request (required)
-     * @param idempotencyKey Unique key for idempotent create. When supplied, duplicate requests (same key and body) return the original transfer instead of creating a new one. Use a client-generated value (e.g. UUID) per logical transfer. Strongly recommended for production to prevent duplicate transfers on retries.  (optional)
+     * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @return ApiResponse&lt;InstantFunding&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1338,7 +1338,7 @@ public class InstantFundingApi {
      * Create an instant funding request (asynchronously)
      * Creates an instant funding request. The request will be processed and the funds will be made available to the account in the form of a Memopost non trade activity. Upon settlement the Memoposted will be corrected to a CSD activity.  **Idempotency**: When the &#x60;Idempotency-Key&#x60; header is supplied, this endpoint is idempotent. Multiple requests with the same key and identical request body will create only one transfer. A subsequent request returns the previously created transfer with the same response (no duplicate is created). If the same key is used with a different request body, the API returns &#x60;422 Unprocessable Entity&#x60;.  **Recommended for production**: Always supply &#x60;Idempotency-Key&#x60; when creating transfers. This allows safe retries on timeouts, network errors, or 5xx responses without risking duplicate transfers. Use a client-generated unique value (e.g. UUID). 
      * @param createIFTransferRequest details of the instant funding request (required)
-     * @param idempotencyKey Unique key for idempotent create. When supplied, duplicate requests (same key and body) return the original transfer instead of creating a new one. Use a client-generated value (e.g. UUID) per logical transfer. Strongly recommended for production to prevent duplicate transfers on retries.  (optional)
+     * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object

@@ -22,6 +22,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import markets.alpaca.client.openapi.trading.model.CryptoChain;
+import markets.alpaca.client.openapi.trading.model.TravelRuleInfo;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -69,6 +70,11 @@ public class CreateWhitelistedAddressRequest implements Serializable {
   @SerializedName(SERIALIZED_NAME_CHAIN)
   @javax.annotation.Nullable
   private CryptoChain chain;
+
+  public static final String SERIALIZED_NAME_TRAVEL_RULE_INFO = "travel_rule_info";
+  @SerializedName(SERIALIZED_NAME_TRAVEL_RULE_INFO)
+  @javax.annotation.Nullable
+  private TravelRuleInfo travelRuleInfo;
 
   public CreateWhitelistedAddressRequest() {
   }
@@ -129,6 +135,25 @@ public class CreateWhitelistedAddressRequest implements Serializable {
     this.chain = chain;
   }
 
+
+  public CreateWhitelistedAddressRequest travelRuleInfo(@javax.annotation.Nullable TravelRuleInfo travelRuleInfo) {
+    this.travelRuleInfo = travelRuleInfo;
+    return this;
+  }
+
+  /**
+   * Get travelRuleInfo
+   * @return travelRuleInfo
+   */
+  @javax.annotation.Nullable
+  public TravelRuleInfo getTravelRuleInfo() {
+    return travelRuleInfo;
+  }
+
+  public void setTravelRuleInfo(@javax.annotation.Nullable TravelRuleInfo travelRuleInfo) {
+    this.travelRuleInfo = travelRuleInfo;
+  }
+
   /**
    * A container for additional, undeclared properties.
    * This is a holder for any undeclared properties as specified with
@@ -186,13 +211,14 @@ public class CreateWhitelistedAddressRequest implements Serializable {
     CreateWhitelistedAddressRequest createWhitelistedAddressRequest = (CreateWhitelistedAddressRequest) o;
     return Objects.equals(this.address, createWhitelistedAddressRequest.address) &&
         Objects.equals(this.asset, createWhitelistedAddressRequest.asset) &&
-        Objects.equals(this.chain, createWhitelistedAddressRequest.chain)&&
+        Objects.equals(this.chain, createWhitelistedAddressRequest.chain) &&
+        Objects.equals(this.travelRuleInfo, createWhitelistedAddressRequest.travelRuleInfo)&&
         Objects.equals(this.additionalProperties, createWhitelistedAddressRequest.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(address, asset, chain, additionalProperties);
+    return Objects.hash(address, asset, chain, travelRuleInfo, additionalProperties);
   }
 
   @Override
@@ -202,6 +228,7 @@ public class CreateWhitelistedAddressRequest implements Serializable {
     sb.append("    address: ").append(toIndentedString(address)).append("\n");
     sb.append("    asset: ").append(toIndentedString(asset)).append("\n");
     sb.append("    chain: ").append(toIndentedString(chain)).append("\n");
+    sb.append("    travelRuleInfo: ").append(toIndentedString(travelRuleInfo)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -221,7 +248,7 @@ public class CreateWhitelistedAddressRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("address", "asset", "chain"));
+    openapiFields = new HashSet<String>(Arrays.asList("address", "asset", "chain", "travel_rule_info"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -249,6 +276,10 @@ public class CreateWhitelistedAddressRequest implements Serializable {
       // validate the optional field `chain`
       if (jsonObj.get("chain") != null && !jsonObj.get("chain").isJsonNull()) {
         CryptoChain.validateJsonElement(jsonObj.get("chain"));
+      }
+      // validate the optional field `travel_rule_info`
+      if (jsonObj.get("travel_rule_info") != null && !jsonObj.get("travel_rule_info").isJsonNull()) {
+        TravelRuleInfo.validateJsonElement(jsonObj.get("travel_rule_info"));
       }
   }
 

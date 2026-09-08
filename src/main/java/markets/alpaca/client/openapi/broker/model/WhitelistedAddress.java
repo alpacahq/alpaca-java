@@ -22,6 +22,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
+import markets.alpaca.client.openapi.broker.model.TravelRuleInfo;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -136,6 +137,11 @@ public class WhitelistedAddress implements Serializable {
   @SerializedName(SERIALIZED_NAME_STATUS)
   @javax.annotation.Nullable
   private StatusEnum status;
+
+  public static final String SERIALIZED_NAME_TRAVEL_RULE_INFO = "travel_rule_info";
+  @SerializedName(SERIALIZED_NAME_TRAVEL_RULE_INFO)
+  @javax.annotation.Nullable
+  private TravelRuleInfo travelRuleInfo;
 
   public WhitelistedAddress() {
   }
@@ -253,6 +259,25 @@ public class WhitelistedAddress implements Serializable {
     this.status = status;
   }
 
+
+  public WhitelistedAddress travelRuleInfo(@javax.annotation.Nullable TravelRuleInfo travelRuleInfo) {
+    this.travelRuleInfo = travelRuleInfo;
+    return this;
+  }
+
+  /**
+   * Travel rule information associated with the whitelisted address.
+   * @return travelRuleInfo
+   */
+  @javax.annotation.Nullable
+  public TravelRuleInfo getTravelRuleInfo() {
+    return travelRuleInfo;
+  }
+
+  public void setTravelRuleInfo(@javax.annotation.Nullable TravelRuleInfo travelRuleInfo) {
+    this.travelRuleInfo = travelRuleInfo;
+  }
+
   /**
    * A container for additional, undeclared properties.
    * This is a holder for any undeclared properties as specified with
@@ -313,13 +338,14 @@ public class WhitelistedAddress implements Serializable {
         Objects.equals(this.chain, whitelistedAddress.chain) &&
         Objects.equals(this.createdAt, whitelistedAddress.createdAt) &&
         Objects.equals(this.id, whitelistedAddress.id) &&
-        Objects.equals(this.status, whitelistedAddress.status)&&
+        Objects.equals(this.status, whitelistedAddress.status) &&
+        Objects.equals(this.travelRuleInfo, whitelistedAddress.travelRuleInfo)&&
         Objects.equals(this.additionalProperties, whitelistedAddress.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(address, asset, chain, createdAt, id, status, additionalProperties);
+    return Objects.hash(address, asset, chain, createdAt, id, status, travelRuleInfo, additionalProperties);
   }
 
   @Override
@@ -332,6 +358,7 @@ public class WhitelistedAddress implements Serializable {
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    travelRuleInfo: ").append(toIndentedString(travelRuleInfo)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -351,7 +378,7 @@ public class WhitelistedAddress implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("address", "asset", "chain", "created_at", "id", "status"));
+    openapiFields = new HashSet<String>(Arrays.asList("address", "asset", "chain", "created_at", "id", "status", "travel_rule_info"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -388,6 +415,10 @@ public class WhitelistedAddress implements Serializable {
       // validate the optional field `status`
       if (jsonObj.get("status") != null && !jsonObj.get("status").isJsonNull()) {
         StatusEnum.validateJsonElement(jsonObj.get("status"));
+      }
+      // validate the optional field `travel_rule_info`
+      if (jsonObj.get("travel_rule_info") != null && !jsonObj.get("travel_rule_info").isJsonNull()) {
+        TravelRuleInfo.validateJsonElement(jsonObj.get("travel_rule_info"));
       }
   }
 

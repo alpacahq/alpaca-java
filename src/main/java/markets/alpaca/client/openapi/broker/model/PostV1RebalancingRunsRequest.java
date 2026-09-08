@@ -20,8 +20,12 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import markets.alpaca.client.openapi.broker.model.PortfolioWeights;
+import java.util.List;
+import java.util.UUID;
+import markets.alpaca.client.openapi.broker.model.PortfolioWeightRequest;
+import markets.alpaca.client.openapi.broker.model.PostV1RebalancingRunsRequestAmount;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -57,23 +61,80 @@ public class PostV1RebalancingRunsRequest implements Serializable {
 
   public static final String SERIALIZED_NAME_ACCOUNT_ID = "account_id";
   @SerializedName(SERIALIZED_NAME_ACCOUNT_ID)
+  @javax.annotation.Nonnull
+  private UUID accountId;
+
+  public static final String SERIALIZED_NAME_AMOUNT = "amount";
+  @SerializedName(SERIALIZED_NAME_AMOUNT)
   @javax.annotation.Nullable
-  private String accountId;
+  private PostV1RebalancingRunsRequestAmount amount;
+
+  /**
+   * The kind of rebalance run to create.
+   */
+  @JsonAdapter(TypeEnum.Adapter.class)
+  public enum TypeEnum {
+    FULL_REBALANCE("full_rebalance"),
+    
+    INVEST_CASH("invest_cash");
+
+    private String value;
+
+    TypeEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static TypeEnum fromValue(String value) {
+      for (TypeEnum b : TypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<TypeEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final TypeEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public TypeEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return TypeEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      TypeEnum.fromValue(value);
+    }
+  }
 
   public static final String SERIALIZED_NAME_TYPE = "type";
   @SerializedName(SERIALIZED_NAME_TYPE)
-  @javax.annotation.Nullable
-  private String type;
+  @javax.annotation.Nonnull
+  private TypeEnum type;
 
   public static final String SERIALIZED_NAME_WEIGHTS = "weights";
   @SerializedName(SERIALIZED_NAME_WEIGHTS)
   @javax.annotation.Nullable
-  private PortfolioWeights weights;
+  private List<PortfolioWeightRequest> weights = new ArrayList<>();
 
   public PostV1RebalancingRunsRequest() {
   }
 
-  public PostV1RebalancingRunsRequest accountId(@javax.annotation.Nullable String accountId) {
+  public PostV1RebalancingRunsRequest accountId(@javax.annotation.Nonnull UUID accountId) {
     this.accountId = accountId;
     return this;
   }
@@ -82,50 +143,77 @@ public class PostV1RebalancingRunsRequest implements Serializable {
    * The account to create the run for.
    * @return accountId
    */
-  @javax.annotation.Nullable
-  public String getAccountId() {
+  @javax.annotation.Nonnull
+  public UUID getAccountId() {
     return accountId;
   }
 
-  public void setAccountId(@javax.annotation.Nullable String accountId) {
+  public void setAccountId(@javax.annotation.Nonnull UUID accountId) {
     this.accountId = accountId;
   }
 
 
-  public PostV1RebalancingRunsRequest type(@javax.annotation.Nullable String type) {
+  public PostV1RebalancingRunsRequest amount(@javax.annotation.Nullable PostV1RebalancingRunsRequestAmount amount) {
+    this.amount = amount;
+    return this;
+  }
+
+  /**
+   * Get amount
+   * @return amount
+   */
+  @javax.annotation.Nullable
+  public PostV1RebalancingRunsRequestAmount getAmount() {
+    return amount;
+  }
+
+  public void setAmount(@javax.annotation.Nullable PostV1RebalancingRunsRequestAmount amount) {
+    this.amount = amount;
+  }
+
+
+  public PostV1RebalancingRunsRequest type(@javax.annotation.Nonnull TypeEnum type) {
     this.type = type;
     return this;
   }
 
   /**
-   * &#x60;full_rebalance&#x60; or &#x60;invest_cash&#x60;
+   * The kind of rebalance run to create.
    * @return type
    */
-  @javax.annotation.Nullable
-  public String getType() {
+  @javax.annotation.Nonnull
+  public TypeEnum getType() {
     return type;
   }
 
-  public void setType(@javax.annotation.Nullable String type) {
+  public void setType(@javax.annotation.Nonnull TypeEnum type) {
     this.type = type;
   }
 
 
-  public PostV1RebalancingRunsRequest weights(@javax.annotation.Nullable PortfolioWeights weights) {
+  public PostV1RebalancingRunsRequest weights(@javax.annotation.Nullable List<PortfolioWeightRequest> weights) {
     this.weights = weights;
     return this;
   }
 
+  public PostV1RebalancingRunsRequest addWeightsItem(PortfolioWeightRequest weightsItem) {
+    if (this.weights == null) {
+      this.weights = new ArrayList<>();
+    }
+    this.weights.add(weightsItem);
+    return this;
+  }
+
   /**
-   * Get weights
+   * Asset allocation weights. Omit this field or provide an empty array to use the account&#39;s active subscription. Provide a non-empty array to create a manual one-off run. A manual run is rejected if the account already has an active subscription.
    * @return weights
    */
   @javax.annotation.Nullable
-  public PortfolioWeights getWeights() {
+  public List<PortfolioWeightRequest> getWeights() {
     return weights;
   }
 
-  public void setWeights(@javax.annotation.Nullable PortfolioWeights weights) {
+  public void setWeights(@javax.annotation.Nullable List<PortfolioWeightRequest> weights) {
     this.weights = weights;
   }
 
@@ -185,6 +273,7 @@ public class PostV1RebalancingRunsRequest implements Serializable {
     }
     PostV1RebalancingRunsRequest postV1RebalancingRunsRequest = (PostV1RebalancingRunsRequest) o;
     return Objects.equals(this.accountId, postV1RebalancingRunsRequest.accountId) &&
+        Objects.equals(this.amount, postV1RebalancingRunsRequest.amount) &&
         Objects.equals(this.type, postV1RebalancingRunsRequest.type) &&
         Objects.equals(this.weights, postV1RebalancingRunsRequest.weights)&&
         Objects.equals(this.additionalProperties, postV1RebalancingRunsRequest.additionalProperties);
@@ -192,7 +281,7 @@ public class PostV1RebalancingRunsRequest implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(accountId, type, weights, additionalProperties);
+    return Objects.hash(accountId, amount, type, weights, additionalProperties);
   }
 
   @Override
@@ -200,6 +289,7 @@ public class PostV1RebalancingRunsRequest implements Serializable {
     StringBuilder sb = new StringBuilder();
     sb.append("class PostV1RebalancingRunsRequest {\n");
     sb.append("    accountId: ").append(toIndentedString(accountId)).append("\n");
+    sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    weights: ").append(toIndentedString(weights)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
@@ -221,10 +311,10 @@ public class PostV1RebalancingRunsRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("account_id", "type", "weights"));
+    openapiFields = new HashSet<String>(Arrays.asList("account_id", "amount", "type", "weights"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("account_id", "type"));
   }
 
   /**
@@ -239,16 +329,39 @@ public class PostV1RebalancingRunsRequest implements Serializable {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PostV1RebalancingRunsRequest is not found in the empty JSON string", PostV1RebalancingRunsRequest.openapiRequiredFields.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : PostV1RebalancingRunsRequest.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("account_id") != null && !jsonObj.get("account_id").isJsonNull()) && !jsonObj.get("account_id").isJsonPrimitive()) {
+      if (!jsonObj.get("account_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `account_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("account_id").toString()));
       }
-      if ((jsonObj.get("type") != null && !jsonObj.get("type").isJsonNull()) && !jsonObj.get("type").isJsonPrimitive()) {
+      // validate the optional field `amount`
+      if (jsonObj.get("amount") != null && !jsonObj.get("amount").isJsonNull()) {
+        PostV1RebalancingRunsRequestAmount.validateJsonElement(jsonObj.get("amount"));
+      }
+      if (!jsonObj.get("type").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("type").toString()));
       }
-      // validate the optional field `weights`
+      // validate the required field `type`
+      TypeEnum.validateJsonElement(jsonObj.get("type"));
       if (jsonObj.get("weights") != null && !jsonObj.get("weights").isJsonNull()) {
-        PortfolioWeights.validateJsonElement(jsonObj.get("weights"));
+        JsonArray jsonArrayweights = jsonObj.getAsJsonArray("weights");
+        if (jsonArrayweights != null) {
+          // ensure the json data is an array
+          if (!jsonObj.get("weights").isJsonArray()) {
+            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `weights` to be an array in the JSON string but got `%s`", jsonObj.get("weights").toString()));
+          }
+
+          // validate the optional field `weights` (array)
+          for (int i = 0; i < jsonArrayweights.size(); i++) {
+            PortfolioWeightRequest.validateJsonElement(jsonArrayweights.get(i));
+          };
+        }
       }
   }
 

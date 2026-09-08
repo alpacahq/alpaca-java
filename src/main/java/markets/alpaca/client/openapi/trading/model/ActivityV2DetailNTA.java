@@ -24,2264 +24,2144 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.UUID;
+import markets.alpaca.client.openapi.trading.model.AcatcActivityV2;
+import markets.alpaca.client.openapi.trading.model.AcatsActivityV2;
+import markets.alpaca.client.openapi.trading.model.CDIVActivityV2;
+import markets.alpaca.client.openapi.trading.model.CGDActivityV2;
+import markets.alpaca.client.openapi.trading.model.CSWActivityV2;
+import markets.alpaca.client.openapi.trading.model.DIVNRAActivityV2;
+import markets.alpaca.client.openapi.trading.model.DIVSPDActivityV2;
+import markets.alpaca.client.openapi.trading.model.DIVWHActivityV2;
+import markets.alpaca.client.openapi.trading.model.ExchangeOfferActivityV2;
+import markets.alpaca.client.openapi.trading.model.FEEActivityV2;
+import markets.alpaca.client.openapi.trading.model.FOPTActivityV2;
+import markets.alpaca.client.openapi.trading.model.FixedIncomeInterestActivityV2;
+import markets.alpaca.client.openapi.trading.model.FixedIncomeRedemptionActivityV2;
+import markets.alpaca.client.openapi.trading.model.ForwardSplitActivityV2;
+import markets.alpaca.client.openapi.trading.model.JNLCActivityV2;
+import markets.alpaca.client.openapi.trading.model.JNLSActivityV2;
+import markets.alpaca.client.openapi.trading.model.MAActivityV2;
+import markets.alpaca.client.openapi.trading.model.MEMActivityV2;
+import markets.alpaca.client.openapi.trading.model.NCActivityV2;
+import markets.alpaca.client.openapi.trading.model.OCTActivityV2;
+import markets.alpaca.client.openapi.trading.model.OPASNActivityV2;
+import markets.alpaca.client.openapi.trading.model.OPCSHActivityV2;
+import markets.alpaca.client.openapi.trading.model.OPEXCActivityV2;
+import markets.alpaca.client.openapi.trading.model.OPEXPActivityV2;
+import markets.alpaca.client.openapi.trading.model.OPTRDActivityV2;
+import markets.alpaca.client.openapi.trading.model.OpcaCDIVActivityV2;
+import markets.alpaca.client.openapi.trading.model.OpcaFSPLITActivityV2;
+import markets.alpaca.client.openapi.trading.model.OpcaMAActivityV2;
+import markets.alpaca.client.openapi.trading.model.OpcaNCActivityV2;
+import markets.alpaca.client.openapi.trading.model.OpcaRSPLITActivityV2;
+import markets.alpaca.client.openapi.trading.model.OpcaSDIVActivityV2;
+import markets.alpaca.client.openapi.trading.model.OpcaSPINActivityV2;
+import markets.alpaca.client.openapi.trading.model.OpcaUSPLITActivityV2;
+import markets.alpaca.client.openapi.trading.model.REOActivityV2;
+import markets.alpaca.client.openapi.trading.model.ReverseSplitActivityV2;
+import markets.alpaca.client.openapi.trading.model.RightsDistributionActivityV2;
+import markets.alpaca.client.openapi.trading.model.RightsSubscriptionElectionActivityV2;
+import markets.alpaca.client.openapi.trading.model.SDIVActivityV2;
+import markets.alpaca.client.openapi.trading.model.SpinoffActivityV2;
+import markets.alpaca.client.openapi.trading.model.TenderOfferActivityV2;
+import markets.alpaca.client.openapi.trading.model.UnitSplitActivityV2;
+import markets.alpaca.client.openapi.trading.model.WRMActivityV2;
+import markets.alpaca.client.openapi.trading.model.WarrantExerciseElectionActivityV2;
 import java.io.Serializable;
+
+
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
+import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.TypeAdapter;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParseException;
 
 import markets.alpaca.client.openapi.trading.http.JSON;
 
-/**
- * ActivityV2DetailNTA
- */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
-public class ActivityV2DetailNTA implements Serializable {
-  private static final long serialVersionUID = 1L;
-
-  public static final String SERIALIZED_NAME_GROUP_ID = "group_id";
-  @SerializedName(SERIALIZED_NAME_GROUP_ID)
-  @javax.annotation.Nonnull
-  private UUID groupId;
-
-  public static final String SERIALIZED_NAME_SYSTEM_DATE = "system_date";
-  @SerializedName(SERIALIZED_NAME_SYSTEM_DATE)
-  @javax.annotation.Nonnull
-  private LocalDate systemDate;
-
-  public static final String SERIALIZED_NAME_CA_ID = "ca_id";
-  @SerializedName(SERIALIZED_NAME_CA_ID)
-  @javax.annotation.Nonnull
-  private UUID caId;
-
-  public static final String SERIALIZED_NAME_POSITION_DATE = "position_date";
-  @SerializedName(SERIALIZED_NAME_POSITION_DATE)
-  @javax.annotation.Nonnull
-  private LocalDate positionDate;
-
-  public static final String SERIALIZED_NAME_REORG_ID = "reorg_id";
-  @SerializedName(SERIALIZED_NAME_REORG_ID)
-  @javax.annotation.Nullable
-  private String reorgId;
-
-  public static final String SERIALIZED_NAME_CASH_PAYOUT = "cash_payout";
-  @SerializedName(SERIALIZED_NAME_CASH_PAYOUT)
-  @javax.annotation.Nonnull
-  private BigDecimal cashPayout;
-
-  public static final String SERIALIZED_NAME_CUSIP = "cusip";
-  @SerializedName(SERIALIZED_NAME_CUSIP)
-  @javax.annotation.Nonnull
-  private String cusip;
-
-  public static final String SERIALIZED_NAME_DUE_BILL_OFF_DATE = "due_bill_off_date";
-  @SerializedName(SERIALIZED_NAME_DUE_BILL_OFF_DATE)
-  @javax.annotation.Nullable
-  private LocalDate dueBillOffDate;
-
-  public static final String SERIALIZED_NAME_DUE_BILL_ON_DATE = "due_bill_on_date";
-  @SerializedName(SERIALIZED_NAME_DUE_BILL_ON_DATE)
-  @javax.annotation.Nullable
-  private LocalDate dueBillOnDate;
-
-  public static final String SERIALIZED_NAME_ENTITLED_QTY = "entitled_qty";
-  @SerializedName(SERIALIZED_NAME_ENTITLED_QTY)
-  @javax.annotation.Nonnull
-  private String entitledQty;
-
-  public static final String SERIALIZED_NAME_EX_DATE = "ex_date";
-  @SerializedName(SERIALIZED_NAME_EX_DATE)
-  @javax.annotation.Nullable
-  private LocalDate exDate;
-
-  public static final String SERIALIZED_NAME_FOREIGN = "foreign";
-  @SerializedName(SERIALIZED_NAME_FOREIGN)
-  @javax.annotation.Nonnull
-  private Boolean foreign;
-
-  public static final String SERIALIZED_NAME_ISIN = "isin";
-  @SerializedName(SERIALIZED_NAME_ISIN)
-  @javax.annotation.Nullable
-  private String isin;
-
-  public static final String SERIALIZED_NAME_PAYABLE_DATE = "payable_date";
-  @SerializedName(SERIALIZED_NAME_PAYABLE_DATE)
-  @javax.annotation.Nonnull
-  private LocalDate payableDate;
-
-  public static final String SERIALIZED_NAME_RATE = "rate";
-  @SerializedName(SERIALIZED_NAME_RATE)
-  @javax.annotation.Nonnull
-  private String rate;
-
-  public static final String SERIALIZED_NAME_RECORD_DATE = "record_date";
-  @SerializedName(SERIALIZED_NAME_RECORD_DATE)
-  @javax.annotation.Nullable
-  private LocalDate recordDate;
-
-  public static final String SERIALIZED_NAME_SPECIAL = "special";
-  @SerializedName(SERIALIZED_NAME_SPECIAL)
-  @javax.annotation.Nonnull
-  private Boolean special;
-
-  public static final String SERIALIZED_NAME_SYMBOL = "symbol";
-  @SerializedName(SERIALIZED_NAME_SYMBOL)
-  @javax.annotation.Nonnull
-  private String symbol;
-
-  public static final String SERIALIZED_NAME_NEW_QTY = "new_qty";
-  @SerializedName(SERIALIZED_NAME_NEW_QTY)
-  @javax.annotation.Nonnull
-  private String newQty;
-
-  public static final String SERIALIZED_NAME_PAID_QTY = "paid_qty";
-  @SerializedName(SERIALIZED_NAME_PAID_QTY)
-  @javax.annotation.Nonnull
-  private String paidQty;
-
-  public static final String SERIALIZED_NAME_NEW_CUSIP = "new_cusip";
-  @SerializedName(SERIALIZED_NAME_NEW_CUSIP)
-  @javax.annotation.Nonnull
-  private String newCusip;
-
-  public static final String SERIALIZED_NAME_NEW_ISIN = "new_isin";
-  @SerializedName(SERIALIZED_NAME_NEW_ISIN)
-  @javax.annotation.Nullable
-  private String newIsin;
-
-  public static final String SERIALIZED_NAME_NEW_RATE = "new_rate";
-  @SerializedName(SERIALIZED_NAME_NEW_RATE)
-  @javax.annotation.Nonnull
-  private String newRate;
-
-  public static final String SERIALIZED_NAME_OLD_CUSIP = "old_cusip";
-  @SerializedName(SERIALIZED_NAME_OLD_CUSIP)
-  @javax.annotation.Nonnull
-  private String oldCusip;
-
-  public static final String SERIALIZED_NAME_OLD_ISIN = "old_isin";
-  @SerializedName(SERIALIZED_NAME_OLD_ISIN)
-  @javax.annotation.Nullable
-  private String oldIsin;
-
-  public static final String SERIALIZED_NAME_OLD_RATE = "old_rate";
-  @SerializedName(SERIALIZED_NAME_OLD_RATE)
-  @javax.annotation.Nonnull
-  private String oldRate;
-
-  public static final String SERIALIZED_NAME_OLD_QTY = "old_qty";
-  @SerializedName(SERIALIZED_NAME_OLD_QTY)
-  @javax.annotation.Nonnull
-  private String oldQty;
-
-  public static final String SERIALIZED_NAME_DUE_BILL_REDEMPTION_DATE = "due_bill_redemption_date";
-  @SerializedName(SERIALIZED_NAME_DUE_BILL_REDEMPTION_DATE)
-  @javax.annotation.Nullable
-  private LocalDate dueBillRedemptionDate;
-
-  public static final String SERIALIZED_NAME_NEW_SYMBOL = "new_symbol";
-  @SerializedName(SERIALIZED_NAME_NEW_SYMBOL)
-  @javax.annotation.Nonnull
-  private String newSymbol;
-
-  public static final String SERIALIZED_NAME_ALTERNATE_CUSIP = "alternate_cusip";
-  @SerializedName(SERIALIZED_NAME_ALTERNATE_CUSIP)
-  @javax.annotation.Nonnull
-  private String alternateCusip;
-
-  public static final String SERIALIZED_NAME_ALTERNATE_ISIN = "alternate_isin";
-  @SerializedName(SERIALIZED_NAME_ALTERNATE_ISIN)
-  @javax.annotation.Nullable
-  private String alternateIsin;
-
-  public static final String SERIALIZED_NAME_ALTERNATE_QTY = "alternate_qty";
-  @SerializedName(SERIALIZED_NAME_ALTERNATE_QTY)
-  @javax.annotation.Nonnull
-  private String alternateQty;
-
-  public static final String SERIALIZED_NAME_ALTERNATE_RATE = "alternate_rate";
-  @SerializedName(SERIALIZED_NAME_ALTERNATE_RATE)
-  @javax.annotation.Nonnull
-  private String alternateRate;
-
-  public static final String SERIALIZED_NAME_ALTERNATE_SYMBOL = "alternate_symbol";
-  @SerializedName(SERIALIZED_NAME_ALTERNATE_SYMBOL)
-  @javax.annotation.Nonnull
-  private String alternateSymbol;
-
-  public static final String SERIALIZED_NAME_EFFECTIVE_DATE = "effective_date";
-  @SerializedName(SERIALIZED_NAME_EFFECTIVE_DATE)
-  @javax.annotation.Nonnull
-  private LocalDate effectiveDate;
-
-  public static final String SERIALIZED_NAME_OLD_SYMBOL = "old_symbol";
-  @SerializedName(SERIALIZED_NAME_OLD_SYMBOL)
-  @javax.annotation.Nonnull
-  private String oldSymbol;
-
-  public static final String SERIALIZED_NAME_NEW_PRICE = "new_price";
-  @SerializedName(SERIALIZED_NAME_NEW_PRICE)
-  @javax.annotation.Nonnull
-  private String newPrice;
-
-  public static final String SERIALIZED_NAME_SOURCE_CUSIP = "source_cusip";
-  @SerializedName(SERIALIZED_NAME_SOURCE_CUSIP)
-  @javax.annotation.Nonnull
-  private String sourceCusip;
-
-  public static final String SERIALIZED_NAME_SOURCE_ISIN = "source_isin";
-  @SerializedName(SERIALIZED_NAME_SOURCE_ISIN)
-  @javax.annotation.Nullable
-  private String sourceIsin;
-
-  public static final String SERIALIZED_NAME_SOURCE_PRICE = "source_price";
-  @SerializedName(SERIALIZED_NAME_SOURCE_PRICE)
-  @javax.annotation.Nonnull
-  private String sourcePrice;
-
-  public static final String SERIALIZED_NAME_SOURCE_RATE = "source_rate";
-  @SerializedName(SERIALIZED_NAME_SOURCE_RATE)
-  @javax.annotation.Nonnull
-  private String sourceRate;
-
-  public static final String SERIALIZED_NAME_SOURCE_SYMBOL = "source_symbol";
-  @SerializedName(SERIALIZED_NAME_SOURCE_SYMBOL)
-  @javax.annotation.Nonnull
-  private String sourceSymbol;
-
-  public static final String SERIALIZED_NAME_SOURCE_QTY = "source_qty";
-  @SerializedName(SERIALIZED_NAME_SOURCE_QTY)
-  @javax.annotation.Nonnull
-  private String sourceQty;
-
-  public static final String SERIALIZED_NAME_ACQUIREE_CUSIP = "acquiree_cusip";
-  @SerializedName(SERIALIZED_NAME_ACQUIREE_CUSIP)
-  @javax.annotation.Nonnull
-  private String acquireeCusip;
-
-  public static final String SERIALIZED_NAME_ACQUIREE_ISIN = "acquiree_isin";
-  @SerializedName(SERIALIZED_NAME_ACQUIREE_ISIN)
-  @javax.annotation.Nullable
-  private String acquireeIsin;
-
-  public static final String SERIALIZED_NAME_ACQUIREE_RATE = "acquiree_rate";
-  @SerializedName(SERIALIZED_NAME_ACQUIREE_RATE)
-  @javax.annotation.Nullable
-  private String acquireeRate;
-
-  public static final String SERIALIZED_NAME_ACQUIREE_SYMBOL = "acquiree_symbol";
-  @SerializedName(SERIALIZED_NAME_ACQUIREE_SYMBOL)
-  @javax.annotation.Nonnull
-  private String acquireeSymbol;
-
-  public static final String SERIALIZED_NAME_ACQUIRER_CUSIP = "acquirer_cusip";
-  @SerializedName(SERIALIZED_NAME_ACQUIRER_CUSIP)
-  @javax.annotation.Nullable
-  private String acquirerCusip;
-
-  public static final String SERIALIZED_NAME_ACQUIRER_ISIN = "acquirer_isin";
-  @SerializedName(SERIALIZED_NAME_ACQUIRER_ISIN)
-  @javax.annotation.Nullable
-  private String acquirerIsin;
-
-  public static final String SERIALIZED_NAME_ACQUIRER_RATE = "acquirer_rate";
-  @SerializedName(SERIALIZED_NAME_ACQUIRER_RATE)
-  @javax.annotation.Nullable
-  private String acquirerRate;
-
-  public static final String SERIALIZED_NAME_ACQUIRER_SYMBOL = "acquirer_symbol";
-  @SerializedName(SERIALIZED_NAME_ACQUIRER_SYMBOL)
-  @javax.annotation.Nullable
-  private String acquirerSymbol;
-
-  public static final String SERIALIZED_NAME_ACQUIREE_QTY = "acquiree_qty";
-  @SerializedName(SERIALIZED_NAME_ACQUIREE_QTY)
-  @javax.annotation.Nonnull
-  private String acquireeQty;
-
-  public static final String SERIALIZED_NAME_ACQUIRER_QTY = "acquirer_qty";
-  @SerializedName(SERIALIZED_NAME_ACQUIRER_QTY)
-  @javax.annotation.Nullable
-  private String acquirerQty;
-
-  public static final String SERIALIZED_NAME_CASH_RATE = "cash_rate";
-  @SerializedName(SERIALIZED_NAME_CASH_RATE)
-  @javax.annotation.Nullable
-  private String cashRate;
-
-  public static final String SERIALIZED_NAME_POSITION_QTY = "position_qty";
-  @SerializedName(SERIALIZED_NAME_POSITION_QTY)
-  @javax.annotation.Nonnull
-  private String positionQty;
-
-  public static final String SERIALIZED_NAME_PAYMENT_DATE = "payment_date";
-  @SerializedName(SERIALIZED_NAME_PAYMENT_DATE)
-  @javax.annotation.Nonnull
-  private LocalDate paymentDate;
-
-  public static final String SERIALIZED_NAME_QTY = "qty";
-  @SerializedName(SERIALIZED_NAME_QTY)
-  @javax.annotation.Nonnull
-  private String qty;
-
-  public static final String SERIALIZED_NAME_ACCRUED_INTEREST_RATE = "accrued_interest_rate";
-  @SerializedName(SERIALIZED_NAME_ACCRUED_INTEREST_RATE)
-  @javax.annotation.Nullable
-  private BigDecimal accruedInterestRate;
-
-  public static final String SERIALIZED_NAME_PRICE = "price";
-  @SerializedName(SERIALIZED_NAME_PRICE)
-  @javax.annotation.Nullable
-  private BigDecimal price;
-
-  public static final String SERIALIZED_NAME_EXPIRATION_DATE = "expiration_date";
-  @SerializedName(SERIALIZED_NAME_EXPIRATION_DATE)
-  @javax.annotation.Nullable
-  private LocalDate expirationDate;
-
-  public static final String SERIALIZED_NAME_REMOVED_QTY = "removed_qty";
-  @SerializedName(SERIALIZED_NAME_REMOVED_QTY)
-  @javax.annotation.Nonnull
-  private String removedQty;
-
-  public static final String SERIALIZED_NAME_NEW_CONTRACT_SYMBOL = "new_contract_symbol";
-  @SerializedName(SERIALIZED_NAME_NEW_CONTRACT_SYMBOL)
-  @javax.annotation.Nonnull
-  private String newContractSymbol;
-
-  public static final String SERIALIZED_NAME_OLD_CONTRACT_SYMBOL = "old_contract_symbol";
-  @SerializedName(SERIALIZED_NAME_OLD_CONTRACT_SYMBOL)
-  @javax.annotation.Nonnull
-  private String oldContractSymbol;
-
-  public static final String SERIALIZED_NAME_EXTERNAL_ID = "external_id";
-  @SerializedName(SERIALIZED_NAME_EXTERNAL_ID)
-  @javax.annotation.Nonnull
-  private String externalId;
-
-  public static final String SERIALIZED_NAME_HOLD_DATE = "hold_date";
-  @SerializedName(SERIALIZED_NAME_HOLD_DATE)
-  @javax.annotation.Nullable
-  private LocalDate holdDate;
-
-  public static final String SERIALIZED_NAME_REQUEST_ID = "request_id";
-  @SerializedName(SERIALIZED_NAME_REQUEST_ID)
-  @javax.annotation.Nonnull
-  private UUID requestId;
-
-  public static final String SERIALIZED_NAME_CONTRA = "contra";
-  @SerializedName(SERIALIZED_NAME_CONTRA)
-  @javax.annotation.Nonnull
-  private String contra;
-
-  public static final String SERIALIZED_NAME_PARENT_ID = "parent_id";
-  @SerializedName(SERIALIZED_NAME_PARENT_ID)
-  @javax.annotation.Nonnull
-  private UUID parentId;
-
-  public static final String SERIALIZED_NAME_JOURNAL_ID = "journal_id";
-  @SerializedName(SERIALIZED_NAME_JOURNAL_ID)
-  @javax.annotation.Nullable
-  private UUID journalId;
-
-  public static final String SERIALIZED_NAME_BANK_TRANSACTION_ID = "bank_transaction_id";
-  @SerializedName(SERIALIZED_NAME_BANK_TRANSACTION_ID)
-  @javax.annotation.Nullable
-  private UUID bankTransactionId;
-
-  public static final String SERIALIZED_NAME_TRANSFER_ID = "transfer_id";
-  @SerializedName(SERIALIZED_NAME_TRANSFER_ID)
-  @javax.annotation.Nonnull
-  private UUID transferId;
-
-  public ActivityV2DetailNTA() {
-  }
-
-  public ActivityV2DetailNTA groupId(@javax.annotation.Nonnull UUID groupId) {
-    this.groupId = groupId;
-    return this;
-  }
-
-  /**
-   * Optional group ID which can help grouping together related activities
-   * @return groupId
-   */
-  @javax.annotation.Nonnull
-  public UUID getGroupId() {
-    return groupId;
-  }
-
-  public void setGroupId(@javax.annotation.Nonnull UUID groupId) {
-    this.groupId = groupId;
-  }
-
-
-  public ActivityV2DetailNTA systemDate(@javax.annotation.Nonnull LocalDate systemDate) {
-    this.systemDate = systemDate;
-    return this;
-  }
-
-  /**
-   * The date when the activity was booked
-   * @return systemDate
-   */
-  @javax.annotation.Nonnull
-  public LocalDate getSystemDate() {
-    return systemDate;
-  }
-
-  public void setSystemDate(@javax.annotation.Nonnull LocalDate systemDate) {
-    this.systemDate = systemDate;
-  }
-
-
-  public ActivityV2DetailNTA caId(@javax.annotation.Nonnull UUID caId) {
-    this.caId = caId;
-    return this;
-  }
-
-  /**
-   * The unique identifier for this corporate action
-   * @return caId
-   */
-  @javax.annotation.Nonnull
-  public UUID getCaId() {
-    return caId;
-  }
-
-  public void setCaId(@javax.annotation.Nonnull UUID caId) {
-    this.caId = caId;
-  }
-
-
-  public ActivityV2DetailNTA positionDate(@javax.annotation.Nonnull LocalDate positionDate) {
-    this.positionDate = positionDate;
-    return this;
-  }
-
-  /**
-   * The position_date for this corporate action
-   * @return positionDate
-   */
-  @javax.annotation.Nonnull
-  public LocalDate getPositionDate() {
-    return positionDate;
-  }
-
-  public void setPositionDate(@javax.annotation.Nonnull LocalDate positionDate) {
-    this.positionDate = positionDate;
-  }
-
-
-  public ActivityV2DetailNTA reorgId(@javax.annotation.Nullable String reorgId) {
-    this.reorgId = reorgId;
-    return this;
-  }
-
-  /**
-   * The reorg identifier, if present in the source corporate action definition
-   * @return reorgId
-   */
-  @javax.annotation.Nullable
-  public String getReorgId() {
-    return reorgId;
-  }
-
-  public void setReorgId(@javax.annotation.Nullable String reorgId) {
-    this.reorgId = reorgId;
-  }
-
-
-  public ActivityV2DetailNTA cashPayout(@javax.annotation.Nonnull BigDecimal cashPayout) {
-    this.cashPayout = cashPayout;
-    return this;
-  }
-
-  /**
-   * The cash payout for this interest activity
-   * @return cashPayout
-   */
-  @javax.annotation.Nonnull
-  public BigDecimal getCashPayout() {
-    return cashPayout;
-  }
-
-  public void setCashPayout(@javax.annotation.Nonnull BigDecimal cashPayout) {
-    this.cashPayout = cashPayout;
-  }
-
-
-  public ActivityV2DetailNTA cusip(@javax.annotation.Nonnull String cusip) {
-    this.cusip = cusip;
-    return this;
-  }
-
-  /**
-   * The CUSIP of the security involved with the activity
-   * @return cusip
-   */
-  @javax.annotation.Nonnull
-  public String getCusip() {
-    return cusip;
-  }
-
-  public void setCusip(@javax.annotation.Nonnull String cusip) {
-    this.cusip = cusip;
-  }
-
-
-  public ActivityV2DetailNTA dueBillOffDate(@javax.annotation.Nullable LocalDate dueBillOffDate) {
-    this.dueBillOffDate = dueBillOffDate;
-    return this;
-  }
-
-  /**
-   * When due bills stop applying for this event
-   * @return dueBillOffDate
-   */
-  @javax.annotation.Nullable
-  public LocalDate getDueBillOffDate() {
-    return dueBillOffDate;
-  }
-
-  public void setDueBillOffDate(@javax.annotation.Nullable LocalDate dueBillOffDate) {
-    this.dueBillOffDate = dueBillOffDate;
-  }
-
-
-  public ActivityV2DetailNTA dueBillOnDate(@javax.annotation.Nullable LocalDate dueBillOnDate) {
-    this.dueBillOnDate = dueBillOnDate;
-    return this;
-  }
-
-  /**
-   * When due bills begin to apply for this event
-   * @return dueBillOnDate
-   */
-  @javax.annotation.Nullable
-  public LocalDate getDueBillOnDate() {
-    return dueBillOnDate;
-  }
-
-  public void setDueBillOnDate(@javax.annotation.Nullable LocalDate dueBillOnDate) {
-    this.dueBillOnDate = dueBillOnDate;
-  }
-
-
-  public ActivityV2DetailNTA entitledQty(@javax.annotation.Nonnull String entitledQty) {
-    this.entitledQty = entitledQty;
-    return this;
-  }
-
-  /**
-   * The entitled quantity (principal / face amount)
-   * @return entitledQty
-   */
-  @javax.annotation.Nonnull
-  public String getEntitledQty() {
-    return entitledQty;
-  }
-
-  public void setEntitledQty(@javax.annotation.Nonnull String entitledQty) {
-    this.entitledQty = entitledQty;
-  }
-
-
-  public ActivityV2DetailNTA exDate(@javax.annotation.Nullable LocalDate exDate) {
-    this.exDate = exDate;
-    return this;
-  }
-
-  /**
-   * The ex_date for this corporate action
-   * @return exDate
-   */
-  @javax.annotation.Nullable
-  public LocalDate getExDate() {
-    return exDate;
-  }
-
-  public void setExDate(@javax.annotation.Nullable LocalDate exDate) {
-    this.exDate = exDate;
-  }
-
-
-  public ActivityV2DetailNTA foreign(@javax.annotation.Nonnull Boolean foreign) {
-    this.foreign = foreign;
-    return this;
-  }
-
-  /**
-   * Indicates if related to a non-US security
-   * @return foreign
-   */
-  @javax.annotation.Nonnull
-  public Boolean getForeign() {
-    return foreign;
-  }
-
-  public void setForeign(@javax.annotation.Nonnull Boolean foreign) {
-    this.foreign = foreign;
-  }
-
-
-  public ActivityV2DetailNTA isin(@javax.annotation.Nullable String isin) {
-    this.isin = isin;
-    return this;
-  }
-
-  /**
-   * The ISIN of the security involved with the activity
-   * @return isin
-   */
-  @javax.annotation.Nullable
-  public String getIsin() {
-    return isin;
-  }
-
-  public void setIsin(@javax.annotation.Nullable String isin) {
-    this.isin = isin;
-  }
-
-
-  public ActivityV2DetailNTA payableDate(@javax.annotation.Nonnull LocalDate payableDate) {
-    this.payableDate = payableDate;
-    return this;
-  }
-
-  /**
-   * The payable_date for this corporate action
-   * @return payableDate
-   */
-  @javax.annotation.Nonnull
-  public LocalDate getPayableDate() {
-    return payableDate;
-  }
-
-  public void setPayableDate(@javax.annotation.Nonnull LocalDate payableDate) {
-    this.payableDate = payableDate;
-  }
-
-
-  public ActivityV2DetailNTA rate(@javax.annotation.Nonnull String rate) {
-    this.rate = rate;
-    return this;
-  }
-
-  /**
-   * The rate for the rights distribution
-   * @return rate
-   */
-  @javax.annotation.Nonnull
-  public String getRate() {
-    return rate;
-  }
-
-  public void setRate(@javax.annotation.Nonnull String rate) {
-    this.rate = rate;
-  }
-
-
-  public ActivityV2DetailNTA recordDate(@javax.annotation.Nullable LocalDate recordDate) {
-    this.recordDate = recordDate;
-    return this;
-  }
-
-  /**
-   * The record_date for this corporate action
-   * @return recordDate
-   */
-  @javax.annotation.Nullable
-  public LocalDate getRecordDate() {
-    return recordDate;
-  }
-
-  public void setRecordDate(@javax.annotation.Nullable LocalDate recordDate) {
-    this.recordDate = recordDate;
-  }
-
-
-  public ActivityV2DetailNTA special(@javax.annotation.Nonnull Boolean special) {
-    this.special = special;
-    return this;
-  }
-
-  /**
-   * Indicates if this is a special dividend
-   * @return special
-   */
-  @javax.annotation.Nonnull
-  public Boolean getSpecial() {
-    return special;
-  }
-
-  public void setSpecial(@javax.annotation.Nonnull Boolean special) {
-    this.special = special;
-  }
-
-
-  public ActivityV2DetailNTA symbol(@javax.annotation.Nonnull String symbol) {
-    this.symbol = symbol;
-    return this;
-  }
-
-  /**
-   * The symbol of the asset involved with the on chain transaction
-   * @return symbol
-   */
-  @javax.annotation.Nonnull
-  public String getSymbol() {
-    return symbol;
-  }
-
-  public void setSymbol(@javax.annotation.Nonnull String symbol) {
-    this.symbol = symbol;
-  }
-
-
-  public ActivityV2DetailNTA newQty(@javax.annotation.Nonnull String newQty) {
-    this.newQty = newQty;
-    return this;
-  }
-
-  /**
-   * used when the old contract&#39;s quantity is not equal to the new contract&#39;s quantity. Mutually exclusive with &#39;qty&#39;.
-   * @return newQty
-   */
-  @javax.annotation.Nonnull
-  public String getNewQty() {
-    return newQty;
-  }
-
-  public void setNewQty(@javax.annotation.Nonnull String newQty) {
-    this.newQty = newQty;
-  }
-
-
-  public ActivityV2DetailNTA paidQty(@javax.annotation.Nonnull String paidQty) {
-    this.paidQty = paidQty;
-    return this;
-  }
-
-  /**
-   * The paid quantity
-   * @return paidQty
-   */
-  @javax.annotation.Nonnull
-  public String getPaidQty() {
-    return paidQty;
-  }
-
-  public void setPaidQty(@javax.annotation.Nonnull String paidQty) {
-    this.paidQty = paidQty;
-  }
-
-
-  public ActivityV2DetailNTA newCusip(@javax.annotation.Nonnull String newCusip) {
-    this.newCusip = newCusip;
-    return this;
-  }
-
-  /**
-   * CUSIP of the new security
-   * @return newCusip
-   */
-  @javax.annotation.Nonnull
-  public String getNewCusip() {
-    return newCusip;
-  }
-
-  public void setNewCusip(@javax.annotation.Nonnull String newCusip) {
-    this.newCusip = newCusip;
-  }
-
-
-  public ActivityV2DetailNTA newIsin(@javax.annotation.Nullable String newIsin) {
-    this.newIsin = newIsin;
-    return this;
-  }
-
-  /**
-   * ISIN of the new security
-   * @return newIsin
-   */
-  @javax.annotation.Nullable
-  public String getNewIsin() {
-    return newIsin;
-  }
-
-  public void setNewIsin(@javax.annotation.Nullable String newIsin) {
-    this.newIsin = newIsin;
-  }
-
-
-  public ActivityV2DetailNTA newRate(@javax.annotation.Nonnull String newRate) {
-    this.newRate = newRate;
-    return this;
-  }
-
-  /**
-   * Ratio of new shares received
-   * @return newRate
-   */
-  @javax.annotation.Nonnull
-  public String getNewRate() {
-    return newRate;
-  }
-
-  public void setNewRate(@javax.annotation.Nonnull String newRate) {
-    this.newRate = newRate;
-  }
-
-
-  public ActivityV2DetailNTA oldCusip(@javax.annotation.Nonnull String oldCusip) {
-    this.oldCusip = oldCusip;
-    return this;
-  }
-
-  /**
-   * Old CUSIP for the name change
-   * @return oldCusip
-   */
-  @javax.annotation.Nonnull
-  public String getOldCusip() {
-    return oldCusip;
-  }
-
-  public void setOldCusip(@javax.annotation.Nonnull String oldCusip) {
-    this.oldCusip = oldCusip;
-  }
-
-
-  public ActivityV2DetailNTA oldIsin(@javax.annotation.Nullable String oldIsin) {
-    this.oldIsin = oldIsin;
-    return this;
-  }
-
-  /**
-   * ISIN of the old security before the split
-   * @return oldIsin
-   */
-  @javax.annotation.Nullable
-  public String getOldIsin() {
-    return oldIsin;
-  }
-
-  public void setOldIsin(@javax.annotation.Nullable String oldIsin) {
-    this.oldIsin = oldIsin;
-  }
-
-
-  public ActivityV2DetailNTA oldRate(@javax.annotation.Nonnull String oldRate) {
-    this.oldRate = oldRate;
-    return this;
-  }
-
-  /**
-   * Ratio of old shares exchanged
-   * @return oldRate
-   */
-  @javax.annotation.Nonnull
-  public String getOldRate() {
-    return oldRate;
-  }
-
-  public void setOldRate(@javax.annotation.Nonnull String oldRate) {
-    this.oldRate = oldRate;
-  }
-
-
-  public ActivityV2DetailNTA oldQty(@javax.annotation.Nonnull String oldQty) {
-    this.oldQty = oldQty;
-    return this;
-  }
-
-  /**
-   * used when the old contract&#39;s quantity is not equal to the new contract&#39;s quantity. Mutually exclusive with &#39;qty&#39;.
-   * @return oldQty
-   */
-  @javax.annotation.Nonnull
-  public String getOldQty() {
-    return oldQty;
-  }
-
-  public void setOldQty(@javax.annotation.Nonnull String oldQty) {
-    this.oldQty = oldQty;
-  }
-
-
-  public ActivityV2DetailNTA dueBillRedemptionDate(@javax.annotation.Nullable LocalDate dueBillRedemptionDate) {
-    this.dueBillRedemptionDate = dueBillRedemptionDate;
-    return this;
-  }
-
-  /**
-   * When due bills related to the split are redeemed
-   * @return dueBillRedemptionDate
-   */
-  @javax.annotation.Nullable
-  public LocalDate getDueBillRedemptionDate() {
-    return dueBillRedemptionDate;
-  }
-
-  public void setDueBillRedemptionDate(@javax.annotation.Nullable LocalDate dueBillRedemptionDate) {
-    this.dueBillRedemptionDate = dueBillRedemptionDate;
-  }
-
-
-  public ActivityV2DetailNTA newSymbol(@javax.annotation.Nonnull String newSymbol) {
-    this.newSymbol = newSymbol;
-    return this;
-  }
-
-  /**
-   * Symbol of the new security after the unit split
-   * @return newSymbol
-   */
-  @javax.annotation.Nonnull
-  public String getNewSymbol() {
-    return newSymbol;
-  }
-
-  public void setNewSymbol(@javax.annotation.Nonnull String newSymbol) {
-    this.newSymbol = newSymbol;
-  }
-
-
-  public ActivityV2DetailNTA alternateCusip(@javax.annotation.Nonnull String alternateCusip) {
-    this.alternateCusip = alternateCusip;
-    return this;
-  }
-
-  /**
-   * CUSIP for the alternate security after the split
-   * @return alternateCusip
-   */
-  @javax.annotation.Nonnull
-  public String getAlternateCusip() {
-    return alternateCusip;
-  }
-
-  public void setAlternateCusip(@javax.annotation.Nonnull String alternateCusip) {
-    this.alternateCusip = alternateCusip;
-  }
-
-
-  public ActivityV2DetailNTA alternateIsin(@javax.annotation.Nullable String alternateIsin) {
-    this.alternateIsin = alternateIsin;
-    return this;
-  }
-
-  /**
-   * ISIN for the alternate security after the split
-   * @return alternateIsin
-   */
-  @javax.annotation.Nullable
-  public String getAlternateIsin() {
-    return alternateIsin;
-  }
-
-  public void setAlternateIsin(@javax.annotation.Nullable String alternateIsin) {
-    this.alternateIsin = alternateIsin;
-  }
-
-
-  public ActivityV2DetailNTA alternateQty(@javax.annotation.Nonnull String alternateQty) {
-    this.alternateQty = alternateQty;
-    return this;
-  }
-
-  /**
-   * Quantity of alternate shares received
-   * @return alternateQty
-   */
-  @javax.annotation.Nonnull
-  public String getAlternateQty() {
-    return alternateQty;
-  }
-
-  public void setAlternateQty(@javax.annotation.Nonnull String alternateQty) {
-    this.alternateQty = alternateQty;
-  }
-
-
-  public ActivityV2DetailNTA alternateRate(@javax.annotation.Nonnull String alternateRate) {
-    this.alternateRate = alternateRate;
-    return this;
-  }
-
-  /**
-   * Ratio of alternate shares received
-   * @return alternateRate
-   */
-  @javax.annotation.Nonnull
-  public String getAlternateRate() {
-    return alternateRate;
-  }
-
-  public void setAlternateRate(@javax.annotation.Nonnull String alternateRate) {
-    this.alternateRate = alternateRate;
-  }
-
-
-  public ActivityV2DetailNTA alternateSymbol(@javax.annotation.Nonnull String alternateSymbol) {
-    this.alternateSymbol = alternateSymbol;
-    return this;
-  }
-
-  /**
-   * Symbol for the alternate security after the split
-   * @return alternateSymbol
-   */
-  @javax.annotation.Nonnull
-  public String getAlternateSymbol() {
-    return alternateSymbol;
-  }
-
-  public void setAlternateSymbol(@javax.annotation.Nonnull String alternateSymbol) {
-    this.alternateSymbol = alternateSymbol;
-  }
-
-
-  public ActivityV2DetailNTA effectiveDate(@javax.annotation.Nonnull LocalDate effectiveDate) {
-    this.effectiveDate = effectiveDate;
-    return this;
-  }
-
-  /**
-   * When the unit split becomes effective
-   * @return effectiveDate
-   */
-  @javax.annotation.Nonnull
-  public LocalDate getEffectiveDate() {
-    return effectiveDate;
-  }
-
-  public void setEffectiveDate(@javax.annotation.Nonnull LocalDate effectiveDate) {
-    this.effectiveDate = effectiveDate;
-  }
-
-
-  public ActivityV2DetailNTA oldSymbol(@javax.annotation.Nonnull String oldSymbol) {
-    this.oldSymbol = oldSymbol;
-    return this;
-  }
-
-  /**
-   * The old symbol of the security involved with the activity
-   * @return oldSymbol
-   */
-  @javax.annotation.Nonnull
-  public String getOldSymbol() {
-    return oldSymbol;
-  }
-
-  public void setOldSymbol(@javax.annotation.Nonnull String oldSymbol) {
-    this.oldSymbol = oldSymbol;
-  }
-
-
-  public ActivityV2DetailNTA newPrice(@javax.annotation.Nonnull String newPrice) {
-    this.newPrice = newPrice;
-    return this;
-  }
-
-  /**
-   * Market price of new shares after the spinoff
-   * @return newPrice
-   */
-  @javax.annotation.Nonnull
-  public String getNewPrice() {
-    return newPrice;
-  }
-
-  public void setNewPrice(@javax.annotation.Nonnull String newPrice) {
-    this.newPrice = newPrice;
-  }
-
-
-  public ActivityV2DetailNTA sourceCusip(@javax.annotation.Nonnull String sourceCusip) {
-    this.sourceCusip = sourceCusip;
-    return this;
-  }
-
-  /**
-   * CUSIP of the parent security
-   * @return sourceCusip
-   */
-  @javax.annotation.Nonnull
-  public String getSourceCusip() {
-    return sourceCusip;
-  }
-
-  public void setSourceCusip(@javax.annotation.Nonnull String sourceCusip) {
-    this.sourceCusip = sourceCusip;
-  }
-
-
-  public ActivityV2DetailNTA sourceIsin(@javax.annotation.Nullable String sourceIsin) {
-    this.sourceIsin = sourceIsin;
-    return this;
-  }
-
-  /**
-   * ISIN of the parent security
-   * @return sourceIsin
-   */
-  @javax.annotation.Nullable
-  public String getSourceIsin() {
-    return sourceIsin;
-  }
-
-  public void setSourceIsin(@javax.annotation.Nullable String sourceIsin) {
-    this.sourceIsin = sourceIsin;
-  }
-
-
-  public ActivityV2DetailNTA sourcePrice(@javax.annotation.Nonnull String sourcePrice) {
-    this.sourcePrice = sourcePrice;
-    return this;
-  }
-
-  /**
-   * Market price of parent shares before the spinoff
-   * @return sourcePrice
-   */
-  @javax.annotation.Nonnull
-  public String getSourcePrice() {
-    return sourcePrice;
-  }
-
-  public void setSourcePrice(@javax.annotation.Nonnull String sourcePrice) {
-    this.sourcePrice = sourcePrice;
-  }
-
-
-  public ActivityV2DetailNTA sourceRate(@javax.annotation.Nonnull String sourceRate) {
-    this.sourceRate = sourceRate;
-    return this;
-  }
-
-  /**
-   * Ratio of parent shares
-   * @return sourceRate
-   */
-  @javax.annotation.Nonnull
-  public String getSourceRate() {
-    return sourceRate;
-  }
-
-  public void setSourceRate(@javax.annotation.Nonnull String sourceRate) {
-    this.sourceRate = sourceRate;
-  }
-
-
-  public ActivityV2DetailNTA sourceSymbol(@javax.annotation.Nonnull String sourceSymbol) {
-    this.sourceSymbol = sourceSymbol;
-    return this;
-  }
-
-  /**
-   * Symbol of the parent security
-   * @return sourceSymbol
-   */
-  @javax.annotation.Nonnull
-  public String getSourceSymbol() {
-    return sourceSymbol;
-  }
-
-  public void setSourceSymbol(@javax.annotation.Nonnull String sourceSymbol) {
-    this.sourceSymbol = sourceSymbol;
-  }
-
-
-  public ActivityV2DetailNTA sourceQty(@javax.annotation.Nonnull String sourceQty) {
-    this.sourceQty = sourceQty;
-    return this;
-  }
-
-  /**
-   * The source quantity
-   * @return sourceQty
-   */
-  @javax.annotation.Nonnull
-  public String getSourceQty() {
-    return sourceQty;
-  }
-
-  public void setSourceQty(@javax.annotation.Nonnull String sourceQty) {
-    this.sourceQty = sourceQty;
-  }
-
-
-  public ActivityV2DetailNTA acquireeCusip(@javax.annotation.Nonnull String acquireeCusip) {
-    this.acquireeCusip = acquireeCusip;
-    return this;
-  }
-
-  /**
-   * CUSIP of the acquiree
-   * @return acquireeCusip
-   */
-  @javax.annotation.Nonnull
-  public String getAcquireeCusip() {
-    return acquireeCusip;
-  }
-
-  public void setAcquireeCusip(@javax.annotation.Nonnull String acquireeCusip) {
-    this.acquireeCusip = acquireeCusip;
-  }
-
-
-  public ActivityV2DetailNTA acquireeIsin(@javax.annotation.Nullable String acquireeIsin) {
-    this.acquireeIsin = acquireeIsin;
-    return this;
-  }
-
-  /**
-   * ISIN of the acquiree
-   * @return acquireeIsin
-   */
-  @javax.annotation.Nullable
-  public String getAcquireeIsin() {
-    return acquireeIsin;
-  }
-
-  public void setAcquireeIsin(@javax.annotation.Nullable String acquireeIsin) {
-    this.acquireeIsin = acquireeIsin;
-  }
-
-
-  public ActivityV2DetailNTA acquireeRate(@javax.annotation.Nullable String acquireeRate) {
-    this.acquireeRate = acquireeRate;
-    return this;
-  }
-
-  /**
-   * Rate of the acquiree
-   * @return acquireeRate
-   */
-  @javax.annotation.Nullable
-  public String getAcquireeRate() {
-    return acquireeRate;
-  }
-
-  public void setAcquireeRate(@javax.annotation.Nullable String acquireeRate) {
-    this.acquireeRate = acquireeRate;
-  }
-
-
-  public ActivityV2DetailNTA acquireeSymbol(@javax.annotation.Nonnull String acquireeSymbol) {
-    this.acquireeSymbol = acquireeSymbol;
-    return this;
-  }
-
-  /**
-   * Symbol of the acquiree
-   * @return acquireeSymbol
-   */
-  @javax.annotation.Nonnull
-  public String getAcquireeSymbol() {
-    return acquireeSymbol;
-  }
-
-  public void setAcquireeSymbol(@javax.annotation.Nonnull String acquireeSymbol) {
-    this.acquireeSymbol = acquireeSymbol;
-  }
-
-
-  public ActivityV2DetailNTA acquirerCusip(@javax.annotation.Nullable String acquirerCusip) {
-    this.acquirerCusip = acquirerCusip;
-    return this;
-  }
-
-  /**
-   * CUSIP of the acquirer
-   * @return acquirerCusip
-   */
-  @javax.annotation.Nullable
-  public String getAcquirerCusip() {
-    return acquirerCusip;
-  }
-
-  public void setAcquirerCusip(@javax.annotation.Nullable String acquirerCusip) {
-    this.acquirerCusip = acquirerCusip;
-  }
-
-
-  public ActivityV2DetailNTA acquirerIsin(@javax.annotation.Nullable String acquirerIsin) {
-    this.acquirerIsin = acquirerIsin;
-    return this;
-  }
-
-  /**
-   * ISIN of the acquirer
-   * @return acquirerIsin
-   */
-  @javax.annotation.Nullable
-  public String getAcquirerIsin() {
-    return acquirerIsin;
-  }
-
-  public void setAcquirerIsin(@javax.annotation.Nullable String acquirerIsin) {
-    this.acquirerIsin = acquirerIsin;
-  }
-
-
-  public ActivityV2DetailNTA acquirerRate(@javax.annotation.Nullable String acquirerRate) {
-    this.acquirerRate = acquirerRate;
-    return this;
-  }
-
-  /**
-   * Rate of the acquirer
-   * @return acquirerRate
-   */
-  @javax.annotation.Nullable
-  public String getAcquirerRate() {
-    return acquirerRate;
-  }
-
-  public void setAcquirerRate(@javax.annotation.Nullable String acquirerRate) {
-    this.acquirerRate = acquirerRate;
-  }
-
-
-  public ActivityV2DetailNTA acquirerSymbol(@javax.annotation.Nullable String acquirerSymbol) {
-    this.acquirerSymbol = acquirerSymbol;
-    return this;
-  }
-
-  /**
-   * Symbol of the acquirer
-   * @return acquirerSymbol
-   */
-  @javax.annotation.Nullable
-  public String getAcquirerSymbol() {
-    return acquirerSymbol;
-  }
-
-  public void setAcquirerSymbol(@javax.annotation.Nullable String acquirerSymbol) {
-    this.acquirerSymbol = acquirerSymbol;
-  }
-
-
-  public ActivityV2DetailNTA acquireeQty(@javax.annotation.Nonnull String acquireeQty) {
-    this.acquireeQty = acquireeQty;
-    return this;
-  }
-
-  /**
-   * Quantity of the acquiree
-   * @return acquireeQty
-   */
-  @javax.annotation.Nonnull
-  public String getAcquireeQty() {
-    return acquireeQty;
-  }
-
-  public void setAcquireeQty(@javax.annotation.Nonnull String acquireeQty) {
-    this.acquireeQty = acquireeQty;
-  }
-
-
-  public ActivityV2DetailNTA acquirerQty(@javax.annotation.Nullable String acquirerQty) {
-    this.acquirerQty = acquirerQty;
-    return this;
-  }
-
-  /**
-   * Quantity of the acquirer
-   * @return acquirerQty
-   */
-  @javax.annotation.Nullable
-  public String getAcquirerQty() {
-    return acquirerQty;
-  }
-
-  public void setAcquirerQty(@javax.annotation.Nullable String acquirerQty) {
-    this.acquirerQty = acquirerQty;
-  }
-
-
-  public ActivityV2DetailNTA cashRate(@javax.annotation.Nullable String cashRate) {
-    this.cashRate = cashRate;
-    return this;
-  }
-
-  /**
-   * The cash rate
-   * @return cashRate
-   */
-  @javax.annotation.Nullable
-  public String getCashRate() {
-    return cashRate;
-  }
-
-  public void setCashRate(@javax.annotation.Nullable String cashRate) {
-    this.cashRate = cashRate;
-  }
-
-
-  public ActivityV2DetailNTA positionQty(@javax.annotation.Nonnull String positionQty) {
-    this.positionQty = positionQty;
-    return this;
-  }
-
-  /**
-   * The position quantity
-   * @return positionQty
-   */
-  @javax.annotation.Nonnull
-  public String getPositionQty() {
-    return positionQty;
-  }
-
-  public void setPositionQty(@javax.annotation.Nonnull String positionQty) {
-    this.positionQty = positionQty;
-  }
-
-
-  public ActivityV2DetailNTA paymentDate(@javax.annotation.Nonnull LocalDate paymentDate) {
-    this.paymentDate = paymentDate;
-    return this;
-  }
-
-  /**
-   * The payment date
-   * @return paymentDate
-   */
-  @javax.annotation.Nonnull
-  public LocalDate getPaymentDate() {
-    return paymentDate;
-  }
-
-  public void setPaymentDate(@javax.annotation.Nonnull LocalDate paymentDate) {
-    this.paymentDate = paymentDate;
-  }
-
-
-  public ActivityV2DetailNTA qty(@javax.annotation.Nonnull String qty) {
-    this.qty = qty;
-    return this;
-  }
-
-  /**
-   * used when the old contract&#39;s quantity is equal to the new contract&#39;s quantity. Mutually exclusive with &#39;old_qty&#39; and &#39;new_qty&#39;
-   * @return qty
-   */
-  @javax.annotation.Nonnull
-  public String getQty() {
-    return qty;
-  }
-
-  public void setQty(@javax.annotation.Nonnull String qty) {
-    this.qty = qty;
-  }
-
-
-  public ActivityV2DetailNTA accruedInterestRate(@javax.annotation.Nullable BigDecimal accruedInterestRate) {
-    this.accruedInterestRate = accruedInterestRate;
-    return this;
-  }
-
-  /**
-   * Accrued interest rate (present for accrued-interest-on-call variants)
-   * @return accruedInterestRate
-   */
-  @javax.annotation.Nullable
-  public BigDecimal getAccruedInterestRate() {
-    return accruedInterestRate;
-  }
-
-  public void setAccruedInterestRate(@javax.annotation.Nullable BigDecimal accruedInterestRate) {
-    this.accruedInterestRate = accruedInterestRate;
-  }
-
-
-  public ActivityV2DetailNTA price(@javax.annotation.Nullable BigDecimal price) {
-    this.price = price;
-    return this;
-  }
-
-  /**
-   * Call price used for accrued-interest-on-call variants
-   * @return price
-   */
-  @javax.annotation.Nullable
-  public BigDecimal getPrice() {
-    return price;
-  }
-
-  public void setPrice(@javax.annotation.Nullable BigDecimal price) {
-    this.price = price;
-  }
-
-
-  public ActivityV2DetailNTA expirationDate(@javax.annotation.Nullable LocalDate expirationDate) {
-    this.expirationDate = expirationDate;
-    return this;
-  }
-
-  /**
-   * The expiration date for the rights distribution
-   * @return expirationDate
-   */
-  @javax.annotation.Nullable
-  public LocalDate getExpirationDate() {
-    return expirationDate;
-  }
-
-  public void setExpirationDate(@javax.annotation.Nullable LocalDate expirationDate) {
-    this.expirationDate = expirationDate;
-  }
-
-
-  public ActivityV2DetailNTA removedQty(@javax.annotation.Nonnull String removedQty) {
-    this.removedQty = removedQty;
-    return this;
-  }
-
-  /**
-   * The removed quantity
-   * @return removedQty
-   */
-  @javax.annotation.Nonnull
-  public String getRemovedQty() {
-    return removedQty;
-  }
-
-  public void setRemovedQty(@javax.annotation.Nonnull String removedQty) {
-    this.removedQty = removedQty;
-  }
-
-
-  public ActivityV2DetailNTA newContractSymbol(@javax.annotation.Nonnull String newContractSymbol) {
-    this.newContractSymbol = newContractSymbol;
-    return this;
-  }
-
-  /**
-   * The new contract symbol
-   * @return newContractSymbol
-   */
-  @javax.annotation.Nonnull
-  public String getNewContractSymbol() {
-    return newContractSymbol;
-  }
-
-  public void setNewContractSymbol(@javax.annotation.Nonnull String newContractSymbol) {
-    this.newContractSymbol = newContractSymbol;
-  }
-
-
-  public ActivityV2DetailNTA oldContractSymbol(@javax.annotation.Nonnull String oldContractSymbol) {
-    this.oldContractSymbol = oldContractSymbol;
-    return this;
-  }
-
-  /**
-   * The old contract symbol
-   * @return oldContractSymbol
-   */
-  @javax.annotation.Nonnull
-  public String getOldContractSymbol() {
-    return oldContractSymbol;
-  }
-
-  public void setOldContractSymbol(@javax.annotation.Nonnull String oldContractSymbol) {
-    this.oldContractSymbol = oldContractSymbol;
-  }
-
-
-  public ActivityV2DetailNTA externalId(@javax.annotation.Nonnull String externalId) {
-    this.externalId = externalId;
-    return this;
-  }
-
-  /**
-   * External ID of the transfer
-   * @return externalId
-   */
-  @javax.annotation.Nonnull
-  public String getExternalId() {
-    return externalId;
-  }
-
-  public void setExternalId(@javax.annotation.Nonnull String externalId) {
-    this.externalId = externalId;
-  }
-
-
-  public ActivityV2DetailNTA holdDate(@javax.annotation.Nullable LocalDate holdDate) {
-    this.holdDate = holdDate;
-    return this;
-  }
-
-  /**
-   * Hold date when the transfers settle
-   * @return holdDate
-   */
-  @javax.annotation.Nullable
-  public LocalDate getHoldDate() {
-    return holdDate;
-  }
-
-  public void setHoldDate(@javax.annotation.Nullable LocalDate holdDate) {
-    this.holdDate = holdDate;
-  }
-
-
-  public ActivityV2DetailNTA requestId(@javax.annotation.Nonnull UUID requestId) {
-    this.requestId = requestId;
-    return this;
-  }
-
-  /**
-   * The ID for original ACATS request
-   * @return requestId
-   */
-  @javax.annotation.Nonnull
-  public UUID getRequestId() {
-    return requestId;
-  }
-
-  public void setRequestId(@javax.annotation.Nonnull UUID requestId) {
-    this.requestId = requestId;
-  }
-
-
-  public ActivityV2DetailNTA contra(@javax.annotation.Nonnull String contra) {
-    this.contra = contra;
-    return this;
-  }
-
-  /**
-   * Contra for the transfer
-   * @return contra
-   */
-  @javax.annotation.Nonnull
-  public String getContra() {
-    return contra;
-  }
-
-  public void setContra(@javax.annotation.Nonnull String contra) {
-    this.contra = contra;
-  }
-
-
-  public ActivityV2DetailNTA parentId(@javax.annotation.Nonnull UUID parentId) {
-    this.parentId = parentId;
-    return this;
-  }
-
-  /**
-   * The parent transaction&#39;s ID
-   * @return parentId
-   */
-  @javax.annotation.Nonnull
-  public UUID getParentId() {
-    return parentId;
-  }
-
-  public void setParentId(@javax.annotation.Nonnull UUID parentId) {
-    this.parentId = parentId;
-  }
-
-
-  public ActivityV2DetailNTA journalId(@javax.annotation.Nullable UUID journalId) {
-    this.journalId = journalId;
-    return this;
-  }
-
-  /**
-   * The journal&#39;s ID
-   * @return journalId
-   */
-  @javax.annotation.Nullable
-  public UUID getJournalId() {
-    return journalId;
-  }
-
-  public void setJournalId(@javax.annotation.Nullable UUID journalId) {
-    this.journalId = journalId;
-  }
-
-
-  public ActivityV2DetailNTA bankTransactionId(@javax.annotation.Nullable UUID bankTransactionId) {
-    this.bankTransactionId = bankTransactionId;
-    return this;
-  }
-
-  /**
-   * The bank transaction&#39;s ID
-   * @return bankTransactionId
-   */
-  @javax.annotation.Nullable
-  public UUID getBankTransactionId() {
-    return bankTransactionId;
-  }
-
-  public void setBankTransactionId(@javax.annotation.Nullable UUID bankTransactionId) {
-    this.bankTransactionId = bankTransactionId;
-  }
-
-
-  public ActivityV2DetailNTA transferId(@javax.annotation.Nonnull UUID transferId) {
-    this.transferId = transferId;
-    return this;
-  }
-
-  /**
-   * The transfer ID of the associated deposit or withdrawal
-   * @return transferId
-   */
-  @javax.annotation.Nonnull
-  public UUID getTransferId() {
-    return transferId;
-  }
-
-  public void setTransferId(@javax.annotation.Nonnull UUID transferId) {
-    this.transferId = transferId;
-  }
-
-  /**
-   * A container for additional, undeclared properties.
-   * This is a holder for any undeclared properties as specified with
-   * the 'additionalProperties' keyword in the OAS document.
-   */
-  private Map<String, Object> additionalProperties;
-
-  /**
-   * Set the additional (undeclared) property with the specified name and value.
-   * If the property does not already exist, create it otherwise replace it.
-   *
-   * @param key name of the property
-   * @param value value of the property
-   * @return the ActivityV2DetailNTA instance itself
-   */
-  public ActivityV2DetailNTA putAdditionalProperty(String key, Object value) {
-    if (this.additionalProperties == null) {
-        this.additionalProperties = new HashMap<String, Object>();
-    }
-    this.additionalProperties.put(key, value);
-    return this;
-  }
-
-  /**
-   * Return the additional (undeclared) property.
-   *
-   * @return a map of objects
-   */
-  public Map<String, Object> getAdditionalProperties() {
-    return additionalProperties;
-  }
-
-  /**
-   * Return the additional (undeclared) property with the specified name.
-   *
-   * @param key name of the property
-   * @return an object
-   */
-  public Object getAdditionalProperty(String key) {
-    if (this.additionalProperties == null) {
-        return null;
-    }
-    return this.additionalProperties.get(key);
-  }
-
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    ActivityV2DetailNTA activityV2DetailNTA = (ActivityV2DetailNTA) o;
-    return Objects.equals(this.groupId, activityV2DetailNTA.groupId) &&
-        Objects.equals(this.systemDate, activityV2DetailNTA.systemDate) &&
-        Objects.equals(this.caId, activityV2DetailNTA.caId) &&
-        Objects.equals(this.positionDate, activityV2DetailNTA.positionDate) &&
-        Objects.equals(this.reorgId, activityV2DetailNTA.reorgId) &&
-        Objects.equals(this.cashPayout, activityV2DetailNTA.cashPayout) &&
-        Objects.equals(this.cusip, activityV2DetailNTA.cusip) &&
-        Objects.equals(this.dueBillOffDate, activityV2DetailNTA.dueBillOffDate) &&
-        Objects.equals(this.dueBillOnDate, activityV2DetailNTA.dueBillOnDate) &&
-        Objects.equals(this.entitledQty, activityV2DetailNTA.entitledQty) &&
-        Objects.equals(this.exDate, activityV2DetailNTA.exDate) &&
-        Objects.equals(this.foreign, activityV2DetailNTA.foreign) &&
-        Objects.equals(this.isin, activityV2DetailNTA.isin) &&
-        Objects.equals(this.payableDate, activityV2DetailNTA.payableDate) &&
-        Objects.equals(this.rate, activityV2DetailNTA.rate) &&
-        Objects.equals(this.recordDate, activityV2DetailNTA.recordDate) &&
-        Objects.equals(this.special, activityV2DetailNTA.special) &&
-        Objects.equals(this.symbol, activityV2DetailNTA.symbol) &&
-        Objects.equals(this.newQty, activityV2DetailNTA.newQty) &&
-        Objects.equals(this.paidQty, activityV2DetailNTA.paidQty) &&
-        Objects.equals(this.newCusip, activityV2DetailNTA.newCusip) &&
-        Objects.equals(this.newIsin, activityV2DetailNTA.newIsin) &&
-        Objects.equals(this.newRate, activityV2DetailNTA.newRate) &&
-        Objects.equals(this.oldCusip, activityV2DetailNTA.oldCusip) &&
-        Objects.equals(this.oldIsin, activityV2DetailNTA.oldIsin) &&
-        Objects.equals(this.oldRate, activityV2DetailNTA.oldRate) &&
-        Objects.equals(this.oldQty, activityV2DetailNTA.oldQty) &&
-        Objects.equals(this.dueBillRedemptionDate, activityV2DetailNTA.dueBillRedemptionDate) &&
-        Objects.equals(this.newSymbol, activityV2DetailNTA.newSymbol) &&
-        Objects.equals(this.alternateCusip, activityV2DetailNTA.alternateCusip) &&
-        Objects.equals(this.alternateIsin, activityV2DetailNTA.alternateIsin) &&
-        Objects.equals(this.alternateQty, activityV2DetailNTA.alternateQty) &&
-        Objects.equals(this.alternateRate, activityV2DetailNTA.alternateRate) &&
-        Objects.equals(this.alternateSymbol, activityV2DetailNTA.alternateSymbol) &&
-        Objects.equals(this.effectiveDate, activityV2DetailNTA.effectiveDate) &&
-        Objects.equals(this.oldSymbol, activityV2DetailNTA.oldSymbol) &&
-        Objects.equals(this.newPrice, activityV2DetailNTA.newPrice) &&
-        Objects.equals(this.sourceCusip, activityV2DetailNTA.sourceCusip) &&
-        Objects.equals(this.sourceIsin, activityV2DetailNTA.sourceIsin) &&
-        Objects.equals(this.sourcePrice, activityV2DetailNTA.sourcePrice) &&
-        Objects.equals(this.sourceRate, activityV2DetailNTA.sourceRate) &&
-        Objects.equals(this.sourceSymbol, activityV2DetailNTA.sourceSymbol) &&
-        Objects.equals(this.sourceQty, activityV2DetailNTA.sourceQty) &&
-        Objects.equals(this.acquireeCusip, activityV2DetailNTA.acquireeCusip) &&
-        Objects.equals(this.acquireeIsin, activityV2DetailNTA.acquireeIsin) &&
-        Objects.equals(this.acquireeRate, activityV2DetailNTA.acquireeRate) &&
-        Objects.equals(this.acquireeSymbol, activityV2DetailNTA.acquireeSymbol) &&
-        Objects.equals(this.acquirerCusip, activityV2DetailNTA.acquirerCusip) &&
-        Objects.equals(this.acquirerIsin, activityV2DetailNTA.acquirerIsin) &&
-        Objects.equals(this.acquirerRate, activityV2DetailNTA.acquirerRate) &&
-        Objects.equals(this.acquirerSymbol, activityV2DetailNTA.acquirerSymbol) &&
-        Objects.equals(this.acquireeQty, activityV2DetailNTA.acquireeQty) &&
-        Objects.equals(this.acquirerQty, activityV2DetailNTA.acquirerQty) &&
-        Objects.equals(this.cashRate, activityV2DetailNTA.cashRate) &&
-        Objects.equals(this.positionQty, activityV2DetailNTA.positionQty) &&
-        Objects.equals(this.paymentDate, activityV2DetailNTA.paymentDate) &&
-        Objects.equals(this.qty, activityV2DetailNTA.qty) &&
-        Objects.equals(this.accruedInterestRate, activityV2DetailNTA.accruedInterestRate) &&
-        Objects.equals(this.price, activityV2DetailNTA.price) &&
-        Objects.equals(this.expirationDate, activityV2DetailNTA.expirationDate) &&
-        Objects.equals(this.removedQty, activityV2DetailNTA.removedQty) &&
-        Objects.equals(this.newContractSymbol, activityV2DetailNTA.newContractSymbol) &&
-        Objects.equals(this.oldContractSymbol, activityV2DetailNTA.oldContractSymbol) &&
-        Objects.equals(this.externalId, activityV2DetailNTA.externalId) &&
-        Objects.equals(this.holdDate, activityV2DetailNTA.holdDate) &&
-        Objects.equals(this.requestId, activityV2DetailNTA.requestId) &&
-        Objects.equals(this.contra, activityV2DetailNTA.contra) &&
-        Objects.equals(this.parentId, activityV2DetailNTA.parentId) &&
-        Objects.equals(this.journalId, activityV2DetailNTA.journalId) &&
-        Objects.equals(this.bankTransactionId, activityV2DetailNTA.bankTransactionId) &&
-        Objects.equals(this.transferId, activityV2DetailNTA.transferId)&&
-        Objects.equals(this.additionalProperties, activityV2DetailNTA.additionalProperties);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, cashPayout, cusip, dueBillOffDate, dueBillOnDate, entitledQty, exDate, foreign, isin, payableDate, rate, recordDate, special, symbol, newQty, paidQty, newCusip, newIsin, newRate, oldCusip, oldIsin, oldRate, oldQty, dueBillRedemptionDate, newSymbol, alternateCusip, alternateIsin, alternateQty, alternateRate, alternateSymbol, effectiveDate, oldSymbol, newPrice, sourceCusip, sourceIsin, sourcePrice, sourceRate, sourceSymbol, sourceQty, acquireeCusip, acquireeIsin, acquireeRate, acquireeSymbol, acquirerCusip, acquirerIsin, acquirerRate, acquirerSymbol, acquireeQty, acquirerQty, cashRate, positionQty, paymentDate, qty, accruedInterestRate, price, expirationDate, removedQty, newContractSymbol, oldContractSymbol, externalId, holdDate, requestId, contra, parentId, journalId, bankTransactionId, transferId, additionalProperties);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class ActivityV2DetailNTA {\n");
-    sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
-    sb.append("    systemDate: ").append(toIndentedString(systemDate)).append("\n");
-    sb.append("    caId: ").append(toIndentedString(caId)).append("\n");
-    sb.append("    positionDate: ").append(toIndentedString(positionDate)).append("\n");
-    sb.append("    reorgId: ").append(toIndentedString(reorgId)).append("\n");
-    sb.append("    cashPayout: ").append(toIndentedString(cashPayout)).append("\n");
-    sb.append("    cusip: ").append(toIndentedString(cusip)).append("\n");
-    sb.append("    dueBillOffDate: ").append(toIndentedString(dueBillOffDate)).append("\n");
-    sb.append("    dueBillOnDate: ").append(toIndentedString(dueBillOnDate)).append("\n");
-    sb.append("    entitledQty: ").append(toIndentedString(entitledQty)).append("\n");
-    sb.append("    exDate: ").append(toIndentedString(exDate)).append("\n");
-    sb.append("    foreign: ").append(toIndentedString(foreign)).append("\n");
-    sb.append("    isin: ").append(toIndentedString(isin)).append("\n");
-    sb.append("    payableDate: ").append(toIndentedString(payableDate)).append("\n");
-    sb.append("    rate: ").append(toIndentedString(rate)).append("\n");
-    sb.append("    recordDate: ").append(toIndentedString(recordDate)).append("\n");
-    sb.append("    special: ").append(toIndentedString(special)).append("\n");
-    sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
-    sb.append("    newQty: ").append(toIndentedString(newQty)).append("\n");
-    sb.append("    paidQty: ").append(toIndentedString(paidQty)).append("\n");
-    sb.append("    newCusip: ").append(toIndentedString(newCusip)).append("\n");
-    sb.append("    newIsin: ").append(toIndentedString(newIsin)).append("\n");
-    sb.append("    newRate: ").append(toIndentedString(newRate)).append("\n");
-    sb.append("    oldCusip: ").append(toIndentedString(oldCusip)).append("\n");
-    sb.append("    oldIsin: ").append(toIndentedString(oldIsin)).append("\n");
-    sb.append("    oldRate: ").append(toIndentedString(oldRate)).append("\n");
-    sb.append("    oldQty: ").append(toIndentedString(oldQty)).append("\n");
-    sb.append("    dueBillRedemptionDate: ").append(toIndentedString(dueBillRedemptionDate)).append("\n");
-    sb.append("    newSymbol: ").append(toIndentedString(newSymbol)).append("\n");
-    sb.append("    alternateCusip: ").append(toIndentedString(alternateCusip)).append("\n");
-    sb.append("    alternateIsin: ").append(toIndentedString(alternateIsin)).append("\n");
-    sb.append("    alternateQty: ").append(toIndentedString(alternateQty)).append("\n");
-    sb.append("    alternateRate: ").append(toIndentedString(alternateRate)).append("\n");
-    sb.append("    alternateSymbol: ").append(toIndentedString(alternateSymbol)).append("\n");
-    sb.append("    effectiveDate: ").append(toIndentedString(effectiveDate)).append("\n");
-    sb.append("    oldSymbol: ").append(toIndentedString(oldSymbol)).append("\n");
-    sb.append("    newPrice: ").append(toIndentedString(newPrice)).append("\n");
-    sb.append("    sourceCusip: ").append(toIndentedString(sourceCusip)).append("\n");
-    sb.append("    sourceIsin: ").append(toIndentedString(sourceIsin)).append("\n");
-    sb.append("    sourcePrice: ").append(toIndentedString(sourcePrice)).append("\n");
-    sb.append("    sourceRate: ").append(toIndentedString(sourceRate)).append("\n");
-    sb.append("    sourceSymbol: ").append(toIndentedString(sourceSymbol)).append("\n");
-    sb.append("    sourceQty: ").append(toIndentedString(sourceQty)).append("\n");
-    sb.append("    acquireeCusip: ").append(toIndentedString(acquireeCusip)).append("\n");
-    sb.append("    acquireeIsin: ").append(toIndentedString(acquireeIsin)).append("\n");
-    sb.append("    acquireeRate: ").append(toIndentedString(acquireeRate)).append("\n");
-    sb.append("    acquireeSymbol: ").append(toIndentedString(acquireeSymbol)).append("\n");
-    sb.append("    acquirerCusip: ").append(toIndentedString(acquirerCusip)).append("\n");
-    sb.append("    acquirerIsin: ").append(toIndentedString(acquirerIsin)).append("\n");
-    sb.append("    acquirerRate: ").append(toIndentedString(acquirerRate)).append("\n");
-    sb.append("    acquirerSymbol: ").append(toIndentedString(acquirerSymbol)).append("\n");
-    sb.append("    acquireeQty: ").append(toIndentedString(acquireeQty)).append("\n");
-    sb.append("    acquirerQty: ").append(toIndentedString(acquirerQty)).append("\n");
-    sb.append("    cashRate: ").append(toIndentedString(cashRate)).append("\n");
-    sb.append("    positionQty: ").append(toIndentedString(positionQty)).append("\n");
-    sb.append("    paymentDate: ").append(toIndentedString(paymentDate)).append("\n");
-    sb.append("    qty: ").append(toIndentedString(qty)).append("\n");
-    sb.append("    accruedInterestRate: ").append(toIndentedString(accruedInterestRate)).append("\n");
-    sb.append("    price: ").append(toIndentedString(price)).append("\n");
-    sb.append("    expirationDate: ").append(toIndentedString(expirationDate)).append("\n");
-    sb.append("    removedQty: ").append(toIndentedString(removedQty)).append("\n");
-    sb.append("    newContractSymbol: ").append(toIndentedString(newContractSymbol)).append("\n");
-    sb.append("    oldContractSymbol: ").append(toIndentedString(oldContractSymbol)).append("\n");
-    sb.append("    externalId: ").append(toIndentedString(externalId)).append("\n");
-    sb.append("    holdDate: ").append(toIndentedString(holdDate)).append("\n");
-    sb.append("    requestId: ").append(toIndentedString(requestId)).append("\n");
-    sb.append("    contra: ").append(toIndentedString(contra)).append("\n");
-    sb.append("    parentId: ").append(toIndentedString(parentId)).append("\n");
-    sb.append("    journalId: ").append(toIndentedString(journalId)).append("\n");
-    sb.append("    bankTransactionId: ").append(toIndentedString(bankTransactionId)).append("\n");
-    sb.append("    transferId: ").append(toIndentedString(transferId)).append("\n");
-    sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    return o == null ? "null" : o.toString().replace("\n", "\n    ");
-  }
-
-
-  public static HashSet<String> openapiFields;
-  public static HashSet<String> openapiRequiredFields;
-
-  static {
-    // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "cash_payout", "cusip", "due_bill_off_date", "due_bill_on_date", "entitled_qty", "ex_date", "foreign", "isin", "payable_date", "rate", "record_date", "special", "symbol", "new_qty", "paid_qty", "new_cusip", "new_isin", "new_rate", "old_cusip", "old_isin", "old_rate", "old_qty", "due_bill_redemption_date", "new_symbol", "alternate_cusip", "alternate_isin", "alternate_qty", "alternate_rate", "alternate_symbol", "effective_date", "old_symbol", "new_price", "source_cusip", "source_isin", "source_price", "source_rate", "source_symbol", "source_qty", "acquiree_cusip", "acquiree_isin", "acquiree_rate", "acquiree_symbol", "acquirer_cusip", "acquirer_isin", "acquirer_rate", "acquirer_symbol", "acquiree_qty", "acquirer_qty", "cash_rate", "position_qty", "payment_date", "qty", "accrued_interest_rate", "price", "expiration_date", "removed_qty", "new_contract_symbol", "old_contract_symbol", "external_id", "hold_date", "request_id", "contra", "parent_id", "journal_id", "bank_transaction_id", "transfer_id"));
-
-    // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "cash_payout", "cusip", "entitled_qty", "foreign", "payable_date", "rate", "special", "symbol", "new_qty", "paid_qty", "new_cusip", "new_rate", "old_cusip", "old_rate", "old_qty", "new_symbol", "alternate_cusip", "alternate_qty", "alternate_rate", "alternate_symbol", "effective_date", "old_symbol", "new_price", "source_cusip", "source_price", "source_rate", "source_symbol", "source_qty", "acquiree_cusip", "acquiree_symbol", "acquiree_qty", "position_qty", "payment_date", "qty", "removed_qty", "new_contract_symbol", "old_contract_symbol", "external_id", "request_id", "contra", "parent_id", "transfer_id"));
-  }
-
-  /**
-   * Validates the JSON Element and throws an exception if issues found
-   *
-   * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to ActivityV2DetailNTA
-   */
-  public static void validateJsonElement(JsonElement jsonElement) throws IOException {
-      if (jsonElement == null) {
-        if (!ActivityV2DetailNTA.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in ActivityV2DetailNTA is not found in the empty JSON string", ActivityV2DetailNTA.openapiRequiredFields.toString()));
+public class ActivityV2DetailNTA extends AbstractOpenApiSchema implements Serializable {
+    private static final Logger log = Logger.getLogger(ActivityV2DetailNTA.class.getName());
+
+    public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+            if (!ActivityV2DetailNTA.class.isAssignableFrom(type.getRawType())) {
+                return null; // this class only serializes 'ActivityV2DetailNTA' and its subtypes
+            }
+            final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
+            final TypeAdapter<DIVSPDActivityV2> adapterDIVSPDActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(DIVSPDActivityV2.class));
+            final TypeAdapter<CDIVActivityV2> adapterCDIVActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(CDIVActivityV2.class));
+            final TypeAdapter<SDIVActivityV2> adapterSDIVActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(SDIVActivityV2.class));
+            final TypeAdapter<CGDActivityV2> adapterCGDActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(CGDActivityV2.class));
+            final TypeAdapter<ForwardSplitActivityV2> adapterForwardSplitActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(ForwardSplitActivityV2.class));
+            final TypeAdapter<ReverseSplitActivityV2> adapterReverseSplitActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(ReverseSplitActivityV2.class));
+            final TypeAdapter<UnitSplitActivityV2> adapterUnitSplitActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(UnitSplitActivityV2.class));
+            final TypeAdapter<SpinoffActivityV2> adapterSpinoffActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(SpinoffActivityV2.class));
+            final TypeAdapter<MAActivityV2> adapterMAActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(MAActivityV2.class));
+            final TypeAdapter<NCActivityV2> adapterNCActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(NCActivityV2.class));
+            final TypeAdapter<FixedIncomeRedemptionActivityV2> adapterFixedIncomeRedemptionActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(FixedIncomeRedemptionActivityV2.class));
+            final TypeAdapter<FixedIncomeInterestActivityV2> adapterFixedIncomeInterestActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(FixedIncomeInterestActivityV2.class));
+            final TypeAdapter<REOActivityV2> adapterREOActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(REOActivityV2.class));
+            final TypeAdapter<RightsDistributionActivityV2> adapterRightsDistributionActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(RightsDistributionActivityV2.class));
+            final TypeAdapter<RightsSubscriptionElectionActivityV2> adapterRightsSubscriptionElectionActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(RightsSubscriptionElectionActivityV2.class));
+            final TypeAdapter<TenderOfferActivityV2> adapterTenderOfferActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(TenderOfferActivityV2.class));
+            final TypeAdapter<ExchangeOfferActivityV2> adapterExchangeOfferActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(ExchangeOfferActivityV2.class));
+            final TypeAdapter<WarrantExerciseElectionActivityV2> adapterWarrantExerciseElectionActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(WarrantExerciseElectionActivityV2.class));
+            final TypeAdapter<WRMActivityV2> adapterWRMActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(WRMActivityV2.class));
+            final TypeAdapter<OpcaCDIVActivityV2> adapterOpcaCDIVActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OpcaCDIVActivityV2.class));
+            final TypeAdapter<OpcaSDIVActivityV2> adapterOpcaSDIVActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OpcaSDIVActivityV2.class));
+            final TypeAdapter<OpcaMAActivityV2> adapterOpcaMAActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OpcaMAActivityV2.class));
+            final TypeAdapter<OpcaNCActivityV2> adapterOpcaNCActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OpcaNCActivityV2.class));
+            final TypeAdapter<OpcaSPINActivityV2> adapterOpcaSPINActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OpcaSPINActivityV2.class));
+            final TypeAdapter<OpcaFSPLITActivityV2> adapterOpcaFSPLITActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OpcaFSPLITActivityV2.class));
+            final TypeAdapter<OpcaUSPLITActivityV2> adapterOpcaUSPLITActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OpcaUSPLITActivityV2.class));
+            final TypeAdapter<OpcaRSPLITActivityV2> adapterOpcaRSPLITActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OpcaRSPLITActivityV2.class));
+            final TypeAdapter<OPASNActivityV2> adapterOPASNActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OPASNActivityV2.class));
+            final TypeAdapter<OPEXCActivityV2> adapterOPEXCActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OPEXCActivityV2.class));
+            final TypeAdapter<OPEXPActivityV2> adapterOPEXPActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OPEXPActivityV2.class));
+            final TypeAdapter<OPTRDActivityV2> adapterOPTRDActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OPTRDActivityV2.class));
+            final TypeAdapter<OPCSHActivityV2> adapterOPCSHActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OPCSHActivityV2.class));
+            final TypeAdapter<AcatsActivityV2> adapterAcatsActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(AcatsActivityV2.class));
+            final TypeAdapter<AcatcActivityV2> adapterAcatcActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(AcatcActivityV2.class));
+            final TypeAdapter<FOPTActivityV2> adapterFOPTActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(FOPTActivityV2.class));
+            final TypeAdapter<DIVNRAActivityV2> adapterDIVNRAActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(DIVNRAActivityV2.class));
+            final TypeAdapter<DIVWHActivityV2> adapterDIVWHActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(DIVWHActivityV2.class));
+            final TypeAdapter<JNLSActivityV2> adapterJNLSActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(JNLSActivityV2.class));
+            final TypeAdapter<JNLCActivityV2> adapterJNLCActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(JNLCActivityV2.class));
+            final TypeAdapter<CSWActivityV2> adapterCSWActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(CSWActivityV2.class));
+            final TypeAdapter<FEEActivityV2> adapterFEEActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(FEEActivityV2.class));
+            final TypeAdapter<MEMActivityV2> adapterMEMActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(MEMActivityV2.class));
+            final TypeAdapter<OCTActivityV2> adapterOCTActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OCTActivityV2.class));
+
+            return (TypeAdapter<T>) new TypeAdapter<ActivityV2DetailNTA>() {
+                @Override
+                public void write(JsonWriter out, ActivityV2DetailNTA value) throws IOException {
+                    if (value == null || value.getActualInstance() == null) {
+                        elementAdapter.write(out, null);
+                        return;
+                    }
+
+                    // check if the actual instance is of the type `DIVSPDActivityV2`
+                    if (value.getActualInstance() instanceof DIVSPDActivityV2) {
+                        JsonElement element = adapterDIVSPDActivityV2.toJsonTree((DIVSPDActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `CDIVActivityV2`
+                    if (value.getActualInstance() instanceof CDIVActivityV2) {
+                        JsonElement element = adapterCDIVActivityV2.toJsonTree((CDIVActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `SDIVActivityV2`
+                    if (value.getActualInstance() instanceof SDIVActivityV2) {
+                        JsonElement element = adapterSDIVActivityV2.toJsonTree((SDIVActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `CGDActivityV2`
+                    if (value.getActualInstance() instanceof CGDActivityV2) {
+                        JsonElement element = adapterCGDActivityV2.toJsonTree((CGDActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `ForwardSplitActivityV2`
+                    if (value.getActualInstance() instanceof ForwardSplitActivityV2) {
+                        JsonElement element = adapterForwardSplitActivityV2.toJsonTree((ForwardSplitActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `ReverseSplitActivityV2`
+                    if (value.getActualInstance() instanceof ReverseSplitActivityV2) {
+                        JsonElement element = adapterReverseSplitActivityV2.toJsonTree((ReverseSplitActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `UnitSplitActivityV2`
+                    if (value.getActualInstance() instanceof UnitSplitActivityV2) {
+                        JsonElement element = adapterUnitSplitActivityV2.toJsonTree((UnitSplitActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `SpinoffActivityV2`
+                    if (value.getActualInstance() instanceof SpinoffActivityV2) {
+                        JsonElement element = adapterSpinoffActivityV2.toJsonTree((SpinoffActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `MAActivityV2`
+                    if (value.getActualInstance() instanceof MAActivityV2) {
+                        JsonElement element = adapterMAActivityV2.toJsonTree((MAActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `NCActivityV2`
+                    if (value.getActualInstance() instanceof NCActivityV2) {
+                        JsonElement element = adapterNCActivityV2.toJsonTree((NCActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `FixedIncomeRedemptionActivityV2`
+                    if (value.getActualInstance() instanceof FixedIncomeRedemptionActivityV2) {
+                        JsonElement element = adapterFixedIncomeRedemptionActivityV2.toJsonTree((FixedIncomeRedemptionActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `FixedIncomeInterestActivityV2`
+                    if (value.getActualInstance() instanceof FixedIncomeInterestActivityV2) {
+                        JsonElement element = adapterFixedIncomeInterestActivityV2.toJsonTree((FixedIncomeInterestActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `REOActivityV2`
+                    if (value.getActualInstance() instanceof REOActivityV2) {
+                        JsonElement element = adapterREOActivityV2.toJsonTree((REOActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `RightsDistributionActivityV2`
+                    if (value.getActualInstance() instanceof RightsDistributionActivityV2) {
+                        JsonElement element = adapterRightsDistributionActivityV2.toJsonTree((RightsDistributionActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `RightsSubscriptionElectionActivityV2`
+                    if (value.getActualInstance() instanceof RightsSubscriptionElectionActivityV2) {
+                        JsonElement element = adapterRightsSubscriptionElectionActivityV2.toJsonTree((RightsSubscriptionElectionActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `TenderOfferActivityV2`
+                    if (value.getActualInstance() instanceof TenderOfferActivityV2) {
+                        JsonElement element = adapterTenderOfferActivityV2.toJsonTree((TenderOfferActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `ExchangeOfferActivityV2`
+                    if (value.getActualInstance() instanceof ExchangeOfferActivityV2) {
+                        JsonElement element = adapterExchangeOfferActivityV2.toJsonTree((ExchangeOfferActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `WarrantExerciseElectionActivityV2`
+                    if (value.getActualInstance() instanceof WarrantExerciseElectionActivityV2) {
+                        JsonElement element = adapterWarrantExerciseElectionActivityV2.toJsonTree((WarrantExerciseElectionActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `WRMActivityV2`
+                    if (value.getActualInstance() instanceof WRMActivityV2) {
+                        JsonElement element = adapterWRMActivityV2.toJsonTree((WRMActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OpcaCDIVActivityV2`
+                    if (value.getActualInstance() instanceof OpcaCDIVActivityV2) {
+                        JsonElement element = adapterOpcaCDIVActivityV2.toJsonTree((OpcaCDIVActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OpcaSDIVActivityV2`
+                    if (value.getActualInstance() instanceof OpcaSDIVActivityV2) {
+                        JsonElement element = adapterOpcaSDIVActivityV2.toJsonTree((OpcaSDIVActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OpcaMAActivityV2`
+                    if (value.getActualInstance() instanceof OpcaMAActivityV2) {
+                        JsonElement element = adapterOpcaMAActivityV2.toJsonTree((OpcaMAActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OpcaNCActivityV2`
+                    if (value.getActualInstance() instanceof OpcaNCActivityV2) {
+                        JsonElement element = adapterOpcaNCActivityV2.toJsonTree((OpcaNCActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OpcaSPINActivityV2`
+                    if (value.getActualInstance() instanceof OpcaSPINActivityV2) {
+                        JsonElement element = adapterOpcaSPINActivityV2.toJsonTree((OpcaSPINActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OpcaFSPLITActivityV2`
+                    if (value.getActualInstance() instanceof OpcaFSPLITActivityV2) {
+                        JsonElement element = adapterOpcaFSPLITActivityV2.toJsonTree((OpcaFSPLITActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OpcaUSPLITActivityV2`
+                    if (value.getActualInstance() instanceof OpcaUSPLITActivityV2) {
+                        JsonElement element = adapterOpcaUSPLITActivityV2.toJsonTree((OpcaUSPLITActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OpcaRSPLITActivityV2`
+                    if (value.getActualInstance() instanceof OpcaRSPLITActivityV2) {
+                        JsonElement element = adapterOpcaRSPLITActivityV2.toJsonTree((OpcaRSPLITActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OPASNActivityV2`
+                    if (value.getActualInstance() instanceof OPASNActivityV2) {
+                        JsonElement element = adapterOPASNActivityV2.toJsonTree((OPASNActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OPEXCActivityV2`
+                    if (value.getActualInstance() instanceof OPEXCActivityV2) {
+                        JsonElement element = adapterOPEXCActivityV2.toJsonTree((OPEXCActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OPEXPActivityV2`
+                    if (value.getActualInstance() instanceof OPEXPActivityV2) {
+                        JsonElement element = adapterOPEXPActivityV2.toJsonTree((OPEXPActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OPTRDActivityV2`
+                    if (value.getActualInstance() instanceof OPTRDActivityV2) {
+                        JsonElement element = adapterOPTRDActivityV2.toJsonTree((OPTRDActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OPCSHActivityV2`
+                    if (value.getActualInstance() instanceof OPCSHActivityV2) {
+                        JsonElement element = adapterOPCSHActivityV2.toJsonTree((OPCSHActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `AcatsActivityV2`
+                    if (value.getActualInstance() instanceof AcatsActivityV2) {
+                        JsonElement element = adapterAcatsActivityV2.toJsonTree((AcatsActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `AcatcActivityV2`
+                    if (value.getActualInstance() instanceof AcatcActivityV2) {
+                        JsonElement element = adapterAcatcActivityV2.toJsonTree((AcatcActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `FOPTActivityV2`
+                    if (value.getActualInstance() instanceof FOPTActivityV2) {
+                        JsonElement element = adapterFOPTActivityV2.toJsonTree((FOPTActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `DIVNRAActivityV2`
+                    if (value.getActualInstance() instanceof DIVNRAActivityV2) {
+                        JsonElement element = adapterDIVNRAActivityV2.toJsonTree((DIVNRAActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `DIVWHActivityV2`
+                    if (value.getActualInstance() instanceof DIVWHActivityV2) {
+                        JsonElement element = adapterDIVWHActivityV2.toJsonTree((DIVWHActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `JNLSActivityV2`
+                    if (value.getActualInstance() instanceof JNLSActivityV2) {
+                        JsonElement element = adapterJNLSActivityV2.toJsonTree((JNLSActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `JNLCActivityV2`
+                    if (value.getActualInstance() instanceof JNLCActivityV2) {
+                        JsonElement element = adapterJNLCActivityV2.toJsonTree((JNLCActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `CSWActivityV2`
+                    if (value.getActualInstance() instanceof CSWActivityV2) {
+                        JsonElement element = adapterCSWActivityV2.toJsonTree((CSWActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `FEEActivityV2`
+                    if (value.getActualInstance() instanceof FEEActivityV2) {
+                        JsonElement element = adapterFEEActivityV2.toJsonTree((FEEActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `MEMActivityV2`
+                    if (value.getActualInstance() instanceof MEMActivityV2) {
+                        JsonElement element = adapterMEMActivityV2.toJsonTree((MEMActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    // check if the actual instance is of the type `OCTActivityV2`
+                    if (value.getActualInstance() instanceof OCTActivityV2) {
+                        JsonElement element = adapterOCTActivityV2.toJsonTree((OCTActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    throw new IOException("Failed to serialize as the type doesn't match oneOf schemas: AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2");
+                }
+
+                @Override
+                public ActivityV2DetailNTA read(JsonReader in) throws IOException {
+                    Object deserialized = null;
+                    JsonElement jsonElement = elementAdapter.read(in);
+
+                    int match = 0;
+                    ArrayList<String> errorMessages = new ArrayList<>();
+                    TypeAdapter actualAdapter = elementAdapter;
+
+                    // deserialize DIVSPDActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        DIVSPDActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterDIVSPDActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'DIVSPDActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for DIVSPDActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'DIVSPDActivityV2'", e);
+                    }
+                    // deserialize CDIVActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        CDIVActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterCDIVActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'CDIVActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for CDIVActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'CDIVActivityV2'", e);
+                    }
+                    // deserialize SDIVActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        SDIVActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterSDIVActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'SDIVActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for SDIVActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'SDIVActivityV2'", e);
+                    }
+                    // deserialize CGDActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        CGDActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterCGDActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'CGDActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for CGDActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'CGDActivityV2'", e);
+                    }
+                    // deserialize ForwardSplitActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        ForwardSplitActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterForwardSplitActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'ForwardSplitActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for ForwardSplitActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'ForwardSplitActivityV2'", e);
+                    }
+                    // deserialize ReverseSplitActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        ReverseSplitActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterReverseSplitActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'ReverseSplitActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for ReverseSplitActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'ReverseSplitActivityV2'", e);
+                    }
+                    // deserialize UnitSplitActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        UnitSplitActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterUnitSplitActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'UnitSplitActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for UnitSplitActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'UnitSplitActivityV2'", e);
+                    }
+                    // deserialize SpinoffActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        SpinoffActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterSpinoffActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'SpinoffActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for SpinoffActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'SpinoffActivityV2'", e);
+                    }
+                    // deserialize MAActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        MAActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterMAActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'MAActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for MAActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'MAActivityV2'", e);
+                    }
+                    // deserialize NCActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        NCActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterNCActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'NCActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for NCActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'NCActivityV2'", e);
+                    }
+                    // deserialize FixedIncomeRedemptionActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        FixedIncomeRedemptionActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterFixedIncomeRedemptionActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'FixedIncomeRedemptionActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for FixedIncomeRedemptionActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'FixedIncomeRedemptionActivityV2'", e);
+                    }
+                    // deserialize FixedIncomeInterestActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        FixedIncomeInterestActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterFixedIncomeInterestActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'FixedIncomeInterestActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for FixedIncomeInterestActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'FixedIncomeInterestActivityV2'", e);
+                    }
+                    // deserialize REOActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        REOActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterREOActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'REOActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for REOActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'REOActivityV2'", e);
+                    }
+                    // deserialize RightsDistributionActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        RightsDistributionActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterRightsDistributionActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'RightsDistributionActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for RightsDistributionActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'RightsDistributionActivityV2'", e);
+                    }
+                    // deserialize RightsSubscriptionElectionActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        RightsSubscriptionElectionActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterRightsSubscriptionElectionActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'RightsSubscriptionElectionActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for RightsSubscriptionElectionActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'RightsSubscriptionElectionActivityV2'", e);
+                    }
+                    // deserialize TenderOfferActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        TenderOfferActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterTenderOfferActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'TenderOfferActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for TenderOfferActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'TenderOfferActivityV2'", e);
+                    }
+                    // deserialize ExchangeOfferActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        ExchangeOfferActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterExchangeOfferActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'ExchangeOfferActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for ExchangeOfferActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'ExchangeOfferActivityV2'", e);
+                    }
+                    // deserialize WarrantExerciseElectionActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        WarrantExerciseElectionActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterWarrantExerciseElectionActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'WarrantExerciseElectionActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for WarrantExerciseElectionActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'WarrantExerciseElectionActivityV2'", e);
+                    }
+                    // deserialize WRMActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        WRMActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterWRMActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'WRMActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for WRMActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'WRMActivityV2'", e);
+                    }
+                    // deserialize OpcaCDIVActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OpcaCDIVActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOpcaCDIVActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OpcaCDIVActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaCDIVActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OpcaCDIVActivityV2'", e);
+                    }
+                    // deserialize OpcaSDIVActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OpcaSDIVActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOpcaSDIVActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OpcaSDIVActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaSDIVActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OpcaSDIVActivityV2'", e);
+                    }
+                    // deserialize OpcaMAActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OpcaMAActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOpcaMAActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OpcaMAActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaMAActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OpcaMAActivityV2'", e);
+                    }
+                    // deserialize OpcaNCActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OpcaNCActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOpcaNCActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OpcaNCActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaNCActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OpcaNCActivityV2'", e);
+                    }
+                    // deserialize OpcaSPINActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OpcaSPINActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOpcaSPINActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OpcaSPINActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaSPINActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OpcaSPINActivityV2'", e);
+                    }
+                    // deserialize OpcaFSPLITActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OpcaFSPLITActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOpcaFSPLITActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OpcaFSPLITActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaFSPLITActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OpcaFSPLITActivityV2'", e);
+                    }
+                    // deserialize OpcaUSPLITActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OpcaUSPLITActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOpcaUSPLITActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OpcaUSPLITActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaUSPLITActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OpcaUSPLITActivityV2'", e);
+                    }
+                    // deserialize OpcaRSPLITActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OpcaRSPLITActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOpcaRSPLITActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OpcaRSPLITActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaRSPLITActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OpcaRSPLITActivityV2'", e);
+                    }
+                    // deserialize OPASNActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OPASNActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOPASNActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OPASNActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OPASNActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OPASNActivityV2'", e);
+                    }
+                    // deserialize OPEXCActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OPEXCActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOPEXCActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OPEXCActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OPEXCActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OPEXCActivityV2'", e);
+                    }
+                    // deserialize OPEXPActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OPEXPActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOPEXPActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OPEXPActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OPEXPActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OPEXPActivityV2'", e);
+                    }
+                    // deserialize OPTRDActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OPTRDActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOPTRDActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OPTRDActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OPTRDActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OPTRDActivityV2'", e);
+                    }
+                    // deserialize OPCSHActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OPCSHActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOPCSHActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OPCSHActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OPCSHActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OPCSHActivityV2'", e);
+                    }
+                    // deserialize AcatsActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        AcatsActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterAcatsActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'AcatsActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for AcatsActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'AcatsActivityV2'", e);
+                    }
+                    // deserialize AcatcActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        AcatcActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterAcatcActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'AcatcActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for AcatcActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'AcatcActivityV2'", e);
+                    }
+                    // deserialize FOPTActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        FOPTActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterFOPTActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'FOPTActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for FOPTActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'FOPTActivityV2'", e);
+                    }
+                    // deserialize DIVNRAActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        DIVNRAActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterDIVNRAActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'DIVNRAActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for DIVNRAActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'DIVNRAActivityV2'", e);
+                    }
+                    // deserialize DIVWHActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        DIVWHActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterDIVWHActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'DIVWHActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for DIVWHActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'DIVWHActivityV2'", e);
+                    }
+                    // deserialize JNLSActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        JNLSActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterJNLSActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'JNLSActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for JNLSActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'JNLSActivityV2'", e);
+                    }
+                    // deserialize JNLCActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        JNLCActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterJNLCActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'JNLCActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for JNLCActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'JNLCActivityV2'", e);
+                    }
+                    // deserialize CSWActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        CSWActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterCSWActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'CSWActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for CSWActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'CSWActivityV2'", e);
+                    }
+                    // deserialize FEEActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        FEEActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterFEEActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'FEEActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for FEEActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'FEEActivityV2'", e);
+                    }
+                    // deserialize MEMActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        MEMActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterMEMActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'MEMActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for MEMActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'MEMActivityV2'", e);
+                    }
+                    // deserialize OCTActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OCTActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOCTActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OCTActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OCTActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OCTActivityV2'", e);
+                    }
+
+                    if (match == 1) {
+                        ActivityV2DetailNTA ret = new ActivityV2DetailNTA();
+                        ret.setActualInstance(actualAdapter.fromJsonTree(jsonElement));
+                        return ret;
+                    }
+
+                    throw new IOException(String.format(java.util.Locale.ROOT, "Failed deserialization for ActivityV2DetailNTA: %d classes match result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", match, errorMessages, jsonElement.toString()));
+                }
+            }.nullSafe();
         }
-      }
+    }
 
-      // check to make sure all required properties/fields are present in the JSON string
-      for (String requiredField : ActivityV2DetailNTA.openapiRequiredFields) {
-        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+    // store a list of schema names defined in oneOf
+    public static final Map<String, Class<?>> schemas = new HashMap<String, Class<?>>();
+
+    public ActivityV2DetailNTA() {
+        super("oneOf", Boolean.FALSE);
+    }
+
+    public ActivityV2DetailNTA(Object o) {
+        super("oneOf", Boolean.FALSE);
+        setActualInstance(o);
+    }
+
+    static {
+        schemas.put("DIVSPDActivityV2", DIVSPDActivityV2.class);
+        schemas.put("CDIVActivityV2", CDIVActivityV2.class);
+        schemas.put("SDIVActivityV2", SDIVActivityV2.class);
+        schemas.put("CGDActivityV2", CGDActivityV2.class);
+        schemas.put("ForwardSplitActivityV2", ForwardSplitActivityV2.class);
+        schemas.put("ReverseSplitActivityV2", ReverseSplitActivityV2.class);
+        schemas.put("UnitSplitActivityV2", UnitSplitActivityV2.class);
+        schemas.put("SpinoffActivityV2", SpinoffActivityV2.class);
+        schemas.put("MAActivityV2", MAActivityV2.class);
+        schemas.put("NCActivityV2", NCActivityV2.class);
+        schemas.put("FixedIncomeRedemptionActivityV2", FixedIncomeRedemptionActivityV2.class);
+        schemas.put("FixedIncomeInterestActivityV2", FixedIncomeInterestActivityV2.class);
+        schemas.put("REOActivityV2", REOActivityV2.class);
+        schemas.put("RightsDistributionActivityV2", RightsDistributionActivityV2.class);
+        schemas.put("RightsSubscriptionElectionActivityV2", RightsSubscriptionElectionActivityV2.class);
+        schemas.put("TenderOfferActivityV2", TenderOfferActivityV2.class);
+        schemas.put("ExchangeOfferActivityV2", ExchangeOfferActivityV2.class);
+        schemas.put("WarrantExerciseElectionActivityV2", WarrantExerciseElectionActivityV2.class);
+        schemas.put("WRMActivityV2", WRMActivityV2.class);
+        schemas.put("OpcaCDIVActivityV2", OpcaCDIVActivityV2.class);
+        schemas.put("OpcaSDIVActivityV2", OpcaSDIVActivityV2.class);
+        schemas.put("OpcaMAActivityV2", OpcaMAActivityV2.class);
+        schemas.put("OpcaNCActivityV2", OpcaNCActivityV2.class);
+        schemas.put("OpcaSPINActivityV2", OpcaSPINActivityV2.class);
+        schemas.put("OpcaFSPLITActivityV2", OpcaFSPLITActivityV2.class);
+        schemas.put("OpcaUSPLITActivityV2", OpcaUSPLITActivityV2.class);
+        schemas.put("OpcaRSPLITActivityV2", OpcaRSPLITActivityV2.class);
+        schemas.put("OPASNActivityV2", OPASNActivityV2.class);
+        schemas.put("OPEXCActivityV2", OPEXCActivityV2.class);
+        schemas.put("OPEXPActivityV2", OPEXPActivityV2.class);
+        schemas.put("OPTRDActivityV2", OPTRDActivityV2.class);
+        schemas.put("OPCSHActivityV2", OPCSHActivityV2.class);
+        schemas.put("AcatsActivityV2", AcatsActivityV2.class);
+        schemas.put("AcatcActivityV2", AcatcActivityV2.class);
+        schemas.put("FOPTActivityV2", FOPTActivityV2.class);
+        schemas.put("DIVNRAActivityV2", DIVNRAActivityV2.class);
+        schemas.put("DIVWHActivityV2", DIVWHActivityV2.class);
+        schemas.put("JNLSActivityV2", JNLSActivityV2.class);
+        schemas.put("JNLCActivityV2", JNLCActivityV2.class);
+        schemas.put("CSWActivityV2", CSWActivityV2.class);
+        schemas.put("FEEActivityV2", FEEActivityV2.class);
+        schemas.put("MEMActivityV2", MEMActivityV2.class);
+        schemas.put("OCTActivityV2", OCTActivityV2.class);
+    }
+
+    @Override
+    public Map<String, Class<?>> getSchemas() {
+        return ActivityV2DetailNTA.schemas;
+    }
+
+    /**
+     * Set the instance that matches the oneOf child schema, check
+     * the instance parameter is valid against the oneOf child schemas:
+     * AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2
+     *
+     * It could be an instance of the 'oneOf' schemas.
+     */
+    @Override
+    public void setActualInstance(Object instance) {
+        if (instance instanceof DIVSPDActivityV2) {
+            super.setActualInstance(instance);
+            return;
         }
-      }
-        JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if (!jsonObj.get("group_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `group_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("group_id").toString()));
-      }
-      if (!jsonObj.get("ca_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `ca_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("ca_id").toString()));
-      }
-      if ((jsonObj.get("reorg_id") != null && !jsonObj.get("reorg_id").isJsonNull()) && !jsonObj.get("reorg_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `reorg_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("reorg_id").toString()));
-      }
-      if (!jsonObj.get("cash_payout").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cash_payout` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cash_payout").toString()));
-      }
-      if (!jsonObj.get("cusip").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cusip").toString()));
-      }
-      if (!jsonObj.get("entitled_qty").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `entitled_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("entitled_qty").toString()));
-      }
-      if ((jsonObj.get("isin") != null && !jsonObj.get("isin").isJsonNull()) && !jsonObj.get("isin").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("isin").toString()));
-      }
-      if (!jsonObj.get("rate").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("rate").toString()));
-      }
-      if (!jsonObj.get("symbol").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
-      }
-      if (!jsonObj.get("new_qty").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_qty").toString()));
-      }
-      if (!jsonObj.get("paid_qty").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `paid_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("paid_qty").toString()));
-      }
-      if (!jsonObj.get("new_cusip").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_cusip").toString()));
-      }
-      if ((jsonObj.get("new_isin") != null && !jsonObj.get("new_isin").isJsonNull()) && !jsonObj.get("new_isin").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_isin").toString()));
-      }
-      if (!jsonObj.get("new_rate").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_rate").toString()));
-      }
-      if (!jsonObj.get("old_cusip").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_cusip").toString()));
-      }
-      if ((jsonObj.get("old_isin") != null && !jsonObj.get("old_isin").isJsonNull()) && !jsonObj.get("old_isin").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_isin").toString()));
-      }
-      if (!jsonObj.get("old_rate").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_rate").toString()));
-      }
-      if (!jsonObj.get("old_qty").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_qty").toString()));
-      }
-      if (!jsonObj.get("new_symbol").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_symbol").toString()));
-      }
-      if (!jsonObj.get("alternate_cusip").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `alternate_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("alternate_cusip").toString()));
-      }
-      if ((jsonObj.get("alternate_isin") != null && !jsonObj.get("alternate_isin").isJsonNull()) && !jsonObj.get("alternate_isin").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `alternate_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("alternate_isin").toString()));
-      }
-      if (!jsonObj.get("alternate_qty").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `alternate_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("alternate_qty").toString()));
-      }
-      if (!jsonObj.get("alternate_rate").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `alternate_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("alternate_rate").toString()));
-      }
-      if (!jsonObj.get("alternate_symbol").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `alternate_symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("alternate_symbol").toString()));
-      }
-      if (!jsonObj.get("old_symbol").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_symbol").toString()));
-      }
-      if (!jsonObj.get("new_price").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_price").toString()));
-      }
-      if (!jsonObj.get("source_cusip").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `source_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("source_cusip").toString()));
-      }
-      if ((jsonObj.get("source_isin") != null && !jsonObj.get("source_isin").isJsonNull()) && !jsonObj.get("source_isin").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `source_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("source_isin").toString()));
-      }
-      if (!jsonObj.get("source_price").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `source_price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("source_price").toString()));
-      }
-      if (!jsonObj.get("source_rate").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `source_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("source_rate").toString()));
-      }
-      if (!jsonObj.get("source_symbol").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `source_symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("source_symbol").toString()));
-      }
-      if (!jsonObj.get("source_qty").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `source_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("source_qty").toString()));
-      }
-      if (!jsonObj.get("acquiree_cusip").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquiree_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquiree_cusip").toString()));
-      }
-      if ((jsonObj.get("acquiree_isin") != null && !jsonObj.get("acquiree_isin").isJsonNull()) && !jsonObj.get("acquiree_isin").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquiree_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquiree_isin").toString()));
-      }
-      if ((jsonObj.get("acquiree_rate") != null && !jsonObj.get("acquiree_rate").isJsonNull()) && !jsonObj.get("acquiree_rate").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquiree_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquiree_rate").toString()));
-      }
-      if (!jsonObj.get("acquiree_symbol").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquiree_symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquiree_symbol").toString()));
-      }
-      if ((jsonObj.get("acquirer_cusip") != null && !jsonObj.get("acquirer_cusip").isJsonNull()) && !jsonObj.get("acquirer_cusip").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquirer_cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquirer_cusip").toString()));
-      }
-      if ((jsonObj.get("acquirer_isin") != null && !jsonObj.get("acquirer_isin").isJsonNull()) && !jsonObj.get("acquirer_isin").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquirer_isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquirer_isin").toString()));
-      }
-      if ((jsonObj.get("acquirer_rate") != null && !jsonObj.get("acquirer_rate").isJsonNull()) && !jsonObj.get("acquirer_rate").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquirer_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquirer_rate").toString()));
-      }
-      if ((jsonObj.get("acquirer_symbol") != null && !jsonObj.get("acquirer_symbol").isJsonNull()) && !jsonObj.get("acquirer_symbol").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquirer_symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquirer_symbol").toString()));
-      }
-      if (!jsonObj.get("acquiree_qty").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquiree_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquiree_qty").toString()));
-      }
-      if ((jsonObj.get("acquirer_qty") != null && !jsonObj.get("acquirer_qty").isJsonNull()) && !jsonObj.get("acquirer_qty").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `acquirer_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("acquirer_qty").toString()));
-      }
-      if ((jsonObj.get("cash_rate") != null && !jsonObj.get("cash_rate").isJsonNull()) && !jsonObj.get("cash_rate").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cash_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cash_rate").toString()));
-      }
-      if (!jsonObj.get("position_qty").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `position_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("position_qty").toString()));
-      }
-      if (!jsonObj.get("qty").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("qty").toString()));
-      }
-      if ((jsonObj.get("accrued_interest_rate") != null && !jsonObj.get("accrued_interest_rate").isJsonNull()) && !jsonObj.get("accrued_interest_rate").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `accrued_interest_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("accrued_interest_rate").toString()));
-      }
-      if ((jsonObj.get("price") != null && !jsonObj.get("price").isJsonNull()) && !jsonObj.get("price").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("price").toString()));
-      }
-      if (!jsonObj.get("removed_qty").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `removed_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("removed_qty").toString()));
-      }
-      if (!jsonObj.get("new_contract_symbol").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `new_contract_symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("new_contract_symbol").toString()));
-      }
-      if (!jsonObj.get("old_contract_symbol").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `old_contract_symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("old_contract_symbol").toString()));
-      }
-      if (!jsonObj.get("external_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `external_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("external_id").toString()));
-      }
-      if (!jsonObj.get("request_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `request_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("request_id").toString()));
-      }
-      if (!jsonObj.get("contra").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `contra` to be a primitive type in the JSON string but got `%s`", jsonObj.get("contra").toString()));
-      }
-      if (!jsonObj.get("parent_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `parent_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("parent_id").toString()));
-      }
-      if ((jsonObj.get("journal_id") != null && !jsonObj.get("journal_id").isJsonNull()) && !jsonObj.get("journal_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `journal_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("journal_id").toString()));
-      }
-      if ((jsonObj.get("bank_transaction_id") != null && !jsonObj.get("bank_transaction_id").isJsonNull()) && !jsonObj.get("bank_transaction_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `bank_transaction_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("bank_transaction_id").toString()));
-      }
-      if (!jsonObj.get("transfer_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `transfer_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("transfer_id").toString()));
-      }
-  }
 
-  public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
+        if (instance instanceof CDIVActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof SDIVActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof CGDActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof ForwardSplitActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof ReverseSplitActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof UnitSplitActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof SpinoffActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof MAActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof NCActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof FixedIncomeRedemptionActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof FixedIncomeInterestActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof REOActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof RightsDistributionActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof RightsSubscriptionElectionActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof TenderOfferActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof ExchangeOfferActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof WarrantExerciseElectionActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof WRMActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OpcaCDIVActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OpcaSDIVActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OpcaMAActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OpcaNCActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OpcaSPINActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OpcaFSPLITActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OpcaUSPLITActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OpcaRSPLITActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OPASNActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OPEXCActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OPEXPActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OPTRDActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OPCSHActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof AcatsActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof AcatcActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof FOPTActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof DIVNRAActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof DIVWHActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof JNLSActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof JNLCActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof CSWActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof FEEActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof MEMActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        if (instance instanceof OCTActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        throw new RuntimeException("Invalid instance type. Must be AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2");
+    }
+
+    /**
+     * Get the actual instance, which can be the following:
+     * AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2
+     *
+     * @return The actual instance (AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2)
+     */
     @SuppressWarnings("unchecked")
     @Override
-    public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!ActivityV2DetailNTA.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'ActivityV2DetailNTA' and its subtypes
-       }
-       final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<ActivityV2DetailNTA> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(ActivityV2DetailNTA.class));
-
-       return (TypeAdapter<T>) new TypeAdapter<ActivityV2DetailNTA>() {
-           @Override
-           public void write(JsonWriter out, ActivityV2DetailNTA value) throws IOException {
-             JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
-             obj.remove("additionalProperties");
-             // serialize additional properties
-             if (value.getAdditionalProperties() != null) {
-               for (Map.Entry<String, Object> entry : value.getAdditionalProperties().entrySet()) {
-                 if (entry.getValue() instanceof String)
-                   obj.addProperty(entry.getKey(), (String) entry.getValue());
-                 else if (entry.getValue() instanceof Number)
-                   obj.addProperty(entry.getKey(), (Number) entry.getValue());
-                 else if (entry.getValue() instanceof Boolean)
-                   obj.addProperty(entry.getKey(), (Boolean) entry.getValue());
-                 else if (entry.getValue() instanceof Character)
-                   obj.addProperty(entry.getKey(), (Character) entry.getValue());
-                 else {
-                   JsonElement jsonElement = gson.toJsonTree(entry.getValue());
-                   if (jsonElement.isJsonNull()) {
-                     obj.add(entry.getKey(), JsonNull.INSTANCE);
-                   } else if (jsonElement.isJsonArray()) {
-                     obj.add(entry.getKey(), jsonElement.getAsJsonArray());
-                   } else {
-                     obj.add(entry.getKey(), jsonElement.getAsJsonObject());
-                   }
-                 }
-               }
-             }
-             elementAdapter.write(out, obj);
-           }
-
-           @Override
-           public ActivityV2DetailNTA read(JsonReader in) throws IOException {
-             JsonElement jsonElement = elementAdapter.read(in);
-             validateJsonElement(jsonElement);
-             JsonObject jsonObj = jsonElement.getAsJsonObject();
-             // store additional fields in the deserialized instance
-             ActivityV2DetailNTA instance = thisAdapter.fromJsonTree(jsonObj);
-             for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
-               if (!openapiFields.contains(entry.getKey())) {
-                 if (entry.getValue().isJsonPrimitive()) { // primitive type
-                   if (entry.getValue().getAsJsonPrimitive().isString())
-                     instance.putAdditionalProperty(entry.getKey(), entry.getValue().getAsString());
-                   else if (entry.getValue().getAsJsonPrimitive().isNumber())
-                     instance.putAdditionalProperty(entry.getKey(), entry.getValue().getAsNumber());
-                   else if (entry.getValue().getAsJsonPrimitive().isBoolean())
-                     instance.putAdditionalProperty(entry.getKey(), entry.getValue().getAsBoolean());
-                   else
-                     throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` has unknown primitive type. Value: %s", entry.getKey(), entry.getValue().toString()));
-                 } else if (entry.getValue().isJsonArray()) {
-                     instance.putAdditionalProperty(entry.getKey(), gson.fromJson(entry.getValue(), List.class));
-                 } else { // JSON object
-                     instance.putAdditionalProperty(entry.getKey(), gson.fromJson(entry.getValue(), HashMap.class));
-                 }
-               }
-             }
-             return instance;
-           }
-
-       }.nullSafe();
+    public Object getActualInstance() {
+        return super.getActualInstance();
     }
-  }
 
-  /**
-   * Create an instance of ActivityV2DetailNTA given an JSON string
-   *
-   * @param jsonString JSON string
-   * @return An instance of ActivityV2DetailNTA
-   * @throws IOException if the JSON string is invalid with respect to ActivityV2DetailNTA
-   */
-  public static ActivityV2DetailNTA fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, ActivityV2DetailNTA.class);
-  }
+    /**
+     * Get the actual instance of `DIVSPDActivityV2`. If the actual instance is not `DIVSPDActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `DIVSPDActivityV2`
+     * @throws ClassCastException if the instance is not `DIVSPDActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public DIVSPDActivityV2 getDIVSPDActivityV2() throws ClassCastException {
+        return (DIVSPDActivityV2)super.getActualInstance();
+    }
 
-  /**
-   * Convert an instance of ActivityV2DetailNTA to an JSON string
-   *
-   * @return JSON string
-   */
-  public String toJson() {
-    return JSON.getGson().toJson(this);
-  }
+    /**
+     * Get the actual instance of `CDIVActivityV2`. If the actual instance is not `CDIVActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `CDIVActivityV2`
+     * @throws ClassCastException if the instance is not `CDIVActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public CDIVActivityV2 getCDIVActivityV2() throws ClassCastException {
+        return (CDIVActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `SDIVActivityV2`. If the actual instance is not `SDIVActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `SDIVActivityV2`
+     * @throws ClassCastException if the instance is not `SDIVActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public SDIVActivityV2 getSDIVActivityV2() throws ClassCastException {
+        return (SDIVActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `CGDActivityV2`. If the actual instance is not `CGDActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `CGDActivityV2`
+     * @throws ClassCastException if the instance is not `CGDActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public CGDActivityV2 getCGDActivityV2() throws ClassCastException {
+        return (CGDActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `ForwardSplitActivityV2`. If the actual instance is not `ForwardSplitActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `ForwardSplitActivityV2`
+     * @throws ClassCastException if the instance is not `ForwardSplitActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public ForwardSplitActivityV2 getForwardSplitActivityV2() throws ClassCastException {
+        return (ForwardSplitActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `ReverseSplitActivityV2`. If the actual instance is not `ReverseSplitActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `ReverseSplitActivityV2`
+     * @throws ClassCastException if the instance is not `ReverseSplitActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public ReverseSplitActivityV2 getReverseSplitActivityV2() throws ClassCastException {
+        return (ReverseSplitActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `UnitSplitActivityV2`. If the actual instance is not `UnitSplitActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `UnitSplitActivityV2`
+     * @throws ClassCastException if the instance is not `UnitSplitActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public UnitSplitActivityV2 getUnitSplitActivityV2() throws ClassCastException {
+        return (UnitSplitActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `SpinoffActivityV2`. If the actual instance is not `SpinoffActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `SpinoffActivityV2`
+     * @throws ClassCastException if the instance is not `SpinoffActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public SpinoffActivityV2 getSpinoffActivityV2() throws ClassCastException {
+        return (SpinoffActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `MAActivityV2`. If the actual instance is not `MAActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `MAActivityV2`
+     * @throws ClassCastException if the instance is not `MAActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public MAActivityV2 getMAActivityV2() throws ClassCastException {
+        return (MAActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `NCActivityV2`. If the actual instance is not `NCActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `NCActivityV2`
+     * @throws ClassCastException if the instance is not `NCActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public NCActivityV2 getNCActivityV2() throws ClassCastException {
+        return (NCActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `FixedIncomeRedemptionActivityV2`. If the actual instance is not `FixedIncomeRedemptionActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `FixedIncomeRedemptionActivityV2`
+     * @throws ClassCastException if the instance is not `FixedIncomeRedemptionActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public FixedIncomeRedemptionActivityV2 getFixedIncomeRedemptionActivityV2() throws ClassCastException {
+        return (FixedIncomeRedemptionActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `FixedIncomeInterestActivityV2`. If the actual instance is not `FixedIncomeInterestActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `FixedIncomeInterestActivityV2`
+     * @throws ClassCastException if the instance is not `FixedIncomeInterestActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public FixedIncomeInterestActivityV2 getFixedIncomeInterestActivityV2() throws ClassCastException {
+        return (FixedIncomeInterestActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `REOActivityV2`. If the actual instance is not `REOActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `REOActivityV2`
+     * @throws ClassCastException if the instance is not `REOActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public REOActivityV2 getREOActivityV2() throws ClassCastException {
+        return (REOActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `RightsDistributionActivityV2`. If the actual instance is not `RightsDistributionActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `RightsDistributionActivityV2`
+     * @throws ClassCastException if the instance is not `RightsDistributionActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public RightsDistributionActivityV2 getRightsDistributionActivityV2() throws ClassCastException {
+        return (RightsDistributionActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `RightsSubscriptionElectionActivityV2`. If the actual instance is not `RightsSubscriptionElectionActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `RightsSubscriptionElectionActivityV2`
+     * @throws ClassCastException if the instance is not `RightsSubscriptionElectionActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public RightsSubscriptionElectionActivityV2 getRightsSubscriptionElectionActivityV2() throws ClassCastException {
+        return (RightsSubscriptionElectionActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `TenderOfferActivityV2`. If the actual instance is not `TenderOfferActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `TenderOfferActivityV2`
+     * @throws ClassCastException if the instance is not `TenderOfferActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public TenderOfferActivityV2 getTenderOfferActivityV2() throws ClassCastException {
+        return (TenderOfferActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `ExchangeOfferActivityV2`. If the actual instance is not `ExchangeOfferActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `ExchangeOfferActivityV2`
+     * @throws ClassCastException if the instance is not `ExchangeOfferActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public ExchangeOfferActivityV2 getExchangeOfferActivityV2() throws ClassCastException {
+        return (ExchangeOfferActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `WarrantExerciseElectionActivityV2`. If the actual instance is not `WarrantExerciseElectionActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `WarrantExerciseElectionActivityV2`
+     * @throws ClassCastException if the instance is not `WarrantExerciseElectionActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public WarrantExerciseElectionActivityV2 getWarrantExerciseElectionActivityV2() throws ClassCastException {
+        return (WarrantExerciseElectionActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `WRMActivityV2`. If the actual instance is not `WRMActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `WRMActivityV2`
+     * @throws ClassCastException if the instance is not `WRMActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public WRMActivityV2 getWRMActivityV2() throws ClassCastException {
+        return (WRMActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OpcaCDIVActivityV2`. If the actual instance is not `OpcaCDIVActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OpcaCDIVActivityV2`
+     * @throws ClassCastException if the instance is not `OpcaCDIVActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OpcaCDIVActivityV2 getOpcaCDIVActivityV2() throws ClassCastException {
+        return (OpcaCDIVActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OpcaSDIVActivityV2`. If the actual instance is not `OpcaSDIVActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OpcaSDIVActivityV2`
+     * @throws ClassCastException if the instance is not `OpcaSDIVActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OpcaSDIVActivityV2 getOpcaSDIVActivityV2() throws ClassCastException {
+        return (OpcaSDIVActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OpcaMAActivityV2`. If the actual instance is not `OpcaMAActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OpcaMAActivityV2`
+     * @throws ClassCastException if the instance is not `OpcaMAActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OpcaMAActivityV2 getOpcaMAActivityV2() throws ClassCastException {
+        return (OpcaMAActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OpcaNCActivityV2`. If the actual instance is not `OpcaNCActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OpcaNCActivityV2`
+     * @throws ClassCastException if the instance is not `OpcaNCActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OpcaNCActivityV2 getOpcaNCActivityV2() throws ClassCastException {
+        return (OpcaNCActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OpcaSPINActivityV2`. If the actual instance is not `OpcaSPINActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OpcaSPINActivityV2`
+     * @throws ClassCastException if the instance is not `OpcaSPINActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OpcaSPINActivityV2 getOpcaSPINActivityV2() throws ClassCastException {
+        return (OpcaSPINActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OpcaFSPLITActivityV2`. If the actual instance is not `OpcaFSPLITActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OpcaFSPLITActivityV2`
+     * @throws ClassCastException if the instance is not `OpcaFSPLITActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OpcaFSPLITActivityV2 getOpcaFSPLITActivityV2() throws ClassCastException {
+        return (OpcaFSPLITActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OpcaUSPLITActivityV2`. If the actual instance is not `OpcaUSPLITActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OpcaUSPLITActivityV2`
+     * @throws ClassCastException if the instance is not `OpcaUSPLITActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OpcaUSPLITActivityV2 getOpcaUSPLITActivityV2() throws ClassCastException {
+        return (OpcaUSPLITActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OpcaRSPLITActivityV2`. If the actual instance is not `OpcaRSPLITActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OpcaRSPLITActivityV2`
+     * @throws ClassCastException if the instance is not `OpcaRSPLITActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OpcaRSPLITActivityV2 getOpcaRSPLITActivityV2() throws ClassCastException {
+        return (OpcaRSPLITActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OPASNActivityV2`. If the actual instance is not `OPASNActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OPASNActivityV2`
+     * @throws ClassCastException if the instance is not `OPASNActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OPASNActivityV2 getOPASNActivityV2() throws ClassCastException {
+        return (OPASNActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OPEXCActivityV2`. If the actual instance is not `OPEXCActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OPEXCActivityV2`
+     * @throws ClassCastException if the instance is not `OPEXCActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OPEXCActivityV2 getOPEXCActivityV2() throws ClassCastException {
+        return (OPEXCActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OPEXPActivityV2`. If the actual instance is not `OPEXPActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OPEXPActivityV2`
+     * @throws ClassCastException if the instance is not `OPEXPActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OPEXPActivityV2 getOPEXPActivityV2() throws ClassCastException {
+        return (OPEXPActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OPTRDActivityV2`. If the actual instance is not `OPTRDActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OPTRDActivityV2`
+     * @throws ClassCastException if the instance is not `OPTRDActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OPTRDActivityV2 getOPTRDActivityV2() throws ClassCastException {
+        return (OPTRDActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OPCSHActivityV2`. If the actual instance is not `OPCSHActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OPCSHActivityV2`
+     * @throws ClassCastException if the instance is not `OPCSHActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OPCSHActivityV2 getOPCSHActivityV2() throws ClassCastException {
+        return (OPCSHActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `AcatsActivityV2`. If the actual instance is not `AcatsActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `AcatsActivityV2`
+     * @throws ClassCastException if the instance is not `AcatsActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public AcatsActivityV2 getAcatsActivityV2() throws ClassCastException {
+        return (AcatsActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `AcatcActivityV2`. If the actual instance is not `AcatcActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `AcatcActivityV2`
+     * @throws ClassCastException if the instance is not `AcatcActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public AcatcActivityV2 getAcatcActivityV2() throws ClassCastException {
+        return (AcatcActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `FOPTActivityV2`. If the actual instance is not `FOPTActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `FOPTActivityV2`
+     * @throws ClassCastException if the instance is not `FOPTActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public FOPTActivityV2 getFOPTActivityV2() throws ClassCastException {
+        return (FOPTActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `DIVNRAActivityV2`. If the actual instance is not `DIVNRAActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `DIVNRAActivityV2`
+     * @throws ClassCastException if the instance is not `DIVNRAActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public DIVNRAActivityV2 getDIVNRAActivityV2() throws ClassCastException {
+        return (DIVNRAActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `DIVWHActivityV2`. If the actual instance is not `DIVWHActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `DIVWHActivityV2`
+     * @throws ClassCastException if the instance is not `DIVWHActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public DIVWHActivityV2 getDIVWHActivityV2() throws ClassCastException {
+        return (DIVWHActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `JNLSActivityV2`. If the actual instance is not `JNLSActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `JNLSActivityV2`
+     * @throws ClassCastException if the instance is not `JNLSActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public JNLSActivityV2 getJNLSActivityV2() throws ClassCastException {
+        return (JNLSActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `JNLCActivityV2`. If the actual instance is not `JNLCActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `JNLCActivityV2`
+     * @throws ClassCastException if the instance is not `JNLCActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public JNLCActivityV2 getJNLCActivityV2() throws ClassCastException {
+        return (JNLCActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `CSWActivityV2`. If the actual instance is not `CSWActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `CSWActivityV2`
+     * @throws ClassCastException if the instance is not `CSWActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public CSWActivityV2 getCSWActivityV2() throws ClassCastException {
+        return (CSWActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `FEEActivityV2`. If the actual instance is not `FEEActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `FEEActivityV2`
+     * @throws ClassCastException if the instance is not `FEEActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public FEEActivityV2 getFEEActivityV2() throws ClassCastException {
+        return (FEEActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `MEMActivityV2`. If the actual instance is not `MEMActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `MEMActivityV2`
+     * @throws ClassCastException if the instance is not `MEMActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public MEMActivityV2 getMEMActivityV2() throws ClassCastException {
+        return (MEMActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OCTActivityV2`. If the actual instance is not `OCTActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OCTActivityV2`
+     * @throws ClassCastException if the instance is not `OCTActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OCTActivityV2 getOCTActivityV2() throws ClassCastException {
+        return (OCTActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Validates the JSON Element and throws an exception if issues found
+     *
+     * @param jsonElement JSON Element
+     * @throws IOException if the JSON Element is invalid with respect to ActivityV2DetailNTA
+     */
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+        // validate oneOf schemas one by one
+        int validCount = 0;
+        ArrayList<String> errorMessages = new ArrayList<>();
+        // validate the json string with DIVSPDActivityV2
+        try {
+            DIVSPDActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for DIVSPDActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with CDIVActivityV2
+        try {
+            CDIVActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for CDIVActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with SDIVActivityV2
+        try {
+            SDIVActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for SDIVActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with CGDActivityV2
+        try {
+            CGDActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for CGDActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with ForwardSplitActivityV2
+        try {
+            ForwardSplitActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for ForwardSplitActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with ReverseSplitActivityV2
+        try {
+            ReverseSplitActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for ReverseSplitActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with UnitSplitActivityV2
+        try {
+            UnitSplitActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for UnitSplitActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with SpinoffActivityV2
+        try {
+            SpinoffActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for SpinoffActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with MAActivityV2
+        try {
+            MAActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for MAActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with NCActivityV2
+        try {
+            NCActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for NCActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with FixedIncomeRedemptionActivityV2
+        try {
+            FixedIncomeRedemptionActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for FixedIncomeRedemptionActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with FixedIncomeInterestActivityV2
+        try {
+            FixedIncomeInterestActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for FixedIncomeInterestActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with REOActivityV2
+        try {
+            REOActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for REOActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with RightsDistributionActivityV2
+        try {
+            RightsDistributionActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for RightsDistributionActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with RightsSubscriptionElectionActivityV2
+        try {
+            RightsSubscriptionElectionActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for RightsSubscriptionElectionActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with TenderOfferActivityV2
+        try {
+            TenderOfferActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for TenderOfferActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with ExchangeOfferActivityV2
+        try {
+            ExchangeOfferActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for ExchangeOfferActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with WarrantExerciseElectionActivityV2
+        try {
+            WarrantExerciseElectionActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for WarrantExerciseElectionActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with WRMActivityV2
+        try {
+            WRMActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for WRMActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OpcaCDIVActivityV2
+        try {
+            OpcaCDIVActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaCDIVActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OpcaSDIVActivityV2
+        try {
+            OpcaSDIVActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaSDIVActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OpcaMAActivityV2
+        try {
+            OpcaMAActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaMAActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OpcaNCActivityV2
+        try {
+            OpcaNCActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaNCActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OpcaSPINActivityV2
+        try {
+            OpcaSPINActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaSPINActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OpcaFSPLITActivityV2
+        try {
+            OpcaFSPLITActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaFSPLITActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OpcaUSPLITActivityV2
+        try {
+            OpcaUSPLITActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaUSPLITActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OpcaRSPLITActivityV2
+        try {
+            OpcaRSPLITActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaRSPLITActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OPASNActivityV2
+        try {
+            OPASNActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OPASNActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OPEXCActivityV2
+        try {
+            OPEXCActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OPEXCActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OPEXPActivityV2
+        try {
+            OPEXPActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OPEXPActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OPTRDActivityV2
+        try {
+            OPTRDActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OPTRDActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OPCSHActivityV2
+        try {
+            OPCSHActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OPCSHActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with AcatsActivityV2
+        try {
+            AcatsActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for AcatsActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with AcatcActivityV2
+        try {
+            AcatcActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for AcatcActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with FOPTActivityV2
+        try {
+            FOPTActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for FOPTActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with DIVNRAActivityV2
+        try {
+            DIVNRAActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for DIVNRAActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with DIVWHActivityV2
+        try {
+            DIVWHActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for DIVWHActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with JNLSActivityV2
+        try {
+            JNLSActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for JNLSActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with JNLCActivityV2
+        try {
+            JNLCActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for JNLCActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with CSWActivityV2
+        try {
+            CSWActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for CSWActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with FEEActivityV2
+        try {
+            FEEActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for FEEActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with MEMActivityV2
+        try {
+            MEMActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for MEMActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        // validate the json string with OCTActivityV2
+        try {
+            OCTActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OCTActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
+        if (validCount != 1) {
+            throw new IOException(String.format(java.util.Locale.ROOT, "The JSON string is invalid for ActivityV2DetailNTA with oneOf schemas: AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2. %d class(es) match the result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", validCount, errorMessages, jsonElement.toString()));
+        }
+    }
+
+    /**
+     * Create an instance of ActivityV2DetailNTA given an JSON string
+     *
+     * @param jsonString JSON string
+     * @return An instance of ActivityV2DetailNTA
+     * @throws IOException if the JSON string is invalid with respect to ActivityV2DetailNTA
+     */
+    public static ActivityV2DetailNTA fromJson(String jsonString) throws IOException {
+        return JSON.getGson().fromJson(jsonString, ActivityV2DetailNTA.class);
+    }
+
+    /**
+     * Convert an instance of ActivityV2DetailNTA to an JSON string
+     *
+     * @return JSON string
+     */
+    public String toJson() {
+        return JSON.getGson().toJson(this);
+    }
 }
 
