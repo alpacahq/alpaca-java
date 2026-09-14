@@ -50,7 +50,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * CommonJournalActivityV2
+ * Shared fields for journal non-trade activity records.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class CommonJournalActivityV2 implements Serializable {

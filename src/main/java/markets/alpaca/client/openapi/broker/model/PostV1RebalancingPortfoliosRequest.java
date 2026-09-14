@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import markets.alpaca.client.openapi.broker.model.PortfolioWeights;
+import markets.alpaca.client.openapi.broker.model.PortfolioWeightRequest;
 import markets.alpaca.client.openapi.broker.model.RebalancingConditions;
 import java.io.Serializable;
 
@@ -81,7 +81,7 @@ public class PostV1RebalancingPortfoliosRequest implements Serializable {
   public static final String SERIALIZED_NAME_WEIGHTS = "weights";
   @SerializedName(SERIALIZED_NAME_WEIGHTS)
   @javax.annotation.Nullable
-  private List<PortfolioWeights> weights = new ArrayList<>();
+  private List<PortfolioWeightRequest> weights = new ArrayList<>();
 
   public PostV1RebalancingPortfoliosRequest() {
   }
@@ -170,12 +170,12 @@ public class PostV1RebalancingPortfoliosRequest implements Serializable {
   }
 
 
-  public PostV1RebalancingPortfoliosRequest weights(@javax.annotation.Nullable List<PortfolioWeights> weights) {
+  public PostV1RebalancingPortfoliosRequest weights(@javax.annotation.Nullable List<PortfolioWeightRequest> weights) {
     this.weights = weights;
     return this;
   }
 
-  public PostV1RebalancingPortfoliosRequest addWeightsItem(PortfolioWeights weightsItem) {
+  public PostV1RebalancingPortfoliosRequest addWeightsItem(PortfolioWeightRequest weightsItem) {
     if (this.weights == null) {
       this.weights = new ArrayList<>();
     }
@@ -188,11 +188,11 @@ public class PostV1RebalancingPortfoliosRequest implements Serializable {
    * @return weights
    */
   @javax.annotation.Nullable
-  public List<PortfolioWeights> getWeights() {
+  public List<PortfolioWeightRequest> getWeights() {
     return weights;
   }
 
-  public void setWeights(@javax.annotation.Nullable List<PortfolioWeights> weights) {
+  public void setWeights(@javax.annotation.Nullable List<PortfolioWeightRequest> weights) {
     this.weights = weights;
   }
 
@@ -341,7 +341,7 @@ public class PostV1RebalancingPortfoliosRequest implements Serializable {
 
           // validate the optional field `weights` (array)
           for (int i = 0; i < jsonArrayweights.size(); i++) {
-            PortfolioWeights.validateJsonElement(jsonArrayweights.get(i));
+            PortfolioWeightRequest.validateJsonElement(jsonArrayweights.get(i));
           };
         }
       }

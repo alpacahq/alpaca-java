@@ -50,7 +50,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.trading.http.JSON;
 
 /**
- * CommonNTAActivityV2
+ * Shared fields for non-trade (NTA) activity records.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class CommonNTAActivityV2 implements Serializable {

@@ -29,6 +29,7 @@ import java.io.IOException;
 
 import markets.alpaca.client.openapi.trading.model.Error;
 import java.time.OffsetDateTime;
+import markets.alpaca.client.openapi.trading.model.TokenizationIssuer;
 import markets.alpaca.client.openapi.trading.model.TokenizationMintRequest;
 import markets.alpaca.client.openapi.trading.model.TokenizationMintResponse;
 import markets.alpaca.client.openapi.trading.model.TokenizationNetwork;
@@ -412,7 +413,7 @@ public class TokenizationApi {
         <tr><td> 422 </td><td> One or more request parameters are missing or invalid. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getTokenizationRequestsCall(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable String issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call getTokenizationRequestsCall(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable TokenizationIssuer issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -485,7 +486,7 @@ public class TokenizationApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call getTokenizationRequestsValidateBeforeCall(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable String issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call getTokenizationRequestsValidateBeforeCall(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable TokenizationIssuer issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before, final ApiCallback _callback) throws ApiException {
         return getTokenizationRequestsCall(type, status, underlyingSymbol, issuer, network, after, before, _callback);
 
     }
@@ -512,7 +513,7 @@ public class TokenizationApi {
         <tr><td> 422 </td><td> One or more request parameters are missing or invalid. </td><td>  -  </td></tr>
      </table>
      */
-    public List<TokenizationRequest> getTokenizationRequests(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable String issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before) throws ApiException {
+    public List<TokenizationRequest> getTokenizationRequests(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable TokenizationIssuer issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before) throws ApiException {
         ApiResponse<List<TokenizationRequest>> localVarResp = getTokenizationRequestsWithHttpInfo(type, status, underlyingSymbol, issuer, network, after, before);
         return localVarResp.getData();
     }
@@ -539,7 +540,7 @@ public class TokenizationApi {
         <tr><td> 422 </td><td> One or more request parameters are missing or invalid. </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<List<TokenizationRequest>> getTokenizationRequestsWithHttpInfo(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable String issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before) throws ApiException {
+    public ApiResponse<List<TokenizationRequest>> getTokenizationRequestsWithHttpInfo(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable TokenizationIssuer issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before) throws ApiException {
         okhttp3.Call localVarCall = getTokenizationRequestsValidateBeforeCall(type, status, underlyingSymbol, issuer, network, after, before, null);
         Type localVarReturnType = new TypeToken<List<TokenizationRequest>>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -568,7 +569,7 @@ public class TokenizationApi {
         <tr><td> 422 </td><td> One or more request parameters are missing or invalid. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getTokenizationRequestsAsync(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable String issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before, final ApiCallback<List<TokenizationRequest>> _callback) throws ApiException {
+    public okhttp3.Call getTokenizationRequestsAsync(@javax.annotation.Nullable TokenizationRequestType type, @javax.annotation.Nullable TokenizationRequestStatus status, @javax.annotation.Nullable String underlyingSymbol, @javax.annotation.Nullable TokenizationIssuer issuer, @javax.annotation.Nullable TokenizationNetwork network, @javax.annotation.Nullable OffsetDateTime after, @javax.annotation.Nullable OffsetDateTime before, final ApiCallback<List<TokenizationRequest>> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = getTokenizationRequestsValidateBeforeCall(type, status, underlyingSymbol, issuer, network, after, before, _callback);
         Type localVarReturnType = new TypeToken<List<TokenizationRequest>>(){}.getType();
@@ -578,7 +579,7 @@ public class TokenizationApi {
     /**
      * Build call for postTokenizationMint
      * @param tokenizationMintRequest  (required)
-     * @param idempotencyKey Unique key for idempotent create. When supplied, duplicate requests (same key and body) return the original mint request instead of creating a new one. Use a client-generated value (e.g. UUID) per logical request. Strongly recommended for production to prevent duplicate requests on retries.  (optional)
+     * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -658,7 +659,7 @@ public class TokenizationApi {
      * Mint a Tokenized Asset
      * This endpoint is used by an Authorized Participant to request the minting of a tokenized asset.  **Idempotency**: When the &#x60;Idempotency-Key&#x60; header is supplied, this endpoint is idempotent. Multiple requests with the same key and identical request body will create only one mint request. A subsequent request returns the previously created request with the same response (no duplicate is created). If the same key is used with a different request body, the API returns &#x60;422 Unprocessable Entity&#x60;.  **Recommended for production**: Always supply &#x60;Idempotency-Key&#x60; when requesting a mint. This allows safe retries on timeouts, network errors, or 5xx responses without risking duplicate requests. Use a client-generated unique value (e.g. UUID).
      * @param tokenizationMintRequest  (required)
-     * @param idempotencyKey Unique key for idempotent create. When supplied, duplicate requests (same key and body) return the original mint request instead of creating a new one. Use a client-generated value (e.g. UUID) per logical request. Strongly recommended for production to prevent duplicate requests on retries.  (optional)
+     * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @return TokenizationMintResponse
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -681,7 +682,7 @@ public class TokenizationApi {
      * Mint a Tokenized Asset
      * This endpoint is used by an Authorized Participant to request the minting of a tokenized asset.  **Idempotency**: When the &#x60;Idempotency-Key&#x60; header is supplied, this endpoint is idempotent. Multiple requests with the same key and identical request body will create only one mint request. A subsequent request returns the previously created request with the same response (no duplicate is created). If the same key is used with a different request body, the API returns &#x60;422 Unprocessable Entity&#x60;.  **Recommended for production**: Always supply &#x60;Idempotency-Key&#x60; when requesting a mint. This allows safe retries on timeouts, network errors, or 5xx responses without risking duplicate requests. Use a client-generated unique value (e.g. UUID).
      * @param tokenizationMintRequest  (required)
-     * @param idempotencyKey Unique key for idempotent create. When supplied, duplicate requests (same key and body) return the original mint request instead of creating a new one. Use a client-generated value (e.g. UUID) per logical request. Strongly recommended for production to prevent duplicate requests on retries.  (optional)
+     * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @return ApiResponse&lt;TokenizationMintResponse&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -705,7 +706,7 @@ public class TokenizationApi {
      * Mint a Tokenized Asset (asynchronously)
      * This endpoint is used by an Authorized Participant to request the minting of a tokenized asset.  **Idempotency**: When the &#x60;Idempotency-Key&#x60; header is supplied, this endpoint is idempotent. Multiple requests with the same key and identical request body will create only one mint request. A subsequent request returns the previously created request with the same response (no duplicate is created). If the same key is used with a different request body, the API returns &#x60;422 Unprocessable Entity&#x60;.  **Recommended for production**: Always supply &#x60;Idempotency-Key&#x60; when requesting a mint. This allows safe retries on timeouts, network errors, or 5xx responses without risking duplicate requests. Use a client-generated unique value (e.g. UUID).
      * @param tokenizationMintRequest  (required)
-     * @param idempotencyKey Unique key for idempotent create. When supplied, duplicate requests (same key and body) return the original mint request instead of creating a new one. Use a client-generated value (e.g. UUID) per logical request. Strongly recommended for production to prevent duplicate requests on retries.  (optional)
+     * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object

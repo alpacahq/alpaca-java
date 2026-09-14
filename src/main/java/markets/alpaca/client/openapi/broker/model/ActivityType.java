@@ -25,7 +25,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * Represents the various kinds of activity.  TradeActivity&#39;s will always have the type &#x60;FILL&#x60;  - **FILL**   Order Fills (Partial/Full) - **ACATC**   ACATS IN/OUT (Cash) - **ACATS**   ACATS IN/OUT (Securities) - **CGD**   Capital Gain Distribution - **CIL**   Cash in Lieu of Stock - **CSD**   Cash Disbursement (+) - **CSW**   Cash Withdrawable - **DIV**   Dividend - **DIVCGL**   Dividend (Capital Gain Long Term) - **DIVCGS**   Dividend (Capital Gain Short Term) - **DIVNRA**   Dividend Adjusted (NRA Withheld) - **DIVROC**   Dividend Return of Capital - **DIVTXEX**   Dividend (Tax Exempt) - **FEE**   REG and TAF Fees - **INT**   Interest (Credit/Margin) - **JNLC**   Journal Entry (Cash) - **JNLS**   Journal Entry (Stock) - **OPASN**    Option Assignment - **OPCA**   Option Corporate Action - **OPCSH**    Option cash deliverable for non-standard contracts - **OPEXC**   Option Exercise - **OPEXP**   Option Expiration - **OPTRD**   Option Trade - **MA**   Merger/Acquisition - **PTC**   Pass Thru Change - **REORG**   Reorg CA - **SPIN**   Stock Spinoff - **SPLIT**   Stock Split - **FOPT**   Free of Payment Transfers - **OCT**   On Chain Transactions (blockchain deposits/withdrawals)
+ * Represents the various kinds of activity.  TradeActivity&#39;s will always have the type &#x60;FILL&#x60;  - **FILL**   Order Fills (Partial/Full) - **ACATC**   ACATS IN/OUT (Cash) - **ACATS**   ACATS IN/OUT (Securities) - **CGD**   Capital Gains Distribution - **CIL**   Cash in Lieu of Stock - **CSD**   Cash Disbursement (+) - **CSW**   Cash Withdrawable - **DIV**   Dividend - **DIVCGL**   Dividend (Capital Gains Long Term) - **DIVCGS**   Dividend (Capital Gains Short Term) - **DIVNRA**   Dividend Adjusted (NRA Withheld) - **DIVROC**   Dividend Return of Capital - **DIVTXEX**   Dividend (Tax Exempt) - **FEE**   REG and TAF Fees - **INT**   Interest (Credit/Margin) - **JNLC**   Journal Entry (Cash) - **JNLS**   Journal Entry (Stock) - **OPASN**    Option Assignment - **OPCA**   Option Corporate Action - **OPCSH**    Option cash deliverable for non-standard contracts - **OPEXC**   Option Exercise - **OPEXP**   Option Expiration - **OPTRD**   Option Trade - **MA**   Merger/Acquisition - **PTC**   Pass Thru Change - **REO**   Reorganization - **REORG**   Worthless removal CA - **SPIN**   Stock Spinoff - **SPLIT**   Stock Split - **FOPT**   Free of Payment Transfers - **OCT**   On Chain Transactions (blockchain deposits/withdrawals)
  */
 @JsonAdapter(ActivityType.Adapter.class)
 public enum ActivityType implements Serializable {
@@ -79,6 +79,8 @@ public enum ActivityType implements Serializable {
   OPTRD("OPTRD"),
   
   PTC("PTC"),
+  
+  REO("REO"),
   
   REORG("REORG"),
   

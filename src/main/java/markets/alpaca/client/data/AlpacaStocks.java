@@ -4,6 +4,7 @@ import java.util.Objects;
 import markets.alpaca.client.openapi.data.api.StockApi;
 import markets.alpaca.client.openapi.data.http.ApiException;
 import markets.alpaca.client.openapi.data.http.ApiResponse;
+import markets.alpaca.client.openapi.data.model.Sort;
 import markets.alpaca.client.openapi.data.model.StockTradesResp;
 import markets.alpaca.client.openapi.data.model.StockTradesRespSingle;
 
@@ -53,7 +54,7 @@ public final class AlpacaStocks {
         request.feed(),
         request.currency(),
         request.pageToken(),
-        request.sort());
+        sortValue(request.sort()));
   }
 
   /**
@@ -73,7 +74,7 @@ public final class AlpacaStocks {
         request.feed(),
         request.currency(),
         request.pageToken(),
-        request.sort());
+        sortValue(request.sort()));
   }
 
   /**
@@ -93,7 +94,7 @@ public final class AlpacaStocks {
         request.feed(),
         request.currency(),
         request.pageToken(),
-        request.sort());
+        sortValue(request.sort()));
   }
 
   /** Returns single-symbol historical stock trades with HTTP status code and response headers. */
@@ -109,6 +110,10 @@ public final class AlpacaStocks {
         request.feed(),
         request.currency(),
         request.pageToken(),
-        request.sort());
+        sortValue(request.sort()));
+  }
+
+  private static String sortValue(Sort sort) {
+    return sort == null ? null : sort.getValue();
   }
 }

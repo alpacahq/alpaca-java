@@ -1,6 +1,6 @@
 /*
  * Market Data API
- * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News. 
+ * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News. 
  *
  * The version of the OpenAPI document: 1.1
  * Contact: support@alpaca.markets
@@ -30,7 +30,6 @@ import java.io.IOException;
 import markets.alpaca.client.openapi.data.model.ForexLatestRatesResp;
 import markets.alpaca.client.openapi.data.model.ForexRatesResp;
 import java.time.OffsetDateTime;
-import markets.alpaca.client.openapi.data.model.Sort;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -154,7 +153,7 @@ public class ForexApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "BasicAuth", "apiKey", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -249,7 +248,7 @@ public class ForexApi {
      * @param start The inclusive start of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the beginning of the current day, but at least 15 minutes ago if the user doesn&#39;t have real-time access for the feed.  (optional)
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
@@ -266,7 +265,7 @@ public class ForexApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call ratesCall(@javax.annotation.Nonnull String currencyPairs, @javax.annotation.Nullable String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable Sort sort, @javax.annotation.Nullable String pageToken, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call ratesCall(@javax.annotation.Nonnull String currencyPairs, @javax.annotation.Nullable String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String pageToken, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -334,12 +333,12 @@ public class ForexApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "BasicAuth", "apiKey", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call ratesValidateBeforeCall(@javax.annotation.Nonnull String currencyPairs, @javax.annotation.Nullable String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable Sort sort, @javax.annotation.Nullable String pageToken, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call ratesValidateBeforeCall(@javax.annotation.Nonnull String currencyPairs, @javax.annotation.Nullable String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String pageToken, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'currencyPairs' is set
         if (currencyPairs == null) {
             throw new ApiException("Missing the required parameter 'currencyPairs' when calling rates(Async)");
@@ -357,7 +356,7 @@ public class ForexApi {
      * @param start The inclusive start of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the beginning of the current day, but at least 15 minutes ago if the user doesn&#39;t have real-time access for the feed.  (optional)
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
      * @return ForexRatesResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -373,7 +372,7 @@ public class ForexApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ForexRatesResp rates(@javax.annotation.Nonnull String currencyPairs, @javax.annotation.Nullable String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable Sort sort, @javax.annotation.Nullable String pageToken) throws ApiException {
+    public ForexRatesResp rates(@javax.annotation.Nonnull String currencyPairs, @javax.annotation.Nullable String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String pageToken) throws ApiException {
         ApiResponse<ForexRatesResp> localVarResp = ratesWithHttpInfo(currencyPairs, timeframe, start, end, limit, sort, pageToken);
         return localVarResp.getData();
     }
@@ -386,7 +385,7 @@ public class ForexApi {
      * @param start The inclusive start of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the beginning of the current day, but at least 15 minutes ago if the user doesn&#39;t have real-time access for the feed.  (optional)
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
      * @return ApiResponse&lt;ForexRatesResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -402,7 +401,7 @@ public class ForexApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<ForexRatesResp> ratesWithHttpInfo(@javax.annotation.Nonnull String currencyPairs, @javax.annotation.Nullable String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable Sort sort, @javax.annotation.Nullable String pageToken) throws ApiException {
+    public ApiResponse<ForexRatesResp> ratesWithHttpInfo(@javax.annotation.Nonnull String currencyPairs, @javax.annotation.Nullable String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String pageToken) throws ApiException {
         okhttp3.Call localVarCall = ratesValidateBeforeCall(currencyPairs, timeframe, start, end, limit, sort, pageToken, null);
         Type localVarReturnType = new TypeToken<ForexRatesResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -416,7 +415,7 @@ public class ForexApi {
      * @param start The inclusive start of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the beginning of the current day, but at least 15 minutes ago if the user doesn&#39;t have real-time access for the feed.  (optional)
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
@@ -433,7 +432,7 @@ public class ForexApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call ratesAsync(@javax.annotation.Nonnull String currencyPairs, @javax.annotation.Nullable String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable Sort sort, @javax.annotation.Nullable String pageToken, final ApiCallback<ForexRatesResp> _callback) throws ApiException {
+    public okhttp3.Call ratesAsync(@javax.annotation.Nonnull String currencyPairs, @javax.annotation.Nullable String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String pageToken, final ApiCallback<ForexRatesResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = ratesValidateBeforeCall(currencyPairs, timeframe, start, end, limit, sort, pageToken, _callback);
         Type localVarReturnType = new TypeToken<ForexRatesResp>(){}.getType();

@@ -2292,7 +2292,7 @@ public class FundingApi {
 
     /**
      * Create a new JIT settlement
-     * Creates a new JIT settlement, which will trigger the reconciliation process for all included accounts. 
+     * Creates a new JIT settlement, which will trigger the reconciliation process for all included accounts. There is a limit of 150,000 accounts per settlement. If more than 150,000 accounts need to be settled, they should be batched in multiple settlements. 
      * @param createJITSettlementRequest details of the JIT settlement request (required)
      * @return SettlementResponse
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -2311,7 +2311,7 @@ public class FundingApi {
 
     /**
      * Create a new JIT settlement
-     * Creates a new JIT settlement, which will trigger the reconciliation process for all included accounts. 
+     * Creates a new JIT settlement, which will trigger the reconciliation process for all included accounts. There is a limit of 150,000 accounts per settlement. If more than 150,000 accounts need to be settled, they should be batched in multiple settlements. 
      * @param createJITSettlementRequest details of the JIT settlement request (required)
      * @return ApiResponse&lt;SettlementResponse&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -2331,7 +2331,7 @@ public class FundingApi {
 
     /**
      * Create a new JIT settlement (asynchronously)
-     * Creates a new JIT settlement, which will trigger the reconciliation process for all included accounts. 
+     * Creates a new JIT settlement, which will trigger the reconciliation process for all included accounts. There is a limit of 150,000 accounts per settlement. If more than 150,000 accounts need to be settled, they should be batched in multiple settlements. 
      * @param createJITSettlementRequest details of the JIT settlement request (required)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call

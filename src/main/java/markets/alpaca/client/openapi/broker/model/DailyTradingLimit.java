@@ -49,7 +49,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * DailyTradingLimit
+ * Correspondent-level daily net buying limit and the real-time amount currently consuming it.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class DailyTradingLimit implements Serializable {

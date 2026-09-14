@@ -56,7 +56,7 @@ public class PortfolioWeights implements Serializable {
 
   public static final String SERIALIZED_NAME_PERCENT = "percent";
   @SerializedName(SERIALIZED_NAME_PERCENT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String percent;
 
   public static final String SERIALIZED_NAME_SYMBOL = "symbol";
@@ -64,29 +64,81 @@ public class PortfolioWeights implements Serializable {
   @javax.annotation.Nullable
   private String symbol;
 
+  /**
+   * Type of weight entry in a portfolio.
+   */
+  @JsonAdapter(TypeEnum.Adapter.class)
+  public enum TypeEnum {
+    CASH("cash"),
+    
+    ASSET("asset");
+
+    private String value;
+
+    TypeEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static TypeEnum fromValue(String value) {
+      for (TypeEnum b : TypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<TypeEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final TypeEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public TypeEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return TypeEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      TypeEnum.fromValue(value);
+    }
+  }
+
   public static final String SERIALIZED_NAME_TYPE = "type";
   @SerializedName(SERIALIZED_NAME_TYPE)
-  @javax.annotation.Nullable
-  private String type;
+  @javax.annotation.Nonnull
+  private TypeEnum type;
 
   public PortfolioWeights() {
   }
 
-  public PortfolioWeights percent(@javax.annotation.Nullable String percent) {
+  public PortfolioWeights percent(@javax.annotation.Nonnull String percent) {
     this.percent = percent;
     return this;
   }
 
   /**
-   * Must be a positive value, up to two decimal places
+   * Percentage allocated to this weight as a decimal string.
    * @return percent
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getPercent() {
     return percent;
   }
 
-  public void setPercent(@javax.annotation.Nullable String percent) {
+  public void setPercent(@javax.annotation.Nonnull String percent) {
     this.percent = percent;
   }
 
@@ -97,7 +149,7 @@ public class PortfolioWeights implements Serializable {
   }
 
   /**
-   * Must be fractionable asset. Only provided if type &#x3D; \&quot;asset\&quot;
+   * Asset symbol. &#x60;null&#x60; for cash weights. Always present.
    * @return symbol
    */
   @javax.annotation.Nullable
@@ -110,21 +162,21 @@ public class PortfolioWeights implements Serializable {
   }
 
 
-  public PortfolioWeights type(@javax.annotation.Nullable String type) {
+  public PortfolioWeights type(@javax.annotation.Nonnull TypeEnum type) {
     this.type = type;
     return this;
   }
 
   /**
-   * Possible values of cash or asset
+   * Type of weight entry in a portfolio.
    * @return type
    */
-  @javax.annotation.Nullable
-  public String getType() {
+  @javax.annotation.Nonnull
+  public TypeEnum getType() {
     return type;
   }
 
-  public void setType(@javax.annotation.Nullable String type) {
+  public void setType(@javax.annotation.Nonnull TypeEnum type) {
     this.type = type;
   }
 
@@ -223,7 +275,7 @@ public class PortfolioWeights implements Serializable {
     openapiFields = new HashSet<String>(Arrays.asList("percent", "symbol", "type"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("percent", "symbol", "type"));
   }
 
   /**
@@ -238,16 +290,25 @@ public class PortfolioWeights implements Serializable {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PortfolioWeights is not found in the empty JSON string", PortfolioWeights.openapiRequiredFields.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : PortfolioWeights.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("percent") != null && !jsonObj.get("percent").isJsonNull()) && !jsonObj.get("percent").isJsonPrimitive()) {
+      if (!jsonObj.get("percent").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `percent` to be a primitive type in the JSON string but got `%s`", jsonObj.get("percent").toString()));
       }
       if ((jsonObj.get("symbol") != null && !jsonObj.get("symbol").isJsonNull()) && !jsonObj.get("symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
       }
-      if ((jsonObj.get("type") != null && !jsonObj.get("type").isJsonNull()) && !jsonObj.get("type").isJsonPrimitive()) {
+      if (!jsonObj.get("type").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("type").toString()));
       }
+      // validate the required field `type`
+      TypeEnum.validateJsonElement(jsonObj.get("type"));
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {

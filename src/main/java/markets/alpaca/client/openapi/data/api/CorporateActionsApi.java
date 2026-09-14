@@ -1,6 +1,6 @@
 /*
  * Market Data API
- * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News. 
+ * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News. 
  *
  * The version of the OpenAPI document: 1.1
  * Contact: support@alpaca.markets
@@ -34,7 +34,6 @@ import markets.alpaca.client.openapi.data.model.DataQuality;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import markets.alpaca.client.openapi.data.model.Region;
-import markets.alpaca.client.openapi.data.model.Sort;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -100,7 +99,7 @@ public class CorporateActionsApi {
      * Build call for corporateActions
      * @param symbols A comma-separated list of symbols. (optional)
      * @param cusips A comma-separated list of CUSIPs. (optional)
-     * @param types A comma-separated list of types. If not provided, search all types.  The following types are supported:   - reverse_split   - forward_split   - unit_split   - cash_dividend   - stock_dividend   - spin_off   - cash_merger   - stock_merger   - stock_and_cash_merger   - redemption   - name_change   - worthless_removal   - rights_distribution   - partial_call   - reorganization  (optional)
+     * @param types A comma-separated list of types. If not provided, search all types.  The following types are supported:   - reverse_split   - forward_split   - unit_split   - cash_dividend   - stock_dividend   - spin_off   - cash_merger   - stock_merger   - stock_and_cash_merger   - redemption   - name_change   - worthless_removal   - rights_distribution   - partial_call   - reorganization   - capital_gains_distribution  (optional)
      * @param region The region to filter corporate actions by. (optional, default to us)
      * @param start The inclusive start of the interval. The corporate actions are sorted by their &#x60;process_date&#x60;. Format: YYYY-MM-DD. Default: current day.  (optional)
      * @param end The inclusive end of the interval. The corporate actions are sorted by their &#x60;process_date&#x60;. Format: YYYY-MM-DD. Default: current day.  (optional)
@@ -108,7 +107,7 @@ public class CorporateActionsApi {
      * @param limit Maximum number of corporate actions to return in a response. The limit applies to the total number of data points, not the count per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of corporate actions.  (optional, default to 100)
      * @param dataQuality Controls which corporate actions are returned based on data quality.  (optional, default to complete)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -124,7 +123,7 @@ public class CorporateActionsApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call corporateActionsCall(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call corporateActionsCall(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -208,12 +207,12 @@ public class CorporateActionsApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call corporateActionsValidateBeforeCall(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call corporateActionsValidateBeforeCall(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         return corporateActionsCall(symbols, cusips, types, region, start, end, ids, limit, dataQuality, pageToken, sort, _callback);
 
     }
@@ -223,7 +222,7 @@ public class CorporateActionsApi {
      * This endpoint provides data about the corporate actions for each given symbol over a specified time period.  By default (&#x60;data_quality&#x3D;complete&#x60;), corporate actions that are still incomplete (for example, missing required fields such as ex-date or CUSIP/ISIN) and have not yet been processed are excluded from the response. Pass &#x60;data_quality&#x3D;all&#x60; to also receive those early, incomplete records. Already-processed corporate actions are always returned when &#x60;data_quality&#x3D;complete&#x60;, even if they would otherwise be considered incomplete.  &gt; ⚠️ Warning &gt; &gt; Currently Alpaca has no guarantees on the creation time of corporate actions. There may be delays in receiving corporate actions from our data providers, and there may be delays in processing and making them available via this API. As a result, corporate actions may not be available immediately after they are announced. 
      * @param symbols A comma-separated list of symbols. (optional)
      * @param cusips A comma-separated list of CUSIPs. (optional)
-     * @param types A comma-separated list of types. If not provided, search all types.  The following types are supported:   - reverse_split   - forward_split   - unit_split   - cash_dividend   - stock_dividend   - spin_off   - cash_merger   - stock_merger   - stock_and_cash_merger   - redemption   - name_change   - worthless_removal   - rights_distribution   - partial_call   - reorganization  (optional)
+     * @param types A comma-separated list of types. If not provided, search all types.  The following types are supported:   - reverse_split   - forward_split   - unit_split   - cash_dividend   - stock_dividend   - spin_off   - cash_merger   - stock_merger   - stock_and_cash_merger   - redemption   - name_change   - worthless_removal   - rights_distribution   - partial_call   - reorganization   - capital_gains_distribution  (optional)
      * @param region The region to filter corporate actions by. (optional, default to us)
      * @param start The inclusive start of the interval. The corporate actions are sorted by their &#x60;process_date&#x60;. Format: YYYY-MM-DD. Default: current day.  (optional)
      * @param end The inclusive end of the interval. The corporate actions are sorted by their &#x60;process_date&#x60;. Format: YYYY-MM-DD. Default: current day.  (optional)
@@ -231,7 +230,7 @@ public class CorporateActionsApi {
      * @param limit Maximum number of corporate actions to return in a response. The limit applies to the total number of data points, not the count per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of corporate actions.  (optional, default to 100)
      * @param dataQuality Controls which corporate actions are returned based on data quality.  (optional, default to complete)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return CorporateActionsResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -246,7 +245,7 @@ public class CorporateActionsApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public CorporateActionsResp corporateActions(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public CorporateActionsResp corporateActions(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<CorporateActionsResp> localVarResp = corporateActionsWithHttpInfo(symbols, cusips, types, region, start, end, ids, limit, dataQuality, pageToken, sort);
         return localVarResp.getData();
     }
@@ -256,7 +255,7 @@ public class CorporateActionsApi {
      * This endpoint provides data about the corporate actions for each given symbol over a specified time period.  By default (&#x60;data_quality&#x3D;complete&#x60;), corporate actions that are still incomplete (for example, missing required fields such as ex-date or CUSIP/ISIN) and have not yet been processed are excluded from the response. Pass &#x60;data_quality&#x3D;all&#x60; to also receive those early, incomplete records. Already-processed corporate actions are always returned when &#x60;data_quality&#x3D;complete&#x60;, even if they would otherwise be considered incomplete.  &gt; ⚠️ Warning &gt; &gt; Currently Alpaca has no guarantees on the creation time of corporate actions. There may be delays in receiving corporate actions from our data providers, and there may be delays in processing and making them available via this API. As a result, corporate actions may not be available immediately after they are announced. 
      * @param symbols A comma-separated list of symbols. (optional)
      * @param cusips A comma-separated list of CUSIPs. (optional)
-     * @param types A comma-separated list of types. If not provided, search all types.  The following types are supported:   - reverse_split   - forward_split   - unit_split   - cash_dividend   - stock_dividend   - spin_off   - cash_merger   - stock_merger   - stock_and_cash_merger   - redemption   - name_change   - worthless_removal   - rights_distribution   - partial_call   - reorganization  (optional)
+     * @param types A comma-separated list of types. If not provided, search all types.  The following types are supported:   - reverse_split   - forward_split   - unit_split   - cash_dividend   - stock_dividend   - spin_off   - cash_merger   - stock_merger   - stock_and_cash_merger   - redemption   - name_change   - worthless_removal   - rights_distribution   - partial_call   - reorganization   - capital_gains_distribution  (optional)
      * @param region The region to filter corporate actions by. (optional, default to us)
      * @param start The inclusive start of the interval. The corporate actions are sorted by their &#x60;process_date&#x60;. Format: YYYY-MM-DD. Default: current day.  (optional)
      * @param end The inclusive end of the interval. The corporate actions are sorted by their &#x60;process_date&#x60;. Format: YYYY-MM-DD. Default: current day.  (optional)
@@ -264,7 +263,7 @@ public class CorporateActionsApi {
      * @param limit Maximum number of corporate actions to return in a response. The limit applies to the total number of data points, not the count per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of corporate actions.  (optional, default to 100)
      * @param dataQuality Controls which corporate actions are returned based on data quality.  (optional, default to complete)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;CorporateActionsResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -279,7 +278,7 @@ public class CorporateActionsApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<CorporateActionsResp> corporateActionsWithHttpInfo(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<CorporateActionsResp> corporateActionsWithHttpInfo(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = corporateActionsValidateBeforeCall(symbols, cusips, types, region, start, end, ids, limit, dataQuality, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<CorporateActionsResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -290,7 +289,7 @@ public class CorporateActionsApi {
      * This endpoint provides data about the corporate actions for each given symbol over a specified time period.  By default (&#x60;data_quality&#x3D;complete&#x60;), corporate actions that are still incomplete (for example, missing required fields such as ex-date or CUSIP/ISIN) and have not yet been processed are excluded from the response. Pass &#x60;data_quality&#x3D;all&#x60; to also receive those early, incomplete records. Already-processed corporate actions are always returned when &#x60;data_quality&#x3D;complete&#x60;, even if they would otherwise be considered incomplete.  &gt; ⚠️ Warning &gt; &gt; Currently Alpaca has no guarantees on the creation time of corporate actions. There may be delays in receiving corporate actions from our data providers, and there may be delays in processing and making them available via this API. As a result, corporate actions may not be available immediately after they are announced. 
      * @param symbols A comma-separated list of symbols. (optional)
      * @param cusips A comma-separated list of CUSIPs. (optional)
-     * @param types A comma-separated list of types. If not provided, search all types.  The following types are supported:   - reverse_split   - forward_split   - unit_split   - cash_dividend   - stock_dividend   - spin_off   - cash_merger   - stock_merger   - stock_and_cash_merger   - redemption   - name_change   - worthless_removal   - rights_distribution   - partial_call   - reorganization  (optional)
+     * @param types A comma-separated list of types. If not provided, search all types.  The following types are supported:   - reverse_split   - forward_split   - unit_split   - cash_dividend   - stock_dividend   - spin_off   - cash_merger   - stock_merger   - stock_and_cash_merger   - redemption   - name_change   - worthless_removal   - rights_distribution   - partial_call   - reorganization   - capital_gains_distribution  (optional)
      * @param region The region to filter corporate actions by. (optional, default to us)
      * @param start The inclusive start of the interval. The corporate actions are sorted by their &#x60;process_date&#x60;. Format: YYYY-MM-DD. Default: current day.  (optional)
      * @param end The inclusive end of the interval. The corporate actions are sorted by their &#x60;process_date&#x60;. Format: YYYY-MM-DD. Default: current day.  (optional)
@@ -298,7 +297,7 @@ public class CorporateActionsApi {
      * @param limit Maximum number of corporate actions to return in a response. The limit applies to the total number of data points, not the count per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of corporate actions.  (optional, default to 100)
      * @param dataQuality Controls which corporate actions are returned based on data quality.  (optional, default to complete)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -314,7 +313,7 @@ public class CorporateActionsApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call corporateActionsAsync(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<CorporateActionsResp> _callback) throws ApiException {
+    public okhttp3.Call corporateActionsAsync(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<CorporateActionsResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = corporateActionsValidateBeforeCall(symbols, cusips, types, region, start, end, ids, limit, dataQuality, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<CorporateActionsResp>(){}.getType();
@@ -414,7 +413,7 @@ public class CorporateActionsApi {
         }
 
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -426,7 +425,7 @@ public class CorporateActionsApi {
 
     /**
      * Subscribe to Corporate Actions Events (SSE)
-     * Server-Sent Events (SSE) stream that delivers every corporate-action mutation (&#x60;insert&#x60; / &#x60;update&#x60; / &#x60;delete&#x60;) across all 15 CA types on a single long-lived &#x60;text/event-stream&#x60; connection. When &#x60;since&#x60;, &#x60;since_id&#x60;, or the &#x60;Last-Event-Id&#x60; reconnect header is provided, historical events are replayed first; otherwise only live events are pushed.  Each event carries an &#x60;event_type&#x60; discriminator that selects the shape of the &#x60;ca&#x60; payload -- see the [&#x60;corporate_action_event&#x60;](#/components/schemas/corporate_action_event) schema for the mapping to each per-type schema. The same underlying data is available on demand via [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions). 
+     * Server-Sent Events (SSE) stream that delivers every corporate-action mutation (&#x60;insert&#x60; / &#x60;update&#x60; / &#x60;delete&#x60;) across all supported CA types on a single long-lived &#x60;text/event-stream&#x60; connection. When &#x60;since&#x60;, &#x60;since_id&#x60;, or the &#x60;Last-Event-Id&#x60; reconnect header is provided, historical events are replayed first; otherwise only live events are pushed.  Each event carries an &#x60;event_type&#x60; discriminator that selects the shape of the &#x60;ca&#x60; payload -- see the [&#x60;corporate_action_event&#x60;](#/components/schemas/corporate_action_event) schema for the mapping to each per-type schema. The same underlying data is available on demand via [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions). 
      * @param type Filter the stream to a subset of &#x60;event_type&#x60; values.  Passed as a comma-separated list in the URL query, e.g. &#x60;?type&#x3D;cash_dividend_corporateaction_event,stock_dividend_corporateaction_event&#x60;.  Only events whose &#x60;event_type&#x60; is in this list are delivered. An empty or omitted value is treated as \&quot;no filter\&quot; (deliver every type). Unknown values return &#x60;400&#x60; with the list of valid values in the error message. The filter applies uniformly to both replayed (historical) and live events.  See [&#x60;corporate_action_event_type&#x60;](#/components/schemas/corporate_action_event_type) for the full list of accepted values.  (optional)
      * @param region Which markets to receive events for. Compared against the envelope&#39;s &#x60;region&#x60; field and applied uniformly to historical and live events.  - &#x60;all&#x60; (default): every event, regardless of market. - &#x60;us&#x60;: only events with &#x60;region &#x3D;&#x3D; \&quot;us\&quot;&#x60;. - &#x60;non_us&#x60;: only events with &#x60;region &#x3D;&#x3D; \&quot;non_us\&quot;&#x60;.  Unknown values return &#x60;400&#x60; with the list of valid values in the error message. The value is case-insensitive.  (optional, default to all)
      * @param since Replay events emitted on or after this RFC-3339 date. Mutually exclusive with &#x60;since_id&#x60;. Required when &#x60;until&#x60; is specified.  (optional)
@@ -455,7 +454,7 @@ public class CorporateActionsApi {
 
     /**
      * Subscribe to Corporate Actions Events (SSE)
-     * Server-Sent Events (SSE) stream that delivers every corporate-action mutation (&#x60;insert&#x60; / &#x60;update&#x60; / &#x60;delete&#x60;) across all 15 CA types on a single long-lived &#x60;text/event-stream&#x60; connection. When &#x60;since&#x60;, &#x60;since_id&#x60;, or the &#x60;Last-Event-Id&#x60; reconnect header is provided, historical events are replayed first; otherwise only live events are pushed.  Each event carries an &#x60;event_type&#x60; discriminator that selects the shape of the &#x60;ca&#x60; payload -- see the [&#x60;corporate_action_event&#x60;](#/components/schemas/corporate_action_event) schema for the mapping to each per-type schema. The same underlying data is available on demand via [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions). 
+     * Server-Sent Events (SSE) stream that delivers every corporate-action mutation (&#x60;insert&#x60; / &#x60;update&#x60; / &#x60;delete&#x60;) across all supported CA types on a single long-lived &#x60;text/event-stream&#x60; connection. When &#x60;since&#x60;, &#x60;since_id&#x60;, or the &#x60;Last-Event-Id&#x60; reconnect header is provided, historical events are replayed first; otherwise only live events are pushed.  Each event carries an &#x60;event_type&#x60; discriminator that selects the shape of the &#x60;ca&#x60; payload -- see the [&#x60;corporate_action_event&#x60;](#/components/schemas/corporate_action_event) schema for the mapping to each per-type schema. The same underlying data is available on demand via [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions). 
      * @param type Filter the stream to a subset of &#x60;event_type&#x60; values.  Passed as a comma-separated list in the URL query, e.g. &#x60;?type&#x3D;cash_dividend_corporateaction_event,stock_dividend_corporateaction_event&#x60;.  Only events whose &#x60;event_type&#x60; is in this list are delivered. An empty or omitted value is treated as \&quot;no filter\&quot; (deliver every type). Unknown values return &#x60;400&#x60; with the list of valid values in the error message. The filter applies uniformly to both replayed (historical) and live events.  See [&#x60;corporate_action_event_type&#x60;](#/components/schemas/corporate_action_event_type) for the full list of accepted values.  (optional)
      * @param region Which markets to receive events for. Compared against the envelope&#39;s &#x60;region&#x60; field and applied uniformly to historical and live events.  - &#x60;all&#x60; (default): every event, regardless of market. - &#x60;us&#x60;: only events with &#x60;region &#x3D;&#x3D; \&quot;us\&quot;&#x60;. - &#x60;non_us&#x60;: only events with &#x60;region &#x3D;&#x3D; \&quot;non_us\&quot;&#x60;.  Unknown values return &#x60;400&#x60; with the list of valid values in the error message. The value is case-insensitive.  (optional, default to all)
      * @param since Replay events emitted on or after this RFC-3339 date. Mutually exclusive with &#x60;since_id&#x60;. Required when &#x60;until&#x60; is specified.  (optional)
@@ -485,7 +484,7 @@ public class CorporateActionsApi {
 
     /**
      * Subscribe to Corporate Actions Events (SSE) (asynchronously)
-     * Server-Sent Events (SSE) stream that delivers every corporate-action mutation (&#x60;insert&#x60; / &#x60;update&#x60; / &#x60;delete&#x60;) across all 15 CA types on a single long-lived &#x60;text/event-stream&#x60; connection. When &#x60;since&#x60;, &#x60;since_id&#x60;, or the &#x60;Last-Event-Id&#x60; reconnect header is provided, historical events are replayed first; otherwise only live events are pushed.  Each event carries an &#x60;event_type&#x60; discriminator that selects the shape of the &#x60;ca&#x60; payload -- see the [&#x60;corporate_action_event&#x60;](#/components/schemas/corporate_action_event) schema for the mapping to each per-type schema. The same underlying data is available on demand via [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions). 
+     * Server-Sent Events (SSE) stream that delivers every corporate-action mutation (&#x60;insert&#x60; / &#x60;update&#x60; / &#x60;delete&#x60;) across all supported CA types on a single long-lived &#x60;text/event-stream&#x60; connection. When &#x60;since&#x60;, &#x60;since_id&#x60;, or the &#x60;Last-Event-Id&#x60; reconnect header is provided, historical events are replayed first; otherwise only live events are pushed.  Each event carries an &#x60;event_type&#x60; discriminator that selects the shape of the &#x60;ca&#x60; payload -- see the [&#x60;corporate_action_event&#x60;](#/components/schemas/corporate_action_event) schema for the mapping to each per-type schema. The same underlying data is available on demand via [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions). 
      * @param type Filter the stream to a subset of &#x60;event_type&#x60; values.  Passed as a comma-separated list in the URL query, e.g. &#x60;?type&#x3D;cash_dividend_corporateaction_event,stock_dividend_corporateaction_event&#x60;.  Only events whose &#x60;event_type&#x60; is in this list are delivered. An empty or omitted value is treated as \&quot;no filter\&quot; (deliver every type). Unknown values return &#x60;400&#x60; with the list of valid values in the error message. The filter applies uniformly to both replayed (historical) and live events.  See [&#x60;corporate_action_event_type&#x60;](#/components/schemas/corporate_action_event_type) for the full list of accepted values.  (optional)
      * @param region Which markets to receive events for. Compared against the envelope&#39;s &#x60;region&#x60; field and applied uniformly to historical and live events.  - &#x60;all&#x60; (default): every event, regardless of market. - &#x60;us&#x60;: only events with &#x60;region &#x3D;&#x3D; \&quot;us\&quot;&#x60;. - &#x60;non_us&#x60;: only events with &#x60;region &#x3D;&#x3D; \&quot;non_us\&quot;&#x60;.  Unknown values return &#x60;400&#x60; with the list of valid values in the error message. The value is case-insensitive.  (optional, default to all)
      * @param since Replay events emitted on or after this RFC-3339 date. Mutually exclusive with &#x60;since_id&#x60;. Required when &#x60;until&#x60; is specified.  (optional)

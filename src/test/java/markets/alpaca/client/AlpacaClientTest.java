@@ -9,7 +9,6 @@ import java.util.Map;
 import markets.alpaca.client.data.AlpacaStocks;
 import markets.alpaca.client.data.StockTradesRequest;
 import markets.alpaca.client.openapi.data.api.StockApi;
-import markets.alpaca.client.openapi.data.model.Sort;
 import markets.alpaca.client.openapi.data.model.StockHistoricalFeed;
 import markets.alpaca.client.openapi.data.model.StockTradesResp;
 import markets.alpaca.client.openapi.data.model.StockTradesRespSingle;
@@ -363,7 +362,7 @@ class AlpacaClientTest {
         StockHistoricalFeed feed,
         String currency,
         String pageToken,
-        Sort sort)
+        String sort)
         throws markets.alpaca.client.openapi.data.http.ApiException {
       return tradesResponse;
     }
@@ -379,7 +378,7 @@ class AlpacaClientTest {
             StockHistoricalFeed feed,
             String currency,
             String pageToken,
-            Sort sort)
+            String sort)
             throws markets.alpaca.client.openapi.data.http.ApiException {
       return tradesHttpResponse;
     }
@@ -394,7 +393,7 @@ class AlpacaClientTest {
         StockHistoricalFeed feed,
         String currency,
         String pageToken,
-        Sort sort)
+        String sort)
         throws markets.alpaca.client.openapi.data.http.ApiException {
       return singleTradesResponse;
     }
@@ -410,7 +409,7 @@ class AlpacaClientTest {
             StockHistoricalFeed feed,
             String currency,
             String pageToken,
-            Sort sort)
+            String sort)
             throws markets.alpaca.client.openapi.data.http.ApiException {
       return singleTradesHttpResponse;
     }

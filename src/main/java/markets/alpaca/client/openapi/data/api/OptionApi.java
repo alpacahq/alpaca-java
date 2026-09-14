@@ -1,6 +1,6 @@
 /*
  * Market Data API
- * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News. 
+ * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News. 
  *
  * The version of the OpenAPI document: 1.1
  * Contact: support@alpaca.markets
@@ -35,7 +35,6 @@ import markets.alpaca.client.openapi.data.model.OptionLatestQuotesResp;
 import markets.alpaca.client.openapi.data.model.OptionLatestTradesResp;
 import markets.alpaca.client.openapi.data.model.OptionSnapshotsResp;
 import markets.alpaca.client.openapi.data.model.OptionTradesResp;
-import markets.alpaca.client.openapi.data.model.Sort;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -117,7 +116,7 @@ public class OptionApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -133,7 +132,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call optionBarsCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call optionBarsCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -201,12 +200,12 @@ public class OptionApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call optionBarsValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call optionBarsValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'symbols' is set
         if (symbols == null) {
             throw new ApiException("Missing the required parameter 'symbols' when calling optionBars(Async)");
@@ -230,7 +229,7 @@ public class OptionApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return OptionBarsResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -245,7 +244,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public OptionBarsResp optionBars(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public OptionBarsResp optionBars(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<OptionBarsResp> localVarResp = optionBarsWithHttpInfo(symbols, timeframe, start, end, limit, pageToken, sort);
         return localVarResp.getData();
     }
@@ -259,7 +258,7 @@ public class OptionApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;OptionBarsResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -274,7 +273,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<OptionBarsResp> optionBarsWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<OptionBarsResp> optionBarsWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = optionBarsValidateBeforeCall(symbols, timeframe, start, end, limit, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<OptionBarsResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -289,7 +288,7 @@ public class OptionApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -305,7 +304,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call optionBarsAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<OptionBarsResp> _callback) throws ApiException {
+    public okhttp3.Call optionBarsAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<OptionBarsResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = optionBarsValidateBeforeCall(symbols, timeframe, start, end, limit, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<OptionBarsResp>(){}.getType();
@@ -426,7 +425,7 @@ public class OptionApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -614,7 +613,7 @@ public class OptionApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -772,7 +771,7 @@ public class OptionApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -922,7 +921,7 @@ public class OptionApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1067,7 +1066,7 @@ public class OptionApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1229,7 +1228,7 @@ public class OptionApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1336,7 +1335,7 @@ public class OptionApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -1352,7 +1351,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call optionTradesCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call optionTradesCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -1416,12 +1415,12 @@ public class OptionApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] { "apiKey", "apiSecret" };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call optionTradesValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call optionTradesValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'symbols' is set
         if (symbols == null) {
             throw new ApiException("Missing the required parameter 'symbols' when calling optionTrades(Async)");
@@ -1439,7 +1438,7 @@ public class OptionApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return OptionTradesResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1454,7 +1453,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public OptionTradesResp optionTrades(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public OptionTradesResp optionTrades(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<OptionTradesResp> localVarResp = optionTradesWithHttpInfo(symbols, start, end, limit, pageToken, sort);
         return localVarResp.getData();
     }
@@ -1467,7 +1466,7 @@ public class OptionApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;OptionTradesResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1482,7 +1481,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<OptionTradesResp> optionTradesWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<OptionTradesResp> optionTradesWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = optionTradesValidateBeforeCall(symbols, start, end, limit, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<OptionTradesResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -1496,7 +1495,7 @@ public class OptionApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -1512,7 +1511,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call optionTradesAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<OptionTradesResp> _callback) throws ApiException {
+    public okhttp3.Call optionTradesAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<OptionTradesResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = optionTradesValidateBeforeCall(symbols, start, end, limit, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<OptionTradesResp>(){}.getType();

@@ -32,6 +32,10 @@ import markets.alpaca.client.openapi.trading.model.CreateWhitelistedAddressReque
 import markets.alpaca.client.openapi.trading.model.CryptoChain;
 import markets.alpaca.client.openapi.trading.model.CryptoTransfer;
 import markets.alpaca.client.openapi.trading.model.CryptoWallet;
+import markets.alpaca.client.openapi.trading.model.SearchVASPsResponse;
+import markets.alpaca.client.openapi.trading.model.TravelRuleErrorResponse;
+import java.util.UUID;
+import markets.alpaca.client.openapi.trading.model.UpdateWhitelistedAddressTravelRuleInfoRequest;
 import markets.alpaca.client.openapi.trading.model.WalletFeeEstimateResponse;
 import markets.alpaca.client.openapi.trading.model.WhitelistedAddress;
 
@@ -67,6 +71,10 @@ import java.util.Map;
  *   <li><b>{@code listCryptoFundingWallets}</b>: Retrieve Crypto Funding Wallets</li>
  * 
  *   <li><b>{@code listWhitelistedAddress}</b>: An array of whitelisted addresses</li>
+ * 
+ *   <li><b>{@code searchVASPs}</b>: Search for VASPs</li>
+ * 
+ *   <li><b>{@code updateWhitelistedAddressTravelRuleInfo}</b>: Update travel rule information for a whitelisted wallet</li>
  * 
  * </ul>
  */
@@ -118,6 +126,7 @@ public class CryptoFundingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Successfully requested a transfer. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
      </table>
      * @deprecated
      */
@@ -190,6 +199,7 @@ public class CryptoFundingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Successfully requested a transfer. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
      </table>
      * @deprecated
      */
@@ -210,6 +220,7 @@ public class CryptoFundingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Successfully requested a transfer. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
      </table>
      * @deprecated
      */
@@ -232,6 +243,7 @@ public class CryptoFundingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Successfully requested a transfer. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
      </table>
      * @deprecated
      */
@@ -254,6 +266,7 @@ public class CryptoFundingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Successfully requested a whitelisted address </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call createWhitelistedAddressCall(@javax.annotation.Nonnull CreateWhitelistedAddressRequest createWhitelistedAddressRequest, final ApiCallback _callback) throws ApiException {
@@ -314,7 +327,7 @@ public class CryptoFundingApi {
 
     /**
      * Request a new whitelisted address
-     * Submits a new whitelisted withdrawal address for your account. The chain is derived from the supplied asset symbol and address, and the same address cannot be whitelisted twice on the same chain.  Where travel rule reporting applies to your account, address details are validated against the travel rule provider before being persisted.  Note that whitelisted addresses must wait at least 24 hours before they can be used as a withdrawal destination.
+     * Submits a new whitelisted withdrawal address for your account. The chain is derived from the supplied asset symbol and address, and the same address cannot be whitelisted twice on the same chain.  Where travel rule reporting applies to your account, supply travel rule information for the destination wallet. Use the &#x60;Search VASPs&#x60; endpoint to find the VASP DID for the destination exchange. For a self-hosted wallet, set &#x60;beneficiary_is_self_hosted&#x60; to true. If the exchange is not in the directory, provide its information in &#x60;beneficiary_manual_entry&#x60;.  Note that whitelisted addresses must wait at least 24 hours before they can be used as a withdrawal destination.
      * @param createWhitelistedAddressRequest  (required)
      * @return WhitelistedAddress
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -323,6 +336,7 @@ public class CryptoFundingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Successfully requested a whitelisted address </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
      </table>
      */
     public WhitelistedAddress createWhitelistedAddress(@javax.annotation.Nonnull CreateWhitelistedAddressRequest createWhitelistedAddressRequest) throws ApiException {
@@ -332,7 +346,7 @@ public class CryptoFundingApi {
 
     /**
      * Request a new whitelisted address
-     * Submits a new whitelisted withdrawal address for your account. The chain is derived from the supplied asset symbol and address, and the same address cannot be whitelisted twice on the same chain.  Where travel rule reporting applies to your account, address details are validated against the travel rule provider before being persisted.  Note that whitelisted addresses must wait at least 24 hours before they can be used as a withdrawal destination.
+     * Submits a new whitelisted withdrawal address for your account. The chain is derived from the supplied asset symbol and address, and the same address cannot be whitelisted twice on the same chain.  Where travel rule reporting applies to your account, supply travel rule information for the destination wallet. Use the &#x60;Search VASPs&#x60; endpoint to find the VASP DID for the destination exchange. For a self-hosted wallet, set &#x60;beneficiary_is_self_hosted&#x60; to true. If the exchange is not in the directory, provide its information in &#x60;beneficiary_manual_entry&#x60;.  Note that whitelisted addresses must wait at least 24 hours before they can be used as a withdrawal destination.
      * @param createWhitelistedAddressRequest  (required)
      * @return ApiResponse&lt;WhitelistedAddress&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -341,6 +355,7 @@ public class CryptoFundingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Successfully requested a whitelisted address </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<WhitelistedAddress> createWhitelistedAddressWithHttpInfo(@javax.annotation.Nonnull CreateWhitelistedAddressRequest createWhitelistedAddressRequest) throws ApiException {
@@ -351,7 +366,7 @@ public class CryptoFundingApi {
 
     /**
      * Request a new whitelisted address (asynchronously)
-     * Submits a new whitelisted withdrawal address for your account. The chain is derived from the supplied asset symbol and address, and the same address cannot be whitelisted twice on the same chain.  Where travel rule reporting applies to your account, address details are validated against the travel rule provider before being persisted.  Note that whitelisted addresses must wait at least 24 hours before they can be used as a withdrawal destination.
+     * Submits a new whitelisted withdrawal address for your account. The chain is derived from the supplied asset symbol and address, and the same address cannot be whitelisted twice on the same chain.  Where travel rule reporting applies to your account, supply travel rule information for the destination wallet. Use the &#x60;Search VASPs&#x60; endpoint to find the VASP DID for the destination exchange. For a self-hosted wallet, set &#x60;beneficiary_is_self_hosted&#x60; to true. If the exchange is not in the directory, provide its information in &#x60;beneficiary_manual_entry&#x60;.  Note that whitelisted addresses must wait at least 24 hours before they can be used as a withdrawal destination.
      * @param createWhitelistedAddressRequest  (required)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
@@ -361,6 +376,7 @@ public class CryptoFundingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Successfully requested a whitelisted address </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call createWhitelistedAddressAsync(@javax.annotation.Nonnull CreateWhitelistedAddressRequest createWhitelistedAddressRequest, final ApiCallback<WhitelistedAddress> _callback) throws ApiException {
@@ -1141,6 +1157,324 @@ public class CryptoFundingApi {
         okhttp3.Call localVarCall = listWhitelistedAddressValidateBeforeCall(_callback);
         Type localVarReturnType = new TypeToken<WhitelistedAddress>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+    /**
+     * Build call for searchVASPs
+     * @param q General search query string. (optional)
+     * @param emailDomain Filter by VASP email domain. (optional)
+     * @param chainalysisName Filter by Chainalysis-specific VASP name. (optional)
+     * @param fields Specify which fields to return (comma-separated). (optional)
+     * @param page The zero-based page number to retrieve. (optional, default to 0)
+     * @param perPage Number of items per page. (optional, default to 10)
+     * @param order Field-based sort expression, such as name:ASC. Multiple expressions may be comma-separated. Defaults to name:ASC. (optional, default to name:ASC)
+     * @param includeSubsidiaryVASPs Whether to include child/subsidiary entities. (optional, default to false)
+     * @param _callback Callback for upload/download progress
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Successful request. Returns an array of VASPs or an empty list if no matches found. </td><td>  -  </td></tr>
+     </table>
+     */
+    public okhttp3.Call searchVASPsCall(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v2/wallets/travel-rule/vasps";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        if (q != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("q", q));
+        }
+
+        if (emailDomain != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("emailDomain", emailDomain));
+        }
+
+        if (chainalysisName != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("chainalysisName", chainalysisName));
+        }
+
+        if (fields != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("fields", fields));
+        }
+
+        if (page != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("page", page));
+        }
+
+        if (perPage != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("per_page", perPage));
+        }
+
+        if (order != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("order", order));
+        }
+
+        if (includeSubsidiaryVASPs != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("includeSubsidiaryVASPs", includeSubsidiaryVASPs));
+        }
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "API_Key", "API_Secret" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call searchVASPsValidateBeforeCall(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs, final ApiCallback _callback) throws ApiException {
+        return searchVASPsCall(q, emailDomain, chainalysisName, fields, page, perPage, order, includeSubsidiaryVASPs, _callback);
+
+    }
+
+    /**
+     * Search for VASPs
+     * Search for Virtual Asset Service Providers, or crypto exchanges, on Notabene&#39;s network. This endpoint can be used to find the VASP DID for your beneficiary&#39;s exchange when submitting travel rule information for your whitelisted wallets. Use the &#x60;q&#x60; parameter to search for exchanges.
+     * @param q General search query string. (optional)
+     * @param emailDomain Filter by VASP email domain. (optional)
+     * @param chainalysisName Filter by Chainalysis-specific VASP name. (optional)
+     * @param fields Specify which fields to return (comma-separated). (optional)
+     * @param page The zero-based page number to retrieve. (optional, default to 0)
+     * @param perPage Number of items per page. (optional, default to 10)
+     * @param order Field-based sort expression, such as name:ASC. Multiple expressions may be comma-separated. Defaults to name:ASC. (optional, default to name:ASC)
+     * @param includeSubsidiaryVASPs Whether to include child/subsidiary entities. (optional, default to false)
+     * @return SearchVASPsResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Successful request. Returns an array of VASPs or an empty list if no matches found. </td><td>  -  </td></tr>
+     </table>
+     */
+    public SearchVASPsResponse searchVASPs(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs) throws ApiException {
+        ApiResponse<SearchVASPsResponse> localVarResp = searchVASPsWithHttpInfo(q, emailDomain, chainalysisName, fields, page, perPage, order, includeSubsidiaryVASPs);
+        return localVarResp.getData();
+    }
+
+    /**
+     * Search for VASPs
+     * Search for Virtual Asset Service Providers, or crypto exchanges, on Notabene&#39;s network. This endpoint can be used to find the VASP DID for your beneficiary&#39;s exchange when submitting travel rule information for your whitelisted wallets. Use the &#x60;q&#x60; parameter to search for exchanges.
+     * @param q General search query string. (optional)
+     * @param emailDomain Filter by VASP email domain. (optional)
+     * @param chainalysisName Filter by Chainalysis-specific VASP name. (optional)
+     * @param fields Specify which fields to return (comma-separated). (optional)
+     * @param page The zero-based page number to retrieve. (optional, default to 0)
+     * @param perPage Number of items per page. (optional, default to 10)
+     * @param order Field-based sort expression, such as name:ASC. Multiple expressions may be comma-separated. Defaults to name:ASC. (optional, default to name:ASC)
+     * @param includeSubsidiaryVASPs Whether to include child/subsidiary entities. (optional, default to false)
+     * @return ApiResponse&lt;SearchVASPsResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Successful request. Returns an array of VASPs or an empty list if no matches found. </td><td>  -  </td></tr>
+     </table>
+     */
+    public ApiResponse<SearchVASPsResponse> searchVASPsWithHttpInfo(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs) throws ApiException {
+        okhttp3.Call localVarCall = searchVASPsValidateBeforeCall(q, emailDomain, chainalysisName, fields, page, perPage, order, includeSubsidiaryVASPs, null);
+        Type localVarReturnType = new TypeToken<SearchVASPsResponse>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    /**
+     * Search for VASPs (asynchronously)
+     * Search for Virtual Asset Service Providers, or crypto exchanges, on Notabene&#39;s network. This endpoint can be used to find the VASP DID for your beneficiary&#39;s exchange when submitting travel rule information for your whitelisted wallets. Use the &#x60;q&#x60; parameter to search for exchanges.
+     * @param q General search query string. (optional)
+     * @param emailDomain Filter by VASP email domain. (optional)
+     * @param chainalysisName Filter by Chainalysis-specific VASP name. (optional)
+     * @param fields Specify which fields to return (comma-separated). (optional)
+     * @param page The zero-based page number to retrieve. (optional, default to 0)
+     * @param perPage Number of items per page. (optional, default to 10)
+     * @param order Field-based sort expression, such as name:ASC. Multiple expressions may be comma-separated. Defaults to name:ASC. (optional, default to name:ASC)
+     * @param includeSubsidiaryVASPs Whether to include child/subsidiary entities. (optional, default to false)
+     * @param _callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Successful request. Returns an array of VASPs or an empty list if no matches found. </td><td>  -  </td></tr>
+     </table>
+     */
+    public okhttp3.Call searchVASPsAsync(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs, final ApiCallback<SearchVASPsResponse> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = searchVASPsValidateBeforeCall(q, emailDomain, chainalysisName, fields, page, perPage, order, includeSubsidiaryVASPs, _callback);
+        Type localVarReturnType = new TypeToken<SearchVASPsResponse>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+    /**
+     * Build call for updateWhitelistedAddressTravelRuleInfo
+     * @param whitelistedAddressId The whitelisted address update travel rule information for (required)
+     * @param updateWhitelistedAddressTravelRuleInfoRequest Travel rule information to associate with the whitelisted address. (required)
+     * @param _callback Callback for upload/download progress
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Successfully updated travel rule information </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
+     </table>
+     */
+    public okhttp3.Call updateWhitelistedAddressTravelRuleInfoCall(@javax.annotation.Nonnull UUID whitelistedAddressId, @javax.annotation.Nonnull UpdateWhitelistedAddressTravelRuleInfoRequest updateWhitelistedAddressTravelRuleInfoRequest, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = updateWhitelistedAddressTravelRuleInfoRequest;
+
+        // create path and map variables
+        String localVarPath = "/v2/wallets/whitelists/{whitelisted_address_id}/travel-rule-info"
+            .replace("{" + "whitelisted_address_id" + "}", localVarApiClient.escapeString(whitelistedAddressId.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "API_Key", "API_Secret" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "PATCH", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call updateWhitelistedAddressTravelRuleInfoValidateBeforeCall(@javax.annotation.Nonnull UUID whitelistedAddressId, @javax.annotation.Nonnull UpdateWhitelistedAddressTravelRuleInfoRequest updateWhitelistedAddressTravelRuleInfoRequest, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'whitelistedAddressId' is set
+        if (whitelistedAddressId == null) {
+            throw new ApiException("Missing the required parameter 'whitelistedAddressId' when calling updateWhitelistedAddressTravelRuleInfo(Async)");
+        }
+
+        // verify the required parameter 'updateWhitelistedAddressTravelRuleInfoRequest' is set
+        if (updateWhitelistedAddressTravelRuleInfoRequest == null) {
+            throw new ApiException("Missing the required parameter 'updateWhitelistedAddressTravelRuleInfoRequest' when calling updateWhitelistedAddressTravelRuleInfo(Async)");
+        }
+
+        return updateWhitelistedAddressTravelRuleInfoCall(whitelistedAddressId, updateWhitelistedAddressTravelRuleInfoRequest, _callback);
+
+    }
+
+    /**
+     * Update travel rule information for a whitelisted wallet
+     * You are required to supply travel rule information for the crypto wallets you&#39;re withdrawing to.  It is preferred that you use the &#x60;Search VASPs&#x60; endpoint to find the VASP DID for the exchange you are withdrawing to, otherwise, if it&#39;s a self-hosted wallet, please set &#x60;beneficiary_is_self_hosted&#x60; to true.  If the exchange cannot be found in our directory, please supply the information manually using the &#x60;beneficiary_manual_entry&#x60; object.
+     * @param whitelistedAddressId The whitelisted address update travel rule information for (required)
+     * @param updateWhitelistedAddressTravelRuleInfoRequest Travel rule information to associate with the whitelisted address. (required)
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Successfully updated travel rule information </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
+     </table>
+     */
+    public void updateWhitelistedAddressTravelRuleInfo(@javax.annotation.Nonnull UUID whitelistedAddressId, @javax.annotation.Nonnull UpdateWhitelistedAddressTravelRuleInfoRequest updateWhitelistedAddressTravelRuleInfoRequest) throws ApiException {
+        updateWhitelistedAddressTravelRuleInfoWithHttpInfo(whitelistedAddressId, updateWhitelistedAddressTravelRuleInfoRequest);
+    }
+
+    /**
+     * Update travel rule information for a whitelisted wallet
+     * You are required to supply travel rule information for the crypto wallets you&#39;re withdrawing to.  It is preferred that you use the &#x60;Search VASPs&#x60; endpoint to find the VASP DID for the exchange you are withdrawing to, otherwise, if it&#39;s a self-hosted wallet, please set &#x60;beneficiary_is_self_hosted&#x60; to true.  If the exchange cannot be found in our directory, please supply the information manually using the &#x60;beneficiary_manual_entry&#x60; object.
+     * @param whitelistedAddressId The whitelisted address update travel rule information for (required)
+     * @param updateWhitelistedAddressTravelRuleInfoRequest Travel rule information to associate with the whitelisted address. (required)
+     * @return ApiResponse&lt;Void&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Successfully updated travel rule information </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
+     </table>
+     */
+    public ApiResponse<Void> updateWhitelistedAddressTravelRuleInfoWithHttpInfo(@javax.annotation.Nonnull UUID whitelistedAddressId, @javax.annotation.Nonnull UpdateWhitelistedAddressTravelRuleInfoRequest updateWhitelistedAddressTravelRuleInfoRequest) throws ApiException {
+        okhttp3.Call localVarCall = updateWhitelistedAddressTravelRuleInfoValidateBeforeCall(whitelistedAddressId, updateWhitelistedAddressTravelRuleInfoRequest, null);
+        return localVarApiClient.execute(localVarCall);
+    }
+
+    /**
+     * Update travel rule information for a whitelisted wallet (asynchronously)
+     * You are required to supply travel rule information for the crypto wallets you&#39;re withdrawing to.  It is preferred that you use the &#x60;Search VASPs&#x60; endpoint to find the VASP DID for the exchange you are withdrawing to, otherwise, if it&#39;s a self-hosted wallet, please set &#x60;beneficiary_is_self_hosted&#x60; to true.  If the exchange cannot be found in our directory, please supply the information manually using the &#x60;beneficiary_manual_entry&#x60; object.
+     * @param whitelistedAddressId The whitelisted address update travel rule information for (required)
+     * @param updateWhitelistedAddressTravelRuleInfoRequest Travel rule information to associate with the whitelisted address. (required)
+     * @param _callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Successfully updated travel rule information </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
+     </table>
+     */
+    public okhttp3.Call updateWhitelistedAddressTravelRuleInfoAsync(@javax.annotation.Nonnull UUID whitelistedAddressId, @javax.annotation.Nonnull UpdateWhitelistedAddressTravelRuleInfoRequest updateWhitelistedAddressTravelRuleInfoRequest, final ApiCallback<Void> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = updateWhitelistedAddressTravelRuleInfoValidateBeforeCall(whitelistedAddressId, updateWhitelistedAddressTravelRuleInfoRequest, _callback);
+        localVarApiClient.executeAsync(localVarCall, _callback);
         return localVarCall;
     }
 }

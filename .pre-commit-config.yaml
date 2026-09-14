@@ -15,3 +15,9 @@ repos:
           --fallback-extensions md,mdx,html
           --include-fragments
           "$@"' --
+      - id: gradle-code-checks
+        name: Gradle code checks
+        language: system
+        pass_filenames: false
+        always_run: true
+        entry: ./gradlew spotlessCheck checkstyleMain checkstyleTest spotbugsMain

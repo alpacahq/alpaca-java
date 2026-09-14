@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import markets.alpaca.client.openapi.broker.model.PortfolioWeights;
+import markets.alpaca.client.openapi.broker.model.PortfolioWeightRequest;
 import markets.alpaca.client.openapi.broker.model.RebalancingConditions;
 import java.io.Serializable;
 
@@ -81,7 +81,7 @@ public class PatchV1RebalancingPortfoliosPortfolioIdRequest implements Serializa
   public static final String SERIALIZED_NAME_WEIGHTS = "weights";
   @SerializedName(SERIALIZED_NAME_WEIGHTS)
   @javax.annotation.Nullable
-  private List<PortfolioWeights> weights = new ArrayList<>();
+  private List<PortfolioWeightRequest> weights = new ArrayList<>();
 
   public PatchV1RebalancingPortfoliosPortfolioIdRequest() {
   }
@@ -170,12 +170,12 @@ public class PatchV1RebalancingPortfoliosPortfolioIdRequest implements Serializa
   }
 
 
-  public PatchV1RebalancingPortfoliosPortfolioIdRequest weights(@javax.annotation.Nullable List<PortfolioWeights> weights) {
+  public PatchV1RebalancingPortfoliosPortfolioIdRequest weights(@javax.annotation.Nullable List<PortfolioWeightRequest> weights) {
     this.weights = weights;
     return this;
   }
 
-  public PatchV1RebalancingPortfoliosPortfolioIdRequest addWeightsItem(PortfolioWeights weightsItem) {
+  public PatchV1RebalancingPortfoliosPortfolioIdRequest addWeightsItem(PortfolioWeightRequest weightsItem) {
     if (this.weights == null) {
       this.weights = new ArrayList<>();
     }
@@ -188,11 +188,11 @@ public class PatchV1RebalancingPortfoliosPortfolioIdRequest implements Serializa
    * @return weights
    */
   @javax.annotation.Nullable
-  public List<PortfolioWeights> getWeights() {
+  public List<PortfolioWeightRequest> getWeights() {
     return weights;
   }
 
-  public void setWeights(@javax.annotation.Nullable List<PortfolioWeights> weights) {
+  public void setWeights(@javax.annotation.Nullable List<PortfolioWeightRequest> weights) {
     this.weights = weights;
   }
 
@@ -348,7 +348,7 @@ public class PatchV1RebalancingPortfoliosPortfolioIdRequest implements Serializa
 
           // validate the optional field `weights` (array)
           for (int i = 0; i < jsonArrayweights.size(); i++) {
-            PortfolioWeights.validateJsonElement(jsonArrayweights.get(i));
+            PortfolioWeightRequest.validateJsonElement(jsonArrayweights.get(i));
           };
         }
       }

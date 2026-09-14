@@ -1,6 +1,6 @@
 /*
  * Market Data API
- * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Corporate Actions, Screener, and News. 
+ * Access real-time and historical market data for US equities, options, crypto, and foreign exchange data through the Alpaca REST and WebSocket APIs. There are APIs for Stock Pricing, Option Pricing, Crypto Pricing, Forex, Logos, Fixed income, Corporate Actions, Screener, and News. 
  *
  * The version of the OpenAPI document: 1.1
  * Contact: support@alpaca.markets
@@ -38,7 +38,6 @@ import markets.alpaca.client.openapi.data.model.CryptoQuotesResp;
 import markets.alpaca.client.openapi.data.model.CryptoSnapshotsResp;
 import markets.alpaca.client.openapi.data.model.CryptoTradesResp;
 import java.time.OffsetDateTime;
-import markets.alpaca.client.openapi.data.model.Sort;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -121,7 +120,7 @@ public class CryptoApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -137,7 +136,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call cryptoBarsCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call cryptoBarsCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -206,12 +205,12 @@ public class CryptoApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call cryptoBarsValidateBeforeCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call cryptoBarsValidateBeforeCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'loc' is set
         if (loc == null) {
             throw new ApiException("Missing the required parameter 'loc' when calling cryptoBars(Async)");
@@ -241,7 +240,7 @@ public class CryptoApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return CryptoBarsResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -256,7 +255,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public CryptoBarsResp cryptoBars(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public CryptoBarsResp cryptoBars(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<CryptoBarsResp> localVarResp = cryptoBarsWithHttpInfo(loc, symbols, timeframe, start, end, limit, pageToken, sort);
         return localVarResp.getData();
     }
@@ -271,7 +270,7 @@ public class CryptoApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;CryptoBarsResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -286,7 +285,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<CryptoBarsResp> cryptoBarsWithHttpInfo(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<CryptoBarsResp> cryptoBarsWithHttpInfo(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = cryptoBarsValidateBeforeCall(loc, symbols, timeframe, start, end, limit, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<CryptoBarsResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -302,7 +301,7 @@ public class CryptoApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -318,7 +317,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call cryptoBarsAsync(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<CryptoBarsResp> _callback) throws ApiException {
+    public okhttp3.Call cryptoBarsAsync(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<CryptoBarsResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = cryptoBarsValidateBeforeCall(loc, symbols, timeframe, start, end, limit, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<CryptoBarsResp>(){}.getType();
@@ -389,7 +388,7 @@ public class CryptoApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -549,7 +548,7 @@ public class CryptoApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -709,7 +708,7 @@ public class CryptoApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -869,7 +868,7 @@ public class CryptoApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -973,7 +972,7 @@ public class CryptoApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -989,7 +988,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call cryptoQuotesCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call cryptoQuotesCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -1054,12 +1053,12 @@ public class CryptoApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call cryptoQuotesValidateBeforeCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call cryptoQuotesValidateBeforeCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'loc' is set
         if (loc == null) {
             throw new ApiException("Missing the required parameter 'loc' when calling cryptoQuotes(Async)");
@@ -1083,7 +1082,7 @@ public class CryptoApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return CryptoQuotesResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1098,7 +1097,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public CryptoQuotesResp cryptoQuotes(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public CryptoQuotesResp cryptoQuotes(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<CryptoQuotesResp> localVarResp = cryptoQuotesWithHttpInfo(loc, symbols, start, end, limit, pageToken, sort);
         return localVarResp.getData();
     }
@@ -1112,7 +1111,7 @@ public class CryptoApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;CryptoQuotesResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1127,7 +1126,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<CryptoQuotesResp> cryptoQuotesWithHttpInfo(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<CryptoQuotesResp> cryptoQuotesWithHttpInfo(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = cryptoQuotesValidateBeforeCall(loc, symbols, start, end, limit, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<CryptoQuotesResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -1142,7 +1141,7 @@ public class CryptoApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -1158,7 +1157,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call cryptoQuotesAsync(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<CryptoQuotesResp> _callback) throws ApiException {
+    public okhttp3.Call cryptoQuotesAsync(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<CryptoQuotesResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = cryptoQuotesValidateBeforeCall(loc, symbols, start, end, limit, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<CryptoQuotesResp>(){}.getType();
@@ -1229,7 +1228,7 @@ public class CryptoApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
@@ -1333,7 +1332,7 @@ public class CryptoApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -1349,7 +1348,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call cryptoTradesCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call cryptoTradesCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -1414,12 +1413,12 @@ public class CryptoApi {
             localVarHeaderParams.put("Content-Type", localVarContentType);
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "apiKey", "BasicAuth", "apiSecret" };
         return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call cryptoTradesValidateBeforeCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call cryptoTradesValidateBeforeCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'loc' is set
         if (loc == null) {
             throw new ApiException("Missing the required parameter 'loc' when calling cryptoTrades(Async)");
@@ -1443,7 +1442,7 @@ public class CryptoApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return CryptoTradesResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1458,7 +1457,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public CryptoTradesResp cryptoTrades(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public CryptoTradesResp cryptoTrades(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         ApiResponse<CryptoTradesResp> localVarResp = cryptoTradesWithHttpInfo(loc, symbols, start, end, limit, pageToken, sort);
         return localVarResp.getData();
     }
@@ -1472,7 +1471,7 @@ public class CryptoApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @return ApiResponse&lt;CryptoTradesResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1487,7 +1486,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<CryptoTradesResp> cryptoTradesWithHttpInfo(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
+    public ApiResponse<CryptoTradesResp> cryptoTradesWithHttpInfo(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
         okhttp3.Call localVarCall = cryptoTradesValidateBeforeCall(loc, symbols, start, end, limit, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<CryptoTradesResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -1502,7 +1501,7 @@ public class CryptoApi {
      * @param end The inclusive end of the interval. Format: RFC-3339 or YYYY-MM-DD. Default: the current time if the user has a real-time access for the feed, otherwise 15 minutes before the current time.  (optional)
      * @param limit The maximum number of data points to return in the response page. The API may return less, even if there are more available data points in the requested interval. Always check the &#x60;next_page_token&#x60; for more pages. The limit applies to the total number of data points, not per symbol!  (optional, default to 1000)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
-     * @param sort Sort data in ascending or descending order. (optional, default to asc)
+     * @param sort Sort data in ascending or descending order. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -1518,7 +1517,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call cryptoTradesAsync(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<CryptoTradesResp> _callback) throws ApiException {
+    public okhttp3.Call cryptoTradesAsync(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<CryptoTradesResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = cryptoTradesValidateBeforeCall(loc, symbols, start, end, limit, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<CryptoTradesResp>(){}.getType();
