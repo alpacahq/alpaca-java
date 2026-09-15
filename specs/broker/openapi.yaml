@@ -1818,7 +1818,7 @@ components:
         enabled_assets:
           description: Assets the user has enabled and is able to trade once status and/or crypto_status are ACTIVE
           items:
-            $ref: '#/components/schemas/AssetClass'
+            $ref: '#/components/schemas/EnabledAssetClass'
           type: array
         fpsl:
           $ref: '#/components/schemas/AccountFPSLResponse'
@@ -1837,10 +1837,7 @@ components:
           format: decimal
           type: string
         primary_account_holder_id:
-          description: |
-            UUID that identifies the primary account holder (party) for accounts opened under the Multi-Live Accounts (MLA) flow.
-            Only populated when the account was created by referencing an existing account holder via `primary_account_holder_id`
-            on `POST /v1/accounts`. Otherwise `null`. Currently only supported for `account_type` of `trading` and `ira`.
+          description: UUID of the account's primary holder when available; otherwise `null`.
           format: uuid
           type:
             - string
@@ -1964,14 +1961,27 @@ components:
       title: AccountConfigurations
       type: object
     AccountCreationRequest:
-      description: Represents the fields required to create a new account
+      description: |
+        Fields accepted when creating an account. Requirements vary by account type, enabled assets, existing holder agreements, and correspondent configuration. The server enforces conditional requirements that are not represented statically in this schema.
+
+        Account-specific requirements:
+        - Trading accounts require inline `identity` plus `contact`, or an existing holder through `primary_account_holder_id`. Individual US equity accounts created with inline identity also require `disclosures`.
+        - Custodial accounts require `identity` and `minor_identity`. US equity accounts also require `disclosures`.
+        - IRA accounts require `account_sub_type`, US equity, and either inline `identity` or an existing holder through `primary_account_holder_id`; they do not support crypto. IRA accounts created with inline identity also require `disclosures`.
+        - Donor-advised accounts require `entity_id`.
       properties:
         account_sub_type:
-          $ref: '#/components/schemas/AccountSubType'
+          allOf:
+            - $ref: '#/components/schemas/AccountSubType'
+          description: The account subtype. Required for IRA accounts.
         account_type:
-          $ref: '#/components/schemas/AccountType'
+          allOf:
+            - $ref: '#/components/schemas/AccountCreationType'
+          default: trading
+          description: The account type. Defaults to `trading` when omitted.
         agreements:
-          description: The client must present the Alpaca Account and Margin Agreements to the end user, and confirm they have read and agreed to the agreement.
+          description: Agreements submitted for the account or holder. Required agreement types depend on account type, enabled assets, existing holder agreements, and correspondent configuration. The server
+            validates required coverage.
           items:
             $ref: '#/components/schemas/Agreement'
           type: array
@@ -1997,8 +2007,12 @@ components:
         enabled_assets:
           description: Will default to `us_equity`. Alpaca has the ability to update the default value upon request.
           items:
-            $ref: '#/components/schemas/AssetClass'
+            $ref: '#/components/schemas/EnabledAssetClass'
           type: array
+        entity_id:
+          description: UUID of an existing legal entity used as the holder of a donor-advised account. Required for donor-advised accounts.
+          format: uuid
+          type: string
         fpsl:
           $ref: '#/components/schemas/AccountFPSLPost'
         identity:
@@ -2032,15 +2046,15 @@ components:
             - somewhat_important
             - does_not_matter
           type: string
+        minor_identity:
+          allOf:
+            - $ref: '#/components/schemas/CustodialAccountMinorIdentity'
+          description: Identity information for the minor. Required for custodial accounts.
         primary_account_holder_id:
           description: |
-            UUID of an existing account holder (party) to use as the primary account holder for the new account.
-            Used to open additional accounts under the Multi-Live Accounts (MLA) flow.
+            UUID of an existing party to use as the primary account holder. Among the documented account types, existing holders are supported for trading and IRA accounts.
 
-            When present:
-            - `contact` and `identity` must be omitted (returns HTTP 400 otherwise).
-            - `agreements` must still be supplied (e.g. `customer_agreement` for trading; `customer_agreement` and `etc_agreement` for IRA).
-            - Only `account_type` values of `trading` and `ira` are supported.
+            When provided, omit inline holder fields such as `contact`, `identity`, `disclosures`, and `minor_identity`. The server validates the referenced party, account-type compatibility, eligibility, and required agreements.
           format: uuid
           type: string
         risk_tolerance:
@@ -2055,33 +2069,18 @@ components:
           $ref: '#/components/schemas/AccountConfigurations'
         trusted_contact:
           $ref: '#/components/schemas/TrustedContact'
-      required:
-        - contact
-        - identity
-        - disclosures
-        - agreements
       title: AccountCreationRequest
       type: object
-      x-examples:
-        multi-live-accounts:
-          summary: Opening an additional account for an existing account holder (MLA)
-          value:
-            account_sub_type: traditional
-            account_type: ira
-            agreements:
-              - agreement: customer_agreement
-                ip_address: 185.13.21.99
-                signed_at: '2020-09-11T18:13:44Z'
-              - agreement: etc_agreement
-                ip_address: 185.13.21.99
-                signed_at: '2020-09-11T18:13:44Z'
-            enabled_assets:
-              - us_equity
-            primary_account_holder_id: 8b5b7e4c-9f2d-4f4a-9a7b-1b2c3d4e5f60
-            trusted_contact:
-              email_address: jane.doe@example.com
-              family_name: Doe
-              given_name: Jane
+    AccountCreationType:
+      description: The account type to create.
+      enum:
+        - trading
+        - custodial
+        - donor_advised
+        - ira
+      example: trading
+      title: AccountCreationType
+      type: string
     AccountDocument:
       description: A document associated with an account
       example:
@@ -2232,7 +2231,7 @@ components:
           type: array
         enabled_assets:
           items:
-            $ref: '#/components/schemas/AssetClass'
+            $ref: '#/components/schemas/EnabledAssetClass'
           type: array
         fpsl:
           $ref: '#/components/schemas/AccountFPSLResponse'
@@ -2282,10 +2281,7 @@ components:
         minor_identity:
           $ref: '#/components/schemas/CustodialAccountMinorIdentity'
         primary_account_holder_id:
-          description: |
-            UUID that identifies the primary account holder (party) for accounts opened under the Multi-Live Accounts (MLA) flow.
-            Only populated when the account was created by referencing an existing account holder via `primary_account_holder_id`
-            on `POST /v1/accounts`. Otherwise `null`. Currently only supported for `account_type` of `trading` and `ira`.
+          description: UUID of the account's primary holder when available; otherwise `null`.
           format: uuid
           type:
             - string
@@ -2573,18 +2569,17 @@ components:
       title: AccountTradingLimit
       type: object
     AccountType:
-      description: |-
-        Possible values are:
-
-        - trading
-        - custodial
-        - donor_advised
-        - ira
+      description: The account type returned for the account.
       enum:
         - trading
         - custodial
         - donor_advised
         - ira
+        - trust
+        - omnibus_non_disclosed
+        - omnibus_sub
+        - hsa
+        - joint
       example: trading
       title: AccountType
       type: string
@@ -2614,6 +2609,9 @@ components:
             is_affiliated_exchange_or_finra: false
             is_control_person: false
             is_politically_exposed: false
+          enabled_assets:
+            - us_equity
+            - crypto
           identity:
             country_of_birth: AUS
             country_of_citizenship: AUS
@@ -2648,6 +2646,20 @@ components:
           $ref: '#/components/schemas/Contact'
         disclosures:
           $ref: '#/components/schemas/Disclosures'
+        enabled_assets:
+          description: |
+            The asset classes enabled on the account. Omit this field to leave the
+            account's enabled assets unchanged. Updates are additive only: the
+            submitted list must contain every asset class already enabled on the account,
+            because asset removal is not supported. For example, to enable
+            crypto for an account that currently trades only equities, submit
+            `["us_equity", "crypto"]` together with the signed crypto agreement.
+            `us_option` may appear in this list for options-enabled accounts and
+            must be re-listed on additive updates, but options cannot be enabled
+            through this endpoint.
+          items:
+            $ref: '#/components/schemas/EnabledAssetClass'
+          type: array
         fpsl:
           $ref: '#/components/schemas/AccountFPSLPatch'
         identity:
@@ -2657,7 +2669,7 @@ components:
             The UUID of the primary account holder. This field is immutable after the account is created.
 
             - Omitting the field, or supplying the value already associated with the account, is a no-op.
-            - Supplying a value different from the current primary account holder returns HTTP 400.
+            - Supplying a value different from the current primary account holder returns HTTP 403.
           format: uuid
           type: string
         trusted_contact:
@@ -5859,6 +5871,7 @@ components:
         - given_name
         - family_name
         - date_of_birth
+        - tax_id_type
         - country_of_tax_residence
         - state
         - email
@@ -6220,6 +6233,14 @@ components:
         The response body is empty.
       title: DoNotExerciseResponse
       type: object
+    EnabledAssetClass:
+      description: An asset class that can be enabled on a brokerage account, i.e. a value that may appear in an account's `enabled_assets`. This differs from `AssetClass` (which also covers order and asset
+        metadata) by excluding `ipo`, which is not an enable-able asset.
+      enum:
+        - us_equity
+        - us_option
+        - crypto
+      type: string
     EoDCashInterestReportResponse:
       properties:
         interest:
@@ -7194,7 +7215,7 @@ components:
             - significant_risk
           type: string
         tax_id:
-          description: Required if tax_id_type is set.
+          description: If this is provided, `tax_id_type` is required.
           example: 666-55-4321
           type: string
         tax_id_type:
@@ -8891,7 +8912,7 @@ components:
             - 'null'
         submitted_at:
           description: Time the order was submitted for execution or, if not yet submitted the created_at time. Because orders are submitted for execution asynchronous to database updates, at times this
-            may be before the created_at time.
+            may be after the created_at time.
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
           type: string
@@ -9129,7 +9150,7 @@ components:
             - 'null'
         submitted_at:
           description: Time the order was submitted for execution or, if not yet submitted the created_at time. Because orders are submitted for execution asynchronous to database updates, at times this
-            may be before the created_at time.
+            may be after the created_at time.
           example: '2021-03-16T18:38:01.942282Z'
           format: date-time
           type: string
@@ -10337,8 +10358,6 @@ components:
       type: object
     TaxIdType:
       description: |-
-        Required if `tax_id` is set.
-
         An Enum of the various kinds of Tax ID formats Alpaca supports.
 
         Possible Values are:
@@ -10679,6 +10698,7 @@ components:
         - mantle
         - cronos
         - hyperevm
+        - robinhood
       example: solana
       title: TokenizationNetwork
       type: string
@@ -12017,26 +12037,39 @@ components:
       example: BENEFICIARY_NAME_REQUIRED
       type: string
     TrustedContact:
-      description: "This model input is optional. However, the client should\nmake reasonable effort to obtain the trusted contact information.\nSee more details in [FINRA Notice 17-11](https://www.finra.org/sites/default/files/Regulatory-Notice-17-11.pdf)\n\
-        \nOnly one of the following is required:\n\n* email_address\t\n* phone_number\t\n* street_address\t\n"
+      anyOf:
+        - required:
+            - email_address
+        - required:
+            - phone_number
+        - required:
+            - street_address
+      dependentRequired:
+        street_address:
+          - city
+          - state
+          - postal_code
+          - country
+      description: |
+        This model input is optional. However, the client should make a reasonable effort to obtain the trusted contact information. See [FINRA Notice 17-11](https://www.finra.org/sites/default/files/Regulatory-Notice-17-11.pdf) for more details.
+
+        At least one of the following is required:
+        - `email_address`
+        - `phone_number`
+        - `street_address`
       example:
         email_address: jane.doe@example.com
         family_name: Doe
         given_name: Jane
       properties:
         city:
-          description: |
-            required if `street_address` is set
+          description: Required if `street_address` is set.
           type: string
         country:
-          description: |
-            [ISO 3166-1 alpha-3](https://www.iso.org/iso-3166-country-codes.html).
-            required if `street_address` is set
+          description: The country in [ISO 3166-1 alpha-3](https://www.iso.org/iso-3166-country-codes.html) format. Required if `street_address` is set.
           type: string
         email_address:
-          description: |
-            at least one of `email_address`, `phone_number` or
-            `street_address` is required
+          description: At least one of `email_address`, `phone_number`, or `street_address` is required.
           example: jane.doe@example.com
           format: email
           type: string
@@ -12047,22 +12080,16 @@ components:
           example: Jane
           type: string
         phone_number:
-          description: |
-            at least one of `email_address`, `phone_number` or
-            `street_address` is required
+          description: At least one of `email_address`, `phone_number`, or `street_address` is required.
           type: string
         postal_code:
-          description: |
-            required if `street_address` is set
+          description: Required if `street_address` is set.
           type: string
         state:
-          description: |
-            required if `street_address` is set
+          description: Required if `street_address` is set.
           type: string
         street_address:
-          description: |
-            at least one of `email_address`, `phone_number` or
-            `street_address` is required
+          description: At least one of `email_address`, `phone_number`, or `street_address` is required.
           items:
             type: string
           type: array
@@ -14115,13 +14142,109 @@ paths:
         - Accounts
     post:
       description: |
-        Submit an account application with KYC information. This will create a trading account for the end user. The account status may or may not be ACTIVE immediately and you will receive account status updates on the event API.
+        Create an account for a new or existing account holder. Required fields, eligibility, and initial status depend on the account type, enabled assets, and your correspondent configuration. Account status changes are available through the Account Status Events stream.
 
-        **Multi-Live Accounts (MLA)**: To open an additional account for an existing account holder, supply `primary_account_holder_id` at the top level instead of `contact`/`identity` data. In that case, supplying `contact` or `identity` returns HTTP 400. Only `account_type` of `trading` and `ira` are supported via this flow.
+        To create an account for an existing holder, provide `primary_account_holder_id` instead of inline holder information. Among the documented account types, existing holders are supported for trading and IRA accounts. Donor-advised accounts instead reference an existing legal entity with `entity_id`.
       operationId: createAccount
       requestBody:
         content:
           application/json:
+            examples:
+              custodial-account:
+                summary: Custodial account with guardian and minor information
+                value:
+                  account_type: custodial
+                  agreements:
+                    - agreement: customer_agreement
+                      ip_address: 185.13.21.99
+                      signed_at: '2020-09-11T18:13:44Z'
+                  contact:
+                    city: San Mateo
+                    country: USA
+                    email_address: john.doe@example.com
+                    postal_code: '94401'
+                    state: CA
+                    street_address:
+                      - 123 Main Street
+                  disclosures:
+                    immediate_family_exposed: false
+                    is_affiliated_exchange_or_finra: false
+                    is_control_person: false
+                    is_politically_exposed: false
+                  enabled_assets:
+                    - us_equity
+                  identity:
+                    country_of_birth: USA
+                    country_of_citizenship: USA
+                    country_of_tax_residence: USA
+                    date_of_birth: '1990-01-01'
+                    family_name: Doe
+                    funding_source:
+                      - employment_income
+                    given_name: John
+                    tax_id: 666-55-4321
+                    tax_id_type: USA_SSN
+                  minor_identity:
+                    country_of_birth: USA
+                    country_of_citizenship: USA
+                    country_of_tax_residence: USA
+                    date_of_birth: '2012-04-05'
+                    email: jamie.doe@example.com
+                    family_name: Doe
+                    given_name: Jamie
+                    state: CA
+                    tax_id: 666-55-1234
+                    tax_id_type: USA_SSN
+              donor-advised-account:
+                summary: Donor-advised account for an existing legal entity
+                value:
+                  account_type: donor_advised
+                  entity_id: 14fbfc51-3704-4c74-8984-8326c4117aee
+              existing-holder-ira:
+                summary: IRA account for an existing holder
+                value:
+                  account_sub_type: traditional
+                  account_type: ira
+                  agreements:
+                    - agreement: customer_agreement
+                      ip_address: 185.13.21.99
+                      signed_at: '2020-09-11T18:13:44Z'
+                  enabled_assets:
+                    - us_equity
+                  primary_account_holder_id: 8b5b7e4c-9f2d-4f4a-9a7b-1b2c3d4e5f60
+              trading-account:
+                summary: Trading account with inline holder information
+                value:
+                  agreements:
+                    - agreement: customer_agreement
+                      ip_address: 185.13.21.99
+                      signed_at: '2020-09-11T18:13:44Z'
+                  contact:
+                    city: San Mateo
+                    country: USA
+                    email_address: john.doe@example.com
+                    postal_code: '94401'
+                    state: CA
+                    street_address:
+                      - 123 Main Street
+                  disclosures:
+                    immediate_family_exposed: false
+                    is_affiliated_exchange_or_finra: false
+                    is_control_person: false
+                    is_politically_exposed: false
+                  enabled_assets:
+                    - us_equity
+                  identity:
+                    country_of_birth: USA
+                    country_of_citizenship: USA
+                    country_of_tax_residence: USA
+                    date_of_birth: '1990-01-01'
+                    family_name: Doe
+                    funding_source:
+                      - employment_income
+                    given_name: John
+                    tax_id: 666-55-4321
+                    tax_id_type: USA_SSN
             schema:
               $ref: '#/components/schemas/AccountCreationRequest'
         required: true
@@ -14135,21 +14258,30 @@ paths:
         '400':
           content:
             application/json:
+              examples:
+                malformed-request-body:
+                  summary: Malformed request body
+                  value:
+                    code: 40010000
+                    message: 'request body format is invalid: error decoding string ''""'': can''t convert "" to decimal'
               schema:
-                type: string
-          description: |
-            The post body is not well formed. For Multi-Live Accounts (MLA), this also covers:
-            - Supplying `primary_account_holder_id` together with `contact` or `identity`.
-            - Supplying `primary_account_holder_id` with an `account_type` other than `trading` or `ira`.
-            - The referenced primary account holder is not eligible to open an additional account.
+                $ref: '#/components/schemas/Error'
+          description: The request body is malformed or cannot be decoded.
         '409':
           description: There is already an existing account registered with the same email address.
         '422':
           content:
             application/json:
+              examples:
+                conflicting-holder-data:
+                  summary: Conflicting inline and referenced holder data
+                  value:
+                    code: 40010001
+                    message: cannot specify primary_account_holder_id together with identity or contact or disclosures or minor_identity
               schema:
-                type: string
-          description: One of the input values is not a valid value.
+                $ref: '#/components/schemas/Error'
+          description: The request is well-formed but fails account-creation validation. This can include conflicting inline and referenced holder data, an unsupported account-type and holder combination,
+            or an ineligible referenced party.
       summary: Create an Account
       tags:
         - Accounts
@@ -14175,8 +14307,6 @@ paths:
         This operation updates account information.
 
         If all parameters are valid and updates have been made, it returns with status code 200. The response is the account model.
-
-        **Multi-Live Accounts (MLA)**: The `primary_account_holder_id` field is read-only after the account is created. Omitting it or supplying the value already associated with the account is a no-op; supplying a different value returns HTTP 400.
       operationId: patchAccount
       requestBody:
         content:
@@ -14196,9 +14326,16 @@ paths:
             application/json:
               schema:
                 type: string
-          description: |
-            The post body is not well formed. This also includes attempts to change the primary account holder via `primary_account_holder_id`:
-            the field is immutable after account creation, so supplying a value different from the account's current primary account holder returns HTTP 400.
+          description: The post body is not well formed.
+        '403':
+          content:
+            application/json:
+              example:
+                code: 40310000
+                message: 'cannot change primary account holder to: d4dbe130-839d-4e0a-8d2f-312a2011729c'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The requested update is forbidden. This includes attempting to change the immutable `primary_account_holder_id`.
         '422':
           content:
             application/json:

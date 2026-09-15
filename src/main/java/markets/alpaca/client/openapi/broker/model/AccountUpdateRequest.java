@@ -30,6 +30,7 @@ import markets.alpaca.client.openapi.broker.model.Agreement;
 import markets.alpaca.client.openapi.broker.model.Beneficiary;
 import markets.alpaca.client.openapi.broker.model.Contact;
 import markets.alpaca.client.openapi.broker.model.Disclosures;
+import markets.alpaca.client.openapi.broker.model.EnabledAssetClass;
 import markets.alpaca.client.openapi.broker.model.Identity;
 import markets.alpaca.client.openapi.broker.model.TrustedContact;
 import java.io.Serializable;
@@ -94,6 +95,11 @@ public class AccountUpdateRequest implements Serializable {
   @SerializedName(SERIALIZED_NAME_DISCLOSURES)
   @javax.annotation.Nullable
   private Disclosures disclosures;
+
+  public static final String SERIALIZED_NAME_ENABLED_ASSETS = "enabled_assets";
+  @SerializedName(SERIALIZED_NAME_ENABLED_ASSETS)
+  @javax.annotation.Nullable
+  private List<EnabledAssetClass> enabledAssets = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_FPSL = "fpsl";
   @SerializedName(SERIALIZED_NAME_FPSL)
@@ -248,6 +254,33 @@ public class AccountUpdateRequest implements Serializable {
   }
 
 
+  public AccountUpdateRequest enabledAssets(@javax.annotation.Nullable List<EnabledAssetClass> enabledAssets) {
+    this.enabledAssets = enabledAssets;
+    return this;
+  }
+
+  public AccountUpdateRequest addEnabledAssetsItem(EnabledAssetClass enabledAssetsItem) {
+    if (this.enabledAssets == null) {
+      this.enabledAssets = new ArrayList<>();
+    }
+    this.enabledAssets.add(enabledAssetsItem);
+    return this;
+  }
+
+  /**
+   * The asset classes enabled on the account. Omit this field to leave the account&#39;s enabled assets unchanged. Updates are additive only: the submitted list must contain every asset class already enabled on the account, because asset removal is not supported. For example, to enable crypto for an account that currently trades only equities, submit &#x60;[\&quot;us_equity\&quot;, \&quot;crypto\&quot;]&#x60; together with the signed crypto agreement. &#x60;us_option&#x60; may appear in this list for options-enabled accounts and must be re-listed on additive updates, but options cannot be enabled through this endpoint. 
+   * @return enabledAssets
+   */
+  @javax.annotation.Nullable
+  public List<EnabledAssetClass> getEnabledAssets() {
+    return enabledAssets;
+  }
+
+  public void setEnabledAssets(@javax.annotation.Nullable List<EnabledAssetClass> enabledAssets) {
+    this.enabledAssets = enabledAssets;
+  }
+
+
   public AccountUpdateRequest fpsl(@javax.annotation.Nullable AccountFPSLPatch fpsl) {
     this.fpsl = fpsl;
     return this;
@@ -292,7 +325,7 @@ public class AccountUpdateRequest implements Serializable {
   }
 
   /**
-   * The UUID of the primary account holder. This field is immutable after the account is created.  - Omitting the field, or supplying the value already associated with the account, is a no-op. - Supplying a value different from the current primary account holder returns HTTP 400. 
+   * The UUID of the primary account holder. This field is immutable after the account is created.  - Omitting the field, or supplying the value already associated with the account, is a no-op. - Supplying a value different from the current primary account holder returns HTTP 403. 
    * @return primaryAccountHolderId
    */
   @javax.annotation.Nullable
@@ -384,6 +417,7 @@ public class AccountUpdateRequest implements Serializable {
         Objects.equals(this.cashInterest, accountUpdateRequest.cashInterest) &&
         Objects.equals(this.contact, accountUpdateRequest.contact) &&
         Objects.equals(this.disclosures, accountUpdateRequest.disclosures) &&
+        Objects.equals(this.enabledAssets, accountUpdateRequest.enabledAssets) &&
         Objects.equals(this.fpsl, accountUpdateRequest.fpsl) &&
         Objects.equals(this.identity, accountUpdateRequest.identity) &&
         Objects.equals(this.primaryAccountHolderId, accountUpdateRequest.primaryAccountHolderId) &&
@@ -393,7 +427,7 @@ public class AccountUpdateRequest implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(agreements, allowInstantAch, beneficiaries, cashInterest, contact, disclosures, fpsl, identity, primaryAccountHolderId, trustedContact, additionalProperties);
+    return Objects.hash(agreements, allowInstantAch, beneficiaries, cashInterest, contact, disclosures, enabledAssets, fpsl, identity, primaryAccountHolderId, trustedContact, additionalProperties);
   }
 
   @Override
@@ -406,6 +440,7 @@ public class AccountUpdateRequest implements Serializable {
     sb.append("    cashInterest: ").append(toIndentedString(cashInterest)).append("\n");
     sb.append("    contact: ").append(toIndentedString(contact)).append("\n");
     sb.append("    disclosures: ").append(toIndentedString(disclosures)).append("\n");
+    sb.append("    enabledAssets: ").append(toIndentedString(enabledAssets)).append("\n");
     sb.append("    fpsl: ").append(toIndentedString(fpsl)).append("\n");
     sb.append("    identity: ").append(toIndentedString(identity)).append("\n");
     sb.append("    primaryAccountHolderId: ").append(toIndentedString(primaryAccountHolderId)).append("\n");
@@ -429,7 +464,7 @@ public class AccountUpdateRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("agreements", "allow_instant_ach", "beneficiaries", "cash_interest", "contact", "disclosures", "fpsl", "identity", "primary_account_holder_id", "trusted_contact"));
+    openapiFields = new HashSet<String>(Arrays.asList("agreements", "allow_instant_ach", "beneficiaries", "cash_interest", "contact", "disclosures", "enabled_assets", "fpsl", "identity", "primary_account_holder_id", "trusted_contact"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -487,6 +522,10 @@ public class AccountUpdateRequest implements Serializable {
       // validate the optional field `disclosures`
       if (jsonObj.get("disclosures") != null && !jsonObj.get("disclosures").isJsonNull()) {
         Disclosures.validateJsonElement(jsonObj.get("disclosures"));
+      }
+      // ensure the optional json data is an array if present
+      if (jsonObj.get("enabled_assets") != null && !jsonObj.get("enabled_assets").isJsonNull() && !jsonObj.get("enabled_assets").isJsonArray()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `enabled_assets` to be an array in the JSON string but got `%s`", jsonObj.get("enabled_assets").toString()));
       }
       // validate the optional field `fpsl`
       if (jsonObj.get("fpsl") != null && !jsonObj.get("fpsl").isJsonNull()) {

@@ -50,7 +50,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * This model input is optional. However, the client should make reasonable effort to obtain the trusted contact information. See more details in [FINRA Notice 17-11](https://www.finra.org/sites/default/files/Regulatory-Notice-17-11.pdf)  Only one of the following is required:  * email_address  * phone_number  * street_address  
+ * This model input is optional. However, the client should make a reasonable effort to obtain the trusted contact information. See [FINRA Notice 17-11](https://www.finra.org/sites/default/files/Regulatory-Notice-17-11.pdf) for more details.  At least one of the following is required: - &#x60;email_address&#x60; - &#x60;phone_number&#x60; - &#x60;street_address&#x60; 
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class TrustedContact implements Serializable {
@@ -110,7 +110,7 @@ public class TrustedContact implements Serializable {
   }
 
   /**
-   * required if &#x60;street_address&#x60; is set 
+   * Required if &#x60;street_address&#x60; is set.
    * @return city
    */
   @javax.annotation.Nullable
@@ -129,7 +129,7 @@ public class TrustedContact implements Serializable {
   }
 
   /**
-   * [ISO 3166-1 alpha-3](https://www.iso.org/iso-3166-country-codes.html). required if &#x60;street_address&#x60; is set 
+   * The country in [ISO 3166-1 alpha-3](https://www.iso.org/iso-3166-country-codes.html) format. Required if &#x60;street_address&#x60; is set.
    * @return country
    */
   @javax.annotation.Nullable
@@ -148,7 +148,7 @@ public class TrustedContact implements Serializable {
   }
 
   /**
-   * at least one of &#x60;email_address&#x60;, &#x60;phone_number&#x60; or &#x60;street_address&#x60; is required 
+   * At least one of &#x60;email_address&#x60;, &#x60;phone_number&#x60;, or &#x60;street_address&#x60; is required.
    * @return emailAddress
    */
   @javax.annotation.Nullable
@@ -205,7 +205,7 @@ public class TrustedContact implements Serializable {
   }
 
   /**
-   * at least one of &#x60;email_address&#x60;, &#x60;phone_number&#x60; or &#x60;street_address&#x60; is required 
+   * At least one of &#x60;email_address&#x60;, &#x60;phone_number&#x60;, or &#x60;street_address&#x60; is required.
    * @return phoneNumber
    */
   @javax.annotation.Nullable
@@ -224,7 +224,7 @@ public class TrustedContact implements Serializable {
   }
 
   /**
-   * required if &#x60;street_address&#x60; is set 
+   * Required if &#x60;street_address&#x60; is set.
    * @return postalCode
    */
   @javax.annotation.Nullable
@@ -243,7 +243,7 @@ public class TrustedContact implements Serializable {
   }
 
   /**
-   * required if &#x60;street_address&#x60; is set 
+   * Required if &#x60;street_address&#x60; is set.
    * @return state
    */
   @javax.annotation.Nullable
@@ -270,7 +270,7 @@ public class TrustedContact implements Serializable {
   }
 
   /**
-   * at least one of &#x60;email_address&#x60;, &#x60;phone_number&#x60; or &#x60;street_address&#x60; is required 
+   * At least one of &#x60;email_address&#x60;, &#x60;phone_number&#x60;, or &#x60;street_address&#x60; is required.
    * @return streetAddress
    */
   @javax.annotation.Nullable
@@ -386,7 +386,7 @@ public class TrustedContact implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("city", "country", "email_address", "family_name", "given_name", "phone_number", "postal_code", "state", "street_address"));
+    openapiFields = new HashSet<String>(Arrays.asList());
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("family_name", "given_name"));
