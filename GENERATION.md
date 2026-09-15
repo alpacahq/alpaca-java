@@ -157,8 +157,14 @@ Or on CI images that allow user installs:
     Upstream OpenAPI classifier findings stay in the PR body as diagnostics and do
     not by themselves draft the PR. Local `./gradlew adoptOpenApi` still refuses
     breaking OAS writes without `adoptOpenApiBreaking`.
-  - `./gradlew build` against the adopted pins must pass or the PR stays draft
-    (`sdk-build-failure`). A failed nested `generateApis test` during adopt still
+  - `./gradlew build -x checkGenerated` against the adopted pins must pass or the
+    PR stays draft (`sdk-build-failure`). `checkGenerated` is skipped here because
+    it diffs against HEAD before the adopt is committed; the pull_request Build
+    workflow runs a full `./gradlew build` (including `checkGenerated`) on the
+    bot branch afterward, once a maintainer approves the workflow run created
+    using `GITHUB_TOKEN`. Freshness remains unverified until that full build
+    passes; approve the PR's Build workflow and require it to pass before merging.
+    A failed nested `generateApis test` during adopt still
     commits surviving pins and generated sources, opens or updates a **draft**,
     then fails the run. If adopt fails with no spec/generated diff, the workflow
     still opens a triage draft (empty commit when `bot/openapi-adopt` has no open

@@ -105,13 +105,18 @@ jobs:
           set -euo pipefail
           log_file=build/openapi-sdk-build.log
           report_file=build/sdk-build-report.md
-
-          if ./gradlew build 2>&1 | tee "$log_file"; then
+          # Skip checkGenerated: it diffs specs/ + generated Java against HEAD, and this
+          # step still runs on main with uncommitted adopt output. Pin freshness is
+          # checked by the pull_request Build workflow after the adopt commit,
+          # once a maintainer approves that workflow run.
+          if ./gradlew build -x checkGenerated 2>&1 | tee "$log_file"; then
             echo "failed=false" >> "$GITHUB_OUTPUT"
             {
               echo "## SDK build validation"
               echo
-              echo "\`./gradlew build\` passed against the adopted specs and generated sources."
+              echo "\`./gradlew build -x checkGenerated\` passed against the adopted specs and generated sources."
+              echo "Pin and generated-source freshness has not been checked by this step."
+              echo "A maintainer must approve the PR's Build workflow run; its full \`./gradlew build\` must pass before merging."
             } > "$report_file"
             exit 0
           fi
@@ -121,20 +126,27 @@ jobs:
             echo "## SDK build validation"
             echo
             echo "> [!CAUTION]"
-            echo "> \`./gradlew build\` failed against the adopted specs and generated sources."
-            echo "> This PR cannot be merged until the reported SDK compilation or test failures are resolved."
+            echo "> \`./gradlew build -x checkGenerated\` failed against the adopted specs and generated sources."
+            echo "> This PR cannot be merged until the reported build failures are resolved."
             echo
             echo "### Failure excerpt"
             echo
             echo "\`\`\`text"
-            # Java compiler diagnostics identify the handwritten callers or tests that
-            # must be adapted to the regenerated API. Include task failures too, so a
-            # non-compiler Gradle failure remains actionable from the PR description.
-            grep -E '(^.*\.java:[0-9]+: error:|^> Task .* FAILED|^FAILURE:|^\* What went wrong:)' "$log_file" \
-              | head -n 80 || true
+            # Keep compiler context and Gradle's failure explanation, including
+            # the diagnostic lines following "What went wrong".
+            awk '
+              /^FAILURE:/ { failure = 1 }
+              /^\* Try:/ { failure = 0 }
+              /\.java:[0-9]+: error:/ { context = 6 }
+              failure || context > 0 || /^> Task .* FAILED/ {
+                print
+                if (++lines >= 80) exit
+              }
+              context > 0 { context-- }
+            ' "$log_file"
             echo "\`\`\`"
             echo
-            echo "See this workflow run's **Validate adopted Java SDK build** step for the complete log."
+            echo "See the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})'s **Validate adopted Java SDK build** step for the complete log."
           } > "$report_file"
 
       - name: Open or update adopt pull request
