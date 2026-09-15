@@ -142,9 +142,9 @@ public class AccountsApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> The post body is not well formed. For Multi-Live Accounts (MLA), this also covers: - Supplying &#x60;primary_account_holder_id&#x60; together with &#x60;contact&#x60; or &#x60;identity&#x60;. - Supplying &#x60;primary_account_holder_id&#x60; with an &#x60;account_type&#x60; other than &#x60;trading&#x60; or &#x60;ira&#x60;. - The referenced primary account holder is not eligible to open an additional account.  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is malformed or cannot be decoded. </td><td>  -  </td></tr>
         <tr><td> 409 </td><td> There is already an existing account registered with the same email address. </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> One of the input values is not a valid value. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request is well-formed but fails account-creation validation. This can include conflicting inline and referenced holder data, an unsupported account-type and holder combination, or an ineligible referenced party. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call createAccountCall(@javax.annotation.Nonnull AccountCreationRequest accountCreationRequest, final ApiCallback _callback) throws ApiException {
@@ -205,7 +205,7 @@ public class AccountsApi {
 
     /**
      * Create an Account
-     * Submit an account application with KYC information. This will create a trading account for the end user. The account status may or may not be ACTIVE immediately and you will receive account status updates on the event API.  **Multi-Live Accounts (MLA)**: To open an additional account for an existing account holder, supply &#x60;primary_account_holder_id&#x60; at the top level instead of &#x60;contact&#x60;/&#x60;identity&#x60; data. In that case, supplying &#x60;contact&#x60; or &#x60;identity&#x60; returns HTTP 400. Only &#x60;account_type&#x60; of &#x60;trading&#x60; and &#x60;ira&#x60; are supported via this flow. 
+     * Create an account for a new or existing account holder. Required fields, eligibility, and initial status depend on the account type, enabled assets, and your correspondent configuration. Account status changes are available through the Account Status Events stream.  To create an account for an existing holder, provide &#x60;primary_account_holder_id&#x60; instead of inline holder information. Among the documented account types, existing holders are supported for trading and IRA accounts. Donor-advised accounts instead reference an existing legal entity with &#x60;entity_id&#x60;. 
      * @param accountCreationRequest  (required)
      * @return Account
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -214,9 +214,9 @@ public class AccountsApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> The post body is not well formed. For Multi-Live Accounts (MLA), this also covers: - Supplying &#x60;primary_account_holder_id&#x60; together with &#x60;contact&#x60; or &#x60;identity&#x60;. - Supplying &#x60;primary_account_holder_id&#x60; with an &#x60;account_type&#x60; other than &#x60;trading&#x60; or &#x60;ira&#x60;. - The referenced primary account holder is not eligible to open an additional account.  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is malformed or cannot be decoded. </td><td>  -  </td></tr>
         <tr><td> 409 </td><td> There is already an existing account registered with the same email address. </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> One of the input values is not a valid value. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request is well-formed but fails account-creation validation. This can include conflicting inline and referenced holder data, an unsupported account-type and holder combination, or an ineligible referenced party. </td><td>  -  </td></tr>
      </table>
      */
     public Account createAccount(@javax.annotation.Nonnull AccountCreationRequest accountCreationRequest) throws ApiException {
@@ -226,7 +226,7 @@ public class AccountsApi {
 
     /**
      * Create an Account
-     * Submit an account application with KYC information. This will create a trading account for the end user. The account status may or may not be ACTIVE immediately and you will receive account status updates on the event API.  **Multi-Live Accounts (MLA)**: To open an additional account for an existing account holder, supply &#x60;primary_account_holder_id&#x60; at the top level instead of &#x60;contact&#x60;/&#x60;identity&#x60; data. In that case, supplying &#x60;contact&#x60; or &#x60;identity&#x60; returns HTTP 400. Only &#x60;account_type&#x60; of &#x60;trading&#x60; and &#x60;ira&#x60; are supported via this flow. 
+     * Create an account for a new or existing account holder. Required fields, eligibility, and initial status depend on the account type, enabled assets, and your correspondent configuration. Account status changes are available through the Account Status Events stream.  To create an account for an existing holder, provide &#x60;primary_account_holder_id&#x60; instead of inline holder information. Among the documented account types, existing holders are supported for trading and IRA accounts. Donor-advised accounts instead reference an existing legal entity with &#x60;entity_id&#x60;. 
      * @param accountCreationRequest  (required)
      * @return ApiResponse&lt;Account&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -235,9 +235,9 @@ public class AccountsApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> The post body is not well formed. For Multi-Live Accounts (MLA), this also covers: - Supplying &#x60;primary_account_holder_id&#x60; together with &#x60;contact&#x60; or &#x60;identity&#x60;. - Supplying &#x60;primary_account_holder_id&#x60; with an &#x60;account_type&#x60; other than &#x60;trading&#x60; or &#x60;ira&#x60;. - The referenced primary account holder is not eligible to open an additional account.  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is malformed or cannot be decoded. </td><td>  -  </td></tr>
         <tr><td> 409 </td><td> There is already an existing account registered with the same email address. </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> One of the input values is not a valid value. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request is well-formed but fails account-creation validation. This can include conflicting inline and referenced holder data, an unsupported account-type and holder combination, or an ineligible referenced party. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<Account> createAccountWithHttpInfo(@javax.annotation.Nonnull AccountCreationRequest accountCreationRequest) throws ApiException {
@@ -248,7 +248,7 @@ public class AccountsApi {
 
     /**
      * Create an Account (asynchronously)
-     * Submit an account application with KYC information. This will create a trading account for the end user. The account status may or may not be ACTIVE immediately and you will receive account status updates on the event API.  **Multi-Live Accounts (MLA)**: To open an additional account for an existing account holder, supply &#x60;primary_account_holder_id&#x60; at the top level instead of &#x60;contact&#x60;/&#x60;identity&#x60; data. In that case, supplying &#x60;contact&#x60; or &#x60;identity&#x60; returns HTTP 400. Only &#x60;account_type&#x60; of &#x60;trading&#x60; and &#x60;ira&#x60; are supported via this flow. 
+     * Create an account for a new or existing account holder. Required fields, eligibility, and initial status depend on the account type, enabled assets, and your correspondent configuration. Account status changes are available through the Account Status Events stream.  To create an account for an existing holder, provide &#x60;primary_account_holder_id&#x60; instead of inline holder information. Among the documented account types, existing holders are supported for trading and IRA accounts. Donor-advised accounts instead reference an existing legal entity with &#x60;entity_id&#x60;. 
      * @param accountCreationRequest  (required)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
@@ -258,9 +258,9 @@ public class AccountsApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> The post body is not well formed. For Multi-Live Accounts (MLA), this also covers: - Supplying &#x60;primary_account_holder_id&#x60; together with &#x60;contact&#x60; or &#x60;identity&#x60;. - Supplying &#x60;primary_account_holder_id&#x60; with an &#x60;account_type&#x60; other than &#x60;trading&#x60; or &#x60;ira&#x60;. - The referenced primary account holder is not eligible to open an additional account.  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is malformed or cannot be decoded. </td><td>  -  </td></tr>
         <tr><td> 409 </td><td> There is already an existing account registered with the same email address. </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> One of the input values is not a valid value. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request is well-formed but fails account-creation validation. This can include conflicting inline and referenced holder data, an unsupported account-type and holder combination, or an ineligible referenced party. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call createAccountAsync(@javax.annotation.Nonnull AccountCreationRequest accountCreationRequest, final ApiCallback<Account> _callback) throws ApiException {
@@ -1667,7 +1667,8 @@ public class AccountsApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> If all parameters are valid and updates have been made, it returns with status code 200. The response is the account model. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> The post body is not well formed. This also includes attempts to change the primary account holder via &#x60;primary_account_holder_id&#x60;: the field is immutable after account creation, so supplying a value different from the account&#39;s current primary account holder returns HTTP 400.  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The post body is not well formed. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested update is forbidden. This includes attempting to change the immutable &#x60;primary_account_holder_id&#x60;. </td><td>  -  </td></tr>
         <tr><td> 422 </td><td> The request body contains an attribute that is not permitted to be updated or you are attempting to set an invalid value. </td><td>  -  </td></tr>
      </table>
      */
@@ -1735,7 +1736,7 @@ public class AccountsApi {
 
     /**
      * Update an Account
-     * This operation updates account information.  If all parameters are valid and updates have been made, it returns with status code 200. The response is the account model.  **Multi-Live Accounts (MLA)**: The &#x60;primary_account_holder_id&#x60; field is read-only after the account is created. Omitting it or supplying the value already associated with the account is a no-op; supplying a different value returns HTTP 400.
+     * This operation updates account information.  If all parameters are valid and updates have been made, it returns with status code 200. The response is the account model.
      * @param accountId Account identifier. (required)
      * @param accountUpdateRequest  (required)
      * @return AccountExtended
@@ -1745,7 +1746,8 @@ public class AccountsApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> If all parameters are valid and updates have been made, it returns with status code 200. The response is the account model. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> The post body is not well formed. This also includes attempts to change the primary account holder via &#x60;primary_account_holder_id&#x60;: the field is immutable after account creation, so supplying a value different from the account&#39;s current primary account holder returns HTTP 400.  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The post body is not well formed. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested update is forbidden. This includes attempting to change the immutable &#x60;primary_account_holder_id&#x60;. </td><td>  -  </td></tr>
         <tr><td> 422 </td><td> The request body contains an attribute that is not permitted to be updated or you are attempting to set an invalid value. </td><td>  -  </td></tr>
      </table>
      */
@@ -1756,7 +1758,7 @@ public class AccountsApi {
 
     /**
      * Update an Account
-     * This operation updates account information.  If all parameters are valid and updates have been made, it returns with status code 200. The response is the account model.  **Multi-Live Accounts (MLA)**: The &#x60;primary_account_holder_id&#x60; field is read-only after the account is created. Omitting it or supplying the value already associated with the account is a no-op; supplying a different value returns HTTP 400.
+     * This operation updates account information.  If all parameters are valid and updates have been made, it returns with status code 200. The response is the account model.
      * @param accountId Account identifier. (required)
      * @param accountUpdateRequest  (required)
      * @return ApiResponse&lt;AccountExtended&gt;
@@ -1766,7 +1768,8 @@ public class AccountsApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> If all parameters are valid and updates have been made, it returns with status code 200. The response is the account model. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> The post body is not well formed. This also includes attempts to change the primary account holder via &#x60;primary_account_holder_id&#x60;: the field is immutable after account creation, so supplying a value different from the account&#39;s current primary account holder returns HTTP 400.  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The post body is not well formed. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested update is forbidden. This includes attempting to change the immutable &#x60;primary_account_holder_id&#x60;. </td><td>  -  </td></tr>
         <tr><td> 422 </td><td> The request body contains an attribute that is not permitted to be updated or you are attempting to set an invalid value. </td><td>  -  </td></tr>
      </table>
      */
@@ -1778,7 +1781,7 @@ public class AccountsApi {
 
     /**
      * Update an Account (asynchronously)
-     * This operation updates account information.  If all parameters are valid and updates have been made, it returns with status code 200. The response is the account model.  **Multi-Live Accounts (MLA)**: The &#x60;primary_account_holder_id&#x60; field is read-only after the account is created. Omitting it or supplying the value already associated with the account is a no-op; supplying a different value returns HTTP 400.
+     * This operation updates account information.  If all parameters are valid and updates have been made, it returns with status code 200. The response is the account model.
      * @param accountId Account identifier. (required)
      * @param accountUpdateRequest  (required)
      * @param _callback The callback to be executed when the API call finishes
@@ -1789,7 +1792,8 @@ public class AccountsApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> If all parameters are valid and updates have been made, it returns with status code 200. The response is the account model. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> The post body is not well formed. This also includes attempts to change the primary account holder via &#x60;primary_account_holder_id&#x60;: the field is immutable after account creation, so supplying a value different from the account&#39;s current primary account holder returns HTTP 400.  </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The post body is not well formed. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested update is forbidden. This includes attempting to change the immutable &#x60;primary_account_holder_id&#x60;. </td><td>  -  </td></tr>
         <tr><td> 422 </td><td> The request body contains an attribute that is not permitted to be updated or you are attempting to set an invalid value. </td><td>  -  </td></tr>
      </table>
      */

@@ -48,7 +48,9 @@ public enum TokenizationNetwork implements Serializable {
   
   CRONOS("cronos"),
   
-  HYPEREVM("hyperevm");
+  HYPEREVM("hyperevm"),
+  
+  ROBINHOOD("robinhood");
 
   private String value;
 

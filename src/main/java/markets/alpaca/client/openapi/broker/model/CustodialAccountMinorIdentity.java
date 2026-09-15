@@ -103,7 +103,7 @@ public class CustodialAccountMinorIdentity implements Serializable {
 
   public static final String SERIALIZED_NAME_TAX_ID_TYPE = "tax_id_type";
   @SerializedName(SERIALIZED_NAME_TAX_ID_TYPE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private TaxIdType taxIdType;
 
   public CustodialAccountMinorIdentity() {
@@ -280,7 +280,7 @@ public class CustodialAccountMinorIdentity implements Serializable {
   }
 
 
-  public CustodialAccountMinorIdentity taxIdType(@javax.annotation.Nullable TaxIdType taxIdType) {
+  public CustodialAccountMinorIdentity taxIdType(@javax.annotation.Nonnull TaxIdType taxIdType) {
     this.taxIdType = taxIdType;
     return this;
   }
@@ -289,12 +289,12 @@ public class CustodialAccountMinorIdentity implements Serializable {
    * Get taxIdType
    * @return taxIdType
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public TaxIdType getTaxIdType() {
     return taxIdType;
   }
 
-  public void setTaxIdType(@javax.annotation.Nullable TaxIdType taxIdType) {
+  public void setTaxIdType(@javax.annotation.Nonnull TaxIdType taxIdType) {
     this.taxIdType = taxIdType;
   }
 
@@ -407,7 +407,7 @@ public class CustodialAccountMinorIdentity implements Serializable {
     openapiFields = new HashSet<String>(Arrays.asList("country_of_birth", "country_of_citizenship", "country_of_tax_residence", "date_of_birth", "email", "family_name", "given_name", "state", "tax_id", "tax_id_type"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("country_of_tax_residence", "date_of_birth", "email", "family_name", "given_name", "state"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("country_of_tax_residence", "date_of_birth", "email", "family_name", "given_name", "state", "tax_id_type"));
   }
 
   /**
@@ -454,10 +454,8 @@ public class CustodialAccountMinorIdentity implements Serializable {
       if ((jsonObj.get("tax_id") != null && !jsonObj.get("tax_id").isJsonNull()) && !jsonObj.get("tax_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `tax_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("tax_id").toString()));
       }
-      // validate the optional field `tax_id_type`
-      if (jsonObj.get("tax_id_type") != null && !jsonObj.get("tax_id_type").isJsonNull()) {
-        TaxIdType.validateJsonElement(jsonObj.get("tax_id_type"));
-      }
+      // validate the required field `tax_id_type`
+      TaxIdType.validateJsonElement(jsonObj.get("tax_id_type"));
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {

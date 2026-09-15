@@ -26,14 +26,15 @@ import java.util.List;
 import java.util.UUID;
 import markets.alpaca.client.openapi.broker.model.AccountCashInterestPost;
 import markets.alpaca.client.openapi.broker.model.AccountConfigurations;
+import markets.alpaca.client.openapi.broker.model.AccountCreationType;
 import markets.alpaca.client.openapi.broker.model.AccountFPSLPost;
 import markets.alpaca.client.openapi.broker.model.AccountSubType;
-import markets.alpaca.client.openapi.broker.model.AccountType;
 import markets.alpaca.client.openapi.broker.model.Agreement;
-import markets.alpaca.client.openapi.broker.model.AssetClass;
 import markets.alpaca.client.openapi.broker.model.Beneficiary;
 import markets.alpaca.client.openapi.broker.model.Contact;
+import markets.alpaca.client.openapi.broker.model.CustodialAccountMinorIdentity;
 import markets.alpaca.client.openapi.broker.model.Disclosures;
+import markets.alpaca.client.openapi.broker.model.EnabledAssetClass;
 import markets.alpaca.client.openapi.broker.model.Identity;
 import markets.alpaca.client.openapi.broker.model.OwnerDocumentUploadRequest;
 import markets.alpaca.client.openapi.broker.model.TrustedContact;
@@ -64,7 +65,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * Represents the fields required to create a new account
+ * Fields accepted when creating an account. Requirements vary by account type, enabled assets, existing holder agreements, and correspondent configuration. The server enforces conditional requirements that are not represented statically in this schema.  Account-specific requirements: - Trading accounts require inline &#x60;identity&#x60; plus &#x60;contact&#x60;, or an existing holder through &#x60;primary_account_holder_id&#x60;. Individual US equity accounts created with inline identity also require &#x60;disclosures&#x60;. - Custodial accounts require &#x60;identity&#x60; and &#x60;minor_identity&#x60;. US equity accounts also require &#x60;disclosures&#x60;. - IRA accounts require &#x60;account_sub_type&#x60;, US equity, and either inline &#x60;identity&#x60; or an existing holder through &#x60;primary_account_holder_id&#x60;; they do not support crypto. IRA accounts created with inline identity also require &#x60;disclosures&#x60;. - Donor-advised accounts require &#x60;entity_id&#x60;. 
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class AccountCreationRequest implements Serializable {
@@ -78,11 +79,11 @@ public class AccountCreationRequest implements Serializable {
   public static final String SERIALIZED_NAME_ACCOUNT_TYPE = "account_type";
   @SerializedName(SERIALIZED_NAME_ACCOUNT_TYPE)
   @javax.annotation.Nullable
-  private AccountType accountType;
+  private AccountCreationType accountType = AccountCreationType.TRADING;
 
   public static final String SERIALIZED_NAME_AGREEMENTS = "agreements";
   @SerializedName(SERIALIZED_NAME_AGREEMENTS)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private List<Agreement> agreements = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_ALLOW_INSTANT_ACH = "allow_instant_ach";
@@ -102,12 +103,12 @@ public class AccountCreationRequest implements Serializable {
 
   public static final String SERIALIZED_NAME_CONTACT = "contact";
   @SerializedName(SERIALIZED_NAME_CONTACT)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private Contact contact;
 
   public static final String SERIALIZED_NAME_DISCLOSURES = "disclosures";
   @SerializedName(SERIALIZED_NAME_DISCLOSURES)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private Disclosures disclosures;
 
   public static final String SERIALIZED_NAME_DOCUMENTS = "documents";
@@ -118,7 +119,12 @@ public class AccountCreationRequest implements Serializable {
   public static final String SERIALIZED_NAME_ENABLED_ASSETS = "enabled_assets";
   @SerializedName(SERIALIZED_NAME_ENABLED_ASSETS)
   @javax.annotation.Nullable
-  private List<AssetClass> enabledAssets = new ArrayList<>();
+  private List<EnabledAssetClass> enabledAssets = new ArrayList<>();
+
+  public static final String SERIALIZED_NAME_ENTITY_ID = "entity_id";
+  @SerializedName(SERIALIZED_NAME_ENTITY_ID)
+  @javax.annotation.Nullable
+  private UUID entityId;
 
   public static final String SERIALIZED_NAME_FPSL = "fpsl";
   @SerializedName(SERIALIZED_NAME_FPSL)
@@ -127,7 +133,7 @@ public class AccountCreationRequest implements Serializable {
 
   public static final String SERIALIZED_NAME_IDENTITY = "identity";
   @SerializedName(SERIALIZED_NAME_IDENTITY)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private Identity identity;
 
   /**
@@ -317,6 +323,11 @@ public class AccountCreationRequest implements Serializable {
   @javax.annotation.Nullable
   private LiquidityNeedsEnum liquidityNeeds;
 
+  public static final String SERIALIZED_NAME_MINOR_IDENTITY = "minor_identity";
+  @SerializedName(SERIALIZED_NAME_MINOR_IDENTITY)
+  @javax.annotation.Nullable
+  private CustodialAccountMinorIdentity minorIdentity;
+
   public static final String SERIALIZED_NAME_PRIMARY_ACCOUNT_HOLDER_ID = "primary_account_holder_id";
   @SerializedName(SERIALIZED_NAME_PRIMARY_ACCOUNT_HOLDER_ID)
   @javax.annotation.Nullable
@@ -400,7 +411,7 @@ public class AccountCreationRequest implements Serializable {
   }
 
   /**
-   * Get accountSubType
+   * The account subtype. Required for IRA accounts.
    * @return accountSubType
    */
   @javax.annotation.Nullable
@@ -413,26 +424,26 @@ public class AccountCreationRequest implements Serializable {
   }
 
 
-  public AccountCreationRequest accountType(@javax.annotation.Nullable AccountType accountType) {
+  public AccountCreationRequest accountType(@javax.annotation.Nullable AccountCreationType accountType) {
     this.accountType = accountType;
     return this;
   }
 
   /**
-   * Get accountType
+   * The account type. Defaults to &#x60;trading&#x60; when omitted.
    * @return accountType
    */
   @javax.annotation.Nullable
-  public AccountType getAccountType() {
+  public AccountCreationType getAccountType() {
     return accountType;
   }
 
-  public void setAccountType(@javax.annotation.Nullable AccountType accountType) {
+  public void setAccountType(@javax.annotation.Nullable AccountCreationType accountType) {
     this.accountType = accountType;
   }
 
 
-  public AccountCreationRequest agreements(@javax.annotation.Nonnull List<Agreement> agreements) {
+  public AccountCreationRequest agreements(@javax.annotation.Nullable List<Agreement> agreements) {
     this.agreements = agreements;
     return this;
   }
@@ -446,15 +457,15 @@ public class AccountCreationRequest implements Serializable {
   }
 
   /**
-   * The client must present the Alpaca Account and Margin Agreements to the end user, and confirm they have read and agreed to the agreement.
+   * Agreements submitted for the account or holder. Required agreement types depend on account type, enabled assets, existing holder agreements, and correspondent configuration. The server validates required coverage.
    * @return agreements
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public List<Agreement> getAgreements() {
     return agreements;
   }
 
-  public void setAgreements(@javax.annotation.Nonnull List<Agreement> agreements) {
+  public void setAgreements(@javax.annotation.Nullable List<Agreement> agreements) {
     this.agreements = agreements;
   }
 
@@ -524,7 +535,7 @@ public class AccountCreationRequest implements Serializable {
   }
 
 
-  public AccountCreationRequest contact(@javax.annotation.Nonnull Contact contact) {
+  public AccountCreationRequest contact(@javax.annotation.Nullable Contact contact) {
     this.contact = contact;
     return this;
   }
@@ -533,17 +544,17 @@ public class AccountCreationRequest implements Serializable {
    * Get contact
    * @return contact
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public Contact getContact() {
     return contact;
   }
 
-  public void setContact(@javax.annotation.Nonnull Contact contact) {
+  public void setContact(@javax.annotation.Nullable Contact contact) {
     this.contact = contact;
   }
 
 
-  public AccountCreationRequest disclosures(@javax.annotation.Nonnull Disclosures disclosures) {
+  public AccountCreationRequest disclosures(@javax.annotation.Nullable Disclosures disclosures) {
     this.disclosures = disclosures;
     return this;
   }
@@ -552,12 +563,12 @@ public class AccountCreationRequest implements Serializable {
    * Get disclosures
    * @return disclosures
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public Disclosures getDisclosures() {
     return disclosures;
   }
 
-  public void setDisclosures(@javax.annotation.Nonnull Disclosures disclosures) {
+  public void setDisclosures(@javax.annotation.Nullable Disclosures disclosures) {
     this.disclosures = disclosures;
   }
 
@@ -589,12 +600,12 @@ public class AccountCreationRequest implements Serializable {
   }
 
 
-  public AccountCreationRequest enabledAssets(@javax.annotation.Nullable List<AssetClass> enabledAssets) {
+  public AccountCreationRequest enabledAssets(@javax.annotation.Nullable List<EnabledAssetClass> enabledAssets) {
     this.enabledAssets = enabledAssets;
     return this;
   }
 
-  public AccountCreationRequest addEnabledAssetsItem(AssetClass enabledAssetsItem) {
+  public AccountCreationRequest addEnabledAssetsItem(EnabledAssetClass enabledAssetsItem) {
     if (this.enabledAssets == null) {
       this.enabledAssets = new ArrayList<>();
     }
@@ -607,12 +618,31 @@ public class AccountCreationRequest implements Serializable {
    * @return enabledAssets
    */
   @javax.annotation.Nullable
-  public List<AssetClass> getEnabledAssets() {
+  public List<EnabledAssetClass> getEnabledAssets() {
     return enabledAssets;
   }
 
-  public void setEnabledAssets(@javax.annotation.Nullable List<AssetClass> enabledAssets) {
+  public void setEnabledAssets(@javax.annotation.Nullable List<EnabledAssetClass> enabledAssets) {
     this.enabledAssets = enabledAssets;
+  }
+
+
+  public AccountCreationRequest entityId(@javax.annotation.Nullable UUID entityId) {
+    this.entityId = entityId;
+    return this;
+  }
+
+  /**
+   * UUID of an existing legal entity used as the holder of a donor-advised account. Required for donor-advised accounts.
+   * @return entityId
+   */
+  @javax.annotation.Nullable
+  public UUID getEntityId() {
+    return entityId;
+  }
+
+  public void setEntityId(@javax.annotation.Nullable UUID entityId) {
+    this.entityId = entityId;
   }
 
 
@@ -635,7 +665,7 @@ public class AccountCreationRequest implements Serializable {
   }
 
 
-  public AccountCreationRequest identity(@javax.annotation.Nonnull Identity identity) {
+  public AccountCreationRequest identity(@javax.annotation.Nullable Identity identity) {
     this.identity = identity;
     return this;
   }
@@ -644,12 +674,12 @@ public class AccountCreationRequest implements Serializable {
    * Get identity
    * @return identity
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public Identity getIdentity() {
     return identity;
   }
 
-  public void setIdentity(@javax.annotation.Nonnull Identity identity) {
+  public void setIdentity(@javax.annotation.Nullable Identity identity) {
     this.identity = identity;
   }
 
@@ -711,13 +741,32 @@ public class AccountCreationRequest implements Serializable {
   }
 
 
+  public AccountCreationRequest minorIdentity(@javax.annotation.Nullable CustodialAccountMinorIdentity minorIdentity) {
+    this.minorIdentity = minorIdentity;
+    return this;
+  }
+
+  /**
+   * Identity information for the minor. Required for custodial accounts.
+   * @return minorIdentity
+   */
+  @javax.annotation.Nullable
+  public CustodialAccountMinorIdentity getMinorIdentity() {
+    return minorIdentity;
+  }
+
+  public void setMinorIdentity(@javax.annotation.Nullable CustodialAccountMinorIdentity minorIdentity) {
+    this.minorIdentity = minorIdentity;
+  }
+
+
   public AccountCreationRequest primaryAccountHolderId(@javax.annotation.Nullable UUID primaryAccountHolderId) {
     this.primaryAccountHolderId = primaryAccountHolderId;
     return this;
   }
 
   /**
-   * UUID of an existing account holder (party) to use as the primary account holder for the new account. Used to open additional accounts under the Multi-Live Accounts (MLA) flow.  When present: - &#x60;contact&#x60; and &#x60;identity&#x60; must be omitted (returns HTTP 400 otherwise). - &#x60;agreements&#x60; must still be supplied (e.g. &#x60;customer_agreement&#x60; for trading; &#x60;customer_agreement&#x60; and &#x60;etc_agreement&#x60; for IRA). - Only &#x60;account_type&#x60; values of &#x60;trading&#x60; and &#x60;ira&#x60; are supported. 
+   * UUID of an existing party to use as the primary account holder. Among the documented account types, existing holders are supported for trading and IRA accounts.  When provided, omit inline holder fields such as &#x60;contact&#x60;, &#x60;identity&#x60;, &#x60;disclosures&#x60;, and &#x60;minor_identity&#x60;. The server validates the referenced party, account-type compatibility, eligibility, and required agreements. 
    * @return primaryAccountHolderId
    */
   @javax.annotation.Nullable
@@ -851,11 +900,13 @@ public class AccountCreationRequest implements Serializable {
         Objects.equals(this.disclosures, accountCreationRequest.disclosures) &&
         Objects.equals(this.documents, accountCreationRequest.documents) &&
         Objects.equals(this.enabledAssets, accountCreationRequest.enabledAssets) &&
+        Objects.equals(this.entityId, accountCreationRequest.entityId) &&
         Objects.equals(this.fpsl, accountCreationRequest.fpsl) &&
         Objects.equals(this.identity, accountCreationRequest.identity) &&
         Objects.equals(this.investmentObjective, accountCreationRequest.investmentObjective) &&
         Objects.equals(this.investmentTimeHorizon, accountCreationRequest.investmentTimeHorizon) &&
         Objects.equals(this.liquidityNeeds, accountCreationRequest.liquidityNeeds) &&
+        Objects.equals(this.minorIdentity, accountCreationRequest.minorIdentity) &&
         Objects.equals(this.primaryAccountHolderId, accountCreationRequest.primaryAccountHolderId) &&
         Objects.equals(this.riskTolerance, accountCreationRequest.riskTolerance) &&
         Objects.equals(this.tradingConfigurations, accountCreationRequest.tradingConfigurations) &&
@@ -865,7 +916,7 @@ public class AccountCreationRequest implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(accountSubType, accountType, agreements, allowInstantAch, beneficiaries, cashInterest, contact, disclosures, documents, enabledAssets, fpsl, identity, investmentObjective, investmentTimeHorizon, liquidityNeeds, primaryAccountHolderId, riskTolerance, tradingConfigurations, trustedContact, additionalProperties);
+    return Objects.hash(accountSubType, accountType, agreements, allowInstantAch, beneficiaries, cashInterest, contact, disclosures, documents, enabledAssets, entityId, fpsl, identity, investmentObjective, investmentTimeHorizon, liquidityNeeds, minorIdentity, primaryAccountHolderId, riskTolerance, tradingConfigurations, trustedContact, additionalProperties);
   }
 
   @Override
@@ -882,11 +933,13 @@ public class AccountCreationRequest implements Serializable {
     sb.append("    disclosures: ").append(toIndentedString(disclosures)).append("\n");
     sb.append("    documents: ").append(toIndentedString(documents)).append("\n");
     sb.append("    enabledAssets: ").append(toIndentedString(enabledAssets)).append("\n");
+    sb.append("    entityId: ").append(toIndentedString(entityId)).append("\n");
     sb.append("    fpsl: ").append(toIndentedString(fpsl)).append("\n");
     sb.append("    identity: ").append(toIndentedString(identity)).append("\n");
     sb.append("    investmentObjective: ").append(toIndentedString(investmentObjective)).append("\n");
     sb.append("    investmentTimeHorizon: ").append(toIndentedString(investmentTimeHorizon)).append("\n");
     sb.append("    liquidityNeeds: ").append(toIndentedString(liquidityNeeds)).append("\n");
+    sb.append("    minorIdentity: ").append(toIndentedString(minorIdentity)).append("\n");
     sb.append("    primaryAccountHolderId: ").append(toIndentedString(primaryAccountHolderId)).append("\n");
     sb.append("    riskTolerance: ").append(toIndentedString(riskTolerance)).append("\n");
     sb.append("    tradingConfigurations: ").append(toIndentedString(tradingConfigurations)).append("\n");
@@ -910,10 +963,10 @@ public class AccountCreationRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("account_sub_type", "account_type", "agreements", "allow_instant_ach", "beneficiaries", "cash_interest", "contact", "disclosures", "documents", "enabled_assets", "fpsl", "identity", "investment_objective", "investment_time_horizon", "liquidity_needs", "primary_account_holder_id", "risk_tolerance", "trading_configurations", "trusted_contact"));
+    openapiFields = new HashSet<String>(Arrays.asList("account_sub_type", "account_type", "agreements", "allow_instant_ach", "beneficiaries", "cash_interest", "contact", "disclosures", "documents", "enabled_assets", "entity_id", "fpsl", "identity", "investment_objective", "investment_time_horizon", "liquidity_needs", "minor_identity", "primary_account_holder_id", "risk_tolerance", "trading_configurations", "trusted_contact"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("agreements", "contact", "disclosures", "identity"));
+    openapiRequiredFields = new HashSet<String>(0);
   }
 
   /**
@@ -928,13 +981,6 @@ public class AccountCreationRequest implements Serializable {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in AccountCreationRequest is not found in the empty JSON string", AccountCreationRequest.openapiRequiredFields.toString()));
         }
       }
-
-      // check to make sure all required properties/fields are present in the JSON string
-      for (String requiredField : AccountCreationRequest.openapiRequiredFields) {
-        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
-        }
-      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
       // validate the optional field `account_sub_type`
       if (jsonObj.get("account_sub_type") != null && !jsonObj.get("account_sub_type").isJsonNull()) {
@@ -942,16 +988,20 @@ public class AccountCreationRequest implements Serializable {
       }
       // validate the optional field `account_type`
       if (jsonObj.get("account_type") != null && !jsonObj.get("account_type").isJsonNull()) {
-        AccountType.validateJsonElement(jsonObj.get("account_type"));
+        AccountCreationType.validateJsonElement(jsonObj.get("account_type"));
       }
-      if (jsonObj.get("agreements") != null) {
-        if (!jsonObj.get("agreements").isJsonArray()) {
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `agreements` to be an array in the JSON string but got `%s`", jsonObj.get("agreements").toString()));
-        }
+      if (jsonObj.get("agreements") != null && !jsonObj.get("agreements").isJsonNull()) {
         JsonArray jsonArrayagreements = jsonObj.getAsJsonArray("agreements");
-        // validate the required field `agreements` (array)
-        for (int i = 0; i < jsonArrayagreements.size(); i++) {
-          Agreement.validateJsonElement(jsonArrayagreements.get(i));
+        if (jsonArrayagreements != null) {
+          // ensure the json data is an array
+          if (!jsonObj.get("agreements").isJsonArray()) {
+            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `agreements` to be an array in the JSON string but got `%s`", jsonObj.get("agreements").toString()));
+          }
+
+          // validate the optional field `agreements` (array)
+          for (int i = 0; i < jsonArrayagreements.size(); i++) {
+            Agreement.validateJsonElement(jsonArrayagreements.get(i));
+          };
         }
       }
       if (jsonObj.get("beneficiaries") != null && !jsonObj.get("beneficiaries").isJsonNull()) {
@@ -972,10 +1022,14 @@ public class AccountCreationRequest implements Serializable {
       if (jsonObj.get("cash_interest") != null && !jsonObj.get("cash_interest").isJsonNull()) {
         AccountCashInterestPost.validateJsonElement(jsonObj.get("cash_interest"));
       }
-      // validate the required field `contact`
-      Contact.validateJsonElement(jsonObj.get("contact"));
-      // validate the required field `disclosures`
-      Disclosures.validateJsonElement(jsonObj.get("disclosures"));
+      // validate the optional field `contact`
+      if (jsonObj.get("contact") != null && !jsonObj.get("contact").isJsonNull()) {
+        Contact.validateJsonElement(jsonObj.get("contact"));
+      }
+      // validate the optional field `disclosures`
+      if (jsonObj.get("disclosures") != null && !jsonObj.get("disclosures").isJsonNull()) {
+        Disclosures.validateJsonElement(jsonObj.get("disclosures"));
+      }
       if (jsonObj.get("documents") != null && !jsonObj.get("documents").isJsonNull()) {
         JsonArray jsonArraydocuments = jsonObj.getAsJsonArray("documents");
         if (jsonArraydocuments != null) {
@@ -994,12 +1048,17 @@ public class AccountCreationRequest implements Serializable {
       if (jsonObj.get("enabled_assets") != null && !jsonObj.get("enabled_assets").isJsonNull() && !jsonObj.get("enabled_assets").isJsonArray()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `enabled_assets` to be an array in the JSON string but got `%s`", jsonObj.get("enabled_assets").toString()));
       }
+      if ((jsonObj.get("entity_id") != null && !jsonObj.get("entity_id").isJsonNull()) && !jsonObj.get("entity_id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `entity_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("entity_id").toString()));
+      }
       // validate the optional field `fpsl`
       if (jsonObj.get("fpsl") != null && !jsonObj.get("fpsl").isJsonNull()) {
         AccountFPSLPost.validateJsonElement(jsonObj.get("fpsl"));
       }
-      // validate the required field `identity`
-      Identity.validateJsonElement(jsonObj.get("identity"));
+      // validate the optional field `identity`
+      if (jsonObj.get("identity") != null && !jsonObj.get("identity").isJsonNull()) {
+        Identity.validateJsonElement(jsonObj.get("identity"));
+      }
       if ((jsonObj.get("investment_objective") != null && !jsonObj.get("investment_objective").isJsonNull()) && !jsonObj.get("investment_objective").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `investment_objective` to be a primitive type in the JSON string but got `%s`", jsonObj.get("investment_objective").toString()));
       }
@@ -1020,6 +1079,10 @@ public class AccountCreationRequest implements Serializable {
       // validate the optional field `liquidity_needs`
       if (jsonObj.get("liquidity_needs") != null && !jsonObj.get("liquidity_needs").isJsonNull()) {
         LiquidityNeedsEnum.validateJsonElement(jsonObj.get("liquidity_needs"));
+      }
+      // validate the optional field `minor_identity`
+      if (jsonObj.get("minor_identity") != null && !jsonObj.get("minor_identity").isJsonNull()) {
+        CustodialAccountMinorIdentity.validateJsonElement(jsonObj.get("minor_identity"));
       }
       if ((jsonObj.get("primary_account_holder_id") != null && !jsonObj.get("primary_account_holder_id").isJsonNull()) && !jsonObj.get("primary_account_holder_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `primary_account_holder_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("primary_account_holder_id").toString()));

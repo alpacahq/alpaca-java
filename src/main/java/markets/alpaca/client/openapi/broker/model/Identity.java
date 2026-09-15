@@ -1104,7 +1104,7 @@ public class Identity implements Serializable {
   }
 
   /**
-   * Required if tax_id_type is set.
+   * If this is provided, &#x60;tax_id_type&#x60; is required.
    * @return taxId
    */
   @javax.annotation.Nullable

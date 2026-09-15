@@ -25,10 +25,10 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * The account type returned for the account.
+ * The account type to create.
  */
-@JsonAdapter(AccountType.Adapter.class)
-public enum AccountType implements Serializable {
+@JsonAdapter(AccountCreationType.Adapter.class)
+public enum AccountCreationType implements Serializable {
   
   TRADING("trading"),
   
@@ -36,21 +36,11 @@ public enum AccountType implements Serializable {
   
   DONOR_ADVISED("donor_advised"),
   
-  IRA("ira"),
-  
-  TRUST("trust"),
-  
-  OMNIBUS_NON_DISCLOSED("omnibus_non_disclosed"),
-  
-  OMNIBUS_SUB("omnibus_sub"),
-  
-  HSA("hsa"),
-  
-  JOINT("joint");
+  IRA("ira");
 
   private String value;
 
-  AccountType(String value) {
+  AccountCreationType(String value) {
     this.value = value;
   }
 
@@ -63,8 +53,8 @@ public enum AccountType implements Serializable {
     return String.valueOf(value);
   }
 
-  public static AccountType fromValue(String value) {
-    for (AccountType b : AccountType.values()) {
+  public static AccountCreationType fromValue(String value) {
+    for (AccountCreationType b : AccountCreationType.values()) {
       if (b.value.equals(value)) {
         return b;
       }
@@ -72,22 +62,22 @@ public enum AccountType implements Serializable {
     throw new IllegalArgumentException("Unexpected value '" + value + "'");
   }
 
-  public static class Adapter extends TypeAdapter<AccountType> {
+  public static class Adapter extends TypeAdapter<AccountCreationType> {
     @Override
-    public void write(final JsonWriter jsonWriter, final AccountType enumeration) throws IOException {
+    public void write(final JsonWriter jsonWriter, final AccountCreationType enumeration) throws IOException {
       jsonWriter.value(enumeration.getValue());
     }
 
     @Override
-    public AccountType read(final JsonReader jsonReader) throws IOException {
+    public AccountCreationType read(final JsonReader jsonReader) throws IOException {
       String value = jsonReader.nextString();
-      return AccountType.fromValue(value);
+      return AccountCreationType.fromValue(value);
     }
   }
 
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
     String value = jsonElement.getAsString();
-    AccountType.fromValue(value);
+    AccountCreationType.fromValue(value);
   }
 }
 
