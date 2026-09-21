@@ -50,7 +50,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * Options corporate action of Cash dividend
+ * Options corporate action of cash dividend or return of capital
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class OpcaCDIVActivityV2 implements Serializable {

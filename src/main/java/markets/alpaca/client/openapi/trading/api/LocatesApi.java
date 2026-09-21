@@ -183,7 +183,7 @@ public class LocatesApi {
 
     /**
      * Create Locate
-     * Creates a locate request for a short sale.  **Idempotency**: Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. 
+     * Creates a locate request for a short sale. This endpoint is not available in paper trading.  **Idempotency**: Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. 
      * @param createLocateRequest Locate request details. (required)
      * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @return Locate
@@ -207,7 +207,7 @@ public class LocatesApi {
 
     /**
      * Create Locate
-     * Creates a locate request for a short sale.  **Idempotency**: Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. 
+     * Creates a locate request for a short sale. This endpoint is not available in paper trading.  **Idempotency**: Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. 
      * @param createLocateRequest Locate request details. (required)
      * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @return ApiResponse&lt;Locate&gt;
@@ -232,7 +232,7 @@ public class LocatesApi {
 
     /**
      * Create Locate (asynchronously)
-     * Creates a locate request for a short sale.  **Idempotency**: Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. 
+     * Creates a locate request for a short sale. This endpoint is not available in paper trading.  **Idempotency**: Reusing the same key with the same request returns the original locate response. Reusing the same key with a different request returns HTTP 422. 
      * @param createLocateRequest Locate request details. (required)
      * @param idempotencyKey Optional client-generated key for safe retries and duplicate request detection. This endpoint currently accepts keys up to 128 characters. Alpaca is moving toward a 36-character maximum; new implementations should generate a unique UUIDv7 or UUIDv4 value (36 characters including hyphens) for each logical operation. Do not reuse a key across operations.  (optional)
      * @param _callback The callback to be executed when the API call finishes
@@ -333,7 +333,7 @@ public class LocatesApi {
 
     /**
      * Get Locate
-     * Returns a locate by ID.
+     * Returns a locate by ID. This endpoint is not available in paper trading.
      * @param locateId The locate ID. (required)
      * @return Locate
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -356,7 +356,7 @@ public class LocatesApi {
 
     /**
      * Get Locate
-     * Returns a locate by ID.
+     * Returns a locate by ID. This endpoint is not available in paper trading.
      * @param locateId The locate ID. (required)
      * @return ApiResponse&lt;Locate&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -380,7 +380,7 @@ public class LocatesApi {
 
     /**
      * Get Locate (asynchronously)
-     * Returns a locate by ID.
+     * Returns a locate by ID. This endpoint is not available in paper trading.
      * @param locateId The locate ID. (required)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
@@ -482,7 +482,7 @@ public class LocatesApi {
 
     /**
      * Get Locate Quotes
-     * Returns locate availability and pricing for one or more symbols.
+     * Returns locate availability and pricing for one or more symbols. This endpoint is not available in paper trading.
      * @param symbols Comma-separated list of stock symbols. Maximum 100 unique symbols. (required)
      * @return ListLocateQuotesResponse
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -504,7 +504,7 @@ public class LocatesApi {
 
     /**
      * Get Locate Quotes
-     * Returns locate availability and pricing for one or more symbols.
+     * Returns locate availability and pricing for one or more symbols. This endpoint is not available in paper trading.
      * @param symbols Comma-separated list of stock symbols. Maximum 100 unique symbols. (required)
      * @return ApiResponse&lt;ListLocateQuotesResponse&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -527,7 +527,7 @@ public class LocatesApi {
 
     /**
      * Get Locate Quotes (asynchronously)
-     * Returns locate availability and pricing for one or more symbols.
+     * Returns locate availability and pricing for one or more symbols. This endpoint is not available in paper trading.
      * @param symbols Comma-separated list of stock symbols. Maximum 100 unique symbols. (required)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
@@ -648,7 +648,7 @@ public class LocatesApi {
 
     /**
      * List Locates
-     * Returns locates filtered by status, symbol, or date range. Results are sorted by &#x60;created_at&#x60; descending, with &#x60;id&#x60; descending as the tie-breaker.
+     * Returns locates filtered by status, symbol, or date range. Results are sorted by &#x60;created_at&#x60; descending, with &#x60;id&#x60; descending as the tie-breaker. This endpoint is not available in paper trading.
      * @param pageToken Used for pagination, this token retrieves the next page of results. It is obtained from the response of the preceding page when additional pages are available. (optional)
      * @param limit Maximum number of results to return. (optional, default to 1000)
      * @param status Filter by locate status. (optional)
@@ -675,7 +675,7 @@ public class LocatesApi {
 
     /**
      * List Locates
-     * Returns locates filtered by status, symbol, or date range. Results are sorted by &#x60;created_at&#x60; descending, with &#x60;id&#x60; descending as the tie-breaker.
+     * Returns locates filtered by status, symbol, or date range. Results are sorted by &#x60;created_at&#x60; descending, with &#x60;id&#x60; descending as the tie-breaker. This endpoint is not available in paper trading.
      * @param pageToken Used for pagination, this token retrieves the next page of results. It is obtained from the response of the preceding page when additional pages are available. (optional)
      * @param limit Maximum number of results to return. (optional, default to 1000)
      * @param status Filter by locate status. (optional)
@@ -703,7 +703,7 @@ public class LocatesApi {
 
     /**
      * List Locates (asynchronously)
-     * Returns locates filtered by status, symbol, or date range. Results are sorted by &#x60;created_at&#x60; descending, with &#x60;id&#x60; descending as the tie-breaker.
+     * Returns locates filtered by status, symbol, or date range. Results are sorted by &#x60;created_at&#x60; descending, with &#x60;id&#x60; descending as the tie-breaker. This endpoint is not available in paper trading.
      * @param pageToken Used for pagination, this token retrieves the next page of results. It is obtained from the response of the preceding page when additional pages are available. (optional)
      * @param limit Maximum number of results to return. (optional, default to 1000)
      * @param status Filter by locate status. (optional)

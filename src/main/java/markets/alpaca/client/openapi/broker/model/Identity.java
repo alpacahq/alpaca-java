@@ -630,7 +630,7 @@ public class Identity implements Serializable {
 
   public static final String SERIALIZED_NAME_TAX_ID_TYPE = "tax_id_type";
   @SerializedName(SERIALIZED_NAME_TAX_ID_TYPE)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private TaxIdType taxIdType;
 
   public static final String SERIALIZED_NAME_TOTAL_NET_WORTH_MAX = "total_net_worth_max";
@@ -1104,7 +1104,7 @@ public class Identity implements Serializable {
   }
 
   /**
-   * Required if tax_id_type is set.
+   * If this is provided, &#x60;tax_id_type&#x60; is required.
    * @return taxId
    */
   @javax.annotation.Nullable
@@ -1117,21 +1117,21 @@ public class Identity implements Serializable {
   }
 
 
-  public Identity taxIdType(@javax.annotation.Nonnull TaxIdType taxIdType) {
+  public Identity taxIdType(@javax.annotation.Nullable TaxIdType taxIdType) {
     this.taxIdType = taxIdType;
     return this;
   }
 
   /**
-   * Get taxIdType
+   * Required on write when &#x60;tax_id&#x60; is set. May be &#x60;null&#x60; on read when unset or for sparse identity on OmniSub / omnibus-non-disclosed accounts.
    * @return taxIdType
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public TaxIdType getTaxIdType() {
     return taxIdType;
   }
 
-  public void setTaxIdType(@javax.annotation.Nonnull TaxIdType taxIdType) {
+  public void setTaxIdType(@javax.annotation.Nullable TaxIdType taxIdType) {
     this.taxIdType = taxIdType;
   }
 
@@ -1356,7 +1356,7 @@ public class Identity implements Serializable {
     openapiFields = new HashSet<String>(Arrays.asList("annual_income_max", "annual_income_min", "country_of_birth", "country_of_citizenship", "country_of_tax_residence", "date_of_birth", "date_of_departure_from_usa", "family_name", "funding_source", "given_name", "investment_experience_with_options", "investment_experience_with_stocks", "investment_objective", "investment_time_horizon", "liquid_net_worth_max", "liquid_net_worth_min", "liquidity_needs", "marital_status", "middle_name", "number_of_dependents", "permanent_resident", "risk_tolerance", "tax_id", "tax_id_type", "total_net_worth_max", "total_net_worth_min", "visa_expiration_date", "visa_type"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("country_of_tax_residence", "date_of_birth", "family_name", "funding_source", "given_name", "tax_id_type"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("country_of_tax_residence", "date_of_birth", "family_name", "funding_source", "given_name"));
   }
 
   /**
@@ -1379,6 +1379,12 @@ public class Identity implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if ((jsonObj.get("annual_income_max") != null && !jsonObj.get("annual_income_max").isJsonNull()) && !jsonObj.get("annual_income_max").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `annual_income_max` to be a primitive type in the JSON string but got `%s`", jsonObj.get("annual_income_max").toString()));
+      }
+      if ((jsonObj.get("annual_income_min") != null && !jsonObj.get("annual_income_min").isJsonNull()) && !jsonObj.get("annual_income_min").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `annual_income_min` to be a primitive type in the JSON string but got `%s`", jsonObj.get("annual_income_min").toString()));
+      }
       if ((jsonObj.get("country_of_birth") != null && !jsonObj.get("country_of_birth").isJsonNull()) && !jsonObj.get("country_of_birth").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `country_of_birth` to be a primitive type in the JSON string but got `%s`", jsonObj.get("country_of_birth").toString()));
       }
@@ -1428,6 +1434,12 @@ public class Identity implements Serializable {
       if (jsonObj.get("investment_time_horizon") != null && !jsonObj.get("investment_time_horizon").isJsonNull()) {
         InvestmentTimeHorizonEnum.validateJsonElement(jsonObj.get("investment_time_horizon"));
       }
+      if ((jsonObj.get("liquid_net_worth_max") != null && !jsonObj.get("liquid_net_worth_max").isJsonNull()) && !jsonObj.get("liquid_net_worth_max").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `liquid_net_worth_max` to be a primitive type in the JSON string but got `%s`", jsonObj.get("liquid_net_worth_max").toString()));
+      }
+      if ((jsonObj.get("liquid_net_worth_min") != null && !jsonObj.get("liquid_net_worth_min").isJsonNull()) && !jsonObj.get("liquid_net_worth_min").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `liquid_net_worth_min` to be a primitive type in the JSON string but got `%s`", jsonObj.get("liquid_net_worth_min").toString()));
+      }
       if ((jsonObj.get("liquidity_needs") != null && !jsonObj.get("liquidity_needs").isJsonNull()) && !jsonObj.get("liquidity_needs").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `liquidity_needs` to be a primitive type in the JSON string but got `%s`", jsonObj.get("liquidity_needs").toString()));
       }
@@ -1455,8 +1467,16 @@ public class Identity implements Serializable {
       if ((jsonObj.get("tax_id") != null && !jsonObj.get("tax_id").isJsonNull()) && !jsonObj.get("tax_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `tax_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("tax_id").toString()));
       }
-      // validate the required field `tax_id_type`
-      TaxIdType.validateJsonElement(jsonObj.get("tax_id_type"));
+      // validate the optional field `tax_id_type`
+      if (jsonObj.get("tax_id_type") != null && !jsonObj.get("tax_id_type").isJsonNull()) {
+        TaxIdType.validateJsonElement(jsonObj.get("tax_id_type"));
+      }
+      if ((jsonObj.get("total_net_worth_max") != null && !jsonObj.get("total_net_worth_max").isJsonNull()) && !jsonObj.get("total_net_worth_max").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `total_net_worth_max` to be a primitive type in the JSON string but got `%s`", jsonObj.get("total_net_worth_max").toString()));
+      }
+      if ((jsonObj.get("total_net_worth_min") != null && !jsonObj.get("total_net_worth_min").isJsonNull()) && !jsonObj.get("total_net_worth_min").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `total_net_worth_min` to be a primitive type in the JSON string but got `%s`", jsonObj.get("total_net_worth_min").toString()));
+      }
       if ((jsonObj.get("visa_type") != null && !jsonObj.get("visa_type").isJsonNull()) && !jsonObj.get("visa_type").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `visa_type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("visa_type").toString()));
       }

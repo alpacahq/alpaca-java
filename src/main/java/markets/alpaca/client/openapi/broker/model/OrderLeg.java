@@ -835,7 +835,7 @@ public class OrderLeg implements Serializable {
   }
 
   /**
-   * Time the order was submitted for execution or, if not yet submitted the created_at time. Because orders are submitted for execution asynchronous to database updates, at times this may be before the created_at time.
+   * Time the order was submitted for execution or, if not yet submitted the created_at time. Because orders are submitted for execution asynchronous to database updates, at times this may be after the created_at time.
    * @return submittedAt
    */
   @javax.annotation.Nullable

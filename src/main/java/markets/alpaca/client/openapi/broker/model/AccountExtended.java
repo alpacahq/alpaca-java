@@ -34,11 +34,11 @@ import markets.alpaca.client.openapi.broker.model.AccountStatus;
 import markets.alpaca.client.openapi.broker.model.AccountSubType;
 import markets.alpaca.client.openapi.broker.model.AccountType;
 import markets.alpaca.client.openapi.broker.model.Agreement;
-import markets.alpaca.client.openapi.broker.model.AssetClass;
 import markets.alpaca.client.openapi.broker.model.Beneficiary;
 import markets.alpaca.client.openapi.broker.model.Contact;
 import markets.alpaca.client.openapi.broker.model.CustodialAccountMinorIdentity;
 import markets.alpaca.client.openapi.broker.model.Disclosures;
+import markets.alpaca.client.openapi.broker.model.EnabledAssetClass;
 import markets.alpaca.client.openapi.broker.model.Identity;
 import markets.alpaca.client.openapi.broker.model.KYCResults;
 import markets.alpaca.client.openapi.broker.model.OwnerDocument;
@@ -154,7 +154,7 @@ public class AccountExtended implements Serializable {
   public static final String SERIALIZED_NAME_ENABLED_ASSETS = "enabled_assets";
   @SerializedName(SERIALIZED_NAME_ENABLED_ASSETS)
   @javax.annotation.Nullable
-  private List<AssetClass> enabledAssets = new ArrayList<>();
+  private List<EnabledAssetClass> enabledAssets = new ArrayList<>();
 
   public static final String SERIALIZED_NAME_FPSL = "fpsl";
   @SerializedName(SERIALIZED_NAME_FPSL)
@@ -774,12 +774,12 @@ public class AccountExtended implements Serializable {
   }
 
 
-  public AccountExtended enabledAssets(@javax.annotation.Nullable List<AssetClass> enabledAssets) {
+  public AccountExtended enabledAssets(@javax.annotation.Nullable List<EnabledAssetClass> enabledAssets) {
     this.enabledAssets = enabledAssets;
     return this;
   }
 
-  public AccountExtended addEnabledAssetsItem(AssetClass enabledAssetsItem) {
+  public AccountExtended addEnabledAssetsItem(EnabledAssetClass enabledAssetsItem) {
     if (this.enabledAssets == null) {
       this.enabledAssets = new ArrayList<>();
     }
@@ -792,11 +792,11 @@ public class AccountExtended implements Serializable {
    * @return enabledAssets
    */
   @javax.annotation.Nullable
-  public List<AssetClass> getEnabledAssets() {
+  public List<EnabledAssetClass> getEnabledAssets() {
     return enabledAssets;
   }
 
-  public void setEnabledAssets(@javax.annotation.Nullable List<AssetClass> enabledAssets) {
+  public void setEnabledAssets(@javax.annotation.Nullable List<EnabledAssetClass> enabledAssets) {
     this.enabledAssets = enabledAssets;
   }
 
@@ -997,7 +997,7 @@ public class AccountExtended implements Serializable {
   }
 
   /**
-   * UUID that identifies the primary account holder (party) for accounts opened under the Multi-Live Accounts (MLA) flow. Only populated when the account was created by referencing an existing account holder via &#x60;primary_account_holder_id&#x60; on &#x60;POST /v1/accounts&#x60;. Otherwise &#x60;null&#x60;. Currently only supported for &#x60;account_type&#x60; of &#x60;trading&#x60; and &#x60;ira&#x60;. 
+   * UUID of the account&#39;s primary holder when available; otherwise &#x60;null&#x60;.
    * @return primaryAccountHolderId
    */
   @javax.annotation.Nullable
