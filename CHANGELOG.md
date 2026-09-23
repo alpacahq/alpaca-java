@@ -20,10 +20,23 @@ the policy below applies strictly.
 
 ## [Unreleased]
 
+### Breaking
+Adopting upstream Broker account-creation schemas ([#83](https://github.com/alpacahq/alpaca-java/pull/83)):
+- `AccountCreationRequest.getAccountType()` now returns `AccountCreationType` instead of `AccountType`.
+- `enabled_assets` is now `List<EnabledAssetClass>` on `Account` and `AccountCreationRequest`
+  (previously `List<AssetClass>`).
+
+### Added
+- Broker `AcatsApi` and ACATS transfer models
+  ([#65](https://github.com/alpacahq/alpaca-java/pull/65)).
+- Broker `AccountCreationType` / `EnabledAssetClass`, plus `entity_id` and `minor_identity` on
+  account creation and `enabled_assets` on `AccountUpdateRequest`
+  ([#83](https://github.com/alpacahq/alpaca-java/pull/83)).
+
 ### Fixed
 - The semantic diff no longer classifies added enum values as breaking. A widened enum keeps every
-  value callers already compile against, so `adoptOpenApi` adopts it without `--allow-breaking`, as
-  the additive category always documented. Enum value removals stay breaking.
+  value callers already compile against, so `adoptOpenApi` adopts it without `--allow-breaking`.
+  Enum value removals stay breaking.
 
 ### Changed
 - A failed `generateApis` or `compileJava` after an adopt pin write now restores the previous pins
@@ -31,6 +44,8 @@ the policy below applies strictly.
   `specs/` and the generated sources out of step. The pin backup is dropped by
   `clearOpenApiPinBackup` after a successful compile (including when compile is UP-TO-DATE), so
   failing tests afterward cannot rewind adopted pins.
+- Failed adopt output is preserved for diagnosis, and the weekly job no longer treats an empty
+  additive drift report as failure.
 - `spotbugsMain` now analyses every handwritten class except `markets.alpaca.client.openapi`,
   instead of an allowlist that silently skipped new packages.
 - The semantic diff also treats OAS 3.1 `nullable` equivalents (`type: [T, null]`,
@@ -53,6 +68,7 @@ the policy below applies strictly.
   separate breaking-drift issue. A breaking adopt is expected to fail its nested
   `generateApis test` run, so the workflow still publishes the resulting pins and generated
   sources as a draft PR and only then fails the run.
+- Pre-commit now runs the CI Gradle code checks on every commit.
 
 
 ## [0.1.3] - 2026-08-06
