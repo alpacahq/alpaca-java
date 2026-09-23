@@ -25,32 +25,20 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * The account type returned for the account.
+ * An asset class that can be enabled on a brokerage account, i.e. a value that may appear in an account&#39;s &#x60;enabled_assets&#x60;. This differs from &#x60;AssetClass&#x60; (which also covers order and asset metadata) by excluding &#x60;ipo&#x60;, which is not an enable-able asset.
  */
-@JsonAdapter(AccountType.Adapter.class)
-public enum AccountType implements Serializable {
+@JsonAdapter(EnabledAssetClass.Adapter.class)
+public enum EnabledAssetClass implements Serializable {
   
-  TRADING("trading"),
+  US_EQUITY("us_equity"),
   
-  CUSTODIAL("custodial"),
+  US_OPTION("us_option"),
   
-  DONOR_ADVISED("donor_advised"),
-  
-  IRA("ira"),
-  
-  TRUST("trust"),
-  
-  OMNIBUS_NON_DISCLOSED("omnibus_non_disclosed"),
-  
-  OMNIBUS_SUB("omnibus_sub"),
-  
-  HSA("hsa"),
-  
-  JOINT("joint");
+  CRYPTO("crypto");
 
   private String value;
 
-  AccountType(String value) {
+  EnabledAssetClass(String value) {
     this.value = value;
   }
 
@@ -63,8 +51,8 @@ public enum AccountType implements Serializable {
     return String.valueOf(value);
   }
 
-  public static AccountType fromValue(String value) {
-    for (AccountType b : AccountType.values()) {
+  public static EnabledAssetClass fromValue(String value) {
+    for (EnabledAssetClass b : EnabledAssetClass.values()) {
       if (b.value.equals(value)) {
         return b;
       }
@@ -72,22 +60,22 @@ public enum AccountType implements Serializable {
     throw new IllegalArgumentException("Unexpected value '" + value + "'");
   }
 
-  public static class Adapter extends TypeAdapter<AccountType> {
+  public static class Adapter extends TypeAdapter<EnabledAssetClass> {
     @Override
-    public void write(final JsonWriter jsonWriter, final AccountType enumeration) throws IOException {
+    public void write(final JsonWriter jsonWriter, final EnabledAssetClass enumeration) throws IOException {
       jsonWriter.value(enumeration.getValue());
     }
 
     @Override
-    public AccountType read(final JsonReader jsonReader) throws IOException {
+    public EnabledAssetClass read(final JsonReader jsonReader) throws IOException {
       String value = jsonReader.nextString();
-      return AccountType.fromValue(value);
+      return EnabledAssetClass.fromValue(value);
     }
   }
 
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
     String value = jsonElement.getAsString();
-    AccountType.fromValue(value);
+    EnabledAssetClass.fromValue(value);
   }
 }
 

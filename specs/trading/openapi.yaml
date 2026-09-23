@@ -909,6 +909,7 @@ components:
 
         - **OPCA**: Option Corporate Action activity sub-types:
           - **DIV.CDIV**: Cash Dividend
+          - **DIV.ROC**: Return of Capital
           - **DIV.SDIV**: Stock Dividend
           - **MA.CMA**: Cash Merger
           - **MA.SMA**: Stock Merger
@@ -3143,7 +3144,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/CommonOPCAActivityV2'
         - $ref: '#/components/schemas/CommonCDIVActivityV2'
-      description: Options corporate action of Cash dividend
+      description: Options corporate action of cash dividend or return of capital
       type: object
     OpcaFSPLITActivityV2:
       allOf:
@@ -4517,6 +4518,7 @@ components:
         - mantle
         - cronos
         - hyperevm
+        - robinhood
       example: solana
       title: TokenizationNetwork
       type: string
@@ -5514,7 +5516,8 @@ openapi: 3.1.2
 paths:
   /v1/locates:
     get:
-      description: Returns locates filtered by status, symbol, or date range. Results are sorted by `created_at` descending, with `id` descending as the tie-breaker.
+      description: Returns locates filtered by status, symbol, or date range. Results are sorted by `created_at` descending, with `id` descending as the tie-breaker. This endpoint is not available in paper
+        trading.
       operationId: listLocates
       parameters:
         - $ref: '#/components/parameters/PageToken'
@@ -5602,7 +5605,7 @@ paths:
         - Locates
     post:
       description: |
-        Creates a locate request for a short sale.
+        Creates a locate request for a short sale. This endpoint is not available in paper trading.
 
         **Idempotency**: Reusing the same key with the same request returns the original
         locate response. Reusing the same key with a different request returns HTTP 422.
@@ -5702,7 +5705,7 @@ paths:
         - Locates
   /v1/locates/{locate_id}:
     get:
-      description: Returns a locate by ID.
+      description: Returns a locate by ID. This endpoint is not available in paper trading.
       operationId: getLocate
       parameters:
         - description: The locate ID.
@@ -5768,7 +5771,7 @@ paths:
         - Locates
   /v1/locates/quotes:
     get:
-      description: Returns locate availability and pricing for one or more symbols.
+      description: Returns locate availability and pricing for one or more symbols. This endpoint is not available in paper trading.
       operationId: listLocateQuotes
       parameters:
         - description: Comma-separated list of stock symbols. Maximum 100 unique symbols.
