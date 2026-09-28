@@ -2821,7 +2821,7 @@ components:
           - **CDT**: Credit Interest
           - **SWP**: Sweep Interest
           - **QII**: Qualified Interest
-          - **FI**: Fixed Income Interest (coupon payment or accrued interest on call)
+          - **FI**: Fixed Income Interest (coupon or accrued)
 
         - **MA**: Merger and Acquisition activity sub-types:
           - **CMA**: Cash Merger
@@ -3766,17 +3766,6 @@ components:
           type: string
         class:
           $ref: '#/components/schemas/AssetClass'
-        easy_to_borrow:
-          deprecated: true
-          description: |
-            **deprecated**: Please use borrow_status instead.
-            Asset is easy-to-borrow or not (filtering for easy_to_borrow = True is the best way to check whether the name is currently available to short at Alpaca).
-          example: true
-          type: boolean
-          x-deprecation:
-            reason: Use borrow_status instead.
-            since: '2026-06-22'
-            sunset: '2026-09-22'
         exchange:
           $ref: '#/components/schemas/Exchange'
         fractionable:
@@ -4841,10 +4830,11 @@ components:
       type: object
     CommonFixedIncomeInterestActivityV2:
       description: |-
-        Fixed income interest fields (INT/FI). Two variants from the same activity type,
-        distinguished by which fields are present:
-        - Regular coupon: includes `rate` (no `price` / `accrued_interest_rate`)
-        - Accrued interest on call: includes `price` and `accrued_interest_rate` (no `rate`)
+        Fixed income interest fields (INT/FI). Variants from the same activity type:
+
+        - Coupon: `interest_type` is `coupon`. Includes `rate` (no `price` / `accrued_interest_rate`). No `order_id`.
+        - Accrued interest on call: `interest_type` is `accrued`. Includes `price` and `accrued_interest_rate` (no `rate`). No `order_id`.
+        - Trade accrued: `interest_type` is `accrued`. Includes `order_id` so the interest NTA can be linked to the fill. `parent_id` is set when a parent trade `ref_id` is available.
       properties:
         accrued_interest_rate:
           description: Accrued interest rate (present for accrued-interest-on-call variants)
@@ -4861,8 +4851,20 @@ components:
           description: The entitled quantity (principal / face amount)
           example: '1000'
           type: string
+        interest_type:
+          $ref: '#/components/schemas/FixedIncomeInterestType'
         isin:
           description: The ISIN of the security involved with the activity
+          type: string
+        order_id:
+          description: The order that generated this accrued interest. Present for trade-accrued INT/FI.
+          example: 257bf308-a6b7-4777-8cf6-00dc441dc4d3
+          format: uuid
+          type: string
+        parent_id:
+          description: The ref_id of the parent trade this interest is attached to. Present for trade-accrued INT/FI when a parent trade `ref_id` is available.
+          example: 46aecae1-4629-4bcf-b441-0d8c847a1787
+          format: uuid
           type: string
         payment_date:
           description: The payment date
@@ -4884,6 +4886,7 @@ components:
         - entitled_qty
         - cash_payout
         - cusip
+        - interest_type
       type: object
     CommonJournalActivityV2:
       allOf:
@@ -5902,6 +5905,17 @@ components:
             symbol:
               description: The symbol of the security involved with the activity
               type: string
+            tax_country:
+              description: |
+                Tax country used as the primary jurisdiction when determining withholding treatment for the dividend. Other factors may affect the final withholding rate.
+                The value is an [ISO 3166-1 alpha-3](https://www.iso.org/iso-3166-country-codes.html) country code.
+              example: THA
+              type: string
+            tax_rate:
+              description: The tax withholding rate applied to the dividend, represented as a value between 0 and 1
+              example: '0.15'
+              format: decimal
+              type: string
           required:
             - cusip
             - symbol
@@ -6543,6 +6557,14 @@ components:
         - $ref: '#/components/schemas/CommonFixedIncomeInterestActivityV2'
       description: Fixed income interest (INT/FI)
       type: object
+    FixedIncomeInterestType:
+      description: Distinguishes coupon payments from accrued interest on INT/FI activities.
+      enum:
+        - coupon
+        - accrued
+      example: accrued
+      title: FixedIncomeInterestType
+      type: string
     FixedIncomeRedemptionActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonNTAActivityV2'
@@ -6749,20 +6771,30 @@ components:
           format: uuid
           type: string
         original_amount:
-          description: The amount you should expect to receive, calculated as requested amount - fees
+          deprecated: true
+          description: Deprecated. Prefer `total_amount` for the actual amount debited from the account. The amount you should expect to receive, calculated as requested amount - fees.
           format: decimal
           type: string
+          x-deprecation:
+            reason: Use total_amount for the actual amount debited from the account.
+            since: '2026-09-22'
+            sunset: '2026-12-21'
         original_currency:
           description: The currency of the withdrawn amount, 3-letter ISO code
           type: string
         payment_type:
           $ref: '#/components/schemas/FundingDetailPaymentType'
         requested_amount:
-          description: The amount sent as part of the withdrawal creation
+          description: The amount requested when the transfer was created.
           format: decimal
           type: string
         status:
           $ref: '#/components/schemas/FundingWalletTransferStatus'
+        total_amount:
+          description: The total amount moved for the transfer. For outgoing transfers with fees added on top, this is the requested amount plus fees (the total debited from the account). For fee-inclusive
+            outgoing withdrawals, fees are taken out of the requested amount, so this equals requested_amount. For incoming transfers, this is the requested amount credited to the account.
+          format: decimal
+          type: string
         updated_at:
           format: date-time
           type: string
@@ -8522,6 +8554,12 @@ components:
           example: '2023-12-11'
           format: date
           type: string
+        ppind:
+          description: |-
+            The ppind (Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments,
+            with `true` meaning it is part of the Penny Program and `false` meaning it is not.
+          example: true
+          type: boolean
         root_symbol:
           description: The root symbol of the option contract.
           example: AAPL
@@ -8587,6 +8625,7 @@ components:
         - strike_price
         - multiplier
         - size
+        - ppind
       type: object
     OptionDeliverable:
       properties:
@@ -10600,10 +10639,11 @@ components:
     TokenizationIssuer:
       description: The tokenized asset's issuer
       enum:
-        - xstocks
-        - st0x
         - binance
         - coinbase
+        - ondo
+        - st0x
+        - xstocks
       example: xstocks
       title: TokenizationIssuer
       type: string
@@ -10703,17 +10743,18 @@ components:
     TokenizationNetwork:
       description: The token's blockchain network
       enum:
-        - solana
         - arbitrum
-        - ethereum
-        - binance
         - base
+        - binance
+        - cronos
+        - ethereum
+        - hypercore
+        - hyperevm
+        - mantle
+        - robinhood
+        - solana
         - ton
         - tron
-        - mantle
-        - cronos
-        - hyperevm
-        - robinhood
       example: solana
       title: TokenizationNetwork
       type: string
@@ -12975,8 +13016,8 @@ components:
           $ref: '#/components/schemas/coupon_type'
         cusip:
           description: CUSIP is a nine-character alphanumeric code that uniquely identifies the security
-          maxLength: 12
-          minLength: 12
+          maxLength: 9
+          minLength: 9
           pattern: ^[A-Z0-9]{9}$
           type: string
         dated_date:
@@ -13209,8 +13250,8 @@ components:
           $ref: '#/components/schemas/coupon_type'
         cusip:
           description: CUSIP is a nine-character alphanumeric code that uniquely identifies the security
-          maxLength: 12
-          minLength: 12
+          maxLength: 9
+          minLength: 9
           pattern: ^[A-Z0-9]{9}$
           type: string
         description:
@@ -18150,7 +18191,7 @@ paths:
           schema:
             type: integer
         - description: |-
-            The ppind(Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments,
+            The ppind (Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments,
             with `true` meaning it is part of the Penny Program and `false` meaning it is not.
           example: true
           in: query

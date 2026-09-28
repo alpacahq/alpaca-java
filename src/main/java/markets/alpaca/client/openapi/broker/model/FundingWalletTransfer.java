@@ -90,6 +90,7 @@ public class FundingWalletTransfer implements Serializable {
   private UUID id;
 
   public static final String SERIALIZED_NAME_ORIGINAL_AMOUNT = "original_amount";
+  @Deprecated
   @SerializedName(SERIALIZED_NAME_ORIGINAL_AMOUNT)
   @javax.annotation.Nullable
   private BigDecimal originalAmount;
@@ -113,6 +114,11 @@ public class FundingWalletTransfer implements Serializable {
   @SerializedName(SERIALIZED_NAME_STATUS)
   @javax.annotation.Nullable
   private FundingWalletTransferStatus status;
+
+  public static final String SERIALIZED_NAME_TOTAL_AMOUNT = "total_amount";
+  @SerializedName(SERIALIZED_NAME_TOTAL_AMOUNT)
+  @javax.annotation.Nullable
+  private BigDecimal totalAmount;
 
   public static final String SERIALIZED_NAME_UPDATED_AT = "updated_at";
   @SerializedName(SERIALIZED_NAME_UPDATED_AT)
@@ -230,20 +236,24 @@ public class FundingWalletTransfer implements Serializable {
   }
 
 
+  @Deprecated
   public FundingWalletTransfer originalAmount(@javax.annotation.Nullable BigDecimal originalAmount) {
     this.originalAmount = originalAmount;
     return this;
   }
 
   /**
-   * The amount you should expect to receive, calculated as requested amount - fees
+   * Deprecated. Prefer &#x60;total_amount&#x60; for the actual amount debited from the account. The amount you should expect to receive, calculated as requested amount - fees.
    * @return originalAmount
+   * @deprecated
    */
+  @Deprecated
   @javax.annotation.Nullable
   public BigDecimal getOriginalAmount() {
     return originalAmount;
   }
 
+  @Deprecated
   public void setOriginalAmount(@javax.annotation.Nullable BigDecimal originalAmount) {
     this.originalAmount = originalAmount;
   }
@@ -293,7 +303,7 @@ public class FundingWalletTransfer implements Serializable {
   }
 
   /**
-   * The amount sent as part of the withdrawal creation
+   * The amount requested when the transfer was created.
    * @return requestedAmount
    */
   @javax.annotation.Nullable
@@ -322,6 +332,25 @@ public class FundingWalletTransfer implements Serializable {
 
   public void setStatus(@javax.annotation.Nullable FundingWalletTransferStatus status) {
     this.status = status;
+  }
+
+
+  public FundingWalletTransfer totalAmount(@javax.annotation.Nullable BigDecimal totalAmount) {
+    this.totalAmount = totalAmount;
+    return this;
+  }
+
+  /**
+   * The total amount moved for the transfer. For outgoing transfers with fees added on top, this is the requested amount plus fees (the total debited from the account). For fee-inclusive outgoing withdrawals, fees are taken out of the requested amount, so this equals requested_amount. For incoming transfers, this is the requested amount credited to the account.
+   * @return totalAmount
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getTotalAmount() {
+    return totalAmount;
+  }
+
+  public void setTotalAmount(@javax.annotation.Nullable BigDecimal totalAmount) {
+    this.totalAmount = totalAmount;
   }
 
 
@@ -427,6 +456,7 @@ public class FundingWalletTransfer implements Serializable {
         Objects.equals(this.paymentType, fundingWalletTransfer.paymentType) &&
         Objects.equals(this.requestedAmount, fundingWalletTransfer.requestedAmount) &&
         Objects.equals(this.status, fundingWalletTransfer.status) &&
+        Objects.equals(this.totalAmount, fundingWalletTransfer.totalAmount) &&
         Objects.equals(this.updatedAt, fundingWalletTransfer.updatedAt) &&
         Objects.equals(this.usd, fundingWalletTransfer.usd)&&
         Objects.equals(this.additionalProperties, fundingWalletTransfer.additionalProperties);
@@ -434,7 +464,7 @@ public class FundingWalletTransfer implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(accountId, createdAt, direction, fees, id, originalAmount, originalCurrency, paymentType, requestedAmount, status, updatedAt, usd, additionalProperties);
+    return Objects.hash(accountId, createdAt, direction, fees, id, originalAmount, originalCurrency, paymentType, requestedAmount, status, totalAmount, updatedAt, usd, additionalProperties);
   }
 
   @Override
@@ -451,6 +481,7 @@ public class FundingWalletTransfer implements Serializable {
     sb.append("    paymentType: ").append(toIndentedString(paymentType)).append("\n");
     sb.append("    requestedAmount: ").append(toIndentedString(requestedAmount)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    totalAmount: ").append(toIndentedString(totalAmount)).append("\n");
     sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
     sb.append("    usd: ").append(toIndentedString(usd)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
@@ -472,7 +503,7 @@ public class FundingWalletTransfer implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("account_id", "created_at", "direction", "fees", "id", "original_amount", "original_currency", "payment_type", "requested_amount", "status", "updated_at", "usd"));
+    openapiFields = new HashSet<String>(Arrays.asList("account_id", "created_at", "direction", "fees", "id", "original_amount", "original_currency", "payment_type", "requested_amount", "status", "total_amount", "updated_at", "usd"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -531,6 +562,9 @@ public class FundingWalletTransfer implements Serializable {
       // validate the optional field `status`
       if (jsonObj.get("status") != null && !jsonObj.get("status").isJsonNull()) {
         FundingWalletTransferStatus.validateJsonElement(jsonObj.get("status"));
+      }
+      if ((jsonObj.get("total_amount") != null && !jsonObj.get("total_amount").isJsonNull()) && !jsonObj.get("total_amount").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `total_amount` to be a primitive type in the JSON string but got `%s`", jsonObj.get("total_amount").toString()));
       }
       // validate the optional field `usd`
       if (jsonObj.get("usd") != null && !jsonObj.get("usd").isJsonNull()) {

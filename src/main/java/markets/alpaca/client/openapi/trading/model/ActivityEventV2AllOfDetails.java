@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import markets.alpaca.client.openapi.trading.model.ActivityV2DetailNTA;
 import markets.alpaca.client.openapi.trading.model.ActivityV2DetailTRD;
+import markets.alpaca.client.openapi.trading.model.FixedIncomeInterestType;
 import java.io.Serializable;
 
 
