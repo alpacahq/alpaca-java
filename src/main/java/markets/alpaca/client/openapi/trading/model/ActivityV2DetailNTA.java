@@ -36,6 +36,7 @@ import markets.alpaca.client.openapi.trading.model.ExchangeOfferActivityV2;
 import markets.alpaca.client.openapi.trading.model.FEEActivityV2;
 import markets.alpaca.client.openapi.trading.model.FOPTActivityV2;
 import markets.alpaca.client.openapi.trading.model.FixedIncomeInterestActivityV2;
+import markets.alpaca.client.openapi.trading.model.FixedIncomeInterestType;
 import markets.alpaca.client.openapi.trading.model.FixedIncomeRedemptionActivityV2;
 import markets.alpaca.client.openapi.trading.model.ForwardSplitActivityV2;
 import markets.alpaca.client.openapi.trading.model.JNLCActivityV2;

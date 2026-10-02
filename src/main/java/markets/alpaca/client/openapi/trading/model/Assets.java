@@ -133,12 +133,6 @@ public class Assets implements Serializable {
   @javax.annotation.Nullable
   private String cusip;
 
-  public static final String SERIALIZED_NAME_EASY_TO_BORROW = "easy_to_borrow";
-  @Deprecated
-  @SerializedName(SERIALIZED_NAME_EASY_TO_BORROW)
-  @javax.annotation.Nullable
-  private Boolean easyToBorrow;
-
   public static final String SERIALIZED_NAME_EXCHANGE = "exchange";
   @SerializedName(SERIALIZED_NAME_EXCHANGE)
   @javax.annotation.Nonnull
@@ -351,29 +345,6 @@ public class Assets implements Serializable {
 
   public void setCusip(@javax.annotation.Nullable String cusip) {
     this.cusip = cusip;
-  }
-
-
-  @Deprecated
-  public Assets easyToBorrow(@javax.annotation.Nullable Boolean easyToBorrow) {
-    this.easyToBorrow = easyToBorrow;
-    return this;
-  }
-
-  /**
-   * **deprecated**: Please use borrow_status instead. Asset is easy-to-borrow or not (filtering for easy_to_borrow &#x3D; True is the best way to check whether the name is currently available to short at Alpaca). 
-   * @return easyToBorrow
-   * @deprecated
-   */
-  @Deprecated
-  @javax.annotation.Nullable
-  public Boolean getEasyToBorrow() {
-    return easyToBorrow;
-  }
-
-  @Deprecated
-  public void setEasyToBorrow(@javax.annotation.Nullable Boolean easyToBorrow) {
-    this.easyToBorrow = easyToBorrow;
   }
 
 
@@ -724,7 +695,6 @@ public class Assets implements Serializable {
         Objects.equals(this.borrowStatus, assets.borrowStatus) &&
         Objects.equals(this.propertyClass, assets.propertyClass) &&
         Objects.equals(this.cusip, assets.cusip) &&
-        Objects.equals(this.easyToBorrow, assets.easyToBorrow) &&
         Objects.equals(this.exchange, assets.exchange) &&
         Objects.equals(this.fractionable, assets.fractionable) &&
         Objects.equals(this.id, assets.id) &&
@@ -745,7 +715,7 @@ public class Assets implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(attributes, borrowStatus, propertyClass, cusip, easyToBorrow, exchange, fractionable, id, maintenanceMarginRequirement, marginRequirementLong, marginRequirementShort, marginable, minOrderSize, minTradeIncrement, name, priceIncrement, shortable, status, symbol, tradable, additionalProperties);
+    return Objects.hash(attributes, borrowStatus, propertyClass, cusip, exchange, fractionable, id, maintenanceMarginRequirement, marginRequirementLong, marginRequirementShort, marginable, minOrderSize, minTradeIncrement, name, priceIncrement, shortable, status, symbol, tradable, additionalProperties);
   }
 
   @Override
@@ -756,7 +726,6 @@ public class Assets implements Serializable {
     sb.append("    borrowStatus: ").append(toIndentedString(borrowStatus)).append("\n");
     sb.append("    propertyClass: ").append(toIndentedString(propertyClass)).append("\n");
     sb.append("    cusip: ").append(toIndentedString(cusip)).append("\n");
-    sb.append("    easyToBorrow: ").append(toIndentedString(easyToBorrow)).append("\n");
     sb.append("    exchange: ").append(toIndentedString(exchange)).append("\n");
     sb.append("    fractionable: ").append(toIndentedString(fractionable)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
@@ -791,7 +760,7 @@ public class Assets implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("attributes", "borrow_status", "class", "cusip", "easy_to_borrow", "exchange", "fractionable", "id", "maintenance_margin_requirement", "margin_requirement_long", "margin_requirement_short", "marginable", "min_order_size", "min_trade_increment", "name", "price_increment", "shortable", "status", "symbol", "tradable"));
+    openapiFields = new HashSet<String>(Arrays.asList("attributes", "borrow_status", "class", "cusip", "exchange", "fractionable", "id", "maintenance_margin_requirement", "margin_requirement_long", "margin_requirement_short", "marginable", "min_order_size", "min_trade_increment", "name", "price_increment", "shortable", "status", "symbol", "tradable"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("class", "exchange", "fractionable", "id", "marginable", "name", "shortable", "status", "symbol", "tradable"));

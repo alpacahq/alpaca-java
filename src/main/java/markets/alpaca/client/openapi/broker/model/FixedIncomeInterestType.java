@@ -25,38 +25,18 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * The token&#39;s blockchain network
+ * Distinguishes coupon payments from accrued interest on INT/FI activities.
  */
-@JsonAdapter(TokenizationNetwork.Adapter.class)
-public enum TokenizationNetwork implements Serializable {
+@JsonAdapter(FixedIncomeInterestType.Adapter.class)
+public enum FixedIncomeInterestType implements Serializable {
   
-  ARBITRUM("arbitrum"),
+  COUPON("coupon"),
   
-  BASE("base"),
-  
-  BINANCE("binance"),
-  
-  CRONOS("cronos"),
-  
-  ETHEREUM("ethereum"),
-  
-  HYPERCORE("hypercore"),
-  
-  HYPEREVM("hyperevm"),
-  
-  MANTLE("mantle"),
-  
-  ROBINHOOD("robinhood"),
-  
-  SOLANA("solana"),
-  
-  TON("ton"),
-  
-  TRON("tron");
+  ACCRUED("accrued");
 
   private String value;
 
-  TokenizationNetwork(String value) {
+  FixedIncomeInterestType(String value) {
     this.value = value;
   }
 
@@ -69,8 +49,8 @@ public enum TokenizationNetwork implements Serializable {
     return String.valueOf(value);
   }
 
-  public static TokenizationNetwork fromValue(String value) {
-    for (TokenizationNetwork b : TokenizationNetwork.values()) {
+  public static FixedIncomeInterestType fromValue(String value) {
+    for (FixedIncomeInterestType b : FixedIncomeInterestType.values()) {
       if (b.value.equals(value)) {
         return b;
       }
@@ -78,22 +58,22 @@ public enum TokenizationNetwork implements Serializable {
     throw new IllegalArgumentException("Unexpected value '" + value + "'");
   }
 
-  public static class Adapter extends TypeAdapter<TokenizationNetwork> {
+  public static class Adapter extends TypeAdapter<FixedIncomeInterestType> {
     @Override
-    public void write(final JsonWriter jsonWriter, final TokenizationNetwork enumeration) throws IOException {
+    public void write(final JsonWriter jsonWriter, final FixedIncomeInterestType enumeration) throws IOException {
       jsonWriter.value(enumeration.getValue());
     }
 
     @Override
-    public TokenizationNetwork read(final JsonReader jsonReader) throws IOException {
+    public FixedIncomeInterestType read(final JsonReader jsonReader) throws IOException {
       String value = jsonReader.nextString();
-      return TokenizationNetwork.fromValue(value);
+      return FixedIncomeInterestType.fromValue(value);
     }
   }
 
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
     String value = jsonElement.getAsString();
-    TokenizationNetwork.fromValue(value);
+    FixedIncomeInterestType.fromValue(value);
   }
 }
 

@@ -107,6 +107,11 @@ public class OptionContract implements Serializable {
   @javax.annotation.Nullable
   private LocalDate openInterestDate;
 
+  public static final String SERIALIZED_NAME_PPIND = "ppind";
+  @SerializedName(SERIALIZED_NAME_PPIND)
+  @javax.annotation.Nonnull
+  private Boolean ppind;
+
   public static final String SERIALIZED_NAME_ROOT_SYMBOL = "root_symbol";
   @SerializedName(SERIALIZED_NAME_ROOT_SYMBOL)
   @javax.annotation.Nullable
@@ -391,6 +396,25 @@ public class OptionContract implements Serializable {
   }
 
 
+  public OptionContract ppind(@javax.annotation.Nonnull Boolean ppind) {
+    this.ppind = ppind;
+    return this;
+  }
+
+  /**
+   * The ppind (Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments, with &#x60;true&#x60; meaning it is part of the Penny Program and &#x60;false&#x60; meaning it is not.
+   * @return ppind
+   */
+  @javax.annotation.Nonnull
+  public Boolean getPpind() {
+    return ppind;
+  }
+
+  public void setPpind(@javax.annotation.Nonnull Boolean ppind) {
+    this.ppind = ppind;
+  }
+
+
   public OptionContract rootSymbol(@javax.annotation.Nullable String rootSymbol) {
     this.rootSymbol = rootSymbol;
     return this;
@@ -644,6 +668,7 @@ public class OptionContract implements Serializable {
         Objects.equals(this.name, optionContract.name) &&
         Objects.equals(this.openInterest, optionContract.openInterest) &&
         Objects.equals(this.openInterestDate, optionContract.openInterestDate) &&
+        Objects.equals(this.ppind, optionContract.ppind) &&
         Objects.equals(this.rootSymbol, optionContract.rootSymbol) &&
         Objects.equals(this.size, optionContract.size) &&
         Objects.equals(this.status, optionContract.status) &&
@@ -659,7 +684,7 @@ public class OptionContract implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(closePrice, closePriceDate, deliverables, expirationDate, id, multiplier, name, openInterest, openInterestDate, rootSymbol, size, status, strikePrice, style, symbol, tradable, type, underlyingAssetId, underlyingSymbol, additionalProperties);
+    return Objects.hash(closePrice, closePriceDate, deliverables, expirationDate, id, multiplier, name, openInterest, openInterestDate, ppind, rootSymbol, size, status, strikePrice, style, symbol, tradable, type, underlyingAssetId, underlyingSymbol, additionalProperties);
   }
 
   @Override
@@ -675,6 +700,7 @@ public class OptionContract implements Serializable {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    openInterest: ").append(toIndentedString(openInterest)).append("\n");
     sb.append("    openInterestDate: ").append(toIndentedString(openInterestDate)).append("\n");
+    sb.append("    ppind: ").append(toIndentedString(ppind)).append("\n");
     sb.append("    rootSymbol: ").append(toIndentedString(rootSymbol)).append("\n");
     sb.append("    size: ").append(toIndentedString(size)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
@@ -704,10 +730,10 @@ public class OptionContract implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("close_price", "close_price_date", "deliverables", "expiration_date", "id", "multiplier", "name", "open_interest", "open_interest_date", "root_symbol", "size", "status", "strike_price", "style", "symbol", "tradable", "type", "underlying_asset_id", "underlying_symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("close_price", "close_price_date", "deliverables", "expiration_date", "id", "multiplier", "name", "open_interest", "open_interest_date", "ppind", "root_symbol", "size", "status", "strike_price", "style", "symbol", "tradable", "type", "underlying_asset_id", "underlying_symbol"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("expiration_date", "id", "multiplier", "name", "size", "status", "strike_price", "style", "symbol", "tradable", "type", "underlying_asset_id", "underlying_symbol"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("expiration_date", "id", "multiplier", "name", "ppind", "size", "status", "strike_price", "style", "symbol", "tradable", "type", "underlying_asset_id", "underlying_symbol"));
   }
 
   /**
