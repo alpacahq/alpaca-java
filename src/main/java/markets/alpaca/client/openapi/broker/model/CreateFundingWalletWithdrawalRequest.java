@@ -61,6 +61,11 @@ public class CreateFundingWalletWithdrawalRequest implements Serializable {
   @javax.annotation.Nullable
   private String desiredCurrency;
 
+  public static final String SERIALIZED_NAME_FEE_INCLUSIVE = "fee_inclusive";
+  @SerializedName(SERIALIZED_NAME_FEE_INCLUSIVE)
+  @javax.annotation.Nullable
+  private Boolean feeInclusive = false;
+
   public static final String SERIALIZED_NAME_PAYMENT_TYPE = "payment_type";
   @SerializedName(SERIALIZED_NAME_PAYMENT_TYPE)
   @javax.annotation.Nullable
@@ -90,6 +95,25 @@ public class CreateFundingWalletWithdrawalRequest implements Serializable {
 
   public void setDesiredCurrency(@javax.annotation.Nullable String desiredCurrency) {
     this.desiredCurrency = desiredCurrency;
+  }
+
+
+  public CreateFundingWalletWithdrawalRequest feeInclusive(@javax.annotation.Nullable Boolean feeInclusive) {
+    this.feeInclusive = feeInclusive;
+    return this;
+  }
+
+  /**
+   * When true, fees are deducted from &#x60;usd_amount&#x60; instead of being added on top, so the total amount debited from the account equals &#x60;usd_amount&#x60; exactly (the beneficiary receives &#x60;usd_amount&#x60; minus fees). This lets the account be drained to zero: pass the account&#39;s full available cash as &#x60;usd_amount&#x60;. The request is rejected if &#x60;usd_amount&#x60; is less than or equal to the fees. Defaults to false (fees added on top of &#x60;usd_amount&#x60;). 
+   * @return feeInclusive
+   */
+  @javax.annotation.Nullable
+  public Boolean getFeeInclusive() {
+    return feeInclusive;
+  }
+
+  public void setFeeInclusive(@javax.annotation.Nullable Boolean feeInclusive) {
+    this.feeInclusive = feeInclusive;
   }
 
 
@@ -186,6 +210,7 @@ public class CreateFundingWalletWithdrawalRequest implements Serializable {
     }
     CreateFundingWalletWithdrawalRequest createFundingWalletWithdrawalRequest = (CreateFundingWalletWithdrawalRequest) o;
     return Objects.equals(this.desiredCurrency, createFundingWalletWithdrawalRequest.desiredCurrency) &&
+        Objects.equals(this.feeInclusive, createFundingWalletWithdrawalRequest.feeInclusive) &&
         Objects.equals(this.paymentType, createFundingWalletWithdrawalRequest.paymentType) &&
         Objects.equals(this.usdAmount, createFundingWalletWithdrawalRequest.usdAmount)&&
         Objects.equals(this.additionalProperties, createFundingWalletWithdrawalRequest.additionalProperties);
@@ -193,7 +218,7 @@ public class CreateFundingWalletWithdrawalRequest implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(desiredCurrency, paymentType, usdAmount, additionalProperties);
+    return Objects.hash(desiredCurrency, feeInclusive, paymentType, usdAmount, additionalProperties);
   }
 
   @Override
@@ -201,6 +226,7 @@ public class CreateFundingWalletWithdrawalRequest implements Serializable {
     StringBuilder sb = new StringBuilder();
     sb.append("class CreateFundingWalletWithdrawalRequest {\n");
     sb.append("    desiredCurrency: ").append(toIndentedString(desiredCurrency)).append("\n");
+    sb.append("    feeInclusive: ").append(toIndentedString(feeInclusive)).append("\n");
     sb.append("    paymentType: ").append(toIndentedString(paymentType)).append("\n");
     sb.append("    usdAmount: ").append(toIndentedString(usdAmount)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
@@ -222,7 +248,7 @@ public class CreateFundingWalletWithdrawalRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("desired_currency", "payment_type", "usd_amount"));
+    openapiFields = new HashSet<String>(Arrays.asList("desired_currency", "fee_inclusive", "payment_type", "usd_amount"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);

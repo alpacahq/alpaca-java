@@ -25,7 +25,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * Announcements have both a type and a subtype to categorize them. This model represents the higher level abstract \&quot;types\&quot; of Announcement. Please see the AnnouncementCASubType model for finer grain descriptions of the subtypes  Possible values are: - dividend   can have &#x60;cash&#x60; and &#x60;stock&#x60; subtypes - merger   has &#x60;merger_update&#x60; and &#x60;merger_completion&#x60; sub types - split   has &#x60;stock_split&#x60;, &#x60;until_split&#x60;, &#x60;reverse_split&#x60;, and &#x60;recapitalization&#x60; sub types - spinoff   currently has only the &#x60;spinoff&#x60; subtype and thus is just this higher level category for now. A disbursement of a newly tradable security when the intiating_symbol creates the target_symbol.
+ * Announcements have both a type and a subtype to categorize them. This model represents the higher level abstract \&quot;types\&quot; of Announcement. Please see the AnnouncementCASubType model for finer grain descriptions of the subtypes  Possible values are: - dividend   can have &#x60;cash&#x60; and &#x60;stock&#x60; subtypes - merger   has &#x60;merger_update&#x60; and &#x60;merger_completion&#x60; sub types - split   has &#x60;stock_split&#x60;, &#x60;until_split&#x60;, &#x60;reverse_split&#x60;, and &#x60;recapitalization&#x60; sub types - spinoff   currently has only the &#x60;spinoff&#x60; subtype and thus is just this higher level category for now. A disbursement of a newly tradable security when the initiating_symbol creates the target_symbol.
  */
 @JsonAdapter(AnnouncementCAType.Adapter.class)
 public enum AnnouncementCAType implements Serializable {

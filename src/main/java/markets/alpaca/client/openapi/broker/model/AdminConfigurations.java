@@ -50,7 +50,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * These configurations show account properties that are overriden either by Alpaca Broker Operations or an automated process.  These values cannot be modified by the Broker Partners.  This schema represents the current, effective value of each configuration (e.g. as returned by the get trading account endpoint). For the shape of the payloads broadcast by the **events** streaming API when these values change, see [AdminConfigurationsEvent](#/components/schemas/AdminConfigurationsEvent).
+ * These configurations show account properties that are overridden either by Alpaca Broker Operations or an automated process.  These values cannot be modified by the Broker Partners.  This schema represents the current, effective value of each configuration (e.g. as returned by the get trading account endpoint). For the shape of the payloads broadcast by the **events** streaming API when these values change, see [AdminConfigurationsEvent](#/components/schemas/AdminConfigurationsEvent).
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class AdminConfigurations implements Serializable {

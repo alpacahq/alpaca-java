@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.UUID;
+import markets.alpaca.client.openapi.trading.model.FixedIncomeInterestType;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -102,10 +103,25 @@ public class FixedIncomeInterestActivityV2 implements Serializable {
   @javax.annotation.Nonnull
   private String entitledQty;
 
+  public static final String SERIALIZED_NAME_INTEREST_TYPE = "interest_type";
+  @SerializedName(SERIALIZED_NAME_INTEREST_TYPE)
+  @javax.annotation.Nonnull
+  private FixedIncomeInterestType interestType;
+
   public static final String SERIALIZED_NAME_ISIN = "isin";
   @SerializedName(SERIALIZED_NAME_ISIN)
   @javax.annotation.Nullable
   private String isin;
+
+  public static final String SERIALIZED_NAME_ORDER_ID = "order_id";
+  @SerializedName(SERIALIZED_NAME_ORDER_ID)
+  @javax.annotation.Nullable
+  private UUID orderId;
+
+  public static final String SERIALIZED_NAME_PARENT_ID = "parent_id";
+  @SerializedName(SERIALIZED_NAME_PARENT_ID)
+  @javax.annotation.Nullable
+  private UUID parentId;
 
   public static final String SERIALIZED_NAME_PAYMENT_DATE = "payment_date";
   @SerializedName(SERIALIZED_NAME_PAYMENT_DATE)
@@ -301,6 +317,25 @@ public class FixedIncomeInterestActivityV2 implements Serializable {
   }
 
 
+  public FixedIncomeInterestActivityV2 interestType(@javax.annotation.Nonnull FixedIncomeInterestType interestType) {
+    this.interestType = interestType;
+    return this;
+  }
+
+  /**
+   * Get interestType
+   * @return interestType
+   */
+  @javax.annotation.Nonnull
+  public FixedIncomeInterestType getInterestType() {
+    return interestType;
+  }
+
+  public void setInterestType(@javax.annotation.Nonnull FixedIncomeInterestType interestType) {
+    this.interestType = interestType;
+  }
+
+
   public FixedIncomeInterestActivityV2 isin(@javax.annotation.Nullable String isin) {
     this.isin = isin;
     return this;
@@ -317,6 +352,44 @@ public class FixedIncomeInterestActivityV2 implements Serializable {
 
   public void setIsin(@javax.annotation.Nullable String isin) {
     this.isin = isin;
+  }
+
+
+  public FixedIncomeInterestActivityV2 orderId(@javax.annotation.Nullable UUID orderId) {
+    this.orderId = orderId;
+    return this;
+  }
+
+  /**
+   * The order that generated this accrued interest. Present for trade-accrued INT/FI.
+   * @return orderId
+   */
+  @javax.annotation.Nullable
+  public UUID getOrderId() {
+    return orderId;
+  }
+
+  public void setOrderId(@javax.annotation.Nullable UUID orderId) {
+    this.orderId = orderId;
+  }
+
+
+  public FixedIncomeInterestActivityV2 parentId(@javax.annotation.Nullable UUID parentId) {
+    this.parentId = parentId;
+    return this;
+  }
+
+  /**
+   * The ref_id of the parent trade this interest is attached to. Present for trade-accrued INT/FI when a parent trade &#x60;ref_id&#x60; is available.
+   * @return parentId
+   */
+  @javax.annotation.Nullable
+  public UUID getParentId() {
+    return parentId;
+  }
+
+  public void setParentId(@javax.annotation.Nullable UUID parentId) {
+    this.parentId = parentId;
   }
 
 
@@ -459,7 +532,10 @@ public class FixedIncomeInterestActivityV2 implements Serializable {
         Objects.equals(this.cashPayout, fixedIncomeInterestActivityV2.cashPayout) &&
         Objects.equals(this.cusip, fixedIncomeInterestActivityV2.cusip) &&
         Objects.equals(this.entitledQty, fixedIncomeInterestActivityV2.entitledQty) &&
+        Objects.equals(this.interestType, fixedIncomeInterestActivityV2.interestType) &&
         Objects.equals(this.isin, fixedIncomeInterestActivityV2.isin) &&
+        Objects.equals(this.orderId, fixedIncomeInterestActivityV2.orderId) &&
+        Objects.equals(this.parentId, fixedIncomeInterestActivityV2.parentId) &&
         Objects.equals(this.paymentDate, fixedIncomeInterestActivityV2.paymentDate) &&
         Objects.equals(this.price, fixedIncomeInterestActivityV2.price) &&
         Objects.equals(this.rate, fixedIncomeInterestActivityV2.rate) &&
@@ -469,7 +545,7 @@ public class FixedIncomeInterestActivityV2 implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, accruedInterestRate, cashPayout, cusip, entitledQty, isin, paymentDate, price, rate, recordDate, additionalProperties);
+    return Objects.hash(groupId, systemDate, caId, positionDate, reorgId, accruedInterestRate, cashPayout, cusip, entitledQty, interestType, isin, orderId, parentId, paymentDate, price, rate, recordDate, additionalProperties);
   }
 
   @Override
@@ -485,7 +561,10 @@ public class FixedIncomeInterestActivityV2 implements Serializable {
     sb.append("    cashPayout: ").append(toIndentedString(cashPayout)).append("\n");
     sb.append("    cusip: ").append(toIndentedString(cusip)).append("\n");
     sb.append("    entitledQty: ").append(toIndentedString(entitledQty)).append("\n");
+    sb.append("    interestType: ").append(toIndentedString(interestType)).append("\n");
     sb.append("    isin: ").append(toIndentedString(isin)).append("\n");
+    sb.append("    orderId: ").append(toIndentedString(orderId)).append("\n");
+    sb.append("    parentId: ").append(toIndentedString(parentId)).append("\n");
     sb.append("    paymentDate: ").append(toIndentedString(paymentDate)).append("\n");
     sb.append("    price: ").append(toIndentedString(price)).append("\n");
     sb.append("    rate: ").append(toIndentedString(rate)).append("\n");
@@ -509,10 +588,10 @@ public class FixedIncomeInterestActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "accrued_interest_rate", "cash_payout", "cusip", "entitled_qty", "isin", "payment_date", "price", "rate", "record_date"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "ca_id", "position_date", "reorg_id", "accrued_interest_rate", "cash_payout", "cusip", "entitled_qty", "interest_type", "isin", "order_id", "parent_id", "payment_date", "price", "rate", "record_date"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date", "position_date", "cash_payout", "cusip", "entitled_qty"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date", "position_date", "cash_payout", "cusip", "entitled_qty", "interest_type"));
   }
 
   /**
@@ -556,8 +635,16 @@ public class FixedIncomeInterestActivityV2 implements Serializable {
       if (!jsonObj.get("entitled_qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `entitled_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("entitled_qty").toString()));
       }
+      // validate the required field `interest_type`
+      FixedIncomeInterestType.validateJsonElement(jsonObj.get("interest_type"));
       if ((jsonObj.get("isin") != null && !jsonObj.get("isin").isJsonNull()) && !jsonObj.get("isin").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("isin").toString()));
+      }
+      if ((jsonObj.get("order_id") != null && !jsonObj.get("order_id").isJsonNull()) && !jsonObj.get("order_id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `order_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("order_id").toString()));
+      }
+      if ((jsonObj.get("parent_id") != null && !jsonObj.get("parent_id").isJsonNull()) && !jsonObj.get("parent_id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `parent_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("parent_id").toString()));
       }
       if ((jsonObj.get("price") != null && !jsonObj.get("price").isJsonNull()) && !jsonObj.get("price").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("price").toString()));

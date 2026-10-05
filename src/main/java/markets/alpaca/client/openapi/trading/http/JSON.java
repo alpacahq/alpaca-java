@@ -195,7 +195,7 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.trading.model.PatchOrderRequest.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.trading.model.PortfolioHistory.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.trading.model.Position.CustomTypeAdapterFactory());
-        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.trading.model.PositionClosedReponse.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.trading.model.PositionClosedResponse.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.trading.model.PublicCalendarResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.trading.model.PublicMarket.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.trading.model.REOActivityV2.CustomTypeAdapterFactory());

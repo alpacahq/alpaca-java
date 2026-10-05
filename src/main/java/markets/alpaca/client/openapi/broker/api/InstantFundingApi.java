@@ -256,7 +256,7 @@ public class InstantFundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> invidual broker account limits </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> individual broker account limits </td><td>  -  </td></tr>
         <tr><td> 0 </td><td> error </td><td>  -  </td></tr>
      </table>
      */
@@ -329,7 +329,7 @@ public class InstantFundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> invidual broker account limits </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> individual broker account limits </td><td>  -  </td></tr>
         <tr><td> 0 </td><td> error </td><td>  -  </td></tr>
      </table>
      */
@@ -348,7 +348,7 @@ public class InstantFundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> invidual broker account limits </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> individual broker account limits </td><td>  -  </td></tr>
         <tr><td> 0 </td><td> error </td><td>  -  </td></tr>
      </table>
      */
@@ -369,7 +369,7 @@ public class InstantFundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> invidual broker account limits </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> individual broker account limits </td><td>  -  </td></tr>
         <tr><td> 0 </td><td> error </td><td>  -  </td></tr>
      </table>
      */

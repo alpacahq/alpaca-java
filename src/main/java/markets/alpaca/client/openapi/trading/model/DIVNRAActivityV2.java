@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.UUID;
@@ -80,6 +81,16 @@ public class DIVNRAActivityV2 implements Serializable {
   @SerializedName(SERIALIZED_NAME_SYMBOL)
   @javax.annotation.Nonnull
   private String symbol;
+
+  public static final String SERIALIZED_NAME_TAX_COUNTRY = "tax_country";
+  @SerializedName(SERIALIZED_NAME_TAX_COUNTRY)
+  @javax.annotation.Nullable
+  private String taxCountry;
+
+  public static final String SERIALIZED_NAME_TAX_RATE = "tax_rate";
+  @SerializedName(SERIALIZED_NAME_TAX_RATE)
+  @javax.annotation.Nullable
+  private BigDecimal taxRate;
 
   public DIVNRAActivityV2() {
   }
@@ -178,6 +189,44 @@ public class DIVNRAActivityV2 implements Serializable {
     this.symbol = symbol;
   }
 
+
+  public DIVNRAActivityV2 taxCountry(@javax.annotation.Nullable String taxCountry) {
+    this.taxCountry = taxCountry;
+    return this;
+  }
+
+  /**
+   * Tax country used as the primary jurisdiction when determining withholding treatment for the dividend. Other factors may affect the final withholding rate. The value is an [ISO 3166-1 alpha-3](https://www.iso.org/iso-3166-country-codes.html) country code. 
+   * @return taxCountry
+   */
+  @javax.annotation.Nullable
+  public String getTaxCountry() {
+    return taxCountry;
+  }
+
+  public void setTaxCountry(@javax.annotation.Nullable String taxCountry) {
+    this.taxCountry = taxCountry;
+  }
+
+
+  public DIVNRAActivityV2 taxRate(@javax.annotation.Nullable BigDecimal taxRate) {
+    this.taxRate = taxRate;
+    return this;
+  }
+
+  /**
+   * The tax withholding rate applied to the dividend, represented as a value between 0 and 1
+   * @return taxRate
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getTaxRate() {
+    return taxRate;
+  }
+
+  public void setTaxRate(@javax.annotation.Nullable BigDecimal taxRate) {
+    this.taxRate = taxRate;
+  }
+
   /**
    * A container for additional, undeclared properties.
    * This is a holder for any undeclared properties as specified with
@@ -237,13 +286,15 @@ public class DIVNRAActivityV2 implements Serializable {
         Objects.equals(this.systemDate, diVNRAActivityV2.systemDate) &&
         Objects.equals(this.cusip, diVNRAActivityV2.cusip) &&
         Objects.equals(this.parentId, diVNRAActivityV2.parentId) &&
-        Objects.equals(this.symbol, diVNRAActivityV2.symbol)&&
+        Objects.equals(this.symbol, diVNRAActivityV2.symbol) &&
+        Objects.equals(this.taxCountry, diVNRAActivityV2.taxCountry) &&
+        Objects.equals(this.taxRate, diVNRAActivityV2.taxRate)&&
         Objects.equals(this.additionalProperties, diVNRAActivityV2.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, systemDate, cusip, parentId, symbol, additionalProperties);
+    return Objects.hash(groupId, systemDate, cusip, parentId, symbol, taxCountry, taxRate, additionalProperties);
   }
 
   @Override
@@ -255,6 +306,8 @@ public class DIVNRAActivityV2 implements Serializable {
     sb.append("    cusip: ").append(toIndentedString(cusip)).append("\n");
     sb.append("    parentId: ").append(toIndentedString(parentId)).append("\n");
     sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
+    sb.append("    taxCountry: ").append(toIndentedString(taxCountry)).append("\n");
+    sb.append("    taxRate: ").append(toIndentedString(taxRate)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -274,7 +327,7 @@ public class DIVNRAActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "cusip", "parent_id", "symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "cusip", "parent_id", "symbol", "tax_country", "tax_rate"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date", "cusip", "parent_id", "symbol"));
@@ -311,6 +364,12 @@ public class DIVNRAActivityV2 implements Serializable {
       }
       if (!jsonObj.get("symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
+      }
+      if ((jsonObj.get("tax_country") != null && !jsonObj.get("tax_country").isJsonNull()) && !jsonObj.get("tax_country").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `tax_country` to be a primitive type in the JSON string but got `%s`", jsonObj.get("tax_country").toString()));
+      }
+      if ((jsonObj.get("tax_rate") != null && !jsonObj.get("tax_rate").isJsonNull()) && !jsonObj.get("tax_rate").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `tax_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("tax_rate").toString()));
       }
   }
 

@@ -190,7 +190,7 @@ public class CryptoFundingApi {
 
     /**
      * Request a New Withdrawal
-     * Creates a withdrawal request. Note that outgoing withdrawals must be sent to a whitelisted address and you must whitelist addresses at least 24 hours in advance. If you attempt to withdraw funds to a non-whitelisted address then the transfer will be rejected.
+     * **Deprecation notice:** This endpoint is deprecated. Use the Alpaca web application to initiate withdrawals.  Since: 2026-07-09 Sunset: 2026-10-09  ---  Creates a withdrawal request. Note that outgoing withdrawals must be sent to a whitelisted address and you must whitelist addresses at least 24 hours in advance. If you attempt to withdraw funds to a non-whitelisted address then the transfer will be rejected.
      * @param createCryptoTransferRequest  (required)
      * @return CryptoTransfer
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -211,7 +211,7 @@ public class CryptoFundingApi {
 
     /**
      * Request a New Withdrawal
-     * Creates a withdrawal request. Note that outgoing withdrawals must be sent to a whitelisted address and you must whitelist addresses at least 24 hours in advance. If you attempt to withdraw funds to a non-whitelisted address then the transfer will be rejected.
+     * **Deprecation notice:** This endpoint is deprecated. Use the Alpaca web application to initiate withdrawals.  Since: 2026-07-09 Sunset: 2026-10-09  ---  Creates a withdrawal request. Note that outgoing withdrawals must be sent to a whitelisted address and you must whitelist addresses at least 24 hours in advance. If you attempt to withdraw funds to a non-whitelisted address then the transfer will be rejected.
      * @param createCryptoTransferRequest  (required)
      * @return ApiResponse&lt;CryptoTransfer&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -233,7 +233,7 @@ public class CryptoFundingApi {
 
     /**
      * Request a New Withdrawal (asynchronously)
-     * Creates a withdrawal request. Note that outgoing withdrawals must be sent to a whitelisted address and you must whitelist addresses at least 24 hours in advance. If you attempt to withdraw funds to a non-whitelisted address then the transfer will be rejected.
+     * **Deprecation notice:** This endpoint is deprecated. Use the Alpaca web application to initiate withdrawals.  Since: 2026-07-09 Sunset: 2026-10-09  ---  Creates a withdrawal request. Note that outgoing withdrawals must be sent to a whitelisted address and you must whitelist addresses at least 24 hours in advance. If you attempt to withdraw funds to a non-whitelisted address then the transfer will be rejected.
      * @param createCryptoTransferRequest  (required)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call

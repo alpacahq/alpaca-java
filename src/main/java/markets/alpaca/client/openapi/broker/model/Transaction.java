@@ -184,7 +184,7 @@ public class Transaction implements Serializable {
   }
 
   /**
-   * Ending balance after thetransaction has been applied
+   * Ending balance after the transaction has been applied
    * @return balance
    */
   @javax.annotation.Nullable

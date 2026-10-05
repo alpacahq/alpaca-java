@@ -63,7 +63,7 @@ public class OptionsApprovalResponse implements Serializable {
   private UUID accountId;
 
   /**
-   * The option trading level approved for this request. Only present once the request has completed processiing. Note that a subsequent request may be approved for a different level. 0&#x3D;Disabled, 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles.\&quot; 
+   * The option trading level approved for this request. Only present once the request has completed processing. Note that a subsequent request may be approved for a different level. 0&#x3D;Disabled, 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles.\&quot; 
    */
   @JsonAdapter(ApprovedLevelEnum.Adapter.class)
   public enum ApprovedLevelEnum {
@@ -289,7 +289,7 @@ public class OptionsApprovalResponse implements Serializable {
   }
 
   /**
-   * The option trading level approved for this request. Only present once the request has completed processiing. Note that a subsequent request may be approved for a different level. 0&#x3D;Disabled, 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles.\&quot; 
+   * The option trading level approved for this request. Only present once the request has completed processing. Note that a subsequent request may be approved for a different level. 0&#x3D;Disabled, 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles.\&quot; 
    * @return approvedLevel
    */
   @javax.annotation.Nullable

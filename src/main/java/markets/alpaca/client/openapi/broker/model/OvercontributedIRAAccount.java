@@ -117,7 +117,7 @@ public class OvercontributedIRAAccount implements Serializable {
   }
 
   /**
-   * The total conntribution amount
+   * The total contribution amount
    * @return totalContributionAmount
    */
   @javax.annotation.Nullable

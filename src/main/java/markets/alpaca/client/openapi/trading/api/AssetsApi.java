@@ -247,7 +247,7 @@ public class AssetsApi {
      * @param strikePriceLte Filter contracts with strike price less than or equal to the specified value. (optional)
      * @param pageToken Used for pagination, this token retrieves the next page of results. It is obtained from the response of the preceding page when additional pages are available. (optional)
      * @param limit The number of contracts to limit per page (default&#x3D;100, max&#x3D;10000). (optional)
-     * @param ppind The ppind(Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments, with &#x60;true&#x60; meaning it is part of the Penny Program and &#x60;false&#x60; meaning it is not. (optional)
+     * @param ppind The ppind (Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments, with &#x60;true&#x60; meaning it is part of the Penny Program and &#x60;false&#x60; meaning it is not. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -380,7 +380,7 @@ public class AssetsApi {
      * @param strikePriceLte Filter contracts with strike price less than or equal to the specified value. (optional)
      * @param pageToken Used for pagination, this token retrieves the next page of results. It is obtained from the response of the preceding page when additional pages are available. (optional)
      * @param limit The number of contracts to limit per page (default&#x3D;100, max&#x3D;10000). (optional)
-     * @param ppind The ppind(Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments, with &#x60;true&#x60; meaning it is part of the Penny Program and &#x60;false&#x60; meaning it is not. (optional)
+     * @param ppind The ppind (Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments, with &#x60;true&#x60; meaning it is part of the Penny Program and &#x60;false&#x60; meaning it is not. (optional)
      * @return OptionContractsResponse
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -411,7 +411,7 @@ public class AssetsApi {
      * @param strikePriceLte Filter contracts with strike price less than or equal to the specified value. (optional)
      * @param pageToken Used for pagination, this token retrieves the next page of results. It is obtained from the response of the preceding page when additional pages are available. (optional)
      * @param limit The number of contracts to limit per page (default&#x3D;100, max&#x3D;10000). (optional)
-     * @param ppind The ppind(Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments, with &#x60;true&#x60; meaning it is part of the Penny Program and &#x60;false&#x60; meaning it is not. (optional)
+     * @param ppind The ppind (Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments, with &#x60;true&#x60; meaning it is part of the Penny Program and &#x60;false&#x60; meaning it is not. (optional)
      * @return ApiResponse&lt;OptionContractsResponse&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -443,7 +443,7 @@ public class AssetsApi {
      * @param strikePriceLte Filter contracts with strike price less than or equal to the specified value. (optional)
      * @param pageToken Used for pagination, this token retrieves the next page of results. It is obtained from the response of the preceding page when additional pages are available. (optional)
      * @param limit The number of contracts to limit per page (default&#x3D;100, max&#x3D;10000). (optional)
-     * @param ppind The ppind(Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments, with &#x60;true&#x60; meaning it is part of the Penny Program and &#x60;false&#x60; meaning it is not. (optional)
+     * @param ppind The ppind (Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments, with &#x60;true&#x60; meaning it is part of the Penny Program and &#x60;false&#x60; meaning it is not. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object

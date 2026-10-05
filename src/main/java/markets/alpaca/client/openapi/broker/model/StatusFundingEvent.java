@@ -49,7 +49,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * Represents a change in a Funding entity&#39;s status, sent over the events streaming api. Currently, the suppported entities are: bank relationships, bank wires, transfers and funding wallets.
+ * Represents a change in a Funding entity&#39;s status, sent over the events streaming api. Currently, the supported entities are: bank relationships, bank wires, transfers and funding wallets.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class StatusFundingEvent implements Serializable {

@@ -155,7 +155,7 @@ public class TokenizationRedeemRequest implements Serializable {
   }
 
   /**
-   * Customer&#39;s client identifier on the issuer&#39;s platform. Use &#x60;client_external_account_id&#x60; instead.
+   * **Deprecation notice:** Use &#x60;client_external_account_id&#x60; instead.  Since: 2026-07-15 Sunset: 2026-10-15  ---  Customer&#39;s client identifier on the issuer&#39;s platform.
    * @return clientId
    * @deprecated
    */

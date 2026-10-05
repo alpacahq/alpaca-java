@@ -31,7 +31,7 @@ import java.math.BigDecimal;
 import markets.alpaca.client.openapi.trading.model.Error;
 import markets.alpaca.client.openapi.trading.model.Order;
 import markets.alpaca.client.openapi.trading.model.Position;
-import markets.alpaca.client.openapi.trading.model.PositionClosedReponse;
+import markets.alpaca.client.openapi.trading.model.PositionClosedResponse;
 import java.util.UUID;
 
 import java.lang.reflect.Type;
@@ -174,7 +174,7 @@ public class PositionsApi {
      * Close All Positions
      * Closes (liquidates) all of the account&#39;s open long and short positions. A response will be provided for each order that is attempted to be cancelled. If an order is no longer cancelable, the server will respond with status 500 and reject the request.
      * @param cancelOrders If true is specified, cancel all open orders before liquidating all positions. (optional)
-     * @return List&lt;PositionClosedReponse&gt;
+     * @return List&lt;PositionClosedResponse&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -184,8 +184,8 @@ public class PositionsApi {
         <tr><td> 500 </td><td> Failed to liquidate </td><td>  -  </td></tr>
      </table>
      */
-    public List<PositionClosedReponse> deleteAllOpenPositions(@javax.annotation.Nullable Boolean cancelOrders) throws ApiException {
-        ApiResponse<List<PositionClosedReponse>> localVarResp = deleteAllOpenPositionsWithHttpInfo(cancelOrders);
+    public List<PositionClosedResponse> deleteAllOpenPositions(@javax.annotation.Nullable Boolean cancelOrders) throws ApiException {
+        ApiResponse<List<PositionClosedResponse>> localVarResp = deleteAllOpenPositionsWithHttpInfo(cancelOrders);
         return localVarResp.getData();
     }
 
@@ -193,7 +193,7 @@ public class PositionsApi {
      * Close All Positions
      * Closes (liquidates) all of the account&#39;s open long and short positions. A response will be provided for each order that is attempted to be cancelled. If an order is no longer cancelable, the server will respond with status 500 and reject the request.
      * @param cancelOrders If true is specified, cancel all open orders before liquidating all positions. (optional)
-     * @return ApiResponse&lt;List&lt;PositionClosedReponse&gt;&gt;
+     * @return ApiResponse&lt;List&lt;PositionClosedResponse&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
@@ -203,9 +203,9 @@ public class PositionsApi {
         <tr><td> 500 </td><td> Failed to liquidate </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<List<PositionClosedReponse>> deleteAllOpenPositionsWithHttpInfo(@javax.annotation.Nullable Boolean cancelOrders) throws ApiException {
+    public ApiResponse<List<PositionClosedResponse>> deleteAllOpenPositionsWithHttpInfo(@javax.annotation.Nullable Boolean cancelOrders) throws ApiException {
         okhttp3.Call localVarCall = deleteAllOpenPositionsValidateBeforeCall(cancelOrders, null);
-        Type localVarReturnType = new TypeToken<List<PositionClosedReponse>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<PositionClosedResponse>>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
 
@@ -224,10 +224,10 @@ public class PositionsApi {
         <tr><td> 500 </td><td> Failed to liquidate </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call deleteAllOpenPositionsAsync(@javax.annotation.Nullable Boolean cancelOrders, final ApiCallback<List<PositionClosedReponse>> _callback) throws ApiException {
+    public okhttp3.Call deleteAllOpenPositionsAsync(@javax.annotation.Nullable Boolean cancelOrders, final ApiCallback<List<PositionClosedResponse>> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = deleteAllOpenPositionsValidateBeforeCall(cancelOrders, _callback);
-        Type localVarReturnType = new TypeToken<List<PositionClosedReponse>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<PositionClosedResponse>>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
     }

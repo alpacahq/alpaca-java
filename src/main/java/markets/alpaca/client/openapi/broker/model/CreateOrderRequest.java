@@ -366,7 +366,7 @@ public class CreateOrderRequest implements Serializable {
   }
 
   /**
-   * Required if type is &#x60;limit&#x60; or &#x60;stop_limit&#x60;. - In case of &#x60;mleg&#x60;, the limit_price parameter is expressed with the following notation:   - A positive value indicates a debit, representing a cost or payment to be made.   - A negative value signifies a credit, reflecting an amount to be received. - In case of Fied Income, the price is expressed in percentage of par value (face value). Price is always clean price, meaning it does not include accrued interest.
+   * Required if type is &#x60;limit&#x60; or &#x60;stop_limit&#x60;. - In case of &#x60;mleg&#x60;, the limit_price parameter is expressed with the following notation:   - A positive value indicates a debit, representing a cost or payment to be made.   - A negative value signifies a credit, reflecting an amount to be received. - In case of Fixed Income, the price is expressed in percentage of par value (face value). Price is always clean price, meaning it does not include accrued interest.
    * @return limitPrice
    */
   @javax.annotation.Nullable
