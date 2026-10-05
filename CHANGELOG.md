@@ -20,6 +20,34 @@ the policy below applies strictly.
 
 ## [Unreleased]
 
+### Breaking
+Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/alpaca-java/pull/90)):
+- Broker `EventsApi.suscribeToAccountStatusSSE` is now `subscribeToAccountStatusSSE`, including
+  the `Call`, `WithHttpInfo`, and `Async` variants.
+  `BrokerEventsSseClient.subscribeToAccountStatus` calls the corrected method; its own signature
+  is unchanged.
+- Broker `IraApi.listIRAExcessContritbutions` is now `listIRAExcessContributions`, including the
+  same variants.
+- Trading `PositionsApi.deleteAllOpenPositions` returns `List<PositionClosedResponse>` instead of
+  `List<PositionClosedReponse>`. The misspelled type is removed.
+- `getEasyToBorrow()` is removed from Broker `Asset` and Trading `Assets`. Use `getBorrowStatus()`.
+- Broker and Trading `OptionContract` JSON validation now requires `ppind`.
+- Broker and Trading `CommonFixedIncomeInterestActivityV2` JSON validation now requires
+  `interest_type`.
+
+### Added
+- Broker and Trading `FixedIncomeInterestType` (`coupon`, `accrued`), plus `interest_type`,
+  `order_id`, and `parent_id` on fixed-income interest activities.
+- `ppind` on Broker and Trading `OptionContract`.
+- `tax_country` and `tax_rate` on Broker and Trading `DIVNRAActivityV2`.
+- Broker `FundingWalletTransfer.getTotalAmount()`, and `fee_inclusive` on
+  `CreateFundingWalletWithdrawalRequest`.
+- `TokenizationIssuer.ONDO` and `TokenizationNetwork.HYPERCORE` on Broker and Trading.
+
+### Changed
+- Broker `FundingWalletTransfer.getOriginalAmount()` is deprecated. Use `getTotalAmount()` for the
+  amount debited from the account.
+
 ## [0.1.4] - 2026-09-23
 
 ### Breaking
