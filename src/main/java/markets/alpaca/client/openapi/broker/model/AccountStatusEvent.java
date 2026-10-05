@@ -462,7 +462,7 @@ public class AccountStatusEvent implements Serializable {
   }
 
   /**
-   * If true the account cannot trade going forward, if false, the ban has been lifed
+   * If true the account cannot trade going forward, if false, the ban has been lifted
    * @return tradingBlocked
    */
   @javax.annotation.Nullable

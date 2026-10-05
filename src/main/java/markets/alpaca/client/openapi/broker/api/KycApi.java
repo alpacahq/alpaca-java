@@ -236,7 +236,7 @@ public class KycApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> Onfido applicant not yet created for account. If you haven&#39;t already contacted Alapca to enable Onfido, please do so. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> Onfido applicant not yet created for account. If you haven&#39;t already contacted Alpaca to enable Onfido, please do so. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getV1AccountsAccountIdOnfidoSdkTokensCall(@javax.annotation.Nonnull UUID accountId, @javax.annotation.Nullable String referrer, @javax.annotation.Nullable String platform, final ApiCallback _callback) throws ApiException {
@@ -316,7 +316,7 @@ public class KycApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> Onfido applicant not yet created for account. If you haven&#39;t already contacted Alapca to enable Onfido, please do so. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> Onfido applicant not yet created for account. If you haven&#39;t already contacted Alpaca to enable Onfido, please do so. </td><td>  -  </td></tr>
      </table>
      */
     public GetV1AccountsAccountIdOnfidoSdkTokens200Response getV1AccountsAccountIdOnfidoSdkTokens(@javax.annotation.Nonnull UUID accountId, @javax.annotation.Nullable String referrer, @javax.annotation.Nullable String platform) throws ApiException {
@@ -337,7 +337,7 @@ public class KycApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> Onfido applicant not yet created for account. If you haven&#39;t already contacted Alapca to enable Onfido, please do so. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> Onfido applicant not yet created for account. If you haven&#39;t already contacted Alpaca to enable Onfido, please do so. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<GetV1AccountsAccountIdOnfidoSdkTokens200Response> getV1AccountsAccountIdOnfidoSdkTokensWithHttpInfo(@javax.annotation.Nonnull UUID accountId, @javax.annotation.Nullable String referrer, @javax.annotation.Nullable String platform) throws ApiException {
@@ -360,7 +360,7 @@ public class KycApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> Onfido applicant not yet created for account. If you haven&#39;t already contacted Alapca to enable Onfido, please do so. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> Onfido applicant not yet created for account. If you haven&#39;t already contacted Alpaca to enable Onfido, please do so. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getV1AccountsAccountIdOnfidoSdkTokensAsync(@javax.annotation.Nonnull UUID accountId, @javax.annotation.Nullable String referrer, @javax.annotation.Nullable String platform, final ApiCallback<GetV1AccountsAccountIdOnfidoSdkTokens200Response> _callback) throws ApiException {

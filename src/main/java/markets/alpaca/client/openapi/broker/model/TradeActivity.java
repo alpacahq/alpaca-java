@@ -105,7 +105,7 @@ public class TradeActivity implements Serializable {
   private OffsetDateTime transactionTime;
 
   /**
-   * Valid only for trading activity types. Null for non-trading activites.
+   * Valid only for trading activity types. Null for non-trading activities.
    */
   @JsonAdapter(TypeEnum.Adapter.class)
   public enum TypeEnum {
@@ -170,7 +170,7 @@ public class TradeActivity implements Serializable {
   }
 
   /**
-   * Valid only for trading activity types. Null for non-trading activites.
+   * Valid only for trading activity types. Null for non-trading activities.
    * @return cumQty
    */
   @javax.annotation.Nullable
@@ -189,7 +189,7 @@ public class TradeActivity implements Serializable {
   }
 
   /**
-   * Valid only for trading activity types. Null for non-trading activites.
+   * Valid only for trading activity types. Null for non-trading activities.
    * @return leavesQty
    */
   @javax.annotation.Nullable
@@ -208,7 +208,7 @@ public class TradeActivity implements Serializable {
   }
 
   /**
-   * Valid only for trading activity types. Null for non-trading activites.
+   * Valid only for trading activity types. Null for non-trading activities.
    * @return orderId
    */
   @javax.annotation.Nullable
@@ -246,7 +246,7 @@ public class TradeActivity implements Serializable {
   }
 
   /**
-   * Valid only for trading activity types. Null for non-trading activites.
+   * Valid only for trading activity types. Null for non-trading activities.
    * @return price
    */
   @javax.annotation.Nullable
@@ -265,7 +265,7 @@ public class TradeActivity implements Serializable {
   }
 
   /**
-   * Valid only for trading activity types. Null for non-trading activites.
+   * Valid only for trading activity types. Null for non-trading activities.
    * @return qty
    */
   @javax.annotation.Nullable
@@ -303,7 +303,7 @@ public class TradeActivity implements Serializable {
   }
 
   /**
-   * Valid only for trading activity types. Null for non-trading activites.
+   * Valid only for trading activity types. Null for non-trading activities.
    * @return symbol
    */
   @javax.annotation.Nullable
@@ -322,7 +322,7 @@ public class TradeActivity implements Serializable {
   }
 
   /**
-   * Valid only for trading activity types. Null for non-trading activites.
+   * Valid only for trading activity types. Null for non-trading activities.
    * @return transactionTime
    */
   @javax.annotation.Nullable
@@ -341,7 +341,7 @@ public class TradeActivity implements Serializable {
   }
 
   /**
-   * Valid only for trading activity types. Null for non-trading activites.
+   * Valid only for trading activity types. Null for non-trading activities.
    * @return type
    */
   @javax.annotation.Nullable

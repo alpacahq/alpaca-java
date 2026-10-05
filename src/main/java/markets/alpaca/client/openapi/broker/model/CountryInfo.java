@@ -247,7 +247,7 @@ public class CountryInfo implements Serializable {
   }
 
   /**
-   * The full name of the country definded by ISO 3166-1
+   * The full name of the country defined by ISO 3166-1
    * @return fullName
    */
   @javax.annotation.Nonnull

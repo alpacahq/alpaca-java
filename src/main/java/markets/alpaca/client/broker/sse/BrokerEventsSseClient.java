@@ -368,7 +368,7 @@ public final class BrokerEventsSseClient {
     Objects.requireNonNull(options, "options must not be null");
     return open(
         eventsApi
-            .suscribeToAccountStatusSSECall(
+            .subscribeToAccountStatusSSECall(
                 options.since(),
                 options.until(),
                 options.sinceId(),

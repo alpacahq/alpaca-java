@@ -167,7 +167,7 @@ public class TokenizationRequest implements Serializable {
   }
 
   /**
-   * Alpaca account ID associated with this tokenization request. Use &#x60;client_account_id&#x60; instead.
+   * **Deprecation notice:** Use &#x60;client_account_id&#x60; instead.  Since: 2026-07-15 Sunset: 2026-10-15  ---  Alpaca account ID associated with this tokenization request.
    * @return account
    * @deprecated
    */
@@ -304,7 +304,7 @@ public class TokenizationRequest implements Serializable {
   }
 
   /**
-   * Issuer&#39;s account ID associated with this tokenization request. Use &#x60;client_external_account_id&#x60; instead.
+   * **Deprecation notice:** Use &#x60;client_external_account_id&#x60; instead.  Since: 2026-07-15 Sunset: 2026-10-15  ---  Issuer&#39;s account ID associated with this tokenization request.
    * @return issuerAccount
    * @deprecated
    */

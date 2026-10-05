@@ -1891,7 +1891,7 @@ public class FundingApi {
 
     /**
      * Retrieve JIT Ledgers
-     * Returns an array of objects that correspond to each ledger account, each of whichcontain the following attributes.
+     * Returns an array of objects that correspond to each ledger account, each of which contains the following attributes.
      * @return List&lt;JITLedgerAccount&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1908,7 +1908,7 @@ public class FundingApi {
 
     /**
      * Retrieve JIT Ledgers
-     * Returns an array of objects that correspond to each ledger account, each of whichcontain the following attributes.
+     * Returns an array of objects that correspond to each ledger account, each of which contains the following attributes.
      * @return ApiResponse&lt;List&lt;JITLedgerAccount&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1926,7 +1926,7 @@ public class FundingApi {
 
     /**
      * Retrieve JIT Ledgers (asynchronously)
-     * Returns an array of objects that correspond to each ledger account, each of whichcontain the following attributes.
+     * Returns an array of objects that correspond to each ledger account, each of which contains the following attributes.
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object

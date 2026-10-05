@@ -47,7 +47,7 @@ import java.util.Map;
  *
  * <ul>
  * 
- *   <li><b>{@code listIRAExcessContritbutions}</b>: Retrieve Excess Contributions</li>
+ *   <li><b>{@code listIRAExcessContributions}</b>: Retrieve Excess Contributions</li>
  * 
  * </ul>
  */
@@ -89,7 +89,7 @@ public class IraApi {
     }
 
     /**
-     * Build call for listIRAExcessContritbutions
+     * Build call for listIRAExcessContributions
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -101,7 +101,7 @@ public class IraApi {
         <tr><td> 0 </td><td> error </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call listIRAExcessContritbutionsCall(final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call listIRAExcessContributionsCall(final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -146,8 +146,8 @@ public class IraApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call listIRAExcessContritbutionsValidateBeforeCall(final ApiCallback _callback) throws ApiException {
-        return listIRAExcessContritbutionsCall(_callback);
+    private okhttp3.Call listIRAExcessContributionsValidateBeforeCall(final ApiCallback _callback) throws ApiException {
+        return listIRAExcessContributionsCall(_callback);
 
     }
 
@@ -164,8 +164,8 @@ public class IraApi {
         <tr><td> 0 </td><td> error </td><td>  -  </td></tr>
      </table>
      */
-    public List<OvercontributedIRAAccount> listIRAExcessContritbutions() throws ApiException {
-        ApiResponse<List<OvercontributedIRAAccount>> localVarResp = listIRAExcessContritbutionsWithHttpInfo();
+    public List<OvercontributedIRAAccount> listIRAExcessContributions() throws ApiException {
+        ApiResponse<List<OvercontributedIRAAccount>> localVarResp = listIRAExcessContributionsWithHttpInfo();
         return localVarResp.getData();
     }
 
@@ -182,8 +182,8 @@ public class IraApi {
         <tr><td> 0 </td><td> error </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<List<OvercontributedIRAAccount>> listIRAExcessContritbutionsWithHttpInfo() throws ApiException {
-        okhttp3.Call localVarCall = listIRAExcessContritbutionsValidateBeforeCall(null);
+    public ApiResponse<List<OvercontributedIRAAccount>> listIRAExcessContributionsWithHttpInfo() throws ApiException {
+        okhttp3.Call localVarCall = listIRAExcessContributionsValidateBeforeCall(null);
         Type localVarReturnType = new TypeToken<List<OvercontributedIRAAccount>>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
@@ -202,9 +202,9 @@ public class IraApi {
         <tr><td> 0 </td><td> error </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call listIRAExcessContritbutionsAsync(final ApiCallback<List<OvercontributedIRAAccount>> _callback) throws ApiException {
+    public okhttp3.Call listIRAExcessContributionsAsync(final ApiCallback<List<OvercontributedIRAAccount>> _callback) throws ApiException {
 
-        okhttp3.Call localVarCall = listIRAExcessContritbutionsValidateBeforeCall(_callback);
+        okhttp3.Call localVarCall = listIRAExcessContributionsValidateBeforeCall(_callback);
         Type localVarReturnType = new TypeToken<List<OvercontributedIRAAccount>>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;

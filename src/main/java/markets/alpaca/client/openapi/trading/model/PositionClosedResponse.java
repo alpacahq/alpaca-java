@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
  * Represents the result of asking the api to close a position. 
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
-public class PositionClosedReponse implements Serializable {
+public class PositionClosedResponse implements Serializable {
   private static final long serialVersionUID = 1L;
 
   public static final String SERIALIZED_NAME_BODY = "body";
@@ -70,10 +70,10 @@ public class PositionClosedReponse implements Serializable {
   @javax.annotation.Nonnull
   private String symbol;
 
-  public PositionClosedReponse() {
+  public PositionClosedResponse() {
   }
 
-  public PositionClosedReponse body(@javax.annotation.Nullable Order body) {
+  public PositionClosedResponse body(@javax.annotation.Nullable Order body) {
     this.body = body;
     return this;
   }
@@ -92,7 +92,7 @@ public class PositionClosedReponse implements Serializable {
   }
 
 
-  public PositionClosedReponse status(@javax.annotation.Nonnull Integer status) {
+  public PositionClosedResponse status(@javax.annotation.Nonnull Integer status) {
     this.status = status;
     return this;
   }
@@ -111,7 +111,7 @@ public class PositionClosedReponse implements Serializable {
   }
 
 
-  public PositionClosedReponse symbol(@javax.annotation.Nonnull String symbol) {
+  public PositionClosedResponse symbol(@javax.annotation.Nonnull String symbol) {
     this.symbol = symbol;
     return this;
   }
@@ -142,9 +142,9 @@ public class PositionClosedReponse implements Serializable {
    *
    * @param key name of the property
    * @param value value of the property
-   * @return the PositionClosedReponse instance itself
+   * @return the PositionClosedResponse instance itself
    */
-  public PositionClosedReponse putAdditionalProperty(String key, Object value) {
+  public PositionClosedResponse putAdditionalProperty(String key, Object value) {
     if (this.additionalProperties == null) {
         this.additionalProperties = new HashMap<String, Object>();
     }
@@ -183,11 +183,11 @@ public class PositionClosedReponse implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PositionClosedReponse positionClosedReponse = (PositionClosedReponse) o;
-    return Objects.equals(this.body, positionClosedReponse.body) &&
-        Objects.equals(this.status, positionClosedReponse.status) &&
-        Objects.equals(this.symbol, positionClosedReponse.symbol)&&
-        Objects.equals(this.additionalProperties, positionClosedReponse.additionalProperties);
+    PositionClosedResponse positionClosedResponse = (PositionClosedResponse) o;
+    return Objects.equals(this.body, positionClosedResponse.body) &&
+        Objects.equals(this.status, positionClosedResponse.status) &&
+        Objects.equals(this.symbol, positionClosedResponse.symbol)&&
+        Objects.equals(this.additionalProperties, positionClosedResponse.additionalProperties);
   }
 
   @Override
@@ -198,7 +198,7 @@ public class PositionClosedReponse implements Serializable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PositionClosedReponse {\n");
+    sb.append("class PositionClosedResponse {\n");
     sb.append("    body: ").append(toIndentedString(body)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
@@ -231,17 +231,17 @@ public class PositionClosedReponse implements Serializable {
    * Validates the JSON Element and throws an exception if issues found
    *
    * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to PositionClosedReponse
+   * @throws IOException if the JSON Element is invalid with respect to PositionClosedResponse
    */
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
       if (jsonElement == null) {
-        if (!PositionClosedReponse.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PositionClosedReponse is not found in the empty JSON string", PositionClosedReponse.openapiRequiredFields.toString()));
+        if (!PositionClosedResponse.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PositionClosedResponse is not found in the empty JSON string", PositionClosedResponse.openapiRequiredFields.toString()));
         }
       }
 
       // check to make sure all required properties/fields are present in the JSON string
-      for (String requiredField : PositionClosedReponse.openapiRequiredFields) {
+      for (String requiredField : PositionClosedResponse.openapiRequiredFields) {
         if (jsonElement.getAsJsonObject().get(requiredField) == null) {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
         }
@@ -260,16 +260,16 @@ public class PositionClosedReponse implements Serializable {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!PositionClosedReponse.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'PositionClosedReponse' and its subtypes
+       if (!PositionClosedResponse.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'PositionClosedResponse' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<PositionClosedReponse> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(PositionClosedReponse.class));
+       final TypeAdapter<PositionClosedResponse> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(PositionClosedResponse.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<PositionClosedReponse>() {
+       return (TypeAdapter<T>) new TypeAdapter<PositionClosedResponse>() {
            @Override
-           public void write(JsonWriter out, PositionClosedReponse value) throws IOException {
+           public void write(JsonWriter out, PositionClosedResponse value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              obj.remove("additionalProperties");
              // serialize additional properties
@@ -299,12 +299,12 @@ public class PositionClosedReponse implements Serializable {
            }
 
            @Override
-           public PositionClosedReponse read(JsonReader in) throws IOException {
+           public PositionClosedResponse read(JsonReader in) throws IOException {
              JsonElement jsonElement = elementAdapter.read(in);
              validateJsonElement(jsonElement);
              JsonObject jsonObj = jsonElement.getAsJsonObject();
              // store additional fields in the deserialized instance
-             PositionClosedReponse instance = thisAdapter.fromJsonTree(jsonObj);
+             PositionClosedResponse instance = thisAdapter.fromJsonTree(jsonObj);
              for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
                if (!openapiFields.contains(entry.getKey())) {
                  if (entry.getValue().isJsonPrimitive()) { // primitive type
@@ -331,18 +331,18 @@ public class PositionClosedReponse implements Serializable {
   }
 
   /**
-   * Create an instance of PositionClosedReponse given an JSON string
+   * Create an instance of PositionClosedResponse given an JSON string
    *
    * @param jsonString JSON string
-   * @return An instance of PositionClosedReponse
-   * @throws IOException if the JSON string is invalid with respect to PositionClosedReponse
+   * @return An instance of PositionClosedResponse
+   * @throws IOException if the JSON string is invalid with respect to PositionClosedResponse
    */
-  public static PositionClosedReponse fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, PositionClosedReponse.class);
+  public static PositionClosedResponse fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, PositionClosedResponse.class);
   }
 
   /**
-   * Convert an instance of PositionClosedReponse to an JSON string
+   * Convert an instance of PositionClosedResponse to an JSON string
    *
    * @return JSON string
    */

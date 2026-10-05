@@ -895,7 +895,7 @@ components:
           - **CDT**: Credit Interest
           - **SWP**: Sweep Interest
           - **QII**: Qualified Interest
-          - **FI**: Fixed Income Interest (coupon payment or accrued interest on call)
+          - **FI**: Fixed Income Interest (coupon or accrued)
 
         - **MA**: Merger and Acquisition activity sub-types:
           - **CMA**: Cash Merger
@@ -1358,16 +1358,6 @@ components:
           type:
             - string
             - 'null'
-        easy_to_borrow:
-          deprecated: true
-          description: |
-            **deprecated**: Please use borrow_status instead.
-            Asset is easy-to-borrow or not (filtering for easy_to_borrow = True is the best way to check whether the name is currently available to short at Alpaca).
-          type: boolean
-          x-deprecation:
-            reason: Use borrow_status instead.
-            since: '2026-06-22'
-            sunset: '2026-09-22'
         exchange:
           $ref: '#/components/schemas/Exchange'
         fractionable:
@@ -1639,10 +1629,11 @@ components:
       type: object
     CommonFixedIncomeInterestActivityV2:
       description: |-
-        Fixed income interest fields (INT/FI). Two variants from the same activity type,
-        distinguished by which fields are present:
-        - Regular coupon: includes `rate` (no `price` / `accrued_interest_rate`)
-        - Accrued interest on call: includes `price` and `accrued_interest_rate` (no `rate`)
+        Fixed income interest fields (INT/FI). Variants from the same activity type:
+
+        - Coupon: `interest_type` is `coupon`. Includes `rate` (no `price` / `accrued_interest_rate`). No `order_id`.
+        - Accrued interest on call: `interest_type` is `accrued`. Includes `price` and `accrued_interest_rate` (no `rate`). No `order_id`.
+        - Trade accrued: `interest_type` is `accrued`. Includes `order_id` so the interest NTA can be linked to the fill. `parent_id` is set when a parent trade `ref_id` is available.
       properties:
         accrued_interest_rate:
           description: Accrued interest rate (present for accrued-interest-on-call variants)
@@ -1659,8 +1650,20 @@ components:
           description: The entitled quantity (principal / face amount)
           example: '1000'
           type: string
+        interest_type:
+          $ref: '#/components/schemas/FixedIncomeInterestType'
         isin:
           description: The ISIN of the security involved with the activity
+          type: string
+        order_id:
+          description: The order that generated this accrued interest. Present for trade-accrued INT/FI.
+          example: 257bf308-a6b7-4777-8cf6-00dc441dc4d3
+          format: uuid
+          type: string
+        parent_id:
+          description: The ref_id of the parent trade this interest is attached to. Present for trade-accrued INT/FI when a parent trade `ref_id` is available.
+          example: 46aecae1-4629-4bcf-b441-0d8c847a1787
+          format: uuid
           type: string
         payment_date:
           description: The payment date
@@ -1682,6 +1685,7 @@ components:
         - entitled_qty
         - cash_payout
         - cusip
+        - interest_type
       type: object
     CommonJournalActivityV2:
       allOf:
@@ -2382,6 +2386,17 @@ components:
             symbol:
               description: The symbol of the security involved with the activity
               type: string
+            tax_country:
+              description: |
+                Tax country used as the primary jurisdiction when determining withholding treatment for the dividend. Other factors may affect the final withholding rate.
+                The value is an [ISO 3166-1 alpha-3](https://www.iso.org/iso-3166-country-codes.html) country code.
+              example: THA
+              type: string
+            tax_rate:
+              description: The tax withholding rate applied to the dividend, represented as a value between 0 and 1
+              example: '0.15'
+              format: decimal
+              type: string
           required:
             - cusip
             - symbol
@@ -2598,6 +2613,14 @@ components:
         - $ref: '#/components/schemas/CommonFixedIncomeInterestActivityV2'
       description: Fixed income interest (INT/FI)
       type: object
+    FixedIncomeInterestType:
+      description: Distinguishes coupon payments from accrued interest on INT/FI activities.
+      enum:
+        - coupon
+        - accrued
+      example: accrued
+      title: FixedIncomeInterestType
+      type: string
     FixedIncomeRedemptionActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonNTAActivityV2'
@@ -3045,7 +3068,7 @@ components:
             - FOPT
             - OCT
         created_at:
-          description: Valid only for non-trading activity types. Null for trading activites.
+          description: Valid only for non-trading activity types. Null for trading activities.
           format: date-time
           type: string
         currency:
@@ -3308,6 +3331,12 @@ components:
           example: '2023-12-11'
           format: date
           type: string
+        ppind:
+          description: |-
+            The ppind (Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments,
+            with `true` meaning it is part of the Penny Program and `false` meaning it is not.
+          example: true
+          type: boolean
         root_symbol:
           description: The root symbol of the option contract.
           example: AAPL
@@ -3365,6 +3394,7 @@ components:
         - strike_price
         - multiplier
         - size
+        - ppind
       type: object
     OptionContractStyle:
       description: The style of the option contract.
@@ -3391,6 +3421,7 @@ components:
               id: 98359ef7-5124-49f3-85ea-5cf02df6defa
               multiplier: '100'
               name: AAPL Jun 20 2025 100 Call
+              ppind: true
               root_symbol: AAPL
               size: '100'
               status: active
@@ -4186,7 +4217,7 @@ components:
         - asset_marginable
       title: Position
       type: object
-    PositionClosedReponse:
+    PositionClosedResponse:
       description: 'Represents the result of asking the api to close a position. '
       examples:
         - body:
@@ -4236,7 +4267,7 @@ components:
       required:
         - symbol
         - status
-      title: PositionClosedReponse
+      title: PositionClosedResponse
       type: object
     PositionIntent:
       description: Represents the desired position strategy.
@@ -4441,10 +4472,11 @@ components:
     TokenizationIssuer:
       description: The tokenized asset's issuer
       enum:
-        - xstocks
-        - st0x
         - binance
         - coinbase
+        - ondo
+        - st0x
+        - xstocks
       example: xstocks
       title: TokenizationIssuer
       type: string
@@ -4508,17 +4540,18 @@ components:
     TokenizationNetwork:
       description: The token's blockchain network
       enum:
-        - solana
         - arbitrum
-        - ethereum
-        - binance
         - base
+        - binance
+        - cronos
+        - ethereum
+        - hypercore
+        - hyperevm
+        - mantle
+        - robinhood
+        - solana
         - ton
         - tron
-        - mantle
-        - cronos
-        - hyperevm
-        - robinhood
       example: solana
       title: TokenizationNetwork
       type: string
@@ -4526,11 +4559,20 @@ components:
       properties:
         account:
           deprecated: true
-          description: Alpaca account ID associated with this tokenization request. Use `client_account_id` instead.
+          description: |-
+            **Deprecation notice:**
+            Use `client_account_id` instead.
+
+            Since: 2026-07-15
+            Sunset: 2026-10-15
+
+            ---
+
+            Alpaca account ID associated with this tokenization request.
           example: 06b9d76e-1733-460c-844e-48d1ae0f10c3
           type: string
           x-deprecation:
-            reason: Use client_account_id instead.
+            reason: Use `client_account_id` instead.
             since: '2026-07-15'
             sunset: '2026-10-15'
         client_account_id:
@@ -4560,11 +4602,20 @@ components:
           $ref: '#/components/schemas/TokenizationIssuer'
         issuer_account:
           deprecated: true
-          description: Issuer's account ID associated with this tokenization request. Use `client_external_account_id` instead.
+          description: |-
+            **Deprecation notice:**
+            Use `client_external_account_id` instead.
+
+            Since: 2026-07-15
+            Sunset: 2026-10-15
+
+            ---
+
+            Issuer's account ID associated with this tokenization request.
           example: AP-EXT-001
           type: string
           x-deprecation:
-            reason: Use client_external_account_id instead.
+            reason: Use `client_external_account_id` instead.
             since: '2026-07-15'
             sunset: '2026-10-15'
         issuer_request_id:
@@ -6216,7 +6267,7 @@ paths:
 
             For example, when `intraday_reporting=market_hours` and `start=2023-10-19T23:59:59-04:00`, the provided `start` date occurs outside of the regular market session. The effective `start` timestamp is adjusted to the beginning of the next session: `2023-10-20T09:30:00-04:00`
 
-            `start` may be be combined with one of `end` or `period`.
+            `start` may be combined with one of `end` or `period`.
 
             Providing all of `start`, `end`, and `period` is invalid.
           in: query
@@ -6845,7 +6896,7 @@ paths:
           schema:
             type: integer
         - description: |-
-            The ppind(Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments,
+            The ppind (Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments,
             with `true` meaning it is part of the Penny Program and `false` meaning it is not.
           example: true
           in: query
@@ -7281,7 +7332,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/PositionClosedReponse'
+                  $ref: '#/components/schemas/PositionClosedResponse'
                 type: array
           description: |-
             Multi-Status with body.
@@ -7870,8 +7921,16 @@ paths:
         - Crypto Funding
     post:
       deprecated: true
-      description: Creates a withdrawal request. Note that outgoing withdrawals must be sent to a whitelisted address and you must whitelist addresses at least 24 hours in advance. If you attempt to withdraw
-        funds to a non-whitelisted address then the transfer will be rejected.
+      description: |-
+        **Deprecation notice:**
+        This endpoint is deprecated. Use the Alpaca web application to initiate withdrawals.
+
+        Since: 2026-07-09
+        Sunset: 2026-10-09
+
+        ---
+
+        Creates a withdrawal request. Note that outgoing withdrawals must be sent to a whitelisted address and you must whitelist addresses at least 24 hours in advance. If you attempt to withdraw funds to a non-whitelisted address then the transfer will be rejected.
       operationId: createCryptoTransferForAccount
       requestBody:
         content:

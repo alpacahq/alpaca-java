@@ -1655,7 +1655,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         capital_gains_distribution_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_cash_dividend:
@@ -1673,7 +1673,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         cash_dividend_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_cash_merger:
@@ -1691,7 +1691,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         cash_merger_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_equity_partial_call:
@@ -1709,7 +1709,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         equity_partial_call_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_forward_split:
@@ -1727,7 +1727,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         forward_split_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_name_change:
@@ -1745,7 +1745,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         name_change_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_redemption:
@@ -1763,7 +1763,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         redemption_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_region:
@@ -1793,7 +1793,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         reorganization_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_reverse_split:
@@ -1811,7 +1811,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         reverse_split_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_rights_distribution:
@@ -1829,7 +1829,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         rights_distribution_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_spin_off:
@@ -1847,7 +1847,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         spin_off_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_stock_and_cash_merger:
@@ -1865,7 +1865,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         stock_and_cash_merger_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_stock_dividend:
@@ -1883,7 +1883,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         stock_dividend_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_stock_merger:
@@ -1901,7 +1901,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         stock_merger_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_type:
@@ -1962,7 +1962,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         unit_split_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_action_event_worthless_removal:
@@ -1980,7 +1980,7 @@ components:
             - ca
           type: object
       description: |
-        `corporate_action_event` envelope specialised to `event_type ==
+        `corporate_action_event` envelope specialized to `event_type ==
         worthless_removal_corporateaction_event`. Emitted through
         [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE).
     corporate_actions:

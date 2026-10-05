@@ -61,6 +61,8 @@ import java.util.Map;
  * 
  *   <li><b>{@code getV1EventsNta}</b>: Subscribe to Non-Trading Activities Events (SSE)</li>
  * 
+ *   <li><b>{@code subscribeToAccountStatusSSE}</b>: Subscribe to Account Status Events (SSE)</li>
+ * 
  *   <li><b>{@code subscribeToActivitiesSSE}</b>: Subscribe to Activity Events (SSE)</li>
  * 
  *   <li><b>{@code subscribeToAdminActionSSE}</b>: Subscribe to Admin Action Events (SSE)</li>
@@ -78,8 +80,6 @@ import java.util.Map;
  *   <li><b>{@code subscribeToTradeV2SSE}</b>: Subscribe to Trade Events (SSE)</li>
  * 
  *   <li><b>{@code subscribeToTransferStatusSSE}</b>: Subscribe to Transfer Events (SSE) (Legacy)</li>
- * 
- *   <li><b>{@code suscribeToAccountStatusSSE}</b>: Subscribe to Account Status Events (SSE)</li>
  * 
  * </ul>
  */
@@ -125,8 +125,8 @@ public class EventsApi {
      * @param id  (optional)
      * @param since Format: YYYY-MM-DD (optional)
      * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
      * @param sinceUlid  (optional)
      * @param untilUlid  (optional)
      * @param includePreprocessing  (optional)
@@ -233,8 +233,8 @@ public class EventsApi {
      * @param id  (optional)
      * @param since Format: YYYY-MM-DD (optional)
      * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
      * @param sinceUlid  (optional)
      * @param untilUlid  (optional)
      * @param includePreprocessing  (optional)
@@ -259,8 +259,8 @@ public class EventsApi {
      * @param id  (optional)
      * @param since Format: YYYY-MM-DD (optional)
      * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
      * @param sinceUlid  (optional)
      * @param untilUlid  (optional)
      * @param includePreprocessing  (optional)
@@ -286,8 +286,8 @@ public class EventsApi {
      * @param id  (optional)
      * @param since Format: YYYY-MM-DD (optional)
      * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
      * @param sinceUlid  (optional)
      * @param untilUlid  (optional)
      * @param includePreprocessing  (optional)
@@ -306,6 +306,179 @@ public class EventsApi {
 
         okhttp3.Call localVarCall = getV1EventsNtaValidateBeforeCall(id, since, until, sinceId, untilId, sinceUlid, untilUlid, includePreprocessing, groupId, _callback);
         Type localVarReturnType = new TypeToken<NonTradeActivityEvent>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+    /**
+     * Build call for subscribeToAccountStatusSSE
+     * @param since Format: YYYY-MM-DD (optional)
+     * @param until Format: YYYY-MM-DD (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param sinceUlid  (optional)
+     * @param untilUlid  (optional)
+     * @param id  (optional)
+     * @param _callback Callback for upload/download progress
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Connected. Events will now start streaming as long as you keep the connection open. </td><td>  -  </td></tr>
+     </table>
+     */
+    public okhttp3.Call subscribeToAccountStatusSSECall(@javax.annotation.Nullable LocalDate since, @javax.annotation.Nullable LocalDate until, @javax.annotation.Nullable Integer sinceId, @javax.annotation.Nullable Integer untilId, @javax.annotation.Nullable String sinceUlid, @javax.annotation.Nullable String untilUlid, @javax.annotation.Nullable String id, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v1/events/accounts/status";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        if (since != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("since", since));
+        }
+
+        if (until != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("until", until));
+        }
+
+        if (sinceId != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("since_id", sinceId));
+        }
+
+        if (untilId != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("until_id", untilId));
+        }
+
+        if (sinceUlid != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("since_ulid", sinceUlid));
+        }
+
+        if (untilUlid != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("until_ulid", untilUlid));
+        }
+
+        if (id != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("id", id));
+        }
+
+        final String[] localVarAccepts = {
+            "text/event-stream"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "BasicAuth" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call subscribeToAccountStatusSSEValidateBeforeCall(@javax.annotation.Nullable LocalDate since, @javax.annotation.Nullable LocalDate until, @javax.annotation.Nullable Integer sinceId, @javax.annotation.Nullable Integer untilId, @javax.annotation.Nullable String sinceUlid, @javax.annotation.Nullable String untilUlid, @javax.annotation.Nullable String id, final ApiCallback _callback) throws ApiException {
+        return subscribeToAccountStatusSSECall(since, until, sinceId, untilId, sinceUlid, untilUlid, id, _callback);
+
+    }
+
+    /**
+     * Subscribe to Account Status Events (SSE)
+     * The accounts events API provides streaming of account changes as they occur, via SSE (server sent events). Past events can also be queried.  Events are generated for changes to the following account properties: - account_blocked - admin_configurations - cash_interest - crypto_status - kyc_results - options - status - trading_blocked  Only the changed properties are included in the event payload.  Query Parameter Rules: - &#x60;since_id&#x60; and &#x60;until_id&#x60; are deprecated and available only to select broker partners; use &#x60;since_ulid&#x60; and &#x60;until_ulid&#x60; instead - &#x60;since&#x60; is required if &#x60;until&#x60; specified - &#x60;since_id&#x60; is required if &#x60;until_id&#x60; specified - &#x60;since_ulid&#x60; is required if &#x60;until_ulid&#x60; specified - &#x60;since&#x60;, &#x60;since_id&#x60; and &#x60;since_ulid&#x60; can&#39;t be used at the same time  Behavior: This API supports querying a range of events, starting now or in the past. If the end of the range is in the future or not specified, the connection is kept open and future events are pushed.  To be specific: - if &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60; is not specified, this will not return any historic data - if &#x60;until&#x60;, &#x60;until_id&#x60; or &#x60;until_ulid&#x60; is reached, the stream will end with a status of 200  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3. 
+     * @param since Format: YYYY-MM-DD (optional)
+     * @param until Format: YYYY-MM-DD (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param sinceUlid  (optional)
+     * @param untilUlid  (optional)
+     * @param id  (optional)
+     * @return List&lt;AccountStatusEvent&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Connected. Events will now start streaming as long as you keep the connection open. </td><td>  -  </td></tr>
+     </table>
+     */
+    public List<AccountStatusEvent> subscribeToAccountStatusSSE(@javax.annotation.Nullable LocalDate since, @javax.annotation.Nullable LocalDate until, @javax.annotation.Nullable Integer sinceId, @javax.annotation.Nullable Integer untilId, @javax.annotation.Nullable String sinceUlid, @javax.annotation.Nullable String untilUlid, @javax.annotation.Nullable String id) throws ApiException {
+        ApiResponse<List<AccountStatusEvent>> localVarResp = subscribeToAccountStatusSSEWithHttpInfo(since, until, sinceId, untilId, sinceUlid, untilUlid, id);
+        return localVarResp.getData();
+    }
+
+    /**
+     * Subscribe to Account Status Events (SSE)
+     * The accounts events API provides streaming of account changes as they occur, via SSE (server sent events). Past events can also be queried.  Events are generated for changes to the following account properties: - account_blocked - admin_configurations - cash_interest - crypto_status - kyc_results - options - status - trading_blocked  Only the changed properties are included in the event payload.  Query Parameter Rules: - &#x60;since_id&#x60; and &#x60;until_id&#x60; are deprecated and available only to select broker partners; use &#x60;since_ulid&#x60; and &#x60;until_ulid&#x60; instead - &#x60;since&#x60; is required if &#x60;until&#x60; specified - &#x60;since_id&#x60; is required if &#x60;until_id&#x60; specified - &#x60;since_ulid&#x60; is required if &#x60;until_ulid&#x60; specified - &#x60;since&#x60;, &#x60;since_id&#x60; and &#x60;since_ulid&#x60; can&#39;t be used at the same time  Behavior: This API supports querying a range of events, starting now or in the past. If the end of the range is in the future or not specified, the connection is kept open and future events are pushed.  To be specific: - if &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60; is not specified, this will not return any historic data - if &#x60;until&#x60;, &#x60;until_id&#x60; or &#x60;until_ulid&#x60; is reached, the stream will end with a status of 200  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3. 
+     * @param since Format: YYYY-MM-DD (optional)
+     * @param until Format: YYYY-MM-DD (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param sinceUlid  (optional)
+     * @param untilUlid  (optional)
+     * @param id  (optional)
+     * @return ApiResponse&lt;List&lt;AccountStatusEvent&gt;&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Connected. Events will now start streaming as long as you keep the connection open. </td><td>  -  </td></tr>
+     </table>
+     */
+    public ApiResponse<List<AccountStatusEvent>> subscribeToAccountStatusSSEWithHttpInfo(@javax.annotation.Nullable LocalDate since, @javax.annotation.Nullable LocalDate until, @javax.annotation.Nullable Integer sinceId, @javax.annotation.Nullable Integer untilId, @javax.annotation.Nullable String sinceUlid, @javax.annotation.Nullable String untilUlid, @javax.annotation.Nullable String id) throws ApiException {
+        okhttp3.Call localVarCall = subscribeToAccountStatusSSEValidateBeforeCall(since, until, sinceId, untilId, sinceUlid, untilUlid, id, null);
+        Type localVarReturnType = new TypeToken<List<AccountStatusEvent>>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    /**
+     * Subscribe to Account Status Events (SSE) (asynchronously)
+     * The accounts events API provides streaming of account changes as they occur, via SSE (server sent events). Past events can also be queried.  Events are generated for changes to the following account properties: - account_blocked - admin_configurations - cash_interest - crypto_status - kyc_results - options - status - trading_blocked  Only the changed properties are included in the event payload.  Query Parameter Rules: - &#x60;since_id&#x60; and &#x60;until_id&#x60; are deprecated and available only to select broker partners; use &#x60;since_ulid&#x60; and &#x60;until_ulid&#x60; instead - &#x60;since&#x60; is required if &#x60;until&#x60; specified - &#x60;since_id&#x60; is required if &#x60;until_id&#x60; specified - &#x60;since_ulid&#x60; is required if &#x60;until_ulid&#x60; specified - &#x60;since&#x60;, &#x60;since_id&#x60; and &#x60;since_ulid&#x60; can&#39;t be used at the same time  Behavior: This API supports querying a range of events, starting now or in the past. If the end of the range is in the future or not specified, the connection is kept open and future events are pushed.  To be specific: - if &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60; is not specified, this will not return any historic data - if &#x60;until&#x60;, &#x60;until_id&#x60; or &#x60;until_ulid&#x60; is reached, the stream will end with a status of 200  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3. 
+     * @param since Format: YYYY-MM-DD (optional)
+     * @param until Format: YYYY-MM-DD (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param sinceUlid  (optional)
+     * @param untilUlid  (optional)
+     * @param id  (optional)
+     * @param _callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Connected. Events will now start streaming as long as you keep the connection open. </td><td>  -  </td></tr>
+     </table>
+     */
+    public okhttp3.Call subscribeToAccountStatusSSEAsync(@javax.annotation.Nullable LocalDate since, @javax.annotation.Nullable LocalDate until, @javax.annotation.Nullable Integer sinceId, @javax.annotation.Nullable Integer untilId, @javax.annotation.Nullable String sinceUlid, @javax.annotation.Nullable String untilUlid, @javax.annotation.Nullable String id, final ApiCallback<List<AccountStatusEvent>> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = subscribeToAccountStatusSSEValidateBeforeCall(since, until, sinceId, untilId, sinceUlid, untilUlid, id, _callback);
+        Type localVarReturnType = new TypeToken<List<AccountStatusEvent>>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
     }
@@ -909,8 +1082,8 @@ public class EventsApi {
      * Build call for subscribeToJournalStatusSSE
      * @param since Format: YYYY-MM-DD (optional)
      * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
      * @param sinceUlid  (optional)
      * @param untilUlid  (optional)
      * @param id  (optional)
@@ -1007,8 +1180,8 @@ public class EventsApi {
      * The Events API provides event push as well as historical queries via SSE (server sent events).  You can listen to journal status updates as they get processed by our backoffice.  Historical events are streamed immediately if queried, and updates are pushed as events occur.  Query Params Rules: - &#x60;since_id&#x60; and &#x60;until_id&#x60; are deprecated and available only to select broker partners; use &#x60;since_ulid&#x60; and &#x60;until_ulid&#x60; instead - &#x60;since&#x60; required if &#x60;until&#x60; specified - &#x60;since_id&#x60; required if &#x60;until_id&#x60; specified - &#x60;since_ulid&#x60; required if &#x60;until_ulid&#x60; specified - &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60;  can&#39;t be used at the same time Behavior: - if &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60; not specified this will not return any historic data - if &#x60;until&#x60;, &#x60;until_id&#x60; or &#x60;until_ulid&#x60; reached stream will end (status 200)  ---  There is no compatibility between /v1/events/journals/status and /v2/events/journals/status, the ids (ulid) are always different, and the number of events might also different  Please note that the new &#x60;/v2&#x60; endpoint, is the same as, and was originally available under &#x60;/v2beta1&#x60;. We encourage all customers to adjust their codebase from that interim beta endpoint to the &#x60;/v2&#x60; stable endpoint. In the near future we will setup permanent redirect from &#x60;/v2beta1&#x60; to &#x60;/v2&#x60; before we completely remove the beta endpoint.  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3. 
      * @param since Format: YYYY-MM-DD (optional)
      * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
      * @param sinceUlid  (optional)
      * @param untilUlid  (optional)
      * @param id  (optional)
@@ -1031,8 +1204,8 @@ public class EventsApi {
      * The Events API provides event push as well as historical queries via SSE (server sent events).  You can listen to journal status updates as they get processed by our backoffice.  Historical events are streamed immediately if queried, and updates are pushed as events occur.  Query Params Rules: - &#x60;since_id&#x60; and &#x60;until_id&#x60; are deprecated and available only to select broker partners; use &#x60;since_ulid&#x60; and &#x60;until_ulid&#x60; instead - &#x60;since&#x60; required if &#x60;until&#x60; specified - &#x60;since_id&#x60; required if &#x60;until_id&#x60; specified - &#x60;since_ulid&#x60; required if &#x60;until_ulid&#x60; specified - &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60;  can&#39;t be used at the same time Behavior: - if &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60; not specified this will not return any historic data - if &#x60;until&#x60;, &#x60;until_id&#x60; or &#x60;until_ulid&#x60; reached stream will end (status 200)  ---  There is no compatibility between /v1/events/journals/status and /v2/events/journals/status, the ids (ulid) are always different, and the number of events might also different  Please note that the new &#x60;/v2&#x60; endpoint, is the same as, and was originally available under &#x60;/v2beta1&#x60;. We encourage all customers to adjust their codebase from that interim beta endpoint to the &#x60;/v2&#x60; stable endpoint. In the near future we will setup permanent redirect from &#x60;/v2beta1&#x60; to &#x60;/v2&#x60; before we completely remove the beta endpoint.  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3. 
      * @param since Format: YYYY-MM-DD (optional)
      * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
      * @param sinceUlid  (optional)
      * @param untilUlid  (optional)
      * @param id  (optional)
@@ -1056,8 +1229,8 @@ public class EventsApi {
      * The Events API provides event push as well as historical queries via SSE (server sent events).  You can listen to journal status updates as they get processed by our backoffice.  Historical events are streamed immediately if queried, and updates are pushed as events occur.  Query Params Rules: - &#x60;since_id&#x60; and &#x60;until_id&#x60; are deprecated and available only to select broker partners; use &#x60;since_ulid&#x60; and &#x60;until_ulid&#x60; instead - &#x60;since&#x60; required if &#x60;until&#x60; specified - &#x60;since_id&#x60; required if &#x60;until_id&#x60; specified - &#x60;since_ulid&#x60; required if &#x60;until_ulid&#x60; specified - &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60;  can&#39;t be used at the same time Behavior: - if &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60; not specified this will not return any historic data - if &#x60;until&#x60;, &#x60;until_id&#x60; or &#x60;until_ulid&#x60; reached stream will end (status 200)  ---  There is no compatibility between /v1/events/journals/status and /v2/events/journals/status, the ids (ulid) are always different, and the number of events might also different  Please note that the new &#x60;/v2&#x60; endpoint, is the same as, and was originally available under &#x60;/v2beta1&#x60;. We encourage all customers to adjust their codebase from that interim beta endpoint to the &#x60;/v2&#x60; stable endpoint. In the near future we will setup permanent redirect from &#x60;/v2beta1&#x60; to &#x60;/v2&#x60; before we completely remove the beta endpoint.  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3. 
      * @param since Format: YYYY-MM-DD (optional)
      * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
      * @param sinceUlid  (optional)
      * @param untilUlid  (optional)
      * @param id  (optional)
@@ -1537,8 +1710,8 @@ public class EventsApi {
      * Build call for subscribeToTransferStatusSSE
      * @param since Format: YYYY-MM-DD (optional)
      * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
      * @param sinceUlid  (optional)
      * @param untilUlid  (optional)
      * @param _callback Callback for upload/download progress
@@ -1634,8 +1807,8 @@ public class EventsApi {
      * **Deprecation notice**  As part of the deprecation process, the legacy transfer events API is now only available for existing broker-partners at &#x60;GET /v1/events/transfers/status&#x60; and for compatibility reasons.  All new broker partners will not have the option to use the legacy transfer events endpoint.  They should integrate with the new &#x60;/v2/events/funding/status&#x60; endpoint instead.  Also, all existing broker partners are now recommended to upgrade to the &#x60;/v2/events/funding/status&#x60; endpoint, which provides faster event delivery times.  ---  The Events API provides event push as well as historical queries via SSE (server sent events).  You can listen to transfer status updates as they get processed by our backoffice, for both end-user and firm accounts.  Historical events are streamed immediately if queried, and updates are pushed as events occur.  Query Params Rules: - &#x60;since_id&#x60; and &#x60;until_id&#x60; are deprecated and available only to select broker partners; use &#x60;since_ulid&#x60; and &#x60;until_ulid&#x60; instead - &#x60;since&#x60; required if &#x60;until&#x60; specified - &#x60;since_id&#x60; required if &#x60;until_id&#x60; specified - &#x60;since_ulid&#x60; required if &#x60;until_ulid&#x60; specified - &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60;  can&#39;t be used at the same time Behavior: - if &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60; not specified this will not return any historic data - if &#x60;until&#x60;, &#x60;until_id&#x60; or &#x60;until_ulid&#x60; reached stream will end (status 200)  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3.
      * @param since Format: YYYY-MM-DD (optional)
      * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
      * @param sinceUlid  (optional)
      * @param untilUlid  (optional)
      * @return List&lt;TransferStatusEvent&gt;
@@ -1660,8 +1833,8 @@ public class EventsApi {
      * **Deprecation notice**  As part of the deprecation process, the legacy transfer events API is now only available for existing broker-partners at &#x60;GET /v1/events/transfers/status&#x60; and for compatibility reasons.  All new broker partners will not have the option to use the legacy transfer events endpoint.  They should integrate with the new &#x60;/v2/events/funding/status&#x60; endpoint instead.  Also, all existing broker partners are now recommended to upgrade to the &#x60;/v2/events/funding/status&#x60; endpoint, which provides faster event delivery times.  ---  The Events API provides event push as well as historical queries via SSE (server sent events).  You can listen to transfer status updates as they get processed by our backoffice, for both end-user and firm accounts.  Historical events are streamed immediately if queried, and updates are pushed as events occur.  Query Params Rules: - &#x60;since_id&#x60; and &#x60;until_id&#x60; are deprecated and available only to select broker partners; use &#x60;since_ulid&#x60; and &#x60;until_ulid&#x60; instead - &#x60;since&#x60; required if &#x60;until&#x60; specified - &#x60;since_id&#x60; required if &#x60;until_id&#x60; specified - &#x60;since_ulid&#x60; required if &#x60;until_ulid&#x60; specified - &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60;  can&#39;t be used at the same time Behavior: - if &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60; not specified this will not return any historic data - if &#x60;until&#x60;, &#x60;until_id&#x60; or &#x60;until_ulid&#x60; reached stream will end (status 200)  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3.
      * @param since Format: YYYY-MM-DD (optional)
      * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
      * @param sinceUlid  (optional)
      * @param untilUlid  (optional)
      * @return ApiResponse&lt;List&lt;TransferStatusEvent&gt;&gt;
@@ -1687,8 +1860,8 @@ public class EventsApi {
      * **Deprecation notice**  As part of the deprecation process, the legacy transfer events API is now only available for existing broker-partners at &#x60;GET /v1/events/transfers/status&#x60; and for compatibility reasons.  All new broker partners will not have the option to use the legacy transfer events endpoint.  They should integrate with the new &#x60;/v2/events/funding/status&#x60; endpoint instead.  Also, all existing broker partners are now recommended to upgrade to the &#x60;/v2/events/funding/status&#x60; endpoint, which provides faster event delivery times.  ---  The Events API provides event push as well as historical queries via SSE (server sent events).  You can listen to transfer status updates as they get processed by our backoffice, for both end-user and firm accounts.  Historical events are streamed immediately if queried, and updates are pushed as events occur.  Query Params Rules: - &#x60;since_id&#x60; and &#x60;until_id&#x60; are deprecated and available only to select broker partners; use &#x60;since_ulid&#x60; and &#x60;until_ulid&#x60; instead - &#x60;since&#x60; required if &#x60;until&#x60; specified - &#x60;since_id&#x60; required if &#x60;until_id&#x60; specified - &#x60;since_ulid&#x60; required if &#x60;until_ulid&#x60; specified - &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60;  can&#39;t be used at the same time Behavior: - if &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60; not specified this will not return any historic data - if &#x60;until&#x60;, &#x60;until_id&#x60; or &#x60;until_ulid&#x60; reached stream will end (status 200)  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3.
      * @param since Format: YYYY-MM-DD (optional)
      * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
+     * @param sinceId **Deprecation notice:** Use since_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
+     * @param untilId **Deprecation notice:** Use until_ulid instead.  Since: 2023-08-01 Sunset: 2027-02-15 (optional)
      * @param sinceUlid  (optional)
      * @param untilUlid  (optional)
      * @param _callback The callback to be executed when the API call finishes
@@ -1708,179 +1881,6 @@ public class EventsApi {
 
         okhttp3.Call localVarCall = subscribeToTransferStatusSSEValidateBeforeCall(since, until, sinceId, untilId, sinceUlid, untilUlid, _callback);
         Type localVarReturnType = new TypeToken<List<TransferStatusEvent>>(){}.getType();
-        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
-        return localVarCall;
-    }
-    /**
-     * Build call for suscribeToAccountStatusSSE
-     * @param since Format: YYYY-MM-DD (optional)
-     * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
-     * @param sinceUlid  (optional)
-     * @param untilUlid  (optional)
-     * @param id  (optional)
-     * @param _callback Callback for upload/download progress
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     * @http.response.details
-     <table border="1">
-       <caption>Response Details</caption>
-        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Connected. Events will now start streaming as long as you keep the connection open. </td><td>  -  </td></tr>
-     </table>
-     */
-    public okhttp3.Call suscribeToAccountStatusSSECall(@javax.annotation.Nullable LocalDate since, @javax.annotation.Nullable LocalDate until, @javax.annotation.Nullable Integer sinceId, @javax.annotation.Nullable Integer untilId, @javax.annotation.Nullable String sinceUlid, @javax.annotation.Nullable String untilUlid, @javax.annotation.Nullable String id, final ApiCallback _callback) throws ApiException {
-        String basePath = null;
-        // Operation Servers
-        String[] localBasePaths = new String[] {  };
-
-        // Determine Base Path to Use
-        if (localCustomBaseUrl != null){
-            basePath = localCustomBaseUrl;
-        } else if ( localBasePaths.length > 0 ) {
-            basePath = localBasePaths[localHostIndex];
-        } else {
-            basePath = null;
-        }
-
-        Object localVarPostBody = null;
-
-        // create path and map variables
-        String localVarPath = "/v1/events/accounts/status";
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-        Map<String, String> localVarCookieParams = new HashMap<String, String>();
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        if (since != null) {
-            localVarQueryParams.addAll(localVarApiClient.parameterToPair("since", since));
-        }
-
-        if (until != null) {
-            localVarQueryParams.addAll(localVarApiClient.parameterToPair("until", until));
-        }
-
-        if (sinceId != null) {
-            localVarQueryParams.addAll(localVarApiClient.parameterToPair("since_id", sinceId));
-        }
-
-        if (untilId != null) {
-            localVarQueryParams.addAll(localVarApiClient.parameterToPair("until_id", untilId));
-        }
-
-        if (sinceUlid != null) {
-            localVarQueryParams.addAll(localVarApiClient.parameterToPair("since_ulid", sinceUlid));
-        }
-
-        if (untilUlid != null) {
-            localVarQueryParams.addAll(localVarApiClient.parameterToPair("until_ulid", untilUlid));
-        }
-
-        if (id != null) {
-            localVarQueryParams.addAll(localVarApiClient.parameterToPair("id", id));
-        }
-
-        final String[] localVarAccepts = {
-            "text/event-stream"
-        };
-        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) {
-            localVarHeaderParams.put("Accept", localVarAccept);
-        }
-
-        final String[] localVarContentTypes = {
-        };
-        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
-        if (localVarContentType != null) {
-            localVarHeaderParams.put("Content-Type", localVarContentType);
-        }
-
-        String[] localVarAuthNames = new String[] { "BasicAuth" };
-        return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
-    }
-
-    @SuppressWarnings("rawtypes")
-    private okhttp3.Call suscribeToAccountStatusSSEValidateBeforeCall(@javax.annotation.Nullable LocalDate since, @javax.annotation.Nullable LocalDate until, @javax.annotation.Nullable Integer sinceId, @javax.annotation.Nullable Integer untilId, @javax.annotation.Nullable String sinceUlid, @javax.annotation.Nullable String untilUlid, @javax.annotation.Nullable String id, final ApiCallback _callback) throws ApiException {
-        return suscribeToAccountStatusSSECall(since, until, sinceId, untilId, sinceUlid, untilUlid, id, _callback);
-
-    }
-
-    /**
-     * Subscribe to Account Status Events (SSE)
-     * The accounts events API provides streaming of account changes as they occur, via SSE (server sent events). Past events can also be queried.  Events are generated for changes to the following account properties: - account_blocked - admin_configurations - cash_interest - crypto_status - kyc_results - options - status - trading_blocked  Only the changed properties are included in the event payload.  Query Parameter Rules: - &#x60;since_id&#x60; and &#x60;until_id&#x60; are deprecated and available only to select broker partners; use &#x60;since_ulid&#x60; and &#x60;until_ulid&#x60; instead - &#x60;since&#x60; is required if &#x60;until&#x60; specified - &#x60;since_id&#x60; is required if &#x60;until_id&#x60; specified - &#x60;since_ulid&#x60; is required if &#x60;until_ulid&#x60; specified - &#x60;since&#x60;, &#x60;since_id&#x60; and &#x60;since_ulid&#x60; can&#39;t be used at the same time  Behavior: This API supports querying a range of events, starting now or in the past. If the end of the range is in the future or not specified, the connection is kept open and future events are pushed.  To be specific: - if &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60; is not specified, this will not return any historic data - if &#x60;until&#x60;, &#x60;until_id&#x60; or &#x60;until_ulid&#x60; is reached, the stream will end with a status of 200  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3. 
-     * @param since Format: YYYY-MM-DD (optional)
-     * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
-     * @param sinceUlid  (optional)
-     * @param untilUlid  (optional)
-     * @param id  (optional)
-     * @return List&lt;AccountStatusEvent&gt;
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
-     * @http.response.details
-     <table border="1">
-       <caption>Response Details</caption>
-        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Connected. Events will now start streaming as long as you keep the connection open. </td><td>  -  </td></tr>
-     </table>
-     */
-    public List<AccountStatusEvent> suscribeToAccountStatusSSE(@javax.annotation.Nullable LocalDate since, @javax.annotation.Nullable LocalDate until, @javax.annotation.Nullable Integer sinceId, @javax.annotation.Nullable Integer untilId, @javax.annotation.Nullable String sinceUlid, @javax.annotation.Nullable String untilUlid, @javax.annotation.Nullable String id) throws ApiException {
-        ApiResponse<List<AccountStatusEvent>> localVarResp = suscribeToAccountStatusSSEWithHttpInfo(since, until, sinceId, untilId, sinceUlid, untilUlid, id);
-        return localVarResp.getData();
-    }
-
-    /**
-     * Subscribe to Account Status Events (SSE)
-     * The accounts events API provides streaming of account changes as they occur, via SSE (server sent events). Past events can also be queried.  Events are generated for changes to the following account properties: - account_blocked - admin_configurations - cash_interest - crypto_status - kyc_results - options - status - trading_blocked  Only the changed properties are included in the event payload.  Query Parameter Rules: - &#x60;since_id&#x60; and &#x60;until_id&#x60; are deprecated and available only to select broker partners; use &#x60;since_ulid&#x60; and &#x60;until_ulid&#x60; instead - &#x60;since&#x60; is required if &#x60;until&#x60; specified - &#x60;since_id&#x60; is required if &#x60;until_id&#x60; specified - &#x60;since_ulid&#x60; is required if &#x60;until_ulid&#x60; specified - &#x60;since&#x60;, &#x60;since_id&#x60; and &#x60;since_ulid&#x60; can&#39;t be used at the same time  Behavior: This API supports querying a range of events, starting now or in the past. If the end of the range is in the future or not specified, the connection is kept open and future events are pushed.  To be specific: - if &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60; is not specified, this will not return any historic data - if &#x60;until&#x60;, &#x60;until_id&#x60; or &#x60;until_ulid&#x60; is reached, the stream will end with a status of 200  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3. 
-     * @param since Format: YYYY-MM-DD (optional)
-     * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
-     * @param sinceUlid  (optional)
-     * @param untilUlid  (optional)
-     * @param id  (optional)
-     * @return ApiResponse&lt;List&lt;AccountStatusEvent&gt;&gt;
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
-     * @http.response.details
-     <table border="1">
-       <caption>Response Details</caption>
-        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Connected. Events will now start streaming as long as you keep the connection open. </td><td>  -  </td></tr>
-     </table>
-     */
-    public ApiResponse<List<AccountStatusEvent>> suscribeToAccountStatusSSEWithHttpInfo(@javax.annotation.Nullable LocalDate since, @javax.annotation.Nullable LocalDate until, @javax.annotation.Nullable Integer sinceId, @javax.annotation.Nullable Integer untilId, @javax.annotation.Nullable String sinceUlid, @javax.annotation.Nullable String untilUlid, @javax.annotation.Nullable String id) throws ApiException {
-        okhttp3.Call localVarCall = suscribeToAccountStatusSSEValidateBeforeCall(since, until, sinceId, untilId, sinceUlid, untilUlid, id, null);
-        Type localVarReturnType = new TypeToken<List<AccountStatusEvent>>(){}.getType();
-        return localVarApiClient.execute(localVarCall, localVarReturnType);
-    }
-
-    /**
-     * Subscribe to Account Status Events (SSE) (asynchronously)
-     * The accounts events API provides streaming of account changes as they occur, via SSE (server sent events). Past events can also be queried.  Events are generated for changes to the following account properties: - account_blocked - admin_configurations - cash_interest - crypto_status - kyc_results - options - status - trading_blocked  Only the changed properties are included in the event payload.  Query Parameter Rules: - &#x60;since_id&#x60; and &#x60;until_id&#x60; are deprecated and available only to select broker partners; use &#x60;since_ulid&#x60; and &#x60;until_ulid&#x60; instead - &#x60;since&#x60; is required if &#x60;until&#x60; specified - &#x60;since_id&#x60; is required if &#x60;until_id&#x60; specified - &#x60;since_ulid&#x60; is required if &#x60;until_ulid&#x60; specified - &#x60;since&#x60;, &#x60;since_id&#x60; and &#x60;since_ulid&#x60; can&#39;t be used at the same time  Behavior: This API supports querying a range of events, starting now or in the past. If the end of the range is in the future or not specified, the connection is kept open and future events are pushed.  To be specific: - if &#x60;since&#x60;, &#x60;since_id&#x60; or &#x60;since_ulid&#x60; is not specified, this will not return any historic data - if &#x60;until&#x60;, &#x60;until_id&#x60; or &#x60;until_ulid&#x60; is reached, the stream will end with a status of 200  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3. 
-     * @param since Format: YYYY-MM-DD (optional)
-     * @param until Format: YYYY-MM-DD (optional)
-     * @param sinceId  (optional)
-     * @param untilId  (optional)
-     * @param sinceUlid  (optional)
-     * @param untilUlid  (optional)
-     * @param id  (optional)
-     * @param _callback The callback to be executed when the API call finishes
-     * @return The request call
-     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
-     * @http.response.details
-     <table border="1">
-       <caption>Response Details</caption>
-        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Connected. Events will now start streaming as long as you keep the connection open. </td><td>  -  </td></tr>
-     </table>
-     */
-    public okhttp3.Call suscribeToAccountStatusSSEAsync(@javax.annotation.Nullable LocalDate since, @javax.annotation.Nullable LocalDate until, @javax.annotation.Nullable Integer sinceId, @javax.annotation.Nullable Integer untilId, @javax.annotation.Nullable String sinceUlid, @javax.annotation.Nullable String untilUlid, @javax.annotation.Nullable String id, final ApiCallback<List<AccountStatusEvent>> _callback) throws ApiException {
-
-        okhttp3.Call localVarCall = suscribeToAccountStatusSSEValidateBeforeCall(since, until, sinceId, untilId, sinceUlid, untilUlid, id, _callback);
-        Type localVarReturnType = new TypeToken<List<AccountStatusEvent>>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
     }

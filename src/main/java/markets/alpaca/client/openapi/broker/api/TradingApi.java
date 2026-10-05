@@ -1980,7 +1980,7 @@ public class TradingApi {
 
     /**
      * Estimate an Order
-     * Order estimation endpoint will display, based on user&#39;s account balance, the estimated quantity and price they will receive for their notional order.  For LCT - customer&#39;s order will include the Alpaca swap_fee, while correspondent side swap_fee is configurable in the API call. Utilising this API does not result in a real order and after the calculation - the user&#39;s buying power reverts to the previous state.  Responses and Errors are the same as with the Orders API  Please note that the estimation is based on the market condition at the time of submission and a live order will differ. The output should be considered indicative.  **Note:** This does not support Crypto or non-market orders at this time.
+     * Order estimation endpoint will display, based on user&#39;s account balance, the estimated quantity and price they will receive for their notional order.  For LCT - customer&#39;s order will include the Alpaca swap_fee, while correspondent side swap_fee is configurable in the API call. Utilizing this API does not result in a real order and after the calculation - the user&#39;s buying power reverts to the previous state.  Responses and Errors are the same as with the Orders API  Please note that the estimation is based on the market condition at the time of submission and a live order will differ. The output should be considered indicative.  **Note:** This does not support Crypto or non-market orders at this time.
      * @param accountId  (required)
      * @param getV1TradingAccountsAccountIdOrdersEstimationRequest  (optional)
      * @return Order
@@ -1999,7 +1999,7 @@ public class TradingApi {
 
     /**
      * Estimate an Order
-     * Order estimation endpoint will display, based on user&#39;s account balance, the estimated quantity and price they will receive for their notional order.  For LCT - customer&#39;s order will include the Alpaca swap_fee, while correspondent side swap_fee is configurable in the API call. Utilising this API does not result in a real order and after the calculation - the user&#39;s buying power reverts to the previous state.  Responses and Errors are the same as with the Orders API  Please note that the estimation is based on the market condition at the time of submission and a live order will differ. The output should be considered indicative.  **Note:** This does not support Crypto or non-market orders at this time.
+     * Order estimation endpoint will display, based on user&#39;s account balance, the estimated quantity and price they will receive for their notional order.  For LCT - customer&#39;s order will include the Alpaca swap_fee, while correspondent side swap_fee is configurable in the API call. Utilizing this API does not result in a real order and after the calculation - the user&#39;s buying power reverts to the previous state.  Responses and Errors are the same as with the Orders API  Please note that the estimation is based on the market condition at the time of submission and a live order will differ. The output should be considered indicative.  **Note:** This does not support Crypto or non-market orders at this time.
      * @param accountId  (required)
      * @param getV1TradingAccountsAccountIdOrdersEstimationRequest  (optional)
      * @return ApiResponse&lt;Order&gt;
@@ -2019,7 +2019,7 @@ public class TradingApi {
 
     /**
      * Estimate an Order (asynchronously)
-     * Order estimation endpoint will display, based on user&#39;s account balance, the estimated quantity and price they will receive for their notional order.  For LCT - customer&#39;s order will include the Alpaca swap_fee, while correspondent side swap_fee is configurable in the API call. Utilising this API does not result in a real order and after the calculation - the user&#39;s buying power reverts to the previous state.  Responses and Errors are the same as with the Orders API  Please note that the estimation is based on the market condition at the time of submission and a live order will differ. The output should be considered indicative.  **Note:** This does not support Crypto or non-market orders at this time.
+     * Order estimation endpoint will display, based on user&#39;s account balance, the estimated quantity and price they will receive for their notional order.  For LCT - customer&#39;s order will include the Alpaca swap_fee, while correspondent side swap_fee is configurable in the API call. Utilizing this API does not result in a real order and after the calculation - the user&#39;s buying power reverts to the previous state.  Responses and Errors are the same as with the Orders API  Please note that the estimation is based on the market condition at the time of submission and a live order will differ. The output should be considered indicative.  **Note:** This does not support Crypto or non-market orders at this time.
      * @param accountId  (required)
      * @param getV1TradingAccountsAccountIdOrdersEstimationRequest  (optional)
      * @param _callback The callback to be executed when the API call finishes

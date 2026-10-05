@@ -52,7 +52,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.data.http.JSON;
 
 /**
- * &#x60;corporate_action_event&#x60; envelope specialised to &#x60;event_type &#x3D;&#x3D; rights_distribution_corporateaction_event&#x60;. Emitted through [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE). 
+ * &#x60;corporate_action_event&#x60; envelope specialized to &#x60;event_type &#x3D;&#x3D; rights_distribution_corporateaction_event&#x60;. Emitted through [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE). 
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class CorporateActionEventRightsDistribution implements Serializable {

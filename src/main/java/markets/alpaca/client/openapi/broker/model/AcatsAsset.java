@@ -333,7 +333,7 @@ public class AcatsAsset implements Serializable {
   }
 
   /**
-   * ISIN for the asset. DEPRECATED -- will be removed in a future version; use &#x60;symbol&#x60; or &#x60;cusip&#x60; instead. Temporarily returned with all assets for backward compatibility.
+   * **Deprecation notice:** Use &#x60;symbol&#x60; or &#x60;cusip&#x60; instead. Returned with all assets only for backward compatibility while consumers migrate.  Since: 2026-08-04 Sunset: 2027-02-04  ---  ISIN for the asset.
    * @return isin
    * @deprecated
    */

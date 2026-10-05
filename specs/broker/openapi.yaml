@@ -1186,7 +1186,16 @@ components:
           type: string
         isin:
           deprecated: true
-          description: ISIN for the asset. DEPRECATED -- will be removed in a future version; use `symbol` or `cusip` instead. Temporarily returned with all assets for backward compatibility.
+          description: |-
+            **Deprecation notice:**
+            Use `symbol` or `cusip` instead. Returned with all assets only for backward compatibility while consumers migrate.
+
+            Since: 2026-08-04
+            Sunset: 2027-02-04
+
+            ---
+
+            ISIN for the asset.
           type: string
           x-deprecation:
             reason: Use `symbol` or `cusip` instead. Returned with all assets only for backward compatibility while consumers migrate.
@@ -2519,7 +2528,7 @@ components:
           example: ACTIVE
           type: string
         trading_blocked:
-          description: If true the account cannot trade going forward, if false, the ban has been lifed
+          description: If true the account cannot trade going forward, if false, the ban has been lifted
           type: boolean
       required:
         - account_id
@@ -2821,7 +2830,7 @@ components:
           - **CDT**: Credit Interest
           - **SWP**: Sweep Interest
           - **QII**: Qualified Interest
-          - **FI**: Fixed Income Interest (coupon payment or accrued interest on call)
+          - **FI**: Fixed Income Interest (coupon or accrued)
 
         - **MA**: Merger and Acquisition activity sub-types:
           - **CMA**: Cash Merger
@@ -3273,7 +3282,7 @@ components:
         - correspondent_only
     AdminConfigurations:
       description: |-
-        These configurations show account properties that are overriden either by Alpaca Broker Operations or an automated process.
+        These configurations show account properties that are overridden either by Alpaca Broker Operations or an automated process.
 
         These values cannot be modified by the Broker Partners.
 
@@ -3656,7 +3665,7 @@ components:
       type: object
     AnnouncementCASubType:
       description: |-
-        Announcements have both a type and a subtype to categorize them. This model represents the lowever level abstract "sub types" of Announcement. Please see the AnnouncementCAType model for higher level descriptions of the possible types
+        Announcements have both a type and a subtype to categorize them. This model represents the lower level abstract "sub types" of Announcement. Please see the AnnouncementCAType model for higher level descriptions of the possible types
 
         Possible values are:
 
@@ -3675,18 +3684,18 @@ components:
 
           - **merger_completion**
 
-            A final update in the terms of the merger in which the intiating_symbol will acquire the target_symbol. Any previous terms updates for this announcement will have the same id value.
+            A final update in the terms of the merger in which the initiating_symbol will acquire the target_symbol. Any previous terms updates for this announcement will have the same id value.
 
         - from the `split` type:
           - **stock_split**
 
-            An increase in the number of shares outstanding with a decrease in the dollar value of each share. The new_rate and old_rate parameters will be returned in order to derive the ratio of the split
+            An increase in the number of shares outstanding with a decrease in the dollar value of each share. The new_rate and old_rate parameters will be returned in order to derive the ratio of the split.
           - **until_split**
 
             An increase in the number of shares outstanding with a decrease in the dollar value of each share. The new_rate and old_rate parameters will be returned in order to derive the ratio of the split.
           - **reverse_split**
 
-            A decrease in the number of shares outstanding with an increase in the dollar value of each share. The new_rate and old_rate parameters will be returned in order to derive the ratio of the spli
+            A decrease in the number of shares outstanding with an increase in the dollar value of each share. The new_rate and old_rate parameters will be returned in order to derive the ratio of the split.
           - **recapitalization**
 
             A stock recapitalization, typically used by a company to adjust debt and equity ratios.
@@ -3694,7 +3703,7 @@ components:
         - from the `spinoff` type:
           - **spinoff**
 
-            A disbursement of a newly tradable security when the intiating_symbol creates the target_symbol.
+            A disbursement of a newly tradable security when the initiating_symbol creates the target_symbol.
       enum:
         - cash
         - stock
@@ -3719,7 +3728,7 @@ components:
         - split
           has `stock_split`, `until_split`, `reverse_split`, and `recapitalization` sub types
         - spinoff
-          currently has only the `spinoff` subtype and thus is just this higher level category for now. A disbursement of a newly tradable security when the intiating_symbol creates the target_symbol.
+          currently has only the `spinoff` subtype and thus is just this higher level category for now. A disbursement of a newly tradable security when the initiating_symbol creates the target_symbol.
       enum:
         - dividend
         - merger
@@ -3766,17 +3775,6 @@ components:
           type: string
         class:
           $ref: '#/components/schemas/AssetClass'
-        easy_to_borrow:
-          deprecated: true
-          description: |
-            **deprecated**: Please use borrow_status instead.
-            Asset is easy-to-borrow or not (filtering for easy_to_borrow = True is the best way to check whether the name is currently available to short at Alpaca).
-          example: true
-          type: boolean
-          x-deprecation:
-            reason: Use borrow_status instead.
-            since: '2026-06-22'
-            sunset: '2026-09-22'
         exchange:
           $ref: '#/components/schemas/Exchange'
         fractionable:
@@ -4841,10 +4839,11 @@ components:
       type: object
     CommonFixedIncomeInterestActivityV2:
       description: |-
-        Fixed income interest fields (INT/FI). Two variants from the same activity type,
-        distinguished by which fields are present:
-        - Regular coupon: includes `rate` (no `price` / `accrued_interest_rate`)
-        - Accrued interest on call: includes `price` and `accrued_interest_rate` (no `rate`)
+        Fixed income interest fields (INT/FI). Variants from the same activity type:
+
+        - Coupon: `interest_type` is `coupon`. Includes `rate` (no `price` / `accrued_interest_rate`). No `order_id`.
+        - Accrued interest on call: `interest_type` is `accrued`. Includes `price` and `accrued_interest_rate` (no `rate`). No `order_id`.
+        - Trade accrued: `interest_type` is `accrued`. Includes `order_id` so the interest NTA can be linked to the fill. `parent_id` is set when a parent trade `ref_id` is available.
       properties:
         accrued_interest_rate:
           description: Accrued interest rate (present for accrued-interest-on-call variants)
@@ -4861,8 +4860,20 @@ components:
           description: The entitled quantity (principal / face amount)
           example: '1000'
           type: string
+        interest_type:
+          $ref: '#/components/schemas/FixedIncomeInterestType'
         isin:
           description: The ISIN of the security involved with the activity
+          type: string
+        order_id:
+          description: The order that generated this accrued interest. Present for trade-accrued INT/FI.
+          example: 257bf308-a6b7-4777-8cf6-00dc441dc4d3
+          format: uuid
+          type: string
+        parent_id:
+          description: The ref_id of the parent trade this interest is attached to. Present for trade-accrued INT/FI when a parent trade `ref_id` is available.
+          example: 46aecae1-4629-4bcf-b441-0d8c847a1787
+          format: uuid
           type: string
         payment_date:
           description: The payment date
@@ -4884,6 +4895,7 @@ components:
         - entitled_qty
         - cash_payout
         - cusip
+        - interest_type
       type: object
     CommonJournalActivityV2:
       allOf:
@@ -5315,7 +5327,7 @@ components:
             type: string
           type: array
         full_name:
-          description: The full name of the country definded by ISO 3166-1
+          description: The full name of the country defined by ISO 3166-1
           example: Åland Islands
           minLength: 1
           type: string
@@ -5451,6 +5463,11 @@ components:
       properties:
         desired_currency:
           type: string
+        fee_inclusive:
+          default: false
+          description: |
+            When true, fees are deducted from `usd_amount` instead of being added on top, so the total amount debited from the account equals `usd_amount` exactly (the beneficiary receives `usd_amount` minus fees). This lets the account be drained to zero: pass the account's full available cash as `usd_amount`. The request is rejected if `usd_amount` is less than or equal to the fees. Defaults to false (fees added on top of `usd_amount`).
+          type: boolean
         payment_type:
           $ref: '#/components/schemas/FundingDetailPaymentType'
         usd_amount:
@@ -5612,7 +5629,7 @@ components:
             - In case of `mleg`, the limit_price parameter is expressed with the following notation:
               - A positive value indicates a debit, representing a cost or payment to be made.
               - A negative value signifies a credit, reflecting an amount to be received.
-            - In case of Fied Income, the price is expressed in percentage of par value (face value).
+            - In case of Fixed Income, the price is expressed in percentage of par value (face value).
             Price is always clean price, meaning it does not include accrued interest.
           example: '3.14'
           format: decimal
@@ -5901,6 +5918,17 @@ components:
               type: string
             symbol:
               description: The symbol of the security involved with the activity
+              type: string
+            tax_country:
+              description: |
+                Tax country used as the primary jurisdiction when determining withholding treatment for the dividend. Other factors may affect the final withholding rate.
+                The value is an [ISO 3166-1 alpha-3](https://www.iso.org/iso-3166-country-codes.html) country code.
+              example: THA
+              type: string
+            tax_rate:
+              description: The tax withholding rate applied to the dividend, represented as a value between 0 and 1
+              example: '0.15'
+              format: decimal
               type: string
           required:
             - cusip
@@ -6543,6 +6571,14 @@ components:
         - $ref: '#/components/schemas/CommonFixedIncomeInterestActivityV2'
       description: Fixed income interest (INT/FI)
       type: object
+    FixedIncomeInterestType:
+      description: Distinguishes coupon payments from accrued interest on INT/FI activities.
+      enum:
+        - coupon
+        - accrued
+      example: accrued
+      title: FixedIncomeInterestType
+      type: string
     FixedIncomeRedemptionActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonNTAActivityV2'
@@ -6749,20 +6785,39 @@ components:
           format: uuid
           type: string
         original_amount:
-          description: The amount you should expect to receive, calculated as requested amount - fees
+          deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Use `total_amount` for the actual amount debited from the account.
+
+            Since: 2026-09-22
+            Sunset: 2026-12-21
+
+            ---
+
+            The amount you should expect to receive, calculated as requested amount - fees.
           format: decimal
           type: string
+          x-deprecation:
+            reason: Use `total_amount` for the actual amount debited from the account.
+            since: '2026-09-22'
+            sunset: '2026-12-21'
         original_currency:
           description: The currency of the withdrawn amount, 3-letter ISO code
           type: string
         payment_type:
           $ref: '#/components/schemas/FundingDetailPaymentType'
         requested_amount:
-          description: The amount sent as part of the withdrawal creation
+          description: The amount requested when the transfer was created.
           format: decimal
           type: string
         status:
           $ref: '#/components/schemas/FundingWalletTransferStatus'
+        total_amount:
+          description: The total amount moved for the transfer. For outgoing transfers with fees added on top, this is the requested amount plus fees (the total debited from the account). For fee-inclusive
+            outgoing withdrawals, fees are taken out of the requested amount, so this equals requested_amount. For incoming transfers, this is the requested amount credited to the account.
+          format: decimal
+          type: string
         updated_at:
           format: date-time
           type: string
@@ -8043,7 +8098,7 @@ components:
         activity_sub_type:
           $ref: '#/components/schemas/ActivitySubType'
         created_at:
-          description: Valid only for non-trading activity types. Null for trading activites.
+          description: Valid only for non-trading activity types. Null for trading activities.
           example: '2021-05-10T14:01:04.650275Z'
           format: date-time
           type: string
@@ -8051,16 +8106,16 @@ components:
           description: Currency denomination of the activity. USD by default.
           type: string
         cusip:
-          description: Valid only for non-trading activity types. Null for trading activites.
+          description: Valid only for non-trading activity types. Null for trading activities.
           example: '037833100'
           type: string
         date:
-          description: Valid only for non-trading activity types. Null for trading activites.
+          description: Valid only for non-trading activity types. Null for trading activities.
           example: '2021-05-21'
           format: date
           type: string
         description:
-          description: Valid only for non-trading activity types. Null for trading activites.
+          description: Valid only for non-trading activity types. Null for trading activities.
           example: Example description
           type: string
         group_id:
@@ -8069,22 +8124,22 @@ components:
           format: uuid
           type: string
         net_amount:
-          description: Valid only for non-trading activity types. Null for trading activites.
+          description: Valid only for non-trading activity types. Null for trading activities.
           example: '1234'
           format: decimal
           type: string
         per_share_amount:
-          description: Valid only for non-trading activity types. Null for trading activites.
+          description: Valid only for non-trading activity types. Null for trading activities.
           example: '0.38921'
           format: decimal
           type: string
         qty:
-          description: Valid only for non-trading activity types. Null for trading activites.
+          description: Valid only for non-trading activity types. Null for trading activities.
           example: '0.38921'
           format: decimal
           type: string
         status:
-          description: Valid only for non-trading activity types. Null for trading activites.
+          description: Valid only for non-trading activity types. Null for trading activities.
           enum:
             - executed
             - correct
@@ -8092,7 +8147,7 @@ components:
           example: executed
           type: string
         symbol:
-          description: Valid only for non-trading activity types. Null for trading activites.
+          description: Valid only for non-trading activity types. Null for trading activities.
           example: AAPL
           type: string
         transfer_id:
@@ -8522,6 +8577,12 @@ components:
           example: '2023-12-11'
           format: date
           type: string
+        ppind:
+          description: |-
+            The ppind (Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments,
+            with `true` meaning it is part of the Penny Program and `false` meaning it is not.
+          example: true
+          type: boolean
         root_symbol:
           description: The root symbol of the option contract.
           example: AAPL
@@ -8587,6 +8648,7 @@ components:
         - strike_price
         - multiplier
         - size
+        - ppind
       type: object
     OptionDeliverable:
       properties:
@@ -8694,7 +8756,7 @@ components:
           type: string
         approved_level:
           description: |
-            The option trading level approved for this request. Only present once the request has completed processiing.
+            The option trading level approved for this request. Only present once the request has completed processing.
             Note that a subsequent request may be approved for a different level.
             0=Disabled, 1=Covered Call/Cash-Secured Put, 2=Long Call/Put, 3=Spreads/Straddles."
           enum:
@@ -9268,7 +9330,7 @@ components:
           description: The tax year
           type: number
         total_contribution_amount:
-          description: The total conntribution amount
+          description: The total contribution amount
           type: number
       type: object
     OwnerDocument:
@@ -9766,7 +9828,7 @@ components:
             asset_id: b0b6dd9d-8b9b-48a9-ba46-b9d54906e415
             canceled_at: null
             client_order_id: 52f8574c-96d5-49b6-94c1-2570a268434e
-            commision: '1.0'
+            commission: '1.0'
             created_at: '2022-02-04T16:53:29.53427917Z'
             expired_at: null
             extended_hours: false
@@ -10200,7 +10262,7 @@ components:
       description: Spinoff
       type: object
     StatusFundingEvent:
-      description: 'Represents a change in a Funding entity''s status, sent over the events streaming api. Currently, the suppported entities are: bank relationships, bank wires, transfers and funding wallets.'
+      description: 'Represents a change in a Funding entity''s status, sent over the events streaming api. Currently, the supported entities are: bank relationships, bank wires, transfers and funding wallets.'
       examples:
         - account_id: 8e00606a-c9ac-409a-ba45-f55e8f77984a
           at: '2025-04-11T19:52:24.066998Z'
@@ -10448,7 +10510,7 @@ components:
         Italy Tax ID (Codice Fiscale)
 
         - **JPN_TAX_ID**
-        Japan Tax ID (Koijin Bango)
+        Japan Tax ID (Kojin Bango)
 
         - **MEX_RFC**
         Mexico RFC
@@ -10600,10 +10662,11 @@ components:
     TokenizationIssuer:
       description: The tokenized asset's issuer
       enum:
-        - xstocks
-        - st0x
         - binance
         - coinbase
+        - ondo
+        - st0x
+        - xstocks
       example: xstocks
       title: TokenizationIssuer
       type: string
@@ -10620,10 +10683,19 @@ components:
           type: string
         client_id:
           deprecated: true
-          description: Customer's client identifier on the issuer's platform. Use `client_external_account_id` instead.
+          description: |-
+            **Deprecation notice:**
+            Use `client_external_account_id` instead.
+
+            Since: 2026-07-15
+            Sunset: 2026-10-15
+
+            ---
+
+            Customer's client identifier on the issuer's platform.
           type: string
           x-deprecation:
-            reason: Use client_external_account_id instead.
+            reason: Use `client_external_account_id` instead.
             since: '2026-07-15'
             sunset: '2026-10-15'
         network:
@@ -10703,17 +10775,18 @@ components:
     TokenizationNetwork:
       description: The token's blockchain network
       enum:
-        - solana
         - arbitrum
-        - ethereum
-        - binance
         - base
+        - binance
+        - cronos
+        - ethereum
+        - hypercore
+        - hyperevm
+        - mantle
+        - robinhood
+        - solana
         - ton
         - tron
-        - mantle
-        - cronos
-        - hyperevm
-        - robinhood
       example: solana
       title: TokenizationNetwork
       type: string
@@ -10730,10 +10803,19 @@ components:
           type: string
         client_id:
           deprecated: true
-          description: Customer's client identifier on the issuer's platform. Use `client_external_account_id` instead.
+          description: |-
+            **Deprecation notice:**
+            Use `client_external_account_id` instead.
+
+            Since: 2026-07-15
+            Sunset: 2026-10-15
+
+            ---
+
+            Customer's client identifier on the issuer's platform.
           type: string
           x-deprecation:
-            reason: Use client_external_account_id instead.
+            reason: Use `client_external_account_id` instead.
             since: '2026-07-15'
             sunset: '2026-10-15'
         issuer_request_id:
@@ -10819,7 +10901,16 @@ components:
       properties:
         account:
           deprecated: true
-          description: Alpaca account ID associated with this tokenization request. Use `client_account_id` instead.
+          description: |-
+            **Deprecation notice:**
+            Use client_account_id instead.
+
+            Since: 2026-07-15
+            Sunset: 2026-10-15
+
+            ---
+
+            Alpaca account ID associated with this tokenization request.
           type: string
           x-deprecation:
             reason: Use client_account_id instead.
@@ -10847,7 +10938,16 @@ components:
           $ref: '#/components/schemas/TokenizationIssuer'
         issuer_account:
           deprecated: true
-          description: Issuer's account ID associated with this tokenization request. Use `client_external_account_id` instead.
+          description: |-
+            **Deprecation notice:**
+            Use client_external_account_id instead.
+
+            Since: 2026-07-15
+            Sunset: 2026-10-15
+
+            ---
+
+            Issuer's account ID associated with this tokenization request.
           type: string
           x-deprecation:
             reason: Use client_external_account_id instead.
@@ -11288,45 +11388,45 @@ components:
     TradeActivity:
       properties:
         cum_qty:
-          description: Valid only for trading activity types. Null for non-trading activites.
+          description: Valid only for trading activity types. Null for non-trading activities.
           example: '0.9723'
           format: decimal
           type: string
         leaves_qty:
-          description: Valid only for trading activity types. Null for non-trading activites.
+          description: Valid only for trading activity types. Null for non-trading activities.
           example: '0.5123'
           format: decimal
           type: string
         order_id:
-          description: Valid only for trading activity types. Null for non-trading activites.
+          description: Valid only for trading activity types. Null for non-trading activities.
           example: fe060a1b-5b45-4eba-ba46-c3a3345d8255
           format: uuid
           type: string
         order_status:
           $ref: '#/components/schemas/OrderStatus'
         price:
-          description: Valid only for trading activity types. Null for non-trading activites.
+          description: Valid only for trading activity types. Null for non-trading activities.
           example: '3.1415'
           format: decimal
           type: string
         qty:
-          description: Valid only for trading activity types. Null for non-trading activites.
+          description: Valid only for trading activity types. Null for non-trading activities.
           example: '0.38921'
           format: decimal
           type: string
         side:
           $ref: '#/components/schemas/OrderSide'
         symbol:
-          description: Valid only for trading activity types. Null for non-trading activites.
+          description: Valid only for trading activity types. Null for non-trading activities.
           example: AAPL
           type: string
         transaction_time:
-          description: Valid only for trading activity types. Null for non-trading activites.
+          description: Valid only for trading activity types. Null for non-trading activities.
           example: '2021-05-10T14:01:04.650275Z'
           format: date-time
           type: string
         type:
-          description: Valid only for trading activity types. Null for non-trading activites.
+          description: Valid only for trading activity types. Null for non-trading activities.
           enum:
             - fill
             - partial_fill
@@ -11533,7 +11633,7 @@ components:
           description: Total amount of the transaction
           type: string
         balance:
-          description: Ending balance after thetransaction has been applied
+          description: Ending balance after the transaction has been applied
           type: string
         contra_account_name:
           description: Contra account of transaction
@@ -12975,8 +13075,8 @@ components:
           $ref: '#/components/schemas/coupon_type'
         cusip:
           description: CUSIP is a nine-character alphanumeric code that uniquely identifies the security
-          maxLength: 12
-          minLength: 12
+          maxLength: 9
+          minLength: 9
           pattern: ^[A-Z0-9]{9}$
           type: string
         dated_date:
@@ -13209,8 +13309,8 @@ components:
           $ref: '#/components/schemas/coupon_type'
         cusip:
           description: CUSIP is a nine-character alphanumeric code that uniquely identifies the security
-          maxLength: 12
-          minLength: 12
+          maxLength: 9
+          minLength: 9
           pattern: ^[A-Z0-9]{9}$
           type: string
         description:
@@ -14731,7 +14831,7 @@ paths:
                 type: object
           description: OK
         '422':
-          description: Onfido applicant not yet created for account. If you haven't already contacted Alapca to enable Onfido, please do so.
+          description: Onfido applicant not yet created for account. If you haven't already contacted Alpaca to enable Onfido, please do so.
       summary: Retrieve an Onfido SDK Token
       tags:
         - KYC
@@ -15923,7 +16023,7 @@ paths:
         Notes:
         * Pagination is handled using the `page_token` and `page_size` parameters.
         * `page_token` represents the ID of the end of your current page of results.
-          for example if in your first response the id of the last Activiy item returned in the array was `20220203000000000::045b3b8d-c566-4bef-b741-2bf598dd6ae7`, you'd pass that value as `page_token` to get the next page of results
+          for example if in your first response the id of the last Activity item returned in the array was `20220203000000000::045b3b8d-c566-4bef-b741-2bf598dd6ae7`, you'd pass that value as `page_token` to get the next page of results
 
         * If specified with a `direction` of `desc`, for example, the results will end before the activity with the specified ID.
         * If specified with a `direction` of `asc`, results will begin with the activity immediately after the one specified.
@@ -15994,7 +16094,7 @@ paths:
   /v1/accounts/ira_excess_contributions:
     get:
       description: Returns all overcontributed IRA accounts
-      operationId: listIRAExcessContritbutions
+      operationId: listIRAExcessContributions
       responses:
         '200':
           content:
@@ -16505,7 +16605,7 @@ paths:
           schema:
             type: string
         - description: |-
-            An emum of possible ways to use the `since` and `until` parameters to search by.
+            An enum of possible ways to use the `since` and `until` parameters to search by.
 
             the types are:
 
@@ -16648,7 +16748,7 @@ paths:
         Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn't have full support for representing SSE style responses from an API, so if you are using a generated client and don't specify a `since` and `until` there is a good chance the generated clients will hang waiting for the response to end.
 
         If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3.
-      operationId: suscribeToAccountStatusSSE
+      operationId: subscribeToAccountStatusSSE
       parameters:
         - description: 'Format: YYYY-MM-DD'
           in: query
@@ -16663,6 +16763,12 @@ paths:
             format: date
             type: string
         - deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Use since_ulid instead.
+
+            Since: 2023-08-01
+            Sunset: 2027-02-15
           in: query
           name: since_id
           schema:
@@ -16672,6 +16778,12 @@ paths:
             since: '2023-08-01'
             sunset: '2027-02-15'
         - deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Use until_ulid instead.
+
+            Since: 2023-08-01
+            Sunset: 2027-02-15
           in: query
           name: until_id
           schema:
@@ -16754,6 +16866,12 @@ paths:
             format: date
             type: string
         - deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Use since_ulid instead.
+
+            Since: 2023-08-01
+            Sunset: 2027-02-15
           in: query
           name: since_id
           schema:
@@ -16763,6 +16881,12 @@ paths:
             since: '2023-08-01'
             sunset: '2027-02-15'
         - deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Use until_ulid instead.
+
+            Since: 2023-08-01
+            Sunset: 2027-02-15
           in: query
           name: until_id
           schema:
@@ -16836,6 +16960,12 @@ paths:
             format: date
             type: string
         - deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Use since_ulid instead.
+
+            Since: 2023-08-01
+            Sunset: 2027-02-15
           in: query
           name: since_id
           schema:
@@ -16845,6 +16975,12 @@ paths:
             since: '2023-08-01'
             sunset: '2027-02-15'
         - deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Use until_ulid instead.
+
+            Since: 2023-08-01
+            Sunset: 2027-02-15
           in: query
           name: until_id
           schema:
@@ -16935,6 +17071,12 @@ paths:
             format: date
             type: string
         - deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Use since_ulid instead.
+
+            Since: 2023-08-01
+            Sunset: 2027-02-15
           in: query
           name: since_id
           schema:
@@ -16944,6 +17086,12 @@ paths:
             since: '2023-08-01'
             sunset: '2027-02-15'
         - deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Use until_ulid instead.
+
+            Since: 2023-08-01
+            Sunset: 2027-02-15
           in: query
           name: until_id
           schema:
@@ -17370,7 +17518,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/AccountLimit'
                 type: array
-          description: invidual broker account limits
+          description: individual broker account limits
         default:
           content:
             application/json:
@@ -18150,7 +18298,7 @@ paths:
           schema:
             type: integer
         - description: |-
-            The ppind(Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments,
+            The ppind (Penny Program Indicator) field indicates whether an option contract is eligible for penny price increments,
             with `true` meaning it is part of the Penny Program and `false` meaning it is not.
           example: true
           in: query
@@ -18960,7 +19108,7 @@ paths:
 
             For example, when `intraday_reporting=market_hours` and `start=2023-10-19T23:59:59-04:00`, the provided `start` date occurs outside of the regular market session. The effective `start` timestamp is adjusted to the beginning of the next session: `2023-10-20T09:30:00-04:00`
 
-            `start` may be be combined with one of `end` or `period`.
+            `start` may be combined with one of `end` or `period`.
 
             Providing all of `start`, `end`, and `period` is invalid.
           in: query
@@ -19569,7 +19717,7 @@ paths:
       description: |-
         Order estimation endpoint will display, based on user's account balance, the estimated quantity and price they will receive for their notional order.
 
-        For LCT - customer's order will include the Alpaca swap_fee, while correspondent side swap_fee is configurable in the API call. Utilising this API does not result in a real order and after the calculation - the user's buying power reverts to the previous state.
+        For LCT - customer's order will include the Alpaca swap_fee, while correspondent side swap_fee is configurable in the API call. Utilizing this API does not result in a real order and after the calculation - the user's buying power reverts to the previous state.
 
         Responses and Errors are the same as with the Orders API
 
@@ -20165,7 +20313,7 @@ paths:
         - Funding
   /v1/transfers/jit/ledgers:
     get:
-      description: Returns an array of objects that correspond to each ledger account, each of whichcontain the following attributes.
+      description: Returns an array of objects that correspond to each ledger account, each of which contains the following attributes.
       operationId: get-v1-transfers-jit-ledgers
       responses:
         '200':

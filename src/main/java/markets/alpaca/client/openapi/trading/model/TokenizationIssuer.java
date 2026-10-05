@@ -30,13 +30,15 @@ import com.google.gson.stream.JsonWriter;
 @JsonAdapter(TokenizationIssuer.Adapter.class)
 public enum TokenizationIssuer implements Serializable {
   
-  XSTOCKS("xstocks"),
+  BINANCE("binance"),
+  
+  COINBASE("coinbase"),
+  
+  ONDO("ondo"),
   
   ST0X("st0x"),
   
-  BINANCE("binance"),
-  
-  COINBASE("coinbase");
+  XSTOCKS("xstocks");
 
   private String value;
 
