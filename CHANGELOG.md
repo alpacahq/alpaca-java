@@ -88,6 +88,8 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - `BrokerSseSubscription` implements the shared subscription interface while retaining its
   Broker-specific compatibility surface. Reconnect delay caps now apply to client backoff, server
   `retry:`, and HTTP `Retry-After` values.
+- The migration codemod rewrites only a uniquely bound, bare `BrokerSseSubscription` identifier;
+  qualified, shadowed, inferred, commented, or otherwise uncertain chains are report-only.
 
 ### Fixed
 - Closing during initial connection or reconnect can no longer publish an uncancelled call after the
@@ -99,6 +101,10 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Connection deadlines now cover bounded non-success response-body reads, timeout failures retain
   their cancellation cause, and elapsed reconnect-budget expiry preserves the preceding transport
   or HTTP failure instead of starting an immediately cancelled request.
+- Established reconnect elapsed-time budgets remain active after accepted headers until event
+  delivery, including while the server sends only comments or remains silent.
+- Callback-executor rejection during reconnect and Broker single-activity timeout now always settle
+  their public futures; terminal completion settles before pre-open `opened()` continuations run.
 
 ### Behavioral compatibility and migration
 - Existing Broker listener signatures remain available. Rich callbacks delegate to the legacy

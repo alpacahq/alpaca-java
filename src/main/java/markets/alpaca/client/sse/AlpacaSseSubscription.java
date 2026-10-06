@@ -28,6 +28,10 @@ public interface AlpacaSseSubscription extends AutoCloseable {
   /**
    * Completes with the first accepted connection.
    *
+   * <p>If the subscription terminates before opening, {@link #completion()} is settled before this
+   * future is cancelled or completed exceptionally. A synchronous opening continuation may
+   * therefore safely inspect terminal completion.
+   *
    * <p>Cancelling the returned defensive copy does not close this subscription.
    */
   CompletableFuture<AlpacaSseConnectionInfo> opened();

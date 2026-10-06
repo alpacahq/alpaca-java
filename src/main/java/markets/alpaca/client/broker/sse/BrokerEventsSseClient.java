@@ -452,6 +452,7 @@ public final class BrokerEventsSseClient {
     Objects.requireNonNull(timeout, "timeout must not be null");
     var result = new CompletableFuture<ActivityEventV2>();
     var subscription = new AtomicReference<AlpacaSseSubscription>();
+    var received = new AtomicReference<ActivityEventV2>();
     AlpacaSseOptions oneEventOptions =
         sseOptions.toBuilder()
             .reconnectPolicy(AlpacaSseReconnectPolicy.disabled())
@@ -467,28 +468,32 @@ public final class BrokerEventsSseClient {
             new AlpacaSseListener<>() {
               @Override
               public void onEvent(AlpacaSseEvent<ActivityEventV2> event) {
+                received.compareAndSet(null, event.data());
                 result.complete(event.data());
                 AlpacaSseSubscription active = subscription.get();
                 if (active != null) active.close();
-              }
-
-              @Override
-              public void onFailure(Throwable failure) {
-                result.completeExceptionally(failure);
-              }
-
-              @Override
-              public void onClosed(markets.alpaca.client.sse.AlpacaSseCloseResult closeResult) {
-                if (!result.isDone()) {
-                  result.completeExceptionally(
-                      new AlpacaSseProtocolException(
-                          "Single-activity SSE response ended without an event"));
-                }
               }
             },
             callbackExecutor);
     subscription.set(opened);
     if (result.isDone()) opened.close();
+    opened
+        .completion()
+        .whenComplete(
+            (closeResult, failure) ->
+                SseTransport.executeLifecycle(
+                    () -> {
+                      ActivityEventV2 event = received.get();
+                      if (event != null) {
+                        result.complete(event);
+                      } else if (failure != null) {
+                        result.completeExceptionally(failure);
+                      } else {
+                        result.completeExceptionally(
+                            new AlpacaSseProtocolException(
+                                "Single-activity SSE response ended without an event"));
+                      }
+                    }));
     result.whenComplete(
         (ignored, failure) -> {
           if (result.isCancelled()) opened.close();

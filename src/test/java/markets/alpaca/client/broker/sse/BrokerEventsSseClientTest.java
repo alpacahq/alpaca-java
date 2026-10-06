@@ -3,22 +3,27 @@ package markets.alpaca.client.broker.sse;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import markets.alpaca.client.AlpacaClientFactory;
 import markets.alpaca.client.AlpacaCredentials;
 import markets.alpaca.client.openapi.broker.model.TradeUpdateEventV2;
+import markets.alpaca.client.sse.AlpacaSseCallbackException;
 import markets.alpaca.client.sse.AlpacaSseCloseResult;
 import markets.alpaca.client.sse.AlpacaSseDeserializationException;
 import markets.alpaca.client.sse.AlpacaSseHttpException;
 import markets.alpaca.client.sse.AlpacaSseOptions;
+import markets.alpaca.client.sse.AlpacaSseProtocolException;
 import markets.alpaca.client.sse.AlpacaSseReconnectPolicy;
 import markets.alpaca.client.sse.AlpacaSseState;
 import okhttp3.OkHttpClient;
@@ -533,6 +538,163 @@ class BrokerEventsSseClientTest {
     assertEquals(
         "/v2beta1/accounts/" + accountId + "/events/activities/01K6G000000000000000000000",
         request.getPath());
+  }
+
+  @Test
+  void getAccountActivityEventAsync_completesWhenCallbackExecutorIsBlocked() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("data: " + fillActivityJson() + "\n\n")
+            .setBodyDelay(5, TimeUnit.SECONDS));
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS, httpClient);
+    brokerClient.setBasePath(serverBasePath());
+    ExecutorService callbackExecutor = Executors.newSingleThreadExecutor();
+    var releaseExecutor = new CountDownLatch(1);
+    var executorBlocked = new CountDownLatch(1);
+    callbackExecutor.execute(
+        () -> {
+          executorBlocked.countDown();
+          try {
+            releaseExecutor.await();
+          } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+          }
+        });
+    assertTrue(executorBlocked.await(1, TimeUnit.SECONDS));
+    try {
+      var sse =
+          new BrokerEventsSseClient(
+              brokerClient, AlpacaSseOptions.reconnectDisabled(), callbackExecutor);
+      var accountId = UUID.fromString("123e4567-e89b-12d3-a456-426614174002");
+
+      var failure =
+          assertThrows(
+              ExecutionException.class,
+              () ->
+                  sse.getAccountActivityEventAsync(
+                          accountId, "01K6G000000000000000000000", Duration.ofMillis(100))
+                      .get(2, TimeUnit.SECONDS));
+
+      assertInstanceOf(SocketTimeoutException.class, failure.getCause());
+    } finally {
+      releaseExecutor.countDown();
+      callbackExecutor.shutdownNow();
+    }
+  }
+
+  @Test
+  void getAccountActivityEventAsync_emptyResponseFailsWithProtocolError() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody(""));
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS, httpClient);
+    brokerClient.setBasePath(serverBasePath());
+    var sse = new BrokerEventsSseClient(brokerClient);
+
+    var failure =
+        assertThrows(
+            ExecutionException.class,
+            () ->
+                sse.getAccountActivityEventAsync(
+                        UUID.fromString("123e4567-e89b-12d3-a456-426614174002"),
+                        "01K6G000000000000000000000")
+                    .get(2, TimeUnit.SECONDS));
+
+    assertInstanceOf(AlpacaSseProtocolException.class, failure.getCause());
+  }
+
+  @Test
+  void getAccountActivityEventAsync_httpFailureCompletesResult() throws Exception {
+    server.enqueue(new MockResponse().setResponseCode(404).setBody("missing"));
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS, httpClient);
+    brokerClient.setBasePath(serverBasePath());
+    var sse = new BrokerEventsSseClient(brokerClient);
+
+    var failure =
+        assertThrows(
+            ExecutionException.class,
+            () ->
+                sse.getAccountActivityEventAsync(
+                        UUID.fromString("123e4567-e89b-12d3-a456-426614174002"),
+                        "01K6G000000000000000000000")
+                    .get(2, TimeUnit.SECONDS));
+
+    var httpFailure = assertInstanceOf(AlpacaSseHttpException.class, failure.getCause());
+    assertEquals(404, httpFailure.statusCode());
+  }
+
+  @Test
+  void getAccountActivityEventAsync_callbackRejectionCompletesResult() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("data: " + fillActivityJson() + "\n\n"));
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS, httpClient);
+    brokerClient.setBasePath(serverBasePath());
+    var sse =
+        new BrokerEventsSseClient(
+            brokerClient,
+            AlpacaSseOptions.reconnectDisabled(),
+            command -> {
+              throw new RejectedExecutionException("rejected callback");
+            });
+
+    var failure =
+        assertThrows(
+            ExecutionException.class,
+            () ->
+                sse.getAccountActivityEventAsync(
+                        UUID.fromString("123e4567-e89b-12d3-a456-426614174002"),
+                        "01K6G000000000000000000000")
+                    .get(2, TimeUnit.SECONDS));
+
+    assertInstanceOf(AlpacaSseCallbackException.class, failure.getCause());
+  }
+
+  @Test
+  void getAccountActivityEventAsync_cancellationRemainsCancellation() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("data: " + fillActivityJson() + "\n\n")
+            .setBodyDelay(5, TimeUnit.SECONDS));
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS, httpClient);
+    brokerClient.setBasePath(serverBasePath());
+    var sse = new BrokerEventsSseClient(brokerClient);
+    var result =
+        sse.getAccountActivityEventAsync(
+            UUID.fromString("123e4567-e89b-12d3-a456-426614174002"), "01K6G000000000000000000000");
+
+    assertTrue(result.cancel(true));
+    assertTrue(result.isCancelled());
+  }
+
+  @Test
+  void getAccountActivityEventAsync_eventBeforeTimeoutWins() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("data: " + fillActivityJson() + "\n\n")
+            .setBodyDelay(50, TimeUnit.MILLISECONDS));
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS, httpClient);
+    brokerClient.setBasePath(serverBasePath());
+    var sse = new BrokerEventsSseClient(brokerClient);
+
+    var event =
+        sse.getAccountActivityEventAsync(
+                UUID.fromString("123e4567-e89b-12d3-a456-426614174002"),
+                "01K6G000000000000000000000",
+                Duration.ofMillis(300))
+            .get(2, TimeUnit.SECONDS);
+
+    assertEquals("FILL", event.getActivityType());
   }
 
   private String serverBasePath() {

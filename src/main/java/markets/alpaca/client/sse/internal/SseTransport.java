@@ -66,6 +66,16 @@ public final class SseTransport {
 
   private SseTransport() {}
 
+  /**
+   * Runs transport-lifecycle work independently of user callback executors.
+   *
+   * <p>This is for handwritten SSE adapters that must observe terminal transport state even when a
+   * user-provided callback executor is blocked or rejects work.
+   */
+  public static void executeLifecycle(Runnable action) {
+    LIFECYCLE_EXECUTOR.execute(Objects.requireNonNull(action, "action must not be null"));
+  }
+
   public static <T> AlpacaSseSubscription open(
       OkHttpClient httpClient,
       Request request,
@@ -233,8 +243,11 @@ public final class SseTransport {
     private ScheduledFuture<?> idleTimeout;
     private ScheduledFuture<?> durationTimeout;
     private ScheduledFuture<?> reconnectTask;
+    private ScheduledFuture<?> reconnectDeadline;
     private Call timedOutCall;
     private long idleTimeoutGeneration;
+    private long reconnectDeadlineGeneration;
+    private Throwable reconnectDeadlineFailure;
     private volatile boolean terminal;
 
     Session(
@@ -548,7 +561,12 @@ public final class SseTransport {
         boolean established = hasOpened;
         long now = nanoTime.getAsLong();
         if (established) {
-          if (reconnectCycleStartedNanos == 0) reconnectCycleStartedNanos = now;
+          if (reconnectCycleStartedNanos == 0) {
+            reconnectCycleStartedNanos = now;
+            startReconnectDeadlineLocked(failure);
+          } else {
+            reconnectDeadlineFailure = failure;
+          }
         } else if (initialCycleStartedNanos == 0) {
           initialCycleStartedNanos = now;
         }
@@ -575,8 +593,13 @@ public final class SseTransport {
       }
       int callbackAttempt = attempt;
       Duration callbackDelay = delay;
-      if (!dispatchNonTerminal(
-          "onReconnecting", () -> listener.onReconnecting(callbackAttempt, callbackDelay))) {
+      try {
+        if (!dispatchNonTerminal(
+            "onReconnecting", () -> listener.onReconnecting(callbackAttempt, callbackDelay))) {
+          return;
+        }
+      } catch (AlpacaSseCallbackException callbackFailure) {
+        fail(callbackFailure);
         return;
       }
       synchronized (lifecycleLock) {
@@ -592,6 +615,34 @@ public final class SseTransport {
     private Duration capReconnectDelay(Duration delay) {
       Duration maximum = options.reconnectPolicy().maxBackoff();
       return delay.compareTo(maximum) > 0 ? maximum : delay;
+    }
+
+    private void startReconnectDeadlineLocked(Throwable precedingFailure) {
+      Duration maximum = options.reconnectPolicy().maxElapsedTime();
+      if (maximum == null) return;
+      reconnectDeadlineFailure = precedingFailure;
+      long generation = ++reconnectDeadlineGeneration;
+      reconnectDeadline =
+          scheduler.schedule(
+              () -> LIFECYCLE_EXECUTOR.execute(() -> failReconnectDeadline(generation)),
+              durationToNanos(maximum),
+              TimeUnit.NANOSECONDS);
+    }
+
+    private void failReconnectDeadline(long expectedGeneration) {
+      Throwable failure;
+      synchronized (lifecycleLock) {
+        if (terminal
+            || reconnectCycleStartedNanos == 0
+            || reconnectDeadlineGeneration != expectedGeneration) {
+          return;
+        }
+        failure = reconnectDeadlineFailure;
+      }
+      if (failure == null) {
+        failure = new SocketTimeoutException("SSE reconnect elapsed-time budget exhausted");
+      }
+      fail(failure, null, expectedGeneration);
     }
 
     private AlpacaSseHttpException httpFailure(Response response) throws IOException {
@@ -699,6 +750,7 @@ public final class SseTransport {
         cancelActiveWorkLocked();
         state.set(AlpacaSseState.CLOSED);
       }
+      completion.complete(result);
       if (!openedFuture.isDone()) {
         if (result.reason() == AlpacaSseCloseResult.Reason.USER_CLOSED) {
           openedFuture.cancel(false);
@@ -707,31 +759,34 @@ public final class SseTransport {
               new AlpacaSseException("SSE subscription closed before opening: " + result.reason()));
         }
       }
-      completion.complete(result);
       enqueueTerminal("onClosed", () -> listener.onClosed(result));
     }
 
     private void fail(Throwable failure) {
-      fail(failure, null);
+      fail(failure, null, null);
     }
 
     private void failIdleTimeout(long expectedGeneration, Throwable failure) {
-      fail(failure, expectedGeneration);
+      fail(failure, expectedGeneration, null);
     }
 
-    private void fail(Throwable failure, Long expectedIdleGeneration) {
+    private void fail(
+        Throwable failure, Long expectedIdleGeneration, Long expectedReconnectGeneration) {
       synchronized (lifecycleLock) {
         if (terminal
             || (expectedIdleGeneration != null
-                && idleTimeoutGeneration != expectedIdleGeneration.longValue())) {
+                && idleTimeoutGeneration != expectedIdleGeneration.longValue())
+            || (expectedReconnectGeneration != null
+                && (reconnectCycleStartedNanos == 0
+                    || reconnectDeadlineGeneration != expectedReconnectGeneration.longValue()))) {
           return;
         }
         terminal = true;
         cancelActiveWorkLocked();
         state.set(AlpacaSseState.FAILED);
       }
-      openedFuture.completeExceptionally(failure);
       completion.completeExceptionally(failure);
+      openedFuture.completeExceptionally(failure);
       enqueueTerminal("onFailure", () -> listener.onFailure(failure));
     }
 
@@ -748,6 +803,10 @@ public final class SseTransport {
       durationTimeout = null;
       cancel(reconnectTask);
       reconnectTask = null;
+      cancel(reconnectDeadline);
+      reconnectDeadline = null;
+      reconnectDeadlineFailure = null;
+      reconnectDeadlineGeneration++;
     }
 
     private boolean isCurrent(Call expectedCall) {
@@ -766,17 +825,25 @@ public final class SseTransport {
     private void commitDeliveredEvent(String id) {
       lastEventId.set(id == null || id.isEmpty() ? null : id);
       synchronized (lifecycleLock) {
-        reconnectAttempt = 0;
-        reconnectCycleStartedNanos = 0;
+        resetReconnectCycleLocked();
       }
     }
 
     private void commitDecodedEventId(String id) {
       lastEventId.set(id == null || id.isEmpty() ? null : id);
       synchronized (lifecycleLock) {
-        reconnectAttempt = 0;
-        reconnectCycleStartedNanos = 0;
+        resetReconnectCycleLocked();
       }
+    }
+
+    private void resetReconnectCycleLocked() {
+      if (terminal) return;
+      reconnectAttempt = 0;
+      reconnectCycleStartedNanos = 0;
+      cancel(reconnectDeadline);
+      reconnectDeadline = null;
+      reconnectDeadlineFailure = null;
+      reconnectDeadlineGeneration++;
     }
 
     private boolean budgetAllowsDelayLocked(boolean established, Duration delay) {
@@ -945,6 +1012,14 @@ public final class SseTransport {
 
     private static void cancel(ScheduledFuture<?> future) {
       if (future != null) future.cancel(false);
+    }
+
+    private static long durationToNanos(Duration duration) {
+      try {
+        return duration.toNanos();
+      } catch (ArithmeticException overflow) {
+        return Long.MAX_VALUE;
+      }
     }
   }
 }
