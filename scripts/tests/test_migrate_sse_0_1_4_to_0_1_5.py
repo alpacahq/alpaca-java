@@ -92,6 +92,126 @@ class AnalysisTests(unittest.TestCase):
                 self.assertEqual(source, result.text)
                 self.assertIn("SSE001", [finding.code for finding in result.findings])
 
+    def test_rewrites_unique_fully_qualified_receiver_without_import(self):
+        source = (
+            "class Example {\n"
+            "  void close(\n"
+            "      markets.alpaca.client.broker.sse.BrokerSseSubscription subscription) {\n"
+            "    subscription.eventSource().cancel();\n"
+            "  }\n"
+            "}\n"
+        )
+
+        result = migrate.analyze_text(source)
+
+        self.assertIn("subscription.close();", result.text)
+        self.assertEqual(["SSE000"], [finding.code for finding in result.findings])
+
+    def test_does_not_treat_subscription_return_method_as_a_binder(self):
+        source = (
+            IMPORT
+            + "class Example {\n"
+            + "  BrokerSseSubscription subscription() { return null; }\n"
+            + "  void close() { subscription.eventSource().cancel(); }\n"
+            + "}\n"
+        )
+
+        result = migrate.analyze_text(source)
+
+        self.assertEqual(source, result.text)
+        self.assertIn("SSE001", [finding.code for finding in result.findings])
+
+    def test_reports_shadowed_or_qualified_receivers_without_rewriting(self):
+        sources = (
+            (
+                IMPORT
+                + "class Example {\n"
+                + "  BrokerSseSubscription subscription;\n"
+                + "  void close(String subscription) {\n"
+                + "    subscription.eventSource().cancel();\n"
+                + "  }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
+                + "class Example {\n"
+                + "  BrokerSseSubscription subscription;\n"
+                + "  void close(Example other) {\n"
+                + "    other.subscription.eventSource().cancel();\n"
+                + "  }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
+                + "class Example {\n"
+                + "  BrokerSseSubscription subscription;\n"
+                + "  void close() { this.subscription.eventSource().cancel(); }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
+                + "class Example {\n"
+                + "  BrokerSseSubscription subscription;\n"
+                + "  void consume(java.util.function.Consumer<Object> consumer) {\n"
+                + "    consumer.accept(subscription -> subscription);\n"
+                + "    subscription.eventSource().cancel();\n"
+                + "  }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
+                + "class Example {\n"
+                + "  BrokerSseSubscription subscription;\n"
+                + "  void close() {\n"
+                + "    try { run(); } catch (Exception subscription) { run(); }\n"
+                + "    subscription.eventSource().cancel();\n"
+                + "  }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
+                + "class Example {\n"
+                + "  BrokerSseSubscription subscription;\n"
+                + "  void close(java.util.List<String> values) {\n"
+                + "    for (String subscription : values) { run(); }\n"
+                + "    subscription.eventSource().cancel();\n"
+                + "  }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
+                + "class Example {\n"
+                + "  BrokerSseSubscription subscription;\n"
+                + "  class Nested {\n"
+                + "    BrokerSseSubscription subscription;\n"
+                + "  }\n"
+                + "  void close() { subscription.eventSource().cancel(); }\n"
+                + "}\n"
+            ),
+        )
+
+        for source in sources:
+            with self.subTest(source=source):
+                result = migrate.analyze_text(source)
+                self.assertEqual(source, result.text)
+                self.assertIn("SSE001", [finding.code for finding in result.findings])
+
+    def test_reports_comment_inside_cancel_chain_without_rewriting(self):
+        source = (
+            IMPORT
+            + "class Example {\n"
+            + "  BrokerSseSubscription subscription;\n"
+            + "  void close() {\n"
+            + "    subscription./* keep this explanation */eventSource().cancel();\n"
+            + "  }\n"
+            + "}\n"
+        )
+
+        result = migrate.analyze_text(source)
+
+        self.assertEqual(source, result.text)
+        self.assertIn("SSE001", [finding.code for finding in result.findings])
+
     def test_ignores_lookalikes_in_comments_and_literals(self):
         source = (
             IMPORT
