@@ -243,10 +243,13 @@ public final class SseTransport {
     private ScheduledFuture<?> idleTimeout;
     private ScheduledFuture<?> durationTimeout;
     private ScheduledFuture<?> reconnectTask;
+    private ScheduledFuture<?> initialDeadline;
     private ScheduledFuture<?> reconnectDeadline;
     private Call timedOutCall;
     private long idleTimeoutGeneration;
+    private long initialDeadlineGeneration;
     private long reconnectDeadlineGeneration;
+    private Throwable initialDeadlineFailure;
     private Throwable reconnectDeadlineFailure;
     private volatile boolean terminal;
 
@@ -265,6 +268,7 @@ public final class SseTransport {
       this.httpClient =
           Objects.requireNonNull(httpClient, "httpClient must not be null")
               .newBuilder()
+              .callTimeout(Duration.ZERO)
               .readTimeout(Duration.ZERO)
               .retryOnConnectionFailure(false)
               .build();
@@ -287,6 +291,7 @@ public final class SseTransport {
       synchronized (lifecycleLock) {
         if (terminal) return;
         initialCycleStartedNanos = nanoTime.getAsLong();
+        startInitialDeadlineLocked();
         if (options.maxDuration() != null) {
           durationTimeout =
               scheduler.schedule(
@@ -416,9 +421,10 @@ public final class SseTransport {
           reconnect = hasOpened;
           connection.set(connectionInfo);
           hasOpened = true;
-          if (!reconnect) initialCycleStartedNanos = 0;
+          if (!reconnect) completeInitialCycleLocked();
           state.set(AlpacaSseState.OPEN);
         }
+        resetIdleTimeout();
         if (!reconnect) openedFuture.complete(connectionInfo);
         dispatchNonTerminal(
             reconnect ? "onReconnected" : "onOpen",
@@ -567,8 +573,12 @@ public final class SseTransport {
           } else {
             reconnectDeadlineFailure = failure;
           }
-        } else if (initialCycleStartedNanos == 0) {
-          initialCycleStartedNanos = now;
+        } else {
+          if (initialCycleStartedNanos == 0) {
+            initialCycleStartedNanos = now;
+            startInitialDeadlineLocked();
+          }
+          initialDeadlineFailure = failure;
         }
         attempt = established ? ++reconnectAttempt : ++initialAttempt;
         Duration candidateDelay =
@@ -617,6 +627,33 @@ public final class SseTransport {
       return delay.compareTo(maximum) > 0 ? maximum : delay;
     }
 
+    private void startInitialDeadlineLocked() {
+      Duration maximum = options.reconnectPolicy().maxElapsedTime();
+      if (maximum == null) return;
+      long generation = ++initialDeadlineGeneration;
+      initialDeadline =
+          scheduler.schedule(
+              () -> LIFECYCLE_EXECUTOR.execute(() -> failInitialDeadline(generation)),
+              durationToNanos(maximum),
+              TimeUnit.NANOSECONDS);
+    }
+
+    private void failInitialDeadline(long expectedGeneration) {
+      Throwable failure;
+      synchronized (lifecycleLock) {
+        if (terminal
+            || initialCycleStartedNanos == 0
+            || initialDeadlineGeneration != expectedGeneration) {
+          return;
+        }
+        failure = initialDeadlineFailure;
+      }
+      if (failure == null) {
+        failure = new SocketTimeoutException("SSE initial elapsed-time budget exhausted");
+      }
+      fail(failure, null, null, expectedGeneration);
+    }
+
     private void startReconnectDeadlineLocked(Throwable precedingFailure) {
       Duration maximum = options.reconnectPolicy().maxElapsedTime();
       if (maximum == null) return;
@@ -642,7 +679,7 @@ public final class SseTransport {
       if (failure == null) {
         failure = new SocketTimeoutException("SSE reconnect elapsed-time budget exhausted");
       }
-      fail(failure, null, expectedGeneration);
+      fail(failure, null, expectedGeneration, null);
     }
 
     private AlpacaSseHttpException httpFailure(Response response) throws IOException {
@@ -763,22 +800,28 @@ public final class SseTransport {
     }
 
     private void fail(Throwable failure) {
-      fail(failure, null, null);
+      fail(failure, null, null, null);
     }
 
     private void failIdleTimeout(long expectedGeneration, Throwable failure) {
-      fail(failure, expectedGeneration, null);
+      fail(failure, expectedGeneration, null, null);
     }
 
     private void fail(
-        Throwable failure, Long expectedIdleGeneration, Long expectedReconnectGeneration) {
+        Throwable failure,
+        Long expectedIdleGeneration,
+        Long expectedReconnectGeneration,
+        Long expectedInitialGeneration) {
       synchronized (lifecycleLock) {
         if (terminal
             || (expectedIdleGeneration != null
                 && idleTimeoutGeneration != expectedIdleGeneration.longValue())
             || (expectedReconnectGeneration != null
                 && (reconnectCycleStartedNanos == 0
-                    || reconnectDeadlineGeneration != expectedReconnectGeneration.longValue()))) {
+                    || reconnectDeadlineGeneration != expectedReconnectGeneration.longValue()))
+            || (expectedInitialGeneration != null
+                && (initialCycleStartedNanos == 0
+                    || initialDeadlineGeneration != expectedInitialGeneration.longValue()))) {
           return;
         }
         terminal = true;
@@ -803,6 +846,10 @@ public final class SseTransport {
       durationTimeout = null;
       cancel(reconnectTask);
       reconnectTask = null;
+      cancel(initialDeadline);
+      initialDeadline = null;
+      initialDeadlineFailure = null;
+      initialDeadlineGeneration++;
       cancel(reconnectDeadline);
       reconnectDeadline = null;
       reconnectDeadlineFailure = null;
@@ -823,21 +870,28 @@ public final class SseTransport {
     }
 
     private void commitDeliveredEvent(String id) {
-      lastEventId.set(id == null || id.isEmpty() ? null : id);
       synchronized (lifecycleLock) {
-        resetReconnectCycleLocked();
+        lastEventId.set(id == null || id.isEmpty() ? null : id);
+        if (!terminal) resetReconnectCycleLocked();
       }
     }
 
     private void commitDecodedEventId(String id) {
-      lastEventId.set(id == null || id.isEmpty() ? null : id);
       synchronized (lifecycleLock) {
-        resetReconnectCycleLocked();
+        lastEventId.set(id == null || id.isEmpty() ? null : id);
+        if (!terminal) resetReconnectCycleLocked();
       }
     }
 
+    private void completeInitialCycleLocked() {
+      initialCycleStartedNanos = 0;
+      cancel(initialDeadline);
+      initialDeadline = null;
+      initialDeadlineFailure = null;
+      initialDeadlineGeneration++;
+    }
+
     private void resetReconnectCycleLocked() {
-      if (terminal) return;
       reconnectAttempt = 0;
       reconnectCycleStartedNanos = 0;
       cancel(reconnectDeadline);

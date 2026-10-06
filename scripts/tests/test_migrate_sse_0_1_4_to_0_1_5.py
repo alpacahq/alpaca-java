@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
 from pathlib import Path
@@ -212,6 +212,23 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(source, result.text)
         self.assertIn("SSE001", [finding.code for finding in result.findings])
 
+    def test_reports_nested_same_name_type_without_rewriting(self):
+        source = (
+            IMPORT
+            + "class Example {\n"
+            + "  static class BrokerSseSubscription {\n"
+            + "    Source eventSource() { return null; }\n"
+            + "  }\n"
+            + "  BrokerSseSubscription subscription;\n"
+            + "  void close() { subscription.eventSource().cancel(); }\n"
+            + "}\n"
+        )
+
+        result = migrate.analyze_text(source)
+
+        self.assertEqual(source, result.text)
+        self.assertIn("SSE001", [finding.code for finding in result.findings])
+
     def test_ignores_lookalikes_in_comments_and_literals(self):
         source = (
             IMPORT
@@ -283,6 +300,12 @@ class CliTests(unittest.TestCase):
             with redirect_stdout(io.StringIO()):
                 self.assertEqual(0, migrate.main(["--write", str(path)]))
             self.assertIn("subscription.close()", path.read_text(encoding="utf-8"))
+
+    def test_missing_input_path_fails_closed(self):
+        with redirect_stderr(io.StringIO()):
+            exit_code = migrate.main(["--check", "/definitely/missing/source"])
+
+        self.assertEqual(2, exit_code)
 
 
 if __name__ == "__main__":

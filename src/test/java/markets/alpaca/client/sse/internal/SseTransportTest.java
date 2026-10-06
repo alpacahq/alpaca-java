@@ -419,6 +419,77 @@ class SseTransportTest {
   }
 
   @Test
+  void idleTimeoutRunsWhileOpenCallbackIsBlocked() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("data: late\n\n")
+            .setBodyDelay(5, TimeUnit.SECONDS));
+    var callbackEntered = new CountDownLatch(1);
+    var releaseCallback = new CountDownLatch(1);
+    var options =
+        AlpacaSseOptions.reconnectDisabled().toBuilder()
+            .idleTimeout(Duration.ofMillis(100))
+            .build();
+
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            options,
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onOpen() {
+                callbackEntered.countDown();
+                try {
+                  releaseCallback.await();
+                } catch (InterruptedException failure) {
+                  Thread.currentThread().interrupt();
+                }
+              }
+            });
+
+    try {
+      subscription.opened().get(1, TimeUnit.SECONDS);
+      assertTrue(callbackEntered.await(1, TimeUnit.SECONDS));
+      var failure =
+          assertThrows(
+              ExecutionException.class, () -> subscription.completion().get(1, TimeUnit.SECONDS));
+      assertInstanceOf(SocketTimeoutException.class, failure.getCause());
+    } finally {
+      releaseCallback.countDown();
+    }
+  }
+
+  @Test
+  void inheritedCallTimeoutDoesNotLimitAnAcceptedStream() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody(": keepalive\n\n".repeat(100))
+            .throttleBody(1, 10, TimeUnit.MILLISECONDS));
+    OkHttpClient clientWithCallTimeout =
+        httpClient.newBuilder().callTimeout(Duration.ofMillis(100)).build();
+
+    var subscription =
+        SseTransport.open(
+            clientWithCallTimeout,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {});
+
+    subscription.opened().get(1, TimeUnit.SECONDS);
+    assertThrows(
+        TimeoutException.class, () -> subscription.completion().get(300, TimeUnit.MILLISECONDS));
+    assertEquals(AlpacaSseState.OPEN, subscription.state());
+    subscription.close();
+  }
+
+  @Test
   void finiteEstablishedRetryBudgetExhaustsOnRepeatedEmptyConnections() throws Exception {
     for (int i = 0; i < 3; i++) {
       server.enqueue(new MockResponse().setHeader("Content-Type", "text/event-stream").setBody(""));
@@ -1056,6 +1127,51 @@ class SseTransportTest {
     assertThrows(
         ExecutionException.class, () -> subscription.completion().get(2, TimeUnit.SECONDS));
     assertEquals(1, server.getRequestCount());
+  }
+
+  @Test
+  void initialElapsedBudgetRunsWhileReconnectingCallbackIsBlocked() throws Exception {
+    server.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
+    var callbackEntered = new CountDownLatch(1);
+    var releaseCallback = new CountDownLatch(1);
+    var options =
+        AlpacaSseOptions.builder()
+            .reconnectPolicy(
+                AlpacaSseReconnectPolicy.builder()
+                    .maxElapsedTime(Duration.ofMillis(100))
+                    .initialBackoff(Duration.ofMillis(1))
+                    .maxBackoff(Duration.ofMillis(1))
+                    .jitterRatio(0)
+                    .build())
+            .build();
+
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            options,
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onReconnecting(int attempt, Duration delay) {
+                callbackEntered.countDown();
+                try {
+                  releaseCallback.await();
+                } catch (InterruptedException failure) {
+                  Thread.currentThread().interrupt();
+                }
+              }
+            });
+
+    try {
+      assertTrue(callbackEntered.await(1, TimeUnit.SECONDS));
+      assertThrows(
+          ExecutionException.class, () -> subscription.completion().get(1, TimeUnit.SECONDS));
+      assertEquals(AlpacaSseState.FAILED, subscription.state());
+    } finally {
+      releaseCallback.countDown();
+    }
   }
 
   @Test
