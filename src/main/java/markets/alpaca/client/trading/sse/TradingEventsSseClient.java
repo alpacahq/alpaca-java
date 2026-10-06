@@ -84,17 +84,16 @@ public final class TradingEventsSseClient {
   }
 
   private static Request withResumeCursor(Request request, String eventId) {
-    Request.Builder requestBuilder = request.newBuilder();
+    Request resumedRequest = SseTransport.withLastEventIdHeader(request, eventId);
     if (eventId == null || eventId.isEmpty()) {
-      return requestBuilder.removeHeader("Last-Event-ID").build();
+      return resumedRequest;
     }
-    requestBuilder.header("Last-Event-ID", eventId);
 
     boolean boundedByDate =
         request.url().queryParameter("until") != null
             && request.url().queryParameter("until_id") == null;
     if (boundedByDate) {
-      return requestBuilder.build();
+      return resumedRequest;
     }
 
     var url =
@@ -104,6 +103,6 @@ public final class TradingEventsSseClient {
             .removeAllQueryParameters("since")
             .setQueryParameter("since_id", eventId)
             .build();
-    return requestBuilder.url(url).build();
+    return resumedRequest.newBuilder().url(url).build();
   }
 }

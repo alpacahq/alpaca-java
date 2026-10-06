@@ -44,12 +44,16 @@ python3 scripts/migrate_sse_0_1_4_to_0_1_5.py --check --json src/main/java
 ```
 
 The tool rewrites only a bare identifier receiver with exactly one explicit
-`BrokerSseSubscription` declaration in the file, recognized through either the exact import or the
-fully qualified class name. The same identifier must have no other detected binder anywhere in the
-file. It reports `SSE001` and leaves unchanged qualified or chained access (`this.subscription` or
-`other.subscription`), shadowed names or same-named local/nested types, `var`, inferred lambda
-parameters, comments inside the call chain, and any declaration it cannot prove unique. It also
-reports ambiguous imports,
+`BrokerSseSubscription` declaration in the file and in the call's lexical scope, recognized through
+either the exact import or the fully qualified class name. Automatic rewrites are limited to
+parameters and local variables; fields are report-only because a text scanner cannot safely resolve
+inheritance and member lookup. The same identifier must have no other detected binder anywhere in
+the file. It reports `SSE001` and leaves unchanged qualified or chained access
+(`this.subscription` or `other.subscription`), fields, out-of-scope declarations, shadowed names or
+same-named local/nested types, `var`, lambda parameters, comments inside the call chain, and any
+declaration it cannot prove unique. Control-flow header declarations are also report-only because
+an unbraced statement's scope cannot be established safely by this text scanner. It also reports
+ambiguous imports,
 `EventSource` casts/identity assumptions, raw Gson exception checks, deep OkHttp `Response` use,
 blocking callbacks, generated SSE calls, and listeners overriding both rich and legacy callbacks.
 These deliberate false negatives keep `--write` source-safe; migrate `SSE001` findings manually.
@@ -153,6 +157,12 @@ Lifecycle completion is deliberately separate from listener delivery:
 - terminal listener delivery remains ordered after callbacks that were already admitted;
 - no event, comment, retry, or reconnect callback is admitted after the terminal transition.
 
+Terminal callbacks that are not already queued behind an active subscription callback are started
+through a bounded SDK dispatcher. If that dispatcher is saturated by blocked terminal callbacks,
+the SDK preserves the already-settled lifecycle result, rejects the pending listener delivery, and
+logs a warning. Keep callbacks non-blocking or supply an application-owned executor; lifecycle
+futures are the authoritative termination signal.
+
 A listener `RuntimeException` is logged and considered an application error, not a transport
 failure. The event is considered delivered and its resume ID advances. An executor rejection is a
 terminal `AlpacaSseCallbackException`. Persist work transactionally and deduplicate by event ID
@@ -194,6 +204,18 @@ var brokerSubscription =
 See [Streaming & Events](./streaming) for all stream types and [Broker](./broker) for Broker
 endpoint-specific examples.
 
+## Review generated validation changes
+
+The `0.1.5` generated models enforce two newly required payload fields:
+
+- Broker and Trading `OptionContract` requires `ppind`;
+- Broker and Trading `CommonFixedIncomeInterestActivityV2` requires `interest_type`.
+
+Update stored JSON, fixtures, mocks, and custom integrations before upgrading. Generated
+`validateJsonElement` methods reject payloads that omit these fields even when application code does
+not read them. See the complete generated-symbol list in the repository
+[`MIGRATIONS.md`](https://github.com/alpacahq/alpaca-java/blob/main/MIGRATIONS.md).
+
 ## Migration checklist
 
 - Replace `eventSource().cancel()` with `close()`.
@@ -203,6 +225,7 @@ endpoint-specific examples.
 - Move blocking callback work to an application-owned executor.
 - Confirm listener exceptions may advance the resume cursor.
 - Replace generated blocking SSE methods.
+- Add `ppind` and `interest_type` to affected stored or mocked generated-model payloads.
 - Select the Market Data corporate-actions stream environment explicitly when production is not
   appropriate.
 - Test reconnect/replay behavior and deduplicate by event ID.

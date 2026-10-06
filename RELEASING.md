@@ -43,8 +43,10 @@ all NMCP snapshot tasks. Use these commands rather than lower-level publishing t
 
 After a successful current `main` push, the Build workflow publishes the version in
 `gradle.properties` when it ends in `-SNAPSHOT`. It freezes the committed OpenAPI pins under
-`specs/`, builds from read-only copies, rechecks `main`, then publishes those same copies. Pull
-requests, non-`main` pushes, failed builds, and stale commits never publish.
+`specs/`, builds from read-only copies, checks that exact JAR against the published compatibility
+baseline, rechecks `main`, then publishes those same copies. Pull-request CI also runs the
+compatibility task. Pull requests, non-`main` pushes, failed builds, incompatible JARs, and stale
+commits never publish.
 
 ## Pre-tag verification
 

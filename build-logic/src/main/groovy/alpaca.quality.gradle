@@ -44,7 +44,9 @@ def reviewedApiCompatibilityExclusions = [
     'markets.alpaca.client.openapi.trading.model.Assets#easyToBorrow(java.lang.Boolean)',
     'markets.alpaca.client.openapi.trading.model.Assets#getEasyToBorrow()',
     'markets.alpaca.client.openapi.trading.model.Assets#setEasyToBorrow(java.lang.Boolean)',
-    'markets.alpaca.client.openapi.trading.model.PositionClosedReponse*',
+    'markets.alpaca.client.openapi.trading.model.PositionClosedReponse',
+    'markets.alpaca.client.openapi.trading.model.PositionClosedReponse$CustomTypeAdapterFactory',
+    'markets.alpaca.client.openapi.trading.model.PositionClosedReponse$CustomTypeAdapterFactory$1',
 ]
 def apiCompatibilityTool = configurations.create('apiCompatibilityTool') {
     canBeConsumed = false

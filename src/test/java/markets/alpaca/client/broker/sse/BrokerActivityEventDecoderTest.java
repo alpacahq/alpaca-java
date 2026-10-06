@@ -39,7 +39,34 @@ class BrokerActivityEventDecoderTest {
   void discriminatesStructurallyOverlappingDividendDetails() throws Exception {
     assertDividend("DIV", "CDIV", CDIVActivityV2.class, dividendDetails(true));
     assertDividend("DIV", "SPD", DIVSPDActivityV2.class, dividendDetails(true));
+    assertDividend("DIVROC", null, CDIVActivityV2.class, dividendDetails(true));
     assertDividend("CGD", "LTCG", CGDActivityV2.class, dividendDetails(false));
+  }
+
+  @Test
+  void preservesUnknownEnvelopePropertiesUsingGeneratedValueShapes() throws Exception {
+    var event =
+        decoder.decode(
+            eventJson(
+                "FILL",
+                null,
+                "{}",
+                """
+                "future_string":"value",
+                "future_number":12.5,
+                "future_boolean":true,
+                "future_array":["a",2],
+                "future_object":{"nested":"value"},
+                "future_null":null,
+                """));
+
+    assertEquals("value", event.getAdditionalProperty("future_string"));
+    assertEquals(12.5, ((Number) event.getAdditionalProperty("future_number")).doubleValue());
+    assertEquals(true, event.getAdditionalProperty("future_boolean"));
+    assertInstanceOf(java.util.List.class, event.getAdditionalProperty("future_array"));
+    assertInstanceOf(java.util.Map.class, event.getAdditionalProperty("future_object"));
+    assertTrue(event.getAdditionalProperties().containsKey("future_null"));
+    assertNull(event.getAdditionalProperty("future_null"));
   }
 
   @Test
@@ -108,9 +135,15 @@ class BrokerActivityEventDecoderTest {
   }
 
   private static String eventJson(String type, String subtype, String details) {
+    return eventJson(type, subtype, details, "");
+  }
+
+  private static String eventJson(
+      String type, String subtype, String details, String additionalFields) {
     String subtypeField = subtype == null ? "" : "\"activity_subtype\":\"" + subtype + "\",";
     return """
         {
+          %s
           %s
           "account_id":"123e4567-e89b-12d3-a456-426614174002",
           "activity_type":"%s",
@@ -124,6 +157,6 @@ class BrokerActivityEventDecoderTest {
           "details":%s
         }
         """
-        .formatted(subtypeField, type, details);
+        .formatted(subtypeField, additionalFields, type, details);
   }
 }

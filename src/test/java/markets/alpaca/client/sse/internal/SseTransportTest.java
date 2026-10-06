@@ -11,9 +11,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -98,6 +102,105 @@ class SseTransportTest {
     assertNull(server.takeRequest().getHeader("Last-Event-ID"));
     assertEquals("evt-1", server.takeRequest().getHeader("Last-Event-ID"));
     assertEquals(java.util.List.of("first", "second"), events);
+  }
+
+  @Test
+  void reconnectsWithAUnicodeLastEventId() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("id: évènement-一\ndata: first\n\n"));
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("data: second\n\n"));
+    var events = new CountDownLatch(2);
+
+    try (var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            reconnectOptions(Duration.ofMillis(1)),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onEvent(AlpacaSseEvent<String> event) {
+                events.countDown();
+              }
+            })) {
+      assertTrue(events.await(3, TimeUnit.SECONDS));
+    }
+
+    assertNull(server.takeRequest().getHeader("Last-Event-ID"));
+    assertEquals("évènement-一", server.takeRequest().getHeader("Last-Event-ID"));
+  }
+
+  @Test
+  void illegalStreamCursorFailsInsteadOfStrandingReconnect() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("id: invalid\u0001cursor\ndata: value\n\n"));
+    var delivered = new AtomicBoolean();
+
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            reconnectOptions(Duration.ofMillis(1)),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onEvent(AlpacaSseEvent<String> event) {
+                delivered.set(true);
+              }
+            });
+
+    var failure =
+        assertThrows(
+            ExecutionException.class, () -> subscription.completion().get(3, TimeUnit.SECONDS));
+    assertInstanceOf(
+        markets.alpaca.client.sse.AlpacaSseProtocolException.class, failure.getCause());
+    assertEquals(AlpacaSseState.FAILED, subscription.state());
+    assertFalse(delivered.get());
+  }
+
+  @Test
+  void resumeRequestFailureTerminatesInsteadOfRemainingReconnecting() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("id: evt-1\ndata: first\n\n"));
+    var firstEvent = new CountDownLatch(1);
+
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            reconnectOptions(Duration.ofMillis(1)),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onEvent(AlpacaSseEvent<String> event) {
+                firstEvent.countDown();
+              }
+            },
+            Runnable::run,
+            (request, eventId) -> {
+              if (eventId != null) throw new IllegalArgumentException("invalid resume cursor");
+              return request;
+            });
+
+    assertTrue(firstEvent.await(3, TimeUnit.SECONDS));
+    var failure =
+        assertThrows(
+            ExecutionException.class, () -> subscription.completion().get(3, TimeUnit.SECONDS));
+    assertInstanceOf(
+        markets.alpaca.client.sse.AlpacaSseProtocolException.class, failure.getCause());
+    assertEquals(AlpacaSseState.FAILED, subscription.state());
   }
 
   @Test
@@ -305,6 +408,51 @@ class SseTransportTest {
     var timeout = assertInstanceOf(SocketTimeoutException.class, failure.getCause());
     assertNotNull(timeout.getCause());
     assertEquals(AlpacaSseState.FAILED, subscription.state());
+  }
+
+  @Test
+  void startedConnectTimeoutCannotCancelAnAcceptedResponse() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeadersDelay(75, TimeUnit.MILLISECONDS)
+            .setBodyDelay(75, TimeUnit.MILLISECONDS)
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("data: accepted\n\n"));
+    var options =
+        AlpacaSseOptions.reconnectDisabled().toBuilder()
+            .connectTimeout(Duration.ofMillis(25))
+            .build();
+    var event = new CountDownLatch(1);
+    var scheduler = new GatedScheduler();
+
+    try {
+      var subscription =
+          SseTransport.openForTesting(
+              httpClient,
+              new Request.Builder().url(server.url("/events")).build(),
+              options,
+              false,
+              data -> data,
+              new AlpacaSseListener<>() {
+                @Override
+                public void onEvent(AlpacaSseEvent<String> delivered) {
+                  event.countDown();
+                }
+              },
+              scheduler,
+              System::nanoTime);
+
+      assertTrue(scheduler.taskStarted.await(1, TimeUnit.SECONDS));
+      subscription.opened().get(1, TimeUnit.SECONDS);
+      scheduler.releaseTask.countDown();
+
+      assertTrue(event.await(1, TimeUnit.SECONDS));
+      assertNotEquals(AlpacaSseState.FAILED, subscription.state());
+      subscription.close();
+    } finally {
+      scheduler.releaseTask.countDown();
+      scheduler.shutdownNow();
+    }
   }
 
   @Test
@@ -807,6 +955,124 @@ class SseTransportTest {
       assertTrue(terminalEntered.await(1, TimeUnit.SECONDS));
     } finally {
       releaseTerminal.countDown();
+    }
+  }
+
+  @Test
+  void productionExecutorsRemoveCanceledTimersAndBoundTerminalWork() throws Exception {
+    ScheduledThreadPoolExecutor scheduler = SseTransport.createScheduler();
+    ThreadPoolExecutor terminalExecutor = SseTransport.createTerminalCallbackExecutor();
+    var releaseWorkers = new CountDownLatch(1);
+    var workersStarted = new CountDownLatch(terminalExecutor.getMaximumPoolSize());
+
+    try {
+      ScheduledFuture<?> delayed = scheduler.schedule(() -> {}, 1, TimeUnit.HOURS);
+      assertEquals(1, scheduler.getQueue().size());
+      delayed.cancel(false);
+      assertTrue(scheduler.getRemoveOnCancelPolicy());
+      assertEquals(0, scheduler.getQueue().size());
+
+      for (int index = 0; index < terminalExecutor.getMaximumPoolSize(); index++) {
+        terminalExecutor.execute(
+            () -> {
+              workersStarted.countDown();
+              try {
+                releaseWorkers.await();
+              } catch (InterruptedException failure) {
+                Thread.currentThread().interrupt();
+              }
+            });
+      }
+      assertTrue(workersStarted.await(1, TimeUnit.SECONDS));
+      int queueCapacity = terminalExecutor.getQueue().remainingCapacity();
+      for (int index = 0; index < queueCapacity; index++) {
+        terminalExecutor.execute(() -> {});
+      }
+      assertThrows(RejectedExecutionException.class, () -> terminalExecutor.execute(() -> {}));
+      assertEquals(terminalExecutor.getMaximumPoolSize(), terminalExecutor.getLargestPoolSize());
+    } finally {
+      releaseWorkers.countDown();
+      scheduler.shutdownNow();
+      terminalExecutor.shutdownNow();
+    }
+  }
+
+  @Test
+  void rejectedTerminalDispatchDoesNotChangeLifecycleCompletion() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBodyDelay(5, TimeUnit.SECONDS)
+            .setBody("data: late\n\n"));
+    ScheduledThreadPoolExecutor scheduler = SseTransport.createScheduler();
+    Executor rejectingTerminalExecutor =
+        ignored -> {
+          throw new RejectedExecutionException("saturated");
+        };
+    var closed = new AtomicBoolean();
+
+    try {
+      var subscription =
+          SseTransport.openForTesting(
+              httpClient,
+              new Request.Builder().url(server.url("/events")).build(),
+              AlpacaSseOptions.reconnectDisabled(),
+              false,
+              data -> data,
+              new AlpacaSseListener<>() {
+                @Override
+                public void onClosed(AlpacaSseCloseResult result) {
+                  closed.set(true);
+                }
+              },
+              scheduler,
+              rejectingTerminalExecutor,
+              System::nanoTime);
+      subscription.opened().get(1, TimeUnit.SECONDS);
+
+      subscription.close();
+
+      assertEquals(
+          AlpacaSseCloseResult.Reason.USER_CLOSED,
+          subscription.completion().get(1, TimeUnit.SECONDS).reason());
+      assertEquals(AlpacaSseState.CLOSED, subscription.state());
+      assertFalse(closed.get());
+    } finally {
+      scheduler.shutdownNow();
+    }
+  }
+
+  @Test
+  void rejectedSchedulerTerminatesWithAProtocolFailure() throws Exception {
+    ScheduledThreadPoolExecutor scheduler = SseTransport.createScheduler();
+    scheduler.shutdownNow();
+
+    var subscription =
+        SseTransport.openForTesting(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {},
+            scheduler,
+            System::nanoTime);
+
+    var failure =
+        assertThrows(
+            ExecutionException.class, () -> subscription.completion().get(1, TimeUnit.SECONDS));
+    assertInstanceOf(
+        markets.alpaca.client.sse.AlpacaSseProtocolException.class, failure.getCause());
+    assertEquals(AlpacaSseState.FAILED, subscription.state());
+  }
+
+  @Test
+  void configuredCursorRejectsHttpControlCharactersButAllowsUnicode() {
+    assertDoesNotThrow(() -> AlpacaSseOptions.builder().initialLastEventId("évènement-一").build());
+    for (String invalid : java.util.List.of("\u0000", "\t", "\r", "\n", "\u001f", "\u007f")) {
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> AlpacaSseOptions.builder().initialLastEventId("cursor" + invalid).build());
     }
   }
 
@@ -1411,5 +1677,35 @@ class SseTransportTest {
                 .jitterRatio(0)
                 .build())
         .build();
+  }
+
+  private static final class GatedScheduler extends ScheduledThreadPoolExecutor {
+    private final AtomicBoolean gateNextTask = new AtomicBoolean(true);
+    private final CountDownLatch taskStarted = new CountDownLatch(1);
+    private final CountDownLatch releaseTask = new CountDownLatch(1);
+
+    private GatedScheduler() {
+      super(1);
+    }
+
+    @Override
+    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
+      if (!gateNextTask.compareAndSet(true, false)) {
+        return super.schedule(command, delay, unit);
+      }
+      return super.schedule(
+          () -> {
+            taskStarted.countDown();
+            try {
+              releaseTask.await();
+            } catch (InterruptedException failure) {
+              Thread.currentThread().interrupt();
+              return;
+            }
+            command.run();
+          },
+          delay,
+          unit);
+    }
   }
 }

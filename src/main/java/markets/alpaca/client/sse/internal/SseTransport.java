@@ -9,6 +9,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayDeque;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -17,6 +18,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
@@ -37,6 +40,7 @@ import markets.alpaca.client.sse.AlpacaSseState;
 import markets.alpaca.client.sse.AlpacaSseSubscription;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -49,13 +53,11 @@ public final class SseTransport {
 
   private static final Logger LOG = Logger.getLogger(SseTransport.class.getName());
   private static final Executor DIRECT_EXECUTOR = Runnable::run;
-  private static final ScheduledExecutorService SCHEDULER =
-      Executors.newSingleThreadScheduledExecutor(
-          runnable -> {
-            Thread thread = new Thread(runnable, "alpaca-sse-scheduler");
-            thread.setDaemon(true);
-            return thread;
-          });
+  private static final int TERMINAL_CALLBACK_THREADS = 4;
+  private static final int TERMINAL_CALLBACK_QUEUE_CAPACITY = 256;
+  private static final ScheduledExecutorService SCHEDULER = createScheduler();
+  private static final ExecutorService TERMINAL_CALLBACK_EXECUTOR =
+      createTerminalCallbackExecutor();
   private static final ExecutorService LIFECYCLE_EXECUTOR =
       Executors.newCachedThreadPool(
           runnable -> {
@@ -65,6 +67,34 @@ public final class SseTransport {
           });
 
   private SseTransport() {}
+
+  static ScheduledThreadPoolExecutor createScheduler() {
+    var scheduler =
+        new ScheduledThreadPoolExecutor(
+            1,
+            runnable -> {
+              Thread thread = new Thread(runnable, "alpaca-sse-scheduler");
+              thread.setDaemon(true);
+              return thread;
+            });
+    scheduler.setRemoveOnCancelPolicy(true);
+    return scheduler;
+  }
+
+  static ThreadPoolExecutor createTerminalCallbackExecutor() {
+    return new ThreadPoolExecutor(
+        TERMINAL_CALLBACK_THREADS,
+        TERMINAL_CALLBACK_THREADS,
+        0,
+        TimeUnit.MILLISECONDS,
+        new ArrayBlockingQueue<>(TERMINAL_CALLBACK_QUEUE_CAPACITY),
+        runnable -> {
+          Thread thread = new Thread(runnable, "alpaca-sse-terminal-callback");
+          thread.setDaemon(true);
+          return thread;
+        },
+        new ThreadPoolExecutor.AbortPolicy());
+  }
 
   /**
    * Runs transport-lifecycle work independently of user callback executors.
@@ -169,6 +199,7 @@ public final class SseTransport {
             decodeFailurePolicy,
             resumeRequest,
             SCHEDULER,
+            TERMINAL_CALLBACK_EXECUTOR,
             System::nanoTime);
     session.start();
     return session;
@@ -182,6 +213,49 @@ public final class SseTransport {
       SseDecoder<T> decoder,
       AlpacaSseListener<T> listener,
       LongSupplier nanoTime) {
+    return openForTesting(
+        httpClient,
+        request,
+        options,
+        bounded,
+        decoder,
+        listener,
+        SCHEDULER,
+        TERMINAL_CALLBACK_EXECUTOR,
+        nanoTime);
+  }
+
+  static <T> AlpacaSseSubscription openForTesting(
+      OkHttpClient httpClient,
+      Request request,
+      AlpacaSseOptions options,
+      boolean bounded,
+      SseDecoder<T> decoder,
+      AlpacaSseListener<T> listener,
+      ScheduledExecutorService scheduler,
+      LongSupplier nanoTime) {
+    return openForTesting(
+        httpClient,
+        request,
+        options,
+        bounded,
+        decoder,
+        listener,
+        scheduler,
+        TERMINAL_CALLBACK_EXECUTOR,
+        nanoTime);
+  }
+
+  static <T> AlpacaSseSubscription openForTesting(
+      OkHttpClient httpClient,
+      Request request,
+      AlpacaSseOptions options,
+      boolean bounded,
+      SseDecoder<T> decoder,
+      AlpacaSseListener<T> listener,
+      ScheduledExecutorService scheduler,
+      Executor terminalCallbackExecutor,
+      LongSupplier nanoTime) {
     var session =
         new Session<>(
             httpClient,
@@ -193,20 +267,34 @@ public final class SseTransport {
             DIRECT_EXECUTOR,
             SseDecodeFailurePolicy.TERMINATE,
             SseTransport::withLastEventIdHeader,
-            SCHEDULER,
+            scheduler,
+            terminalCallbackExecutor,
             nanoTime);
     session.start();
     return session;
   }
 
-  private static Request withLastEventIdHeader(Request request, String resumeId) {
-    Request.Builder builder = request.newBuilder();
+  public static Request withLastEventIdHeader(Request request, String resumeId) {
+    Objects.requireNonNull(request, "request must not be null");
+    validateLastEventId(resumeId);
+    Headers.Builder headers = request.headers().newBuilder();
+    headers.removeAll("Last-Event-ID");
     if (resumeId == null || resumeId.isEmpty()) {
-      builder.removeHeader("Last-Event-ID");
-    } else {
-      builder.header("Last-Event-ID", resumeId);
+      return request.newBuilder().headers(headers.build()).build();
     }
-    return builder.build();
+    headers.addUnsafeNonAscii("Last-Event-ID", resumeId);
+    return request.newBuilder().headers(headers.build()).build();
+  }
+
+  private static void validateLastEventId(String id) {
+    if (id == null) return;
+    for (int index = 0; index < id.length(); index++) {
+      char character = id.charAt(index);
+      if (character <= 0x1f || character == 0x7f) {
+        throw new AlpacaSseProtocolException(
+            "SSE event ID contains an HTTP-incompatible control character");
+      }
+    }
   }
 
   private static final class Session<T> implements AlpacaSseSubscription, Callback {
@@ -220,6 +308,7 @@ public final class SseTransport {
     private final SseDecodeFailurePolicy decodeFailurePolicy;
     private final BiFunction<Request, String, Request> resumeRequest;
     private final ScheduledExecutorService scheduler;
+    private final Executor terminalCallbackExecutor;
     private final LongSupplier nanoTime;
     private final Object lifecycleLock = new Object();
     private final SerialCallbackDispatcher callbackDispatcher = new SerialCallbackDispatcher();
@@ -246,6 +335,7 @@ public final class SseTransport {
     private ScheduledFuture<?> initialDeadline;
     private ScheduledFuture<?> reconnectDeadline;
     private Call timedOutCall;
+    private long connectTimeoutGeneration;
     private long idleTimeoutGeneration;
     private long initialDeadlineGeneration;
     private long reconnectDeadlineGeneration;
@@ -264,6 +354,7 @@ public final class SseTransport {
         SseDecodeFailurePolicy decodeFailurePolicy,
         BiFunction<Request, String, Request> resumeRequest,
         ScheduledExecutorService scheduler,
+        Executor terminalCallbackExecutor,
         LongSupplier nanoTime) {
       this.httpClient =
           Objects.requireNonNull(httpClient, "httpClient must not be null")
@@ -283,63 +374,109 @@ public final class SseTransport {
           Objects.requireNonNull(decodeFailurePolicy, "decodeFailurePolicy must not be null");
       this.resumeRequest = Objects.requireNonNull(resumeRequest, "resumeRequest must not be null");
       this.scheduler = Objects.requireNonNull(scheduler, "scheduler must not be null");
+      this.terminalCallbackExecutor =
+          Objects.requireNonNull(
+              terminalCallbackExecutor, "terminalCallbackExecutor must not be null");
       this.nanoTime = Objects.requireNonNull(nanoTime, "nanoTime must not be null");
       this.lastEventId = new AtomicReference<>(options.initialLastEventId());
     }
 
     void start() {
+      Throwable schedulingFailure = null;
       synchronized (lifecycleLock) {
         if (terminal) return;
-        initialCycleStartedNanos = nanoTime.getAsLong();
-        startInitialDeadlineLocked();
-        if (options.maxDuration() != null) {
-          durationTimeout =
-              scheduler.schedule(
-                  () ->
-                      LIFECYCLE_EXECUTOR.execute(
-                          () -> fail(new SocketTimeoutException("SSE maximum duration elapsed"))),
-                  options.maxDuration().toMillis(),
-                  TimeUnit.MILLISECONDS);
+        try {
+          initialCycleStartedNanos = nanoTime.getAsLong();
+          startInitialDeadlineLocked();
+          if (options.maxDuration() != null) {
+            durationTimeout =
+                scheduler.schedule(
+                    () ->
+                        LIFECYCLE_EXECUTOR.execute(
+                            () -> fail(new SocketTimeoutException("SSE maximum duration elapsed"))),
+                    options.maxDuration().toMillis(),
+                    TimeUnit.MILLISECONDS);
+          }
+        } catch (RuntimeException failure) {
+          schedulingFailure =
+              new AlpacaSseProtocolException("Failed to schedule SSE lifecycle deadline", failure);
         }
+      }
+      if (schedulingFailure != null) {
+        fail(schedulingFailure);
+        return;
       }
       connect(null);
     }
 
     private void connect(Throwable precedingFailure) {
       Throwable expiredFailure = null;
+      Throwable preparationFailure = null;
+      Call nextCall = null;
       synchronized (lifecycleLock) {
         if (terminal) return;
         reconnectTask = null;
         if (precedingFailure != null && budgetExpiredLocked(hasOpened)) {
           expiredFailure = precedingFailure;
         } else {
-          String resumeId = lastEventId.get();
-          Request resumedRequest =
-              Objects.requireNonNull(
-                  resumeRequest.apply(originalRequest, resumeId),
-                  "resumeRequest must not return null");
-          state.set(hasOpened ? AlpacaSseState.RECONNECTING : AlpacaSseState.CONNECTING);
-          Call nextCall = httpClient.newCall(resumedRequest);
-          call = nextCall;
-          timedOutCall = null;
-          long connectTimeoutMillis =
-              Math.min(
-                  options.connectTimeout().toMillis(),
-                  remainingBudgetMillisLocked(hasOpened, options.connectTimeout().toMillis()));
-          connectTimeout =
-              scheduler.schedule(
-                  () -> cancelConnectIfCurrent(nextCall),
-                  connectTimeoutMillis,
-                  TimeUnit.MILLISECONDS);
-          nextCall.enqueue(this);
+          try {
+            String resumeId = lastEventId.get();
+            Request resumedRequest =
+                Objects.requireNonNull(
+                    resumeRequest.apply(originalRequest, resumeId),
+                    "resumeRequest must not return null");
+            Call preparedCall = httpClient.newCall(resumedRequest);
+            long connectTimeoutMillis =
+                Math.min(
+                    options.connectTimeout().toMillis(),
+                    remainingBudgetMillisLocked(hasOpened, options.connectTimeout().toMillis()));
+            long timeoutGeneration = ++connectTimeoutGeneration;
+            ScheduledFuture<?> preparedTimeout =
+                scheduler.schedule(
+                    () -> cancelConnectIfCurrent(preparedCall, timeoutGeneration),
+                    connectTimeoutMillis,
+                    TimeUnit.MILLISECONDS);
+            state.set(hasOpened ? AlpacaSseState.RECONNECTING : AlpacaSseState.CONNECTING);
+            call = preparedCall;
+            timedOutCall = null;
+            connectTimeout = preparedTimeout;
+            nextCall = preparedCall;
+          } catch (RuntimeException failure) {
+            preparationFailure =
+                new AlpacaSseProtocolException("Failed to prepare SSE connection attempt", failure);
+          }
         }
       }
-      if (expiredFailure != null) fail(expiredFailure);
+      if (expiredFailure != null) {
+        fail(expiredFailure);
+        return;
+      }
+      if (preparationFailure != null) {
+        fail(preparationFailure);
+        return;
+      }
+      if (nextCall == null) return;
+      synchronized (lifecycleLock) {
+        if (terminal || call != nextCall) return;
+      }
+      try {
+        nextCall.enqueue(this);
+      } catch (RuntimeException failure) {
+        synchronized (lifecycleLock) {
+          if (call == nextCall) {
+            call = null;
+            cancel(connectTimeout);
+            connectTimeout = null;
+            connectTimeoutGeneration++;
+          }
+        }
+        fail(new AlpacaSseProtocolException("Failed to enqueue SSE connection attempt", failure));
+      }
     }
 
-    private void cancelConnectIfCurrent(Call expectedCall) {
+    private void cancelConnectIfCurrent(Call expectedCall, long expectedGeneration) {
       synchronized (lifecycleLock) {
-        if (!terminal && call == expectedCall) {
+        if (!terminal && call == expectedCall && connectTimeoutGeneration == expectedGeneration) {
           timedOutCall = expectedCall;
           expectedCall.cancel();
         }
@@ -354,6 +491,7 @@ public final class SseTransport {
         reportedFailure = connectFailureLocked(failedCall, failure);
         cancel(connectTimeout);
         connectTimeout = null;
+        connectTimeoutGeneration++;
         call = null;
       }
       retryOrFail(reportedFailure, null);
@@ -454,6 +592,7 @@ public final class SseTransport {
         if (terminal || call != expectedCall) return null;
         cancel(connectTimeout);
         connectTimeout = null;
+        connectTimeoutGeneration++;
         return connectFailureLocked(expectedCall, null);
       }
     }
@@ -480,6 +619,7 @@ public final class SseTransport {
               new SseParser.Handler() {
                 @Override
                 public void onEvent(String id, String type, String data) {
+                  validateLastEventId(id);
                   T value;
                   try {
                     value = decoder.decode(data);
@@ -523,6 +663,7 @@ public final class SseTransport {
 
                 @Override
                 public void onLastEventId(String id) {
+                  validateLastEventId(id);
                   commitLastEventId(id);
                 }
 
@@ -556,46 +697,55 @@ public final class SseTransport {
     }
 
     private void retryOrFail(Throwable failure, Duration retryAfter) {
-      int attempt;
-      Duration delay;
+      int attempt = 0;
+      Duration delay = null;
+      Throwable schedulingFailure = null;
       synchronized (lifecycleLock) {
         if (terminal) return;
-        call = null;
-        cancel(idleTimeout);
-        idleTimeout = null;
-        idleTimeoutGeneration++;
-        boolean established = hasOpened;
-        long now = nanoTime.getAsLong();
-        if (established) {
-          if (reconnectCycleStartedNanos == 0) {
-            reconnectCycleStartedNanos = now;
-            startReconnectDeadlineLocked(failure);
+        try {
+          call = null;
+          cancel(idleTimeout);
+          idleTimeout = null;
+          idleTimeoutGeneration++;
+          boolean established = hasOpened;
+          long now = nanoTime.getAsLong();
+          if (established) {
+            if (reconnectCycleStartedNanos == 0) {
+              reconnectCycleStartedNanos = now;
+              startReconnectDeadlineLocked(failure);
+            } else {
+              reconnectDeadlineFailure = failure;
+            }
           } else {
-            reconnectDeadlineFailure = failure;
+            if (initialCycleStartedNanos == 0) {
+              initialCycleStartedNanos = now;
+              startInitialDeadlineLocked();
+            }
+            initialDeadlineFailure = failure;
           }
-        } else {
-          if (initialCycleStartedNanos == 0) {
-            initialCycleStartedNanos = now;
-            startInitialDeadlineLocked();
+          attempt = established ? ++reconnectAttempt : ++initialAttempt;
+          Duration candidateDelay =
+              retryAfter != null
+                  ? retryAfter
+                  : serverRetry != null
+                      ? serverRetry
+                      : options.reconnectPolicy().delayForAttempt(attempt);
+          candidateDelay = capReconnectDelay(candidateDelay);
+          if (!options.reconnectPolicy().allowsAttempt(established, attempt)
+              || !budgetAllowsDelayLocked(established, candidateDelay)) {
+            attempt = -1;
+          } else {
+            delay = candidateDelay;
+            state.set(AlpacaSseState.RECONNECTING);
           }
-          initialDeadlineFailure = failure;
+        } catch (RuntimeException rejected) {
+          schedulingFailure =
+              new AlpacaSseProtocolException("Failed to schedule SSE reconnect deadline", rejected);
         }
-        attempt = established ? ++reconnectAttempt : ++initialAttempt;
-        Duration candidateDelay =
-            retryAfter != null
-                ? retryAfter
-                : serverRetry != null
-                    ? serverRetry
-                    : options.reconnectPolicy().delayForAttempt(attempt);
-        candidateDelay = capReconnectDelay(candidateDelay);
-        if (!options.reconnectPolicy().allowsAttempt(established, attempt)
-            || !budgetAllowsDelayLocked(established, candidateDelay)) {
-          attempt = -1;
-          delay = null;
-        } else {
-          delay = candidateDelay;
-          state.set(AlpacaSseState.RECONNECTING);
-        }
+      }
+      if (schedulingFailure != null) {
+        fail(schedulingFailure);
+        return;
       }
       if (attempt == -1) {
         fail(failure);
@@ -612,14 +762,21 @@ public final class SseTransport {
         fail(callbackFailure);
         return;
       }
+      Throwable reconnectSchedulingFailure = null;
       synchronized (lifecycleLock) {
         if (terminal) return;
-        reconnectTask =
-            scheduler.schedule(
-                () -> connect(failure),
-                Math.max(0, callbackDelay.toMillis()),
-                TimeUnit.MILLISECONDS);
+        try {
+          reconnectTask =
+              scheduler.schedule(
+                  () -> connect(failure),
+                  Math.max(0, callbackDelay.toMillis()),
+                  TimeUnit.MILLISECONDS);
+        } catch (RuntimeException rejected) {
+          reconnectSchedulingFailure =
+              new AlpacaSseProtocolException("Failed to schedule SSE reconnect", rejected);
+        }
       }
+      if (reconnectSchedulingFailure != null) fail(reconnectSchedulingFailure);
     }
 
     private Duration capReconnectDelay(Duration delay) {
@@ -735,7 +892,7 @@ public final class SseTransport {
       EnqueuedCallback enqueued = callbackDispatcher.enqueue(name, callback);
       if (!enqueued.startDrain()) return;
       try {
-        LIFECYCLE_EXECUTOR.execute(
+        terminalCallbackExecutor.execute(
             () -> {
               try {
                 start(enqueued);
@@ -745,7 +902,12 @@ public final class SseTransport {
             });
       } catch (RejectedExecutionException failure) {
         callbackDispatcher.rejectPending(failure);
-        LOG.log(Level.WARNING, "SSE lifecycle executor rejected " + name, failure);
+        LOG.log(
+            Level.WARNING,
+            "SSE terminal callback dispatcher rejected "
+                + name
+                + "; lifecycle completion is unaffected",
+            failure);
       }
     }
 
@@ -839,6 +1001,7 @@ public final class SseTransport {
       timedOutCall = null;
       cancel(connectTimeout);
       connectTimeout = null;
+      connectTimeoutGeneration++;
       cancel(idleTimeout);
       idleTimeout = null;
       idleTimeoutGeneration++;

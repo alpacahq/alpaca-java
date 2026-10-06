@@ -24,6 +24,7 @@ public final class ActivityDetailSchemaResolver {
             case "SPD" -> "DIVSPDActivityV2";
             default -> null;
           };
+      case "DIVROC" -> "CDIVActivityV2";
       case "DIVNRA" -> "DIVNRAActivityV2";
       case "FEE" ->
           oneOf(detail, "REG", "TAF", "LCT", "ORF", "OCC", "NRC", "NRV", "COM", "CAT")

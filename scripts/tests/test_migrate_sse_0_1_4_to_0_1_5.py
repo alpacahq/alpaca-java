@@ -51,6 +51,22 @@ class AnalysisTests(unittest.TestCase):
         self.assertNotIn("eventSource().cancel()", result.text)
         self.assertEqual(["SSE000"], [finding.code for finding in result.findings])
 
+    def test_rewrites_explicitly_typed_local_receiver(self):
+        source = (
+            IMPORT
+            + "class Example {\n"
+            + "  void close() {\n"
+            + "    BrokerSseSubscription subscription = create();\n"
+            + "    subscription.eventSource().cancel();\n"
+            + "  }\n"
+            + "}\n"
+        )
+
+        result = migrate.analyze_text(source)
+
+        self.assertIn("subscription.close();", result.text)
+        self.assertEqual(["SSE000"], [finding.code for finding in result.findings])
+
     def test_rewrite_is_idempotent(self):
         source = (
             IMPORT
@@ -180,12 +196,71 @@ class AnalysisTests(unittest.TestCase):
             ),
             (
                 IMPORT
+                + "class Example extends ExternalBase {\n"
+                + "  void close(java.util.List<BrokerSseSubscription> values) {\n"
+                + "    for (BrokerSseSubscription subscription : values)\n"
+                + "      run(subscription);\n"
+                + "    subscription.eventSource().cancel();\n"
+                + "  }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
                 + "class Example {\n"
                 + "  BrokerSseSubscription subscription;\n"
                 + "  class Nested {\n"
                 + "    BrokerSseSubscription subscription;\n"
                 + "  }\n"
                 + "  void close() { subscription.eventSource().cancel(); }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
+                + "class Example {\n"
+                + "  BrokerSseSubscription subscription;\n"
+                + "  void close() { subscription.eventSource().cancel(); }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
+                + "class One { BrokerSseSubscription subscription; }\n"
+                + "class Two extends ExternalBase {\n"
+                + "  void close() { subscription.eventSource().cancel(); }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
+                + "class Example extends ExternalBase {\n"
+                + "  void keep(BrokerSseSubscription subscription) {}\n"
+                + "  void close() { subscription.eventSource().cancel(); }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
+                + "class Example extends ExternalBase {\n"
+                + "  void close() {\n"
+                + "    try (BrokerSseSubscription subscription = create()) { run(); }\n"
+                + "    subscription.eventSource().cancel();\n"
+                + "  }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
+                + "class Example {\n"
+                + "  void consume() {\n"
+                + "    use((BrokerSseSubscription subscription) -> "
+                + "subscription.eventSource().cancel());\n"
+                + "  }\n"
+                + "}\n"
+            ),
+            (
+                IMPORT
+                + "class Example {\n"
+                + "  void consume() {\n"
+                + "    use((BrokerSseSubscription subscription) -> {\n"
+                + "      subscription.eventSource().cancel();\n"
+                + "    });\n"
+                + "  }\n"
                 + "}\n"
             ),
         )
@@ -274,14 +349,35 @@ class AnalysisTests(unittest.TestCase):
 
         self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
 
+    def test_reports_corrected_and_legacy_generated_sse_variants(self):
+        methods = (
+            "subscribeToAccountStatusSSE",
+            "subscribeToAccountStatusSSECall",
+            "subscribeToAccountStatusSSEWithHttpInfo",
+            "subscribeToAccountStatusSSEAsync",
+            "suscribeToAccountStatusSSE",
+            "suscribeToAccountStatusSSECall",
+            "suscribeToAccountStatusSSEWithHttpInfo",
+            "suscribeToAccountStatusSSEAsync",
+            "getV1EventsNtaCall",
+            "getAccountActivityEventAsync",
+        )
+
+        for method in methods:
+            with self.subTest(method=method):
+                source = f"class Example {{ void open(EventsApi api) {{ api.{method}(); }} }}"
+                result = migrate.analyze_text(source)
+                self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
+
 
 class CliTests(unittest.TestCase):
     def test_dry_run_check_json_and_write_modes(self):
         source = (
             IMPORT
             + "class Example {\n"
-            + "  BrokerSseSubscription subscription;\n"
-            + "  void close() { subscription.eventSource().cancel(); }\n"
+            + "  void close(BrokerSseSubscription subscription) {\n"
+            + "    subscription.eventSource().cancel();\n"
+            + "  }\n"
             + "}\n"
         )
         with tempfile.TemporaryDirectory() as directory:
