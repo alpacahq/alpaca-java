@@ -47,11 +47,14 @@ The tool rewrites only a bare identifier receiver with exactly one explicit
 `BrokerSseSubscription` declaration in the file, recognized through either the exact import or the
 fully qualified class name. The same identifier must have no other detected binder anywhere in the
 file. It reports `SSE001` and leaves unchanged qualified or chained access (`this.subscription` or
-`other.subscription`), shadowed names, `var`, inferred lambda parameters, comments inside the call
-chain, and any declaration it cannot prove unique. It also reports ambiguous imports,
+`other.subscription`), shadowed names or same-named local/nested types, `var`, inferred lambda
+parameters, comments inside the call chain, and any declaration it cannot prove unique. It also
+reports ambiguous imports,
 `EventSource` casts/identity assumptions, raw Gson exception checks, deep OkHttp `Response` use,
 blocking callbacks, generated SSE calls, and listeners overriding both rich and legacy callbacks.
 These deliberate false negatives keep `--write` source-safe; migrate `SSE001` findings manually.
+Missing input paths and explicit non-Java files fail with exit code 2 instead of producing an empty
+success report.
 
 ### Await startup without a latch
 
