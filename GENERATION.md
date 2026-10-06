@@ -37,6 +37,7 @@ preprocessing (`OpenApiSpecSupport`) or Mustache templates under
 
 ```bash
 ./gradlew generateApis      # regenerate from committed pins into src/main/java
+./gradlew checkSseContracts # verify pinned SSE inventory and handwritten coverage
 ./gradlew checkGenerated    # regenerate + fail if specs/ or openapi sources drift
 ./gradlew build             # compileJava depends on generateApis; check → checkGenerated
 ```
@@ -47,7 +48,8 @@ cannot compile a tree that has drifted from those pins without regenerating firs
 Generator scratch still lands under `build/generated/`; only the OpenAPI packages
 under `src/main/java/markets/alpaca/client/openapi/` are synced into the source
 tree. If regeneration changes tracked files, commit them (or run `checkGenerated`
-in CI to catch drift).
+in CI to catch drift). `checkGenerated` also runs `checkSseContracts`, so adopted SSE operations
+cannot silently lose their handwritten support decision or binding.
 
 ## Adopting upstream changes
 

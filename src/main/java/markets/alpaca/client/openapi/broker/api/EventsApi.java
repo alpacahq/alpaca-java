@@ -203,7 +203,7 @@ public class EventsApi {
         }
 
         final String[] localVarAccepts = {
-            "application/json"
+            "text/event-stream"
         };
         final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) {

@@ -20,6 +20,7 @@ gradle.taskGraph.whenReady { graph ->
 tasks.register('compileExamples', Exec) {
     group = 'verification'
     description = 'Compiles the example project without including it in published artifacts'
+    dependsOn 'generateApis'
     workingDir = rootDir
     def gradleWrapper = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
         ? 'gradlew.bat'
@@ -65,6 +66,9 @@ pluginManager.withPlugin('java') {
         shouldRunAfter 'test'
         outputs.upToDateWhen { false }
         addTestListener(testSummaryListener)
+        systemProperty(
+            'alpaca.requireSseIntegration',
+            providers.gradleProperty('alpaca.requireSseIntegration').orElse('false').get())
 
         def tradingKeyId = AlpacaBuildProperties.firstNonBlank(
             localProperties.getProperty('tradingApiKeyId'),
@@ -78,6 +82,17 @@ pluginManager.withPlugin('java') {
         if (tradingSecret) systemProperty 'APCA_TRADING_SECRET_KEY', tradingSecret
         if (tradingEnvironment) {
             systemProperty 'APCA_TRADING_ENVIRONMENT', tradingEnvironment
+        }
+        [
+            APCA_SSE_ACTIVITY_SINCE: 'sseActivitySince',
+            APCA_SSE_ACTIVITY_UNTIL: 'sseActivityUntil',
+            APCA_SSE_CORPORATE_ACTIONS_SINCE: 'sseCorporateActionsSince',
+            APCA_SSE_CORPORATE_ACTIONS_UNTIL: 'sseCorporateActionsUntil',
+        ].each { environmentName, propertyName ->
+            def value = AlpacaBuildProperties.firstNonBlank(
+                localProperties.getProperty(propertyName),
+                System.getenv(environmentName))
+            if (value) systemProperty environmentName, value
         }
 
         def brokerKeyId = localProperties.getProperty('brokerApiKeyId') ?:

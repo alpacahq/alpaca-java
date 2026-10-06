@@ -36,19 +36,28 @@ recovering from a failed publication.
 **Never hand-edit files under `src/main/java/markets/alpaca/client/openapi/`** — regenerate with
 `./gradlew generateApis` or adopt upstream via `./gradlew adoptOpenApi` /
 `./gradlew adoptOpenApiBreaking`. See [`GENERATION.md`](GENERATION.md).
+When a pinned spec changes an SSE operation, run `./gradlew checkSseContracts`; the full
+`checkGenerated`/`build` verification runs it as well.
 
 Pinned OpenAPI documents live under `specs/`. Handwritten code belongs in:
 
 - `src/main/java/markets/alpaca/client/` — top-level SDK concepts such as `AlpacaClientFactory` and `AlpacaCredentials`
 - `src/main/java/markets/alpaca/client/data/` — handwritten Market Data helpers
+- `src/main/java/markets/alpaca/client/data/sse/` — Market Data corporate-actions SSE wrapper
 - `src/main/java/markets/alpaca/client/http/` — handwritten OkHttp and retry helpers
 - `src/main/java/markets/alpaca/client/rest/` — handwritten REST utilities
 - `src/main/java/markets/alpaca/client/trading/` — handwritten Trading helpers
+- `src/main/java/markets/alpaca/client/sse/` — shared SSE lifecycle and transport
+- `src/main/java/markets/alpaca/client/trading/sse/` — Trading activity SSE wrapper
 - `src/main/java/markets/alpaca/client/broker/sse/` — Broker Events SSE wrapper
 - `src/main/java/markets/alpaca/client/ws/` — WebSocket stream clients, listeners, subscriptions, and models
 
 The generated REST packages under `markets.alpaca.client.openapi/**` are owned by OpenAPI Generator. Do not add
 handwritten code there.
+
+`markets.alpaca.client.sse.internal` is an implementation package, not supported public API. It is
+excluded from published Javadocs and API compatibility checks. Keep user-facing lifecycle types in
+`markets.alpaca.client.sse`, and do not expose internal transport types from public signatures.
 
 ### Fixing generated code behaviour
 

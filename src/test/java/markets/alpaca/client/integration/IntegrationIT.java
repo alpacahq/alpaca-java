@@ -3,14 +3,19 @@ package markets.alpaca.client.integration;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import markets.alpaca.client.AlpacaClientFactory;
 import markets.alpaca.client.AlpacaCredentials;
 import markets.alpaca.client.TradingApiEnvironment;
+import markets.alpaca.client.data.sse.CorporateActionsSseRequest;
 import markets.alpaca.client.openapi.data.api.CryptoApi;
 import markets.alpaca.client.openapi.data.api.NewsApi;
 import markets.alpaca.client.openapi.data.api.StockApi;
+import markets.alpaca.client.openapi.data.model.CorporateActionEvent;
 import markets.alpaca.client.openapi.data.model.CryptoHistoricalLoc;
 import markets.alpaca.client.openapi.data.model.CryptoLatestLoc;
 import markets.alpaca.client.openapi.trading.api.AccountsApi;
@@ -18,6 +23,12 @@ import markets.alpaca.client.openapi.trading.api.AssetsApi;
 import markets.alpaca.client.openapi.trading.api.OrdersApi;
 import markets.alpaca.client.openapi.trading.api.PortfolioHistoryApi;
 import markets.alpaca.client.openapi.trading.api.PositionsApi;
+import markets.alpaca.client.openapi.trading.model.ActivityEventV2;
+import markets.alpaca.client.sse.AlpacaSseCloseResult;
+import markets.alpaca.client.sse.AlpacaSseListener;
+import markets.alpaca.client.sse.AlpacaSseOptions;
+import markets.alpaca.client.sse.AlpacaSseState;
+import markets.alpaca.client.trading.sse.TradingActivitySseRequest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -41,12 +52,19 @@ import org.junit.jupiter.api.Test;
  * #      APCA_TRADING_KEY_ID=PK...
  * #      APCA_TRADING_SECRET_KEY=...
  * #      APCA_TRADING_ENVIRONMENT=paper
+ * #      APCA_SSE_ACTIVITY_SINCE=2026-09-01T00:00:00Z
+ * #      APCA_SSE_ACTIVITY_UNTIL=2026-09-01T01:00:00Z
+ * #      APCA_SSE_CORPORATE_ACTIONS_SINCE=2026-09-01T00:00:00Z
+ * #      APCA_SSE_CORPORATE_ACTIONS_UNTIL=2026-09-01T01:00:00Z
  * }</pre>
  *
  * <p>All tests are read-only — they never place orders or modify account state. They intentionally
  * mirror the read-only workflows in {@code examples/}.
  *
- * <p>Tests are skipped automatically when credentials are absent; they do not fail the build.
+ * <p>Tests are skipped automatically when credentials are absent; they do not fail ordinary local
+ * builds. Bounded replay tests also skip when their known-event windows are absent. {@code
+ * -Palpaca.requireSseIntegration=true} makes missing credentials or replay windows fail the strict
+ * release smoke test.
  */
 @Tag("integration")
 class IntegrationIT {
@@ -75,15 +93,37 @@ class IntegrationIT {
     return value == null ? TradingApiEnvironment.PAPER : TradingApiEnvironment.from(value);
   }
 
+  private static OffsetDateTime replayBoundary(String name) {
+    String value = credential(name);
+    if (Boolean.getBoolean("alpaca.requireSseIntegration")) {
+      assertNotNull(value, "Strict SSE integration requires " + name);
+    } else {
+      assumeTrue(value != null, "Skipping bounded SSE replay — set " + name);
+    }
+    try {
+      return OffsetDateTime.parse(value);
+    } catch (RuntimeException failure) {
+      throw new AssertionError(name + " must be an RFC 3339 timestamp", failure);
+    }
+  }
+
   @BeforeAll
   static void setupClients() {
     String keyId = credential("APCA_TRADING_KEY_ID");
     String secretKey = credential("APCA_TRADING_SECRET_KEY");
+    boolean credentialsPresent =
+        keyId != null && !keyId.isBlank() && secretKey != null && !secretKey.isBlank();
 
-    assumeTrue(
-        keyId != null && !keyId.isBlank() && secretKey != null && !secretKey.isBlank(),
-        "Skipping integration tests — set APCA_TRADING_KEY_ID and APCA_TRADING_SECRET_KEY "
-            + "(env vars or local.properties) to run");
+    if (Boolean.getBoolean("alpaca.requireSseIntegration")) {
+      assertTrue(
+          credentialsPresent,
+          "Strict SSE integration requires APCA_TRADING_KEY_ID and APCA_TRADING_SECRET_KEY");
+    } else {
+      assumeTrue(
+          credentialsPresent,
+          "Skipping integration tests — set APCA_TRADING_KEY_ID and APCA_TRADING_SECRET_KEY "
+              + "(env vars or local.properties) to run");
+    }
 
     var creds = new AlpacaCredentials(keyId, secretKey);
 
@@ -111,6 +151,140 @@ class IntegrationIT {
     assertFalse(account.getAccountNumber().isBlank(), "account.accountNumber must not be blank");
     assertEquals("USD", account.getCurrency(), "account.currency must be USD");
     assertFalse(account.getAccountBlocked(), "account must not be blocked");
+  }
+
+  /** Opens and closes the read-only Trading account-activity SSE stream. */
+  @Test
+  void tradingActivitySse_opensSuccessfully() throws Exception {
+    var events = AlpacaClientFactory.tradingEventsSseClient(tradingClient);
+    var subscription = events.subscribeToActivities(new AlpacaSseListener<>() {});
+    try {
+      var connection = subscription.opened().get(10, TimeUnit.SECONDS);
+      assertEquals(200, connection.statusCode(), "Trading activity SSE must return HTTP 200");
+      assertEquals(AlpacaSseState.OPEN, subscription.state());
+    } finally {
+      subscription.close();
+      assertEquals(
+          AlpacaSseCloseResult.Reason.USER_CLOSED,
+          subscription.completion().get(10, TimeUnit.SECONDS).reason());
+      assertEquals(AlpacaSseState.CLOSED, subscription.state());
+    }
+  }
+
+  /** Opens and closes the read-only Market Data corporate-actions SSE stream. */
+  @Test
+  void corporateActionsSse_opensSuccessfully() throws Exception {
+    var events = AlpacaClientFactory.corporateActionsSseClient(dataClient);
+    var subscription = events.subscribeToCorporateActions(new AlpacaSseListener<>() {});
+    try {
+      var connection = subscription.opened().get(10, TimeUnit.SECONDS);
+      assertEquals(200, connection.statusCode(), "Corporate-actions SSE must return HTTP 200");
+      assertEquals(AlpacaSseState.OPEN, subscription.state());
+    } finally {
+      subscription.close();
+      assertEquals(
+          AlpacaSseCloseResult.Reason.USER_CLOSED,
+          subscription.completion().get(10, TimeUnit.SECONDS).reason());
+      assertEquals(AlpacaSseState.CLOSED, subscription.state());
+    }
+  }
+
+  /** Decodes a Trading activity from a caller-supplied bounded replay window. */
+  @Test
+  void tradingActivitySse_decodesKnownReplayEvent() throws Exception {
+    var request =
+        TradingActivitySseRequest.builder()
+            .since(replayBoundary("APCA_SSE_ACTIVITY_SINCE"))
+            .until(replayBoundary("APCA_SSE_ACTIVITY_UNTIL"))
+            .build();
+    var options =
+        AlpacaSseOptions.reconnectDisabled().toBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .maxDuration(Duration.ofSeconds(30))
+            .build();
+    var events = AlpacaClientFactory.tradingEventsSseClient(tradingClient, options);
+    var firstEvent = new CompletableFuture<ActivityEventV2>();
+
+    var subscription =
+        events.subscribeToActivities(
+            request,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onEvent(markets.alpaca.client.sse.AlpacaSseEvent<ActivityEventV2> event) {
+                firstEvent.complete(event.data());
+              }
+
+              @Override
+              public void onFailure(Throwable failure) {
+                firstEvent.completeExceptionally(failure);
+              }
+
+              @Override
+              public void onClosed(AlpacaSseCloseResult result) {
+                firstEvent.completeExceptionally(
+                    new AssertionError(
+                        "Trading replay ended without an event: " + result.reason()));
+              }
+            });
+    try {
+      subscription.opened().get(10, TimeUnit.SECONDS);
+      var event = firstEvent.get(30, TimeUnit.SECONDS);
+      assertNotNull(event.getEventId(), "Trading replay event ID must not be null");
+      assertFalse(event.getEventId().isBlank(), "Trading replay event ID must not be blank");
+    } finally {
+      subscription.close();
+    }
+  }
+
+  /** Decodes a corporate action from a caller-supplied bounded replay window. */
+  @Test
+  void corporateActionsSse_decodesKnownReplayEvent() throws Exception {
+    var request =
+        CorporateActionsSseRequest.builder()
+            .since(replayBoundary("APCA_SSE_CORPORATE_ACTIONS_SINCE"))
+            .until(replayBoundary("APCA_SSE_CORPORATE_ACTIONS_UNTIL"))
+            .build();
+    var options =
+        AlpacaSseOptions.reconnectDisabled().toBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .maxDuration(Duration.ofSeconds(30))
+            .build();
+    var events =
+        AlpacaClientFactory.corporateActionsSseClient(
+            dataClient,
+            markets.alpaca.client.data.sse.MarketDataSseEnvironment.PRODUCTION,
+            options);
+    var firstEvent = new CompletableFuture<CorporateActionEvent>();
+
+    var subscription =
+        events.subscribeToCorporateActions(
+            request,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onEvent(
+                  markets.alpaca.client.sse.AlpacaSseEvent<CorporateActionEvent> event) {
+                firstEvent.complete(event.data());
+              }
+
+              @Override
+              public void onFailure(Throwable failure) {
+                firstEvent.completeExceptionally(failure);
+              }
+
+              @Override
+              public void onClosed(AlpacaSseCloseResult result) {
+                firstEvent.completeExceptionally(
+                    new AssertionError(
+                        "Corporate-actions replay ended without an event: " + result.reason()));
+              }
+            });
+    try {
+      subscription.opened().get(10, TimeUnit.SECONDS);
+      var event = firstEvent.get(30, TimeUnit.SECONDS);
+      assertNotNull(event.getActualInstance(), "Corporate-action payload must be decoded");
+    } finally {
+      subscription.close();
+    }
   }
 
   /**
