@@ -89,7 +89,8 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   Broker-specific compatibility surface. Reconnect delay caps now apply to client backoff, server
   `retry:`, and HTTP `Retry-After` values.
 - The migration codemod rewrites only a uniquely bound, bare `BrokerSseSubscription` identifier;
-  qualified, shadowed, inferred, commented, or otherwise uncertain chains are report-only.
+  qualified, shadowed, same-named local/nested types, inferred, commented, or otherwise uncertain
+  chains are report-only. Missing inputs fail closed.
 
 ### Fixed
 - Closing during initial connection or reconnect can no longer publish an uncancelled call after the
@@ -105,6 +106,10 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   delivery, including while the server sends only comments or remains silent.
 - Callback-executor rejection during reconnect and Broker single-activity timeout now always settle
   their public futures; terminal completion settles before pre-open `opened()` continuations run.
+- Initial reconnect and open-stream idle budgets remain active while lifecycle callbacks execute.
+  SSE clients disable inherited OkHttp read and whole-call timeouts in favor of SDK SSE deadlines.
+- Delivered-event cursor commitment and reconnect-deadline reset are atomic, and Broker
+  single-activity timeout cannot be overwritten by a callback delivered after termination.
 
 ### Behavioral compatibility and migration
 - Existing Broker listener signatures remain available. Rich callbacks delegate to the legacy

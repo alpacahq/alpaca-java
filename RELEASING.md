@@ -58,9 +58,12 @@ candidate commit:
 
 The API compatibility task compares the complete public JAR, including handwritten streaming
 surfaces, and fails on source or binary incompatibility. Update the baseline property only when the
-previous published release changes; do not suppress individual incompatibilities without review.
-It does not prove behavioral compatibility, and missing external dependency classes are ignored, so
-the migration review and SSE regression tests remain mandatory.
+previous published release changes. The member-specific exclusions in
+`alpaca.quality.gradle` cover only reviewed OpenAPI corrections inherited before this gate existed;
+each is documented in [`MIGRATIONS.md`](MIGRATIONS.md). Do not broaden those exclusions or add
+another without equivalent migration guidance and review. The task still fails on every other
+incompatibility. It does not prove behavioral compatibility, and missing external dependency
+classes are ignored, so the migration review and SSE regression tests remain mandatory.
 
 SSE releases additionally require manual live validation with valid Trading paper/Market Data and
 Broker sandbox credentials. Supply bounded RFC 3339 Trading and corporate-actions replay windows

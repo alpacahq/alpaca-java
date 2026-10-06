@@ -82,7 +82,8 @@ public final class AlpacaSseReconnectPolicy {
    * <p>The initial cycle spans connection attempts and backoff until the first accepted response.
    * An established cycle starts after a transient disconnect and resets after an event is
    * delivered. It remains active after reconnect headers during comments or silence. The budget
-   * includes connection time, client backoff, {@code retry:}, and {@code Retry-After} delays.
+   * includes connection time, lifecycle callback execution, client backoff, {@code retry:}, and
+   * {@code Retry-After} delays.
    *
    * <p>This is separate from {@link AlpacaSseOptions#maxDuration()}, which limits the lifetime of
    * the entire subscription.

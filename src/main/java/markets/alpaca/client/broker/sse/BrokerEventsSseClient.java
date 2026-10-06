@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import markets.alpaca.client.http.AlpacaHttpConfig;
 import markets.alpaca.client.openapi.broker.api.AccountsApi;
@@ -452,7 +453,7 @@ public final class BrokerEventsSseClient {
     Objects.requireNonNull(timeout, "timeout must not be null");
     var result = new CompletableFuture<ActivityEventV2>();
     var subscription = new AtomicReference<AlpacaSseSubscription>();
-    var received = new AtomicReference<ActivityEventV2>();
+    var outcomeClaimed = new AtomicBoolean();
     AlpacaSseOptions oneEventOptions =
         sseOptions.toBuilder()
             .reconnectPolicy(AlpacaSseReconnectPolicy.disabled())
@@ -468,7 +469,7 @@ public final class BrokerEventsSseClient {
             new AlpacaSseListener<>() {
               @Override
               public void onEvent(AlpacaSseEvent<ActivityEventV2> event) {
-                received.compareAndSet(null, event.data());
+                if (!outcomeClaimed.compareAndSet(false, true)) return;
                 result.complete(event.data());
                 AlpacaSseSubscription active = subscription.get();
                 if (active != null) active.close();
@@ -480,23 +481,25 @@ public final class BrokerEventsSseClient {
     opened
         .completion()
         .whenComplete(
-            (closeResult, failure) ->
-                SseTransport.executeLifecycle(
-                    () -> {
-                      ActivityEventV2 event = received.get();
-                      if (event != null) {
-                        result.complete(event);
-                      } else if (failure != null) {
-                        result.completeExceptionally(failure);
-                      } else {
-                        result.completeExceptionally(
-                            new AlpacaSseProtocolException(
-                                "Single-activity SSE response ended without an event"));
-                      }
-                    }));
+            (closeResult, failure) -> {
+              if (!outcomeClaimed.compareAndSet(false, true)) return;
+              SseTransport.executeLifecycle(
+                  () -> {
+                    if (failure != null) {
+                      result.completeExceptionally(failure);
+                    } else {
+                      result.completeExceptionally(
+                          new AlpacaSseProtocolException(
+                              "Single-activity SSE response ended without an event"));
+                    }
+                  });
+            });
     result.whenComplete(
         (ignored, failure) -> {
-          if (result.isCancelled()) opened.close();
+          if (result.isCancelled()) {
+            outcomeClaimed.compareAndSet(false, true);
+            opened.close();
+          }
         });
     return result;
   }

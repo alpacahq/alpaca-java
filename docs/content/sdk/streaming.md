@@ -45,6 +45,11 @@ execution. Event callbacks backpressure response parsing, however, so a blocked 
 detection of remote EOF and the following reconnect. Sharing one single-thread executor across
 subscriptions intentionally serializes their callbacks.
 
+The SSE transport retains the supplied OkHttp client's interceptors, proxy, TLS, dispatcher, and
+connection pool, but disables inherited read and whole-call timeouts because they would terminate
+healthy long-lived responses. Use `AlpacaSseOptions` for connection, idle, reconnect-cycle, and
+whole-subscription deadlines.
+
 If a listener throws a `RuntimeException`, the SDK logs it and considers the event delivered, so
 its resume ID advances. A callback-executor rejection is terminal. Applications should handle
 their own callback failures, persist work transactionally, and deduplicate by SSE event ID.

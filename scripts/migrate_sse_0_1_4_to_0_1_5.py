@@ -24,6 +24,9 @@ BROKER_DECLARATION = re.compile(
     rf"\b(?P<type>BrokerSseSubscription|{re.escape(BROKER_SUBSCRIPTION)})\s+"
     r"(?P<name>[A-Za-z_$][\w$]*)\b(?!\s*\()"
 )
+BROKER_TYPE_DECLARATION = re.compile(
+    r"\b(?:class|interface|enum|record|@interface)\s+BrokerSseSubscription\b"
+)
 JAVA_IDENTIFIER = r"[A-Za-z_$][\w$]*"
 JAVA_TYPE = (
     rf"{JAVA_IDENTIFIER}(?:\s*\.\s*{JAVA_IDENTIFIER})*"
@@ -240,6 +243,7 @@ def _diagnostic_patterns(
 def analyze_text(text: str, path: str = "<memory>") -> Analysis:
     mask = _code_mask(text)
     has_exact_import = bool(EXACT_IMPORT.search(mask))
+    has_shadowing_type = bool(BROKER_TYPE_DECLARATION.search(mask))
     broker_binders = _broker_binders(mask, has_exact_import=has_exact_import)
     all_binders = _all_binders(mask)
 
@@ -249,6 +253,7 @@ def analyze_text(text: str, path: str = "<memory>") -> Analysis:
         receiver = call.group(1)
         safe = (
             _is_bare_receiver(mask, call.start())
+            and not has_shadowing_type
             and len(broker_binders.get(receiver, ())) == 1
             and len(all_binders.get(receiver, ())) == 1
             and not _contains_masked_syntax(text, mask, call.start(), call.end())
@@ -317,6 +322,16 @@ def _parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     arguments = _parser().parse_args(argv)
+    invalid_paths = [
+        path
+        for path in arguments.paths
+        if not path.exists() or (path.is_file() and path.suffix != ".java")
+    ]
+    if invalid_paths:
+        for path in invalid_paths:
+            print(f"error: input path is missing or is not Java source: {path}", file=sys.stderr)
+        return 2
+
     findings: list[Finding] = []
     for path in _java_files(arguments.paths):
         original = path.read_text(encoding="utf-8")

@@ -11,6 +11,41 @@ plugins {
 }
 
 def apiBaselineVersion = providers.gradleProperty('apiBaselineVersion').orElse('0.1.4')
+// Reviewed generated-surface breaks adopted on main before this compatibility gate existed.
+// Keep these member-specific: broad class/package exclusions would hide future regressions.
+def reviewedApiCompatibilityExclusions = [
+    'markets.alpaca.client.openapi.broker.api.EventsApi#suscribeToAccountStatusSSE' +
+        '(java.time.LocalDate,java.time.LocalDate,java.lang.Integer,java.lang.Integer,' +
+        'java.lang.String,java.lang.String,java.lang.String)',
+    'markets.alpaca.client.openapi.broker.api.EventsApi#suscribeToAccountStatusSSEAsync' +
+        '(java.time.LocalDate,java.time.LocalDate,java.lang.Integer,java.lang.Integer,' +
+        'java.lang.String,java.lang.String,java.lang.String,' +
+        'markets.alpaca.client.openapi.broker.http.ApiCallback)',
+    'markets.alpaca.client.openapi.broker.api.EventsApi#suscribeToAccountStatusSSECall' +
+        '(java.time.LocalDate,java.time.LocalDate,java.lang.Integer,java.lang.Integer,' +
+        'java.lang.String,java.lang.String,java.lang.String,' +
+        'markets.alpaca.client.openapi.broker.http.ApiCallback)',
+    'markets.alpaca.client.openapi.broker.api.EventsApi#suscribeToAccountStatusSSEWithHttpInfo' +
+        '(java.time.LocalDate,java.time.LocalDate,java.lang.Integer,java.lang.Integer,' +
+        'java.lang.String,java.lang.String,java.lang.String)',
+    'markets.alpaca.client.openapi.broker.api.IraApi#listIRAExcessContritbutions()',
+    'markets.alpaca.client.openapi.broker.api.IraApi#listIRAExcessContritbutionsAsync' +
+        '(markets.alpaca.client.openapi.broker.http.ApiCallback)',
+    'markets.alpaca.client.openapi.broker.api.IraApi#listIRAExcessContritbutionsCall' +
+        '(markets.alpaca.client.openapi.broker.http.ApiCallback)',
+    'markets.alpaca.client.openapi.broker.api.IraApi#listIRAExcessContritbutionsWithHttpInfo()',
+    'markets.alpaca.client.openapi.broker.model.Asset#SERIALIZED_NAME_EASY_TO_BORROW',
+    'markets.alpaca.client.openapi.broker.model.Asset#easyToBorrow(java.lang.Boolean)',
+    'markets.alpaca.client.openapi.broker.model.Asset#getEasyToBorrow()',
+    'markets.alpaca.client.openapi.broker.model.Asset#setEasyToBorrow(java.lang.Boolean)',
+    'markets.alpaca.client.openapi.trading.api.PositionsApi#deleteAllOpenPositions' +
+        '(java.lang.Boolean)',
+    'markets.alpaca.client.openapi.trading.model.Assets#SERIALIZED_NAME_EASY_TO_BORROW',
+    'markets.alpaca.client.openapi.trading.model.Assets#easyToBorrow(java.lang.Boolean)',
+    'markets.alpaca.client.openapi.trading.model.Assets#getEasyToBorrow()',
+    'markets.alpaca.client.openapi.trading.model.Assets#setEasyToBorrow(java.lang.Boolean)',
+    'markets.alpaca.client.openapi.trading.model.PositionClosedReponse*',
+]
 def apiCompatibilityTool = configurations.create('apiCompatibilityTool') {
     canBeConsumed = false
     canBeResolved = true
@@ -96,7 +131,10 @@ pluginManager.withPlugin('java') {
                 '--new', tasks.named('jar').get().archiveFile.get().asFile.absolutePath,
                 '--only-modified',
                 '--ignore-missing-classes',
-                '--exclude', 'markets.alpaca.client.sse.internal.*',
+                '--exclude',
+                (['markets.alpaca.client.sse.internal.*'] +
+                    reviewedApiCompatibilityExclusions).join(';'),
+                '--no-error-on-exclusion-incompatibility',
                 '--error-on-binary-incompatibility',
                 '--error-on-source-incompatibility',
             ])
