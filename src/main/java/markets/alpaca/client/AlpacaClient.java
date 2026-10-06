@@ -2,16 +2,21 @@ package markets.alpaca.client;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executor;
 import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
 import markets.alpaca.client.data.AlpacaStocks;
 import markets.alpaca.client.data.StockTradesRequest;
+import markets.alpaca.client.data.sse.CorporateActionsSseClient;
+import markets.alpaca.client.data.sse.MarketDataSseEnvironment;
 import markets.alpaca.client.http.AlpacaHttpConfig;
 import markets.alpaca.client.openapi.data.http.ApiException;
 import markets.alpaca.client.openapi.data.model.StockTradesResp;
 import markets.alpaca.client.openapi.data.model.StockTradesRespSingle;
 import markets.alpaca.client.openapi.trading.model.Order;
+import markets.alpaca.client.sse.AlpacaSseOptions;
 import markets.alpaca.client.trading.AlpacaOrders;
 import markets.alpaca.client.trading.ListOrdersRequest;
+import markets.alpaca.client.trading.sse.TradingEventsSseClient;
 import okhttp3.OkHttpClient;
 
 /**
@@ -40,6 +45,8 @@ public final class AlpacaClient {
   private final markets.alpaca.client.openapi.broker.http.ApiClient brokerClient;
   private final Orders orders;
   private final Stocks stocks;
+  private final TradingEventsSseClient tradingEventsSseClient;
+  private final CorporateActionsSseClient corporateActionsSseClient;
   private final BrokerEventsSseClient brokerEventsSseClient;
 
   private AlpacaClient(Builder builder) {
@@ -71,7 +78,18 @@ public final class AlpacaClient {
 
     this.orders = new Orders(new AlpacaOrders(tradingClient));
     this.stocks = new Stocks(new AlpacaStocks(dataClient));
-    this.brokerEventsSseClient = AlpacaClientFactory.brokerEventsSseClient(brokerClient);
+    this.tradingEventsSseClient =
+        AlpacaClientFactory.tradingEventsSseClient(
+            tradingClient, builder.tradingSseOptions, builder.tradingSseCallbackExecutor);
+    this.corporateActionsSseClient =
+        AlpacaClientFactory.corporateActionsSseClient(
+            dataClient,
+            builder.marketDataSseEnvironment,
+            builder.dataSseOptions,
+            builder.dataSseCallbackExecutor);
+    this.brokerEventsSseClient =
+        AlpacaClientFactory.brokerEventsSseClient(
+            brokerClient, builder.brokerSseOptions, builder.brokerSseCallbackExecutor);
   }
 
   /**
@@ -94,6 +112,16 @@ public final class AlpacaClient {
   /** Returns common Market Data stock workflows without exposing the mutable generated client. */
   public Stocks stocks() {
     return stocks;
+  }
+
+  /** Returns the Trading account-activity SSE client configured for this client. */
+  public TradingEventsSseClient tradingEventsSseClient() {
+    return tradingEventsSseClient;
+  }
+
+  /** Returns the Market Data corporate-actions SSE client configured for this client. */
+  public CorporateActionsSseClient corporateActionsSseClient() {
+    return corporateActionsSseClient;
   }
 
   /** Returns the Broker Events SSE client configured for this client. */
@@ -144,6 +172,13 @@ public final class AlpacaClient {
     private OkHttpClient tradingHttpClient = AlpacaHttpConfig.defaultClient();
     private OkHttpClient dataHttpClient = AlpacaHttpConfig.defaultClient();
     private OkHttpClient brokerHttpClient = AlpacaHttpConfig.defaultClient();
+    private AlpacaSseOptions tradingSseOptions = AlpacaSseOptions.defaults();
+    private Executor tradingSseCallbackExecutor = Runnable::run;
+    private MarketDataSseEnvironment marketDataSseEnvironment = MarketDataSseEnvironment.PRODUCTION;
+    private AlpacaSseOptions dataSseOptions = AlpacaSseOptions.defaults();
+    private Executor dataSseCallbackExecutor = Runnable::run;
+    private AlpacaSseOptions brokerSseOptions = AlpacaSseOptions.reconnectDisabled();
+    private Executor brokerSseCallbackExecutor = Runnable::run;
 
     private Builder(AlpacaCredentials credentials) {
       this.credentials = Objects.requireNonNull(credentials, "credentials must not be null");
@@ -211,13 +246,13 @@ public final class AlpacaClient {
       return this;
     }
 
-    /** Sets the HTTP client used by Trading REST calls. */
+    /** Sets the HTTP client used by Trading REST and SSE calls. */
     public Builder tradingHttpClient(OkHttpClient tradingHttpClient) {
       this.tradingHttpClient = copyHttpClient(tradingHttpClient, "tradingHttpClient");
       return this;
     }
 
-    /** Sets the HTTP client used by Market Data REST calls. */
+    /** Sets the HTTP client used by Market Data REST and corporate-actions SSE calls. */
     public Builder dataHttpClient(OkHttpClient dataHttpClient) {
       this.dataHttpClient = copyHttpClient(dataHttpClient, "dataHttpClient");
       return this;
@@ -229,9 +264,74 @@ public final class AlpacaClient {
       return this;
     }
 
+    /** Sets transport options for Trading account-activity SSE subscriptions. */
+    public Builder tradingSseOptions(AlpacaSseOptions tradingSseOptions) {
+      this.tradingSseOptions =
+          Objects.requireNonNull(tradingSseOptions, "tradingSseOptions must not be null");
+      return this;
+    }
+
+    /**
+     * Sets the application-owned executor for Trading SSE callbacks.
+     *
+     * <p>The SDK never shuts down the supplied executor.
+     */
+    public Builder tradingSseCallbackExecutor(Executor tradingSseCallbackExecutor) {
+      this.tradingSseCallbackExecutor =
+          Objects.requireNonNull(
+              tradingSseCallbackExecutor, "tradingSseCallbackExecutor must not be null");
+      return this;
+    }
+
+    /** Selects the Market Data corporate-actions stream environment. */
+    public Builder marketDataSseEnvironment(MarketDataSseEnvironment marketDataSseEnvironment) {
+      this.marketDataSseEnvironment =
+          Objects.requireNonNull(
+              marketDataSseEnvironment, "marketDataSseEnvironment must not be null");
+      return this;
+    }
+
+    /** Sets transport options for Market Data corporate-actions SSE subscriptions. */
+    public Builder dataSseOptions(AlpacaSseOptions dataSseOptions) {
+      this.dataSseOptions =
+          Objects.requireNonNull(dataSseOptions, "dataSseOptions must not be null");
+      return this;
+    }
+
+    /**
+     * Sets the application-owned executor for Market Data SSE callbacks.
+     *
+     * <p>The SDK never shuts down the supplied executor.
+     */
+    public Builder dataSseCallbackExecutor(Executor dataSseCallbackExecutor) {
+      this.dataSseCallbackExecutor =
+          Objects.requireNonNull(
+              dataSseCallbackExecutor, "dataSseCallbackExecutor must not be null");
+      return this;
+    }
+
+    /** Sets transport options for Broker Events SSE subscriptions. */
+    public Builder brokerSseOptions(AlpacaSseOptions brokerSseOptions) {
+      this.brokerSseOptions =
+          Objects.requireNonNull(brokerSseOptions, "brokerSseOptions must not be null");
+      return this;
+    }
+
+    /**
+     * Sets the application-owned executor for Broker SSE callbacks.
+     *
+     * <p>The SDK never shuts down the supplied executor.
+     */
+    public Builder brokerSseCallbackExecutor(Executor brokerSseCallbackExecutor) {
+      this.brokerSseCallbackExecutor =
+          Objects.requireNonNull(
+              brokerSseCallbackExecutor, "brokerSseCallbackExecutor must not be null");
+      return this;
+    }
+
     /**
      * Builds an immutable client facade using the configured credentials, environments, base URLs,
-     * and HTTP clients.
+     * HTTP clients, and SSE settings.
      *
      * <p>The builder copies supplied {@link OkHttpClient} instances with {@code newBuilder()} so
      * later mutations by the caller cannot change this client.

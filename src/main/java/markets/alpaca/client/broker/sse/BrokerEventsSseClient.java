@@ -6,10 +6,11 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.atomic.AtomicReference;
 import markets.alpaca.client.http.AlpacaHttpConfig;
+import markets.alpaca.client.openapi.broker.api.AccountsApi;
 import markets.alpaca.client.openapi.broker.api.EventsApi;
 import markets.alpaca.client.openapi.broker.http.ApiException;
 import markets.alpaca.client.openapi.broker.http.JSON;
@@ -23,45 +24,69 @@ import markets.alpaca.client.openapi.broker.model.StatusFundingEvent;
 import markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner;
 import markets.alpaca.client.openapi.broker.model.SystemEventV2;
 import markets.alpaca.client.openapi.broker.model.TradeUpdateEventV2;
+import markets.alpaca.client.sse.AlpacaSseDeserializationException;
+import markets.alpaca.client.sse.AlpacaSseEvent;
+import markets.alpaca.client.sse.AlpacaSseHttpException;
+import markets.alpaca.client.sse.AlpacaSseListener;
+import markets.alpaca.client.sse.AlpacaSseOptions;
+import markets.alpaca.client.sse.AlpacaSseProtocolException;
+import markets.alpaca.client.sse.AlpacaSseReconnectPolicy;
+import markets.alpaca.client.sse.AlpacaSseSubscription;
+import markets.alpaca.client.sse.internal.SseDecodeFailurePolicy;
+import markets.alpaca.client.sse.internal.SseDecoder;
+import markets.alpaca.client.sse.internal.SseTransport;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.sse.EventSource;
-import okhttp3.sse.EventSourceListener;
-import okhttp3.sse.EventSources;
+import okhttp3.ResponseBody;
 
 /**
  * Streaming wrapper for Broker Events SSE endpoints.
  *
  * <p>The generated {@link EventsApi} exposes SSE endpoints as ordinary blocking REST calls, which
  * can hang indefinitely for live streams. This wrapper reuses the generated request builders for
- * path, query parameters, and authentication, then opens them through OkHttp's SSE client.
+ * path, query parameters, and authentication, then opens them through the SDK's incremental OkHttp
+ * transport.
  */
 public final class BrokerEventsSseClient {
 
-  private static final Logger LOG = Logger.getLogger(BrokerEventsSseClient.class.getName());
   private static final Executor DIRECT_CALLBACK_EXECUTOR = Runnable::run;
 
   private final EventsApi eventsApi;
-  private final EventSource.Factory eventSourceFactory;
+  private final AccountsApi accountsApi;
+  private final OkHttpClient httpClient;
+  private final AlpacaSseOptions sseOptions;
   private final Executor callbackExecutor;
 
   /** Creates an SSE wrapper around a generated Broker {@link EventsApi}. */
   public BrokerEventsSseClient(EventsApi eventsApi) {
-    this(eventsApi, DIRECT_CALLBACK_EXECUTOR);
+    this(eventsApi, AlpacaSseOptions.reconnectDisabled(), DIRECT_CALLBACK_EXECUTOR);
+  }
+
+  /** Creates an SSE wrapper with explicit transport options and direct callbacks. */
+  public BrokerEventsSseClient(EventsApi eventsApi, AlpacaSseOptions sseOptions) {
+    this(eventsApi, sseOptions, DIRECT_CALLBACK_EXECUTOR);
   }
 
   /** Creates an SSE wrapper around a generated Broker {@link EventsApi}. */
   public BrokerEventsSseClient(EventsApi eventsApi, Executor callbackExecutor) {
+    this(eventsApi, AlpacaSseOptions.reconnectDisabled(), callbackExecutor);
+  }
+
+  /** Creates an SSE wrapper with explicit transport options and callback executor. */
+  public BrokerEventsSseClient(
+      EventsApi eventsApi, AlpacaSseOptions sseOptions, Executor callbackExecutor) {
     this.eventsApi = Objects.requireNonNull(eventsApi, "eventsApi must not be null");
+    this.accountsApi = new AccountsApi(eventsApi.getApiClient());
+    this.sseOptions = Objects.requireNonNull(sseOptions, "sseOptions must not be null");
     this.callbackExecutor =
         Objects.requireNonNull(callbackExecutor, "callbackExecutor must not be null");
-    OkHttpClient sseHttpClient =
+    this.httpClient =
         AlpacaHttpConfig.withAgentInformation(eventsApi.getApiClient().getHttpClient())
             .newBuilder()
-            .readTimeout(Duration.ZERO)
             .build();
-    this.eventSourceFactory = EventSources.createFactory(sseHttpClient);
   }
 
   /** Creates an SSE wrapper from a generated Broker {@code ApiClient}. */
@@ -69,10 +94,24 @@ public final class BrokerEventsSseClient {
     this(new EventsApi(apiClient));
   }
 
+  /** Creates an SSE wrapper from a generated Broker client with explicit transport options. */
+  public BrokerEventsSseClient(
+      markets.alpaca.client.openapi.broker.http.ApiClient apiClient, AlpacaSseOptions sseOptions) {
+    this(new EventsApi(apiClient), sseOptions);
+  }
+
   /** Creates an SSE wrapper from a generated Broker {@code ApiClient}. */
   public BrokerEventsSseClient(
       markets.alpaca.client.openapi.broker.http.ApiClient apiClient, Executor callbackExecutor) {
     this(new EventsApi(apiClient), callbackExecutor);
+  }
+
+  /** Creates an SSE wrapper from a generated Broker client with explicit transport settings. */
+  public BrokerEventsSseClient(
+      markets.alpaca.client.openapi.broker.http.ApiClient apiClient,
+      AlpacaSseOptions sseOptions,
+      Executor callbackExecutor) {
+    this(new EventsApi(apiClient), sseOptions, callbackExecutor);
   }
 
   /**
@@ -141,7 +180,7 @@ public final class BrokerEventsSseClient {
             .subscribeToActivitiesSSECall(
                 options.since(), options.until(), options.sinceId(), options.untilId(), null)
             .request(),
-        ActivityEventV2.class,
+        new BrokerActivityEventDecoder()::decode,
         listener);
   }
 
@@ -399,69 +438,161 @@ public final class BrokerEventsSseClient {
         listener);
   }
 
+  /**
+   * Fetches one previously observed Broker activity event through its single-event SSE endpoint.
+   */
+  public CompletableFuture<ActivityEventV2> getAccountActivityEventAsync(
+      UUID accountId, String eventId) throws ApiException {
+    return getAccountActivityEventAsync(accountId, eventId, Duration.ofSeconds(30));
+  }
+
+  /** Fetches one Broker activity event, failing if no event arrives before {@code timeout}. */
+  public CompletableFuture<ActivityEventV2> getAccountActivityEventAsync(
+      UUID accountId, String eventId, Duration timeout) throws ApiException {
+    Objects.requireNonNull(timeout, "timeout must not be null");
+    var result = new CompletableFuture<ActivityEventV2>();
+    var subscription = new AtomicReference<AlpacaSseSubscription>();
+    AlpacaSseOptions oneEventOptions =
+        sseOptions.toBuilder()
+            .reconnectPolicy(AlpacaSseReconnectPolicy.disabled())
+            .maxDuration(timeout)
+            .build();
+    AlpacaSseSubscription opened =
+        SseTransport.open(
+            httpClient,
+            accountsApi.getAccountActivityEventCall(accountId, eventId, null).request(),
+            oneEventOptions,
+            true,
+            new BrokerActivityEventDecoder()::decode,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onEvent(AlpacaSseEvent<ActivityEventV2> event) {
+                result.complete(event.data());
+                AlpacaSseSubscription active = subscription.get();
+                if (active != null) active.close();
+              }
+
+              @Override
+              public void onFailure(Throwable failure) {
+                result.completeExceptionally(failure);
+              }
+
+              @Override
+              public void onClosed(markets.alpaca.client.sse.AlpacaSseCloseResult closeResult) {
+                if (!result.isDone()) {
+                  result.completeExceptionally(
+                      new AlpacaSseProtocolException(
+                          "Single-activity SSE response ended without an event"));
+                }
+              }
+            },
+            callbackExecutor);
+    subscription.set(opened);
+    if (result.isDone()) opened.close();
+    result.whenComplete(
+        (ignored, failure) -> {
+          if (result.isCancelled()) opened.close();
+        });
+    return result;
+  }
+
   private <T> BrokerSseSubscription open(
       Request request, Type eventType, BrokerSseEventListener<T> listener) {
+    return open(request, data -> JSON.getGson().fromJson(data, eventType), listener);
+  }
+
+  private <T> BrokerSseSubscription open(
+      Request request, SseDecoder<T> decoder, BrokerSseEventListener<T> listener) {
     Objects.requireNonNull(request, "request must not be null");
-    Objects.requireNonNull(eventType, "eventType must not be null");
+    Objects.requireNonNull(decoder, "decoder must not be null");
     Objects.requireNonNull(listener, "listener must not be null");
-    EventSource source =
-        eventSourceFactory.newEventSource(
-            request, new TypedEventSourceListener<>(eventType, listener, callbackExecutor));
-    return new BrokerSseSubscription(source);
+    boolean bounded =
+        request.url().queryParameter("until") != null
+            || request.url().queryParameter("until_id") != null
+            || request.url().queryParameter("until_ulid") != null;
+    AlpacaSseSubscription subscription =
+        SseTransport.open(
+            httpClient,
+            request,
+            sseOptions,
+            bounded,
+            decoder,
+            adapt(listener, request),
+            callbackExecutor,
+            SseDecodeFailurePolicy.REPORT_AND_CONTINUE);
+    return new BrokerSseSubscription(subscription);
   }
 
-  private static final class TypedEventSourceListener<T> extends EventSourceListener {
-
-    private final Type eventType;
-    private final BrokerSseEventListener<T> listener;
-    private final Executor callbackExecutor;
-
-    private TypedEventSourceListener(
-        Type eventType, BrokerSseEventListener<T> listener, Executor callbackExecutor) {
-      this.eventType = eventType;
-      this.listener = listener;
-      this.callbackExecutor = callbackExecutor;
-    }
-
-    @Override
-    public void onOpen(EventSource eventSource, Response response) {
-      invokeCallback(callbackExecutor, "onOpen", listener::onOpen);
-    }
-
-    @Override
-    public void onEvent(EventSource eventSource, String id, String type, String data) {
-      try {
-        T event = JSON.getGson().fromJson(data, eventType);
-        invokeCallback(callbackExecutor, "onEvent", () -> listener.onEvent(event));
-      } catch (RuntimeException e) {
-        invokeCallback(callbackExecutor, "onFailure", () -> listener.onFailure(e, null));
+  private static <T> AlpacaSseListener<T> adapt(
+      BrokerSseEventListener<T> listener, Request request) {
+    return new AlpacaSseListener<>() {
+      @Override
+      public void onOpen() {
+        listener.onOpen();
       }
-    }
 
-    @Override
-    public void onClosed(EventSource eventSource) {
-      invokeCallback(callbackExecutor, "onClosed", listener::onClosed);
-    }
+      @Override
+      public void onEvent(AlpacaSseEvent<T> event) {
+        listener.onEvent(event.data(), event.id(), event.type());
+      }
 
-    @Override
-    public void onFailure(EventSource eventSource, Throwable t, Response response) {
-      invokeCallback(callbackExecutor, "onFailure", () -> listener.onFailure(t, response));
-    }
+      @Override
+      public void onComment(String comment) {
+        listener.onComment(comment);
+      }
+
+      @Override
+      public void onRetryChanged(Duration delay) {
+        listener.onRetryChanged(delay);
+      }
+
+      @Override
+      public void onReconnecting(int attempt, Duration delay) {
+        listener.onReconnecting(attempt, delay);
+      }
+
+      @Override
+      public void onReconnected() {
+        listener.onReconnected();
+      }
+
+      @Override
+      public void onClosed(markets.alpaca.client.sse.AlpacaSseCloseResult result) {
+        listener.onClosed(result);
+      }
+
+      @Override
+      public void onFailure(Throwable failure) {
+        if (failure instanceof AlpacaSseDeserializationException decodingFailure) {
+          listener.onEventFailure(decodingFailure);
+        } else if (failure instanceof AlpacaSseHttpException httpFailure) {
+          listener.onHttpFailure(httpFailure, responseFor(httpFailure, request));
+        } else {
+          listener.onFailure(failure, null);
+        }
+      }
+    };
   }
 
-  private static void invokeCallback(
-      Executor callbackExecutor, String callbackName, Runnable callback) {
-    try {
-      callbackExecutor.execute(
-          () -> {
-            try {
-              callback.run();
-            } catch (RuntimeException e) {
-              LOG.log(Level.WARNING, "Broker SSE listener callback failed: " + callbackName, e);
-            }
-          });
-    } catch (RuntimeException e) {
-      LOG.log(Level.WARNING, "Broker SSE listener callback executor failed: " + callbackName, e);
-    }
+  private static Response responseFor(Throwable failure, Request request) {
+    if (!(failure instanceof AlpacaSseHttpException httpFailure)) return null;
+    var builder =
+        new Response.Builder()
+            .request(request)
+            .protocol(Protocol.HTTP_1_1)
+            .code(httpFailure.statusCode())
+            .message("SSE request failed");
+    httpFailure
+        .headers()
+        .forEach((name, values) -> values.forEach(value -> builder.addHeader(name, value)));
+    String contentType =
+        httpFailure.headers().entrySet().stream()
+            .filter(entry -> "Content-Type".equalsIgnoreCase(entry.getKey()))
+            .flatMap(entry -> entry.getValue().stream())
+            .findFirst()
+            .orElse(null);
+    MediaType mediaType = contentType == null ? null : MediaType.parse(contentType);
+    builder.body(ResponseBody.create(httpFailure.responseBody(), mediaType));
+    return builder.build();
   }
 }

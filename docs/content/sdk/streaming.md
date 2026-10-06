@@ -4,14 +4,13 @@ title: Streaming & Events
 ---
 
 The Java SDK includes handwritten streaming clients for stock market data, crypto market data,
-news, trading updates, and Broker Events SSE. WebSocket clients use listener callbacks; they do not
-return data from the `connect(...)` call.
+news, trading updates, Market Data corporate-actions SSE, Trading account-activity SSE, and Broker
+Events SSE.
 
 Use the domain pages for REST workflows and the first streaming example for that API area:
 [Market Data](./market-data), [Trading](./trading), and [Broker](./broker). Use this page for the
 shared streaming model: listener callbacks, authentication confirmation, subscription confirmation,
-reconnect behavior, callback executors, and the differences between WebSocket streams and Broker
-Events SSE.
+reconnect behavior, callback executors, and the differences between WebSocket and SSE streams.
 
 ## Stream types
 
@@ -20,7 +19,9 @@ Events SSE.
 | Market Data | `AlpacaStockStream` | WebSocket | Stock trades, quotes, bars, statuses, corrections, and cancel/error events |
 | Market Data | `AlpacaCryptoStream` | WebSocket | Crypto trades, quotes, bars, and orderbooks |
 | Market Data | `AlpacaNewsStream` | WebSocket | Real-time news articles |
+| Market Data | `CorporateActionsSseClient` | Server-Sent Events | Typed corporate-action mutations, filters, history cursors, and live updates |
 | Trading | `AlpacaTradingStream` | WebSocket | Order lifecycle updates for the authenticated account |
+| Trading | `TradingEventsSseClient` | Server-Sent Events | Typed account activities, historical cursors, and live updates |
 | Broker | `BrokerEventsSseClient` | Server-Sent Events | Broker account, trade, funding, journal, system, and related event streams |
 
 Option live streaming is not currently exposed by this SDK. Option REST data is available from the
@@ -28,12 +29,53 @@ generated `OptionApi`.
 
 ## Callback model
 
-All WebSocket listener interfaces provide empty default methods. Override only the events your
-application needs.
+All listener interfaces provide empty default methods. Override only the events your application
+needs.
 
-Callbacks run on OkHttp's reader thread by default. If your handler writes to a database, calls a
-network service, or performs blocking work, use a factory overload that accepts an
-application-owned `Executor`.
+WebSocket callbacks run on OkHttp's reader thread by default. SSE callbacks are serialized per
+subscription, and stream parsing waits for each callback to complete to provide backpressure. The
+default SSE executor runs callbacks directly on the transport or lifecycle thread. If a handler
+writes to a database, calls a network service, or performs blocking work, use a factory overload
+that accepts an application-owned `Executor`.
+
+Transport lifecycle does not wait for user callbacks: `close()` completes the subscription and
+cancels transport work before returning, while the serialized terminal listener callback runs
+after callbacks already in progress. Lifecycle timers also remain independent of callback
+execution. Event callbacks backpressure response parsing, however, so a blocked callback can delay
+detection of remote EOF and the following reconnect. Sharing one single-thread executor across
+subscriptions intentionally serializes their callbacks.
+
+If a listener throws a `RuntimeException`, the SDK logs it and considers the event delivered, so
+its resume ID advances. A callback-executor rejection is terminal. Applications should handle
+their own callback failures, persist work transactionally, and deduplicate by SSE event ID.
+
+SSE subscriptions return immediately while the HTTP connection opens. Use `opened()` with a
+caller-chosen timeout instead of building a startup latch; it yields immutable response URI, status,
+and header metadata. `connection()` reports the most recently accepted connection and changes after
+reconnects, while `opened()` always retains the initial connection.
+
+```java
+var connection = subscription.opened().get(10, TimeUnit.SECONDS);
+System.out.printf("%d %s%n", connection.statusCode(), connection.uri());
+```
+
+Configure transport options without supplying an executor, or configure both through the top-level
+client builder:
+
+```java
+var events = AlpacaClientFactory.tradingEventsSseClient(tradingClient, sseOptions);
+
+var client = AlpacaClient.builder(credentials)
+    .tradingSseOptions(sseOptions)
+    .tradingSseCallbackExecutor(callbackExecutor)
+    .dataSseOptions(sseOptions)
+    .dataSseCallbackExecutor(callbackExecutor)
+    .brokerSseOptions(brokerOptions)
+    .brokerSseCallbackExecutor(callbackExecutor)
+    .build();
+```
+
+The SDK never shuts down an application-owned callback executor.
 
 ## Stock data stream
 
@@ -199,6 +241,114 @@ var resilientStream = AlpacaClientFactory.stockStream(
 Use `AlpacaStreamReconnectPolicy.disabled()` when an application-level supervisor should own
 reconnect decisions.
 
+## Market Data corporate-actions SSE
+
+Corporate-action mutations use Server-Sent Events. Create the handwritten client through the
+factory; the generated `subscribeToCorporateActionsEventsSSE` method buffers the response and is
+not suitable for a live stream.
+
+```java
+import markets.alpaca.client.data.sse.CorporateActionsSseRequest;
+import markets.alpaca.client.data.sse.MarketDataSseEnvironment;
+import markets.alpaca.client.openapi.data.model.CorporateActionEvent;
+import markets.alpaca.client.openapi.data.model.CorporateActionEventCashDividend;
+import markets.alpaca.client.openapi.data.model.CorporateActionEventType;
+import markets.alpaca.client.sse.AlpacaSseEvent;
+import markets.alpaca.client.sse.AlpacaSseListener;
+
+var corporateActions = AlpacaClientFactory.corporateActionsSseClient(
+    dataClient, MarketDataSseEnvironment.PRODUCTION);
+
+var request = CorporateActionsSseRequest.builder()
+    .eventTypes(CorporateActionEventType.CASH_DIVIDEND_CORPORATEACTION_EVENT)
+    .region(CorporateActionsSseRequest.Region.US)
+    .build();
+
+var subscription = corporateActions.subscribeToCorporateActions(
+    request,
+    new AlpacaSseListener<>() {
+        @Override
+        public void onEvent(AlpacaSseEvent<CorporateActionEvent> event) {
+            if (event.data().getActualInstance()
+                    instanceof CorporateActionEventCashDividend dividend) {
+                System.out.printf("%s %s%n", event.id(), dividend.getCa().getSymbol());
+            }
+        }
+    });
+```
+
+Select `PRODUCTION`, `SANDBOX`, or an explicit `MarketDataSseEnvironment.custom(...)` endpoint.
+This stream endpoint is independent from the generated Market Data REST base URL, so selecting a
+REST environment does not implicitly select the SSE environment.
+
+Use `CorporateActionsSseRequest.fromEventId(...)` or `throughEventId(...)` for replay and bounded
+history. Corporate-action event IDs are validated uppercase ULIDs. The endpoint defines inclusive
+resume semantics, so reconnects can redeliver the cursor event; deduplicate by event ID when
+effects must be exactly once. Unknown `event_type` values and payloads that do not validate against
+their generated concrete schema fail the subscription instead of being guessed.
+
+## Trading account-activity SSE
+
+Account activities use Server-Sent Events and are separate from WebSocket `trade_updates`.
+Create the handwritten client through the factory; generated `subscribeToActivitiesSSE` methods
+buffer the response and are not suitable for a live stream.
+
+```java
+import markets.alpaca.client.sse.AlpacaSseEvent;
+import markets.alpaca.client.sse.AlpacaSseListener;
+import markets.alpaca.client.openapi.trading.model.ActivityEventV2;
+import markets.alpaca.client.trading.sse.TradingEventsSseClient;
+
+TradingEventsSseClient events =
+    AlpacaClientFactory.tradingEventsSseClient(tradingClient);
+
+var subscription = events.subscribeToActivities(
+    new AlpacaSseListener<>() {
+        @Override
+        public void onEvent(AlpacaSseEvent<ActivityEventV2> event) {
+            System.out.printf("%s %s%n", event.id(), event.data().getActivityType());
+        }
+    });
+
+// Later:
+subscription.close();
+```
+
+For a bounded historical range, pass a validated cursor request:
+
+```java
+import markets.alpaca.client.trading.sse.TradingActivitySseRequest;
+
+var range = TradingActivitySseRequest.throughEventId(
+    "01K6F000000000000000000000",
+    "01K6G000000000000000000000");
+
+var historical = events.subscribeToActivities(range, new AlpacaSseListener<>() {});
+```
+
+Live Trading SSE reconnects on transient failures by default. It follows the SSE protocol by
+persisting completed `id:` fields (including data-less ID blocks) and sending the cursor as the
+documented `since_id` query parameter and in `Last-Event-ID` on the replacement request. Resume
+state advances after a payload is successfully decoded and dispatched, or when a completed
+data-less `id:` block is observed. Malformed Trading payloads do not advance it. Date-bounded
+requests retain their original date range on retry and can replay already processed events. Server
+replay can be inclusive, so applications requiring exactly-once effects must deduplicate persisted
+work by event ID. `until` or `untilId` makes a request bounded;
+normal EOF then completes the subscription instead of reconnecting. Configure retry budgets,
+initial resume ID, idle timeout, and resource limits with `AlpacaSseOptions` factory overloads.
+`AlpacaSseReconnectPolicy.maxElapsedTime(...)` bounds one initial-open or established reconnect
+cycle, including connection attempts and backoff; `AlpacaSseOptions.maxDuration(...)` separately
+bounds the lifetime of the whole subscription. `maxBackoff(...)` caps client exponential backoff,
+server SSE `retry:` values, and HTTP `Retry-After` values. The connection timeout covers successful
+response-header validation and bounded non-success response-body capture, so a server cannot keep a
+subscription opening indefinitely by stalling an error body.
+
+Malformed Trading activity payloads fail the subscription. Activity detail models are selected by
+the OAS type/subtype mapping. The two schemas whose OAS definitions currently lack discriminants
+(fixed-income redemption and rights distribution) use a unique-most-specific structural fallback;
+ties fail explicitly instead of being guessed. The same decoder behavior applies to Broker Activity
+V2 events.
+
 ## Broker Events SSE
 
 Broker Events are exposed through the Broker SSE client, not a WebSocket stream.
@@ -221,3 +371,30 @@ var subscription = brokerEvents.subscribeToTradeEvents(
 
 subscription.close();
 ```
+
+Existing Broker client constructors preserve the previous one-connection behavior. Use the
+`AlpacaSseOptions` factory overload to opt into resilient reconnect behavior. Broker listener
+callbacks are serialized and provide backpressure; use a dedicated executor for blocking work.
+`BrokerSseSubscription` implements the shared `AlpacaSseSubscription` lifecycle contract, while
+retaining Broker-specific compatibility methods.
+For compatibility, a malformed Broker event invokes `onFailure` for that event and the healthy
+connection continues. Its SSE ID becomes the `Last-Event-ID` transport cursor after the callback.
+Broker endpoints document endpoint-specific `since_id`/`since_ulid` query cursors, so applications
+that require gap replay should reconnect with the appropriate request option and deduplicate.
+Protocol and non-retryable HTTP failures are terminal;
+retryable HTTP and transport failures follow the configured reconnect policy.
+
+New listeners can override `onEventFailure(AlpacaSseDeserializationException)` to distinguish one
+malformed event from terminal failures and inspect its event ID/type. `onRetryChanged(Duration)`
+reports server `retry:` fields, `onHttpFailure(...)` exposes structured HTTP failures, and
+`onClosed(AlpacaSseCloseResult)` exposes the normal close reason. Defaults preserve the original
+callback shapes: malformed events pass their original cause, HTTP failures pass a bounded
+compatibility response with no throwable, and user cancellation passes
+`IOException("canceled")` with no response. Rich overrides receive one callback instead.
+
+Applications upgrading Broker SSE from `0.1.4` should follow the
+[SSE migration guide](./sse-migration), especially when they use `eventSource()`, inspect raw
+failure types, or block inside callbacks.
+
+The deprecated `/v1/events/transfers/status` operation is inventoried but intentionally has no
+handwritten wrapper. Use Broker funding-status events for supported transfer/funding updates.

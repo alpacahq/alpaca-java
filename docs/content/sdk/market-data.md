@@ -270,6 +270,57 @@ var stream = AlpacaClientFactory.stockStream(
 stream.connect(StockSubscription.builder().quotes("AAPL").build());
 ```
 
+## Corporate-actions SSE
+
+Use the handwritten corporate-actions SSE client for typed insert, update, and delete events. The
+generated OpenAPI method treats the response like an ordinary buffered REST call and should not be
+used for a live stream.
+
+```java
+import markets.alpaca.client.data.sse.CorporateActionsSseRequest;
+import markets.alpaca.client.openapi.data.model.CorporateActionEvent;
+import markets.alpaca.client.openapi.data.model.CorporateActionEventCashDividend;
+import markets.alpaca.client.openapi.data.model.CorporateActionEventType;
+import markets.alpaca.client.sse.AlpacaSseEvent;
+import markets.alpaca.client.sse.AlpacaSseListener;
+
+var request = CorporateActionsSseRequest.builder()
+    .eventTypes(CorporateActionEventType.CASH_DIVIDEND_CORPORATEACTION_EVENT)
+    .region(CorporateActionsSseRequest.Region.US)
+    .build();
+
+var subscription = client.corporateActionsSseClient().subscribeToCorporateActions(
+    request,
+    new AlpacaSseListener<>() {
+        @Override
+        public void onEvent(AlpacaSseEvent<CorporateActionEvent> event) {
+            if (event.data().getActualInstance()
+                    instanceof CorporateActionEventCashDividend dividend) {
+                System.out.printf("%s %s%n", event.id(), dividend.getCa().getSymbol());
+            }
+        }
+    });
+
+// Later:
+subscription.close();
+```
+
+The default stream endpoint is production. Select sandbox when building the top-level client:
+
+```java
+import markets.alpaca.client.data.sse.MarketDataSseEnvironment;
+
+var sandboxClient = AlpacaClient.builder(credentials)
+    .marketDataSseEnvironment(MarketDataSseEnvironment.SANDBOX)
+    .build();
+```
+
+The stream environment is explicit and independent from the generated Market Data REST base URL.
+For replay or bounded history, use `CorporateActionsSseRequest.fromEventId(...)` or
+`throughEventId(...)`; corporate-action cursor IDs must be uppercase ULIDs. Reconnects resume with
+standard `Last-Event-ID` semantics and may redeliver the inclusive cursor event, so deduplicate
+event IDs when exactly-once effects matter.
+
 Option live streaming is not currently exposed by this SDK. Use generated `OptionApi` for option
 REST data, and add a handwritten option stream client under `src/main/java/markets/alpaca/client/ws/`
 if WebSocket option data is needed.

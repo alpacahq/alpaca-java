@@ -11,10 +11,13 @@ the policy below applies strictly.
 
 | Change type                                                                                                   | Version bump |
 |---------------------------------------------------------------------------------------------------------------|--------------|
-| Breaking change to `AlpacaClientFactory`, `AlpacaCredentials`, HTTP helpers, REST helpers, or WebSocket public API | MAJOR        |
+| Breaking change to `AlpacaClientFactory`, `AlpacaCredentials`, HTTP helpers, REST helpers, or WebSocket/SSE public API | MAJOR        |
 | Breaking change to the generated API surface (renamed/removed class or method)                                | MAJOR        |
 | New endpoint or model coverage from a spec version update                                                     | MINOR        |
 | Bug fix, dependency update, or preprocessing fix                                                              | PATCH        |
+
+Packages whose name contains `.internal` are implementation details, are omitted from published
+Javadocs and API compatibility checks, and are not covered by this compatibility policy.
 
 ---
 
@@ -34,6 +37,11 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Broker and Trading `OptionContract` JSON validation now requires `ppind`.
 - Broker and Trading `CommonFixedIncomeInterestActivityV2` JSON validation now requires
   `interest_type`.
+- Broker SSE keeps its public `eventSource()` method, but the returned object is now a
+  request/cancel compatibility facade rather than OkHttp's live implementation.
+- Broker callbacks are serialized and backpressured instead of fire-and-forget. Terminal lifecycle
+  completion is independent from terminal listener delivery, and callback failure semantics are
+  defined below. See the migration guide before upgrading callback-heavy applications.
 
 ### Added
 - Broker and Trading `FixedIncomeInterestType` (`coupon`, `accrued`), plus `interest_type`,
@@ -43,10 +51,73 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Broker `FundingWalletTransfer.getTotalAmount()`, and `fee_inclusive` on
   `CreateFundingWalletWithdrawalRequest`.
 - `TokenizationIssuer.ONDO` and `TokenizationNetwork.HYPERCORE` on Broker and Trading.
+- A typed, cancellable, reconnecting Trading account-activity SSE client with cursor filters,
+  bounded streams, resume IDs, resource limits, and structured lifecycle/error reporting.
+- A typed Market Data corporate-actions SSE client with production, sandbox, and custom endpoint
+  selection; event-type and region filters; validated history cursors; and fail-closed decoding for
+  every corporate-action discriminator in the pinned OpenAPI document.
+- Shared Java SSE transport types and explicit OpenAPI SSE contract verification.
+- Broker single-activity asynchronous retrieval through the endpoint's SSE framing.
+- Awaitable SSE opening, immutable current-connection metadata, options-only factories, top-level
+  client configuration, callback-executor factories, and named Trading and Market Data event-ID
+  cursor factories.
+- An optional elapsed-time budget for each initial-open or established reconnect cycle, separate
+  from the whole-subscription maximum duration.
 
 ### Changed
 - Broker `FundingWalletTransfer.getOriginalAmount()` is deprecated. Use `getTotalAmount()` for the
   amount debited from the account.
+- Broker SSE now uses the shared bounded parser and exposes SSE IDs/types, comments, reconnect
+  diagnostics, completion state, and optional resilient reconnect while preserving existing
+  one-connection defaults, per-event decode-failure behavior, and failure response bodies.
+- SSE listener callbacks are serialized per subscription, so terminal listener delivery follows an
+  active event callback and event handling provides transport backpressure; lifecycle completion
+  and timers do not wait for user callbacks. Because response parsing is backpressured, detection
+  of a remote end and its following reconnect can wait for the active event callback.
+- Activity V2 events use discriminant-aware decoders with a unique-most-specific structural
+  fallback instead of ambiguous generated `oneOf` matching; tied matches fail closed.
+- SSE resume state includes completed data-less `id:` blocks, and idle timers are scoped to active
+  response bodies rather than reconnect backoff.
+- Broker malformed events report failure, advance the transport cursor, and continue. Reconnect
+  attempt budgets are reset after a decoded event callback is invoked.
+- Broker listeners can distinguish malformed events, server retry changes, and structured normal
+  closure through additive default callbacks; deserialization failures include SSE ID/type.
+- The pinned Broker NTA operation now declares its actual `text/event-stream` response media type.
+- The public SSE subscription boundary is an interface; transport implementation classes under
+  `markets.alpaca.client.sse.internal` are excluded from Javadocs and compatibility guarantees.
+- `BrokerSseSubscription` implements the shared subscription interface while retaining its
+  Broker-specific compatibility surface. Reconnect delay caps now apply to client backoff, server
+  `retry:`, and HTTP `Retry-After` values.
+
+### Fixed
+- Closing during initial connection or reconnect can no longer publish an uncancelled call after the
+  terminal transition, and closing from a listener while awaiting `completion()` no longer
+  deadlocks.
+- Terminal lifecycle state, timers, and cancellation no longer wait behind user callbacks or block
+  the shared scheduler. Terminal listener delivery remains serialized after callbacks already in
+  progress, and no new callbacks are admitted after termination.
+- Connection deadlines now cover bounded non-success response-body reads, timeout failures retain
+  their cancellation cause, and elapsed reconnect-budget expiry preserves the preceding transport
+  or HTTP failure instead of starting an immediately cancelled request.
+
+### Behavioral compatibility and migration
+- Existing Broker listener signatures remain available. Rich callbacks delegate to the legacy
+  shapes by default: malformed events pass their original deserialization cause, HTTP failures pass
+  a bounded response with no throwable, and user close passes `IOException("canceled")` with no
+  response. Overriding a rich callback suppresses its default legacy delegation.
+- `BrokerSseSubscription.eventSource()` is now a request/cancel compatibility facade rather than
+  the live OkHttp implementation. Prefer `close()`; casts, identity assumptions, and deep response
+  internals require manual review. Cancellation no longer carries OkHttp's stripped active
+  response, and protocol/resource failures use the SDK exception hierarchy.
+- Listener runtime exceptions are logged and a delivered event's resume cursor still advances.
+  Callback-executor rejection is terminal. Lifecycle `completion()` resolves before terminal
+  listener delivery and cannot be held up by a blocked callback.
+- Trading reconnect requests transmit the committed cursor through the documented `since_id` query
+  and `Last-Event-ID`. Replay relies on `since_id`; no backend consumption claim is made for the
+  standard header.
+- See [`MIGRATIONS.md`](MIGRATIONS.md) for the `0.1.4` → `0.1.5` guide and conservative codemod.
+  This substantial additive/behavioral release uses the repository's documented pre-1.0
+  compatibility policy.
 
 ## [0.1.4] - 2026-09-23
 
