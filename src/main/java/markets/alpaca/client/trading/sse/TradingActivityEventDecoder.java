@@ -62,6 +62,7 @@ import markets.alpaca.client.openapi.trading.model.WRMActivityV2;
 import markets.alpaca.client.openapi.trading.model.WarrantExerciseElectionActivityV2;
 import markets.alpaca.client.sse.internal.ActivityDetailSchemaResolver;
 import markets.alpaca.client.sse.internal.ActivityDetailSchemaSelector;
+import markets.alpaca.client.sse.internal.GeneratedModelAdditionalProperties;
 
 /**
  * Decodes Trading activity events.
@@ -243,6 +244,8 @@ final class TradingActivityEventDecoder {
     event.setStatus(string(root, "status"));
     event.setSwapFeeBps(decimal(root, "swap_fee_bps"));
     event.setSwapRate(decimal(root, "swap_rate"));
+    GeneratedModelAdditionalProperties.copy(
+        root, ActivityEventV2.openapiFields, JSON.getGson(), event::putAdditionalProperty);
     return event;
   }
 

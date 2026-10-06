@@ -58,34 +58,16 @@ candidate commit:
 ./gradlew checkApiCompatibility
 ```
 
-The API compatibility task compares the complete public JAR and fails on source or binary
-incompatibility. `apiBaselineVersion` in `gradle.properties` is the previous published release and
-the post-release bump workflow advances it alongside the next development version. The tagged
-release check independently derives the greatest reachable semantic version below the candidate.
-The baseline-specific, member-level exclusions in `alpaca.quality.gradle` cover only reviewed
-OpenAPI corrections inherited before this gate existed. Do not broaden those exclusions or add
-another without equivalent migration guidance and review. The task still fails on every other
-incompatibility. It does not prove behavioral compatibility, and missing external dependency
-classes are ignored, so release-specific migration review and regression tests remain mandatory.
-
-## Pre-tag verification
-
-Run the candidate from a clean tree so `checkGenerated` compares regenerated OpenAPI output with the
-candidate commit:
-
-```bash
-./gradlew build
-./gradlew checkApiCompatibility -PapiBaselineVersion=0.1.4
-```
-
 The API compatibility task compares the complete public JAR, including handwritten streaming
-surfaces, and fails on source or binary incompatibility. Update the baseline property only when the
-previous published release changes. The member-specific exclusions in
-`alpaca.quality.gradle` cover only reviewed OpenAPI corrections inherited before this gate existed;
-each is documented in [`MIGRATIONS.md`](MIGRATIONS.md). Do not broaden those exclusions or add
-another without equivalent migration guidance and review. The task still fails on every other
-incompatibility. It does not prove behavioral compatibility, and missing external dependency
-classes are ignored, so the migration review and SSE regression tests remain mandatory.
+surfaces, and fails on source or binary incompatibility. `apiBaselineVersion` in
+`gradle.properties` is the previous published release and the post-release bump workflow advances
+it alongside the next development version. The tagged release check independently derives the
+greatest reachable semantic version below the candidate. The baseline-specific, member-level
+exclusions in `alpaca.quality.gradle` cover only reviewed OpenAPI corrections inherited before this
+gate existed; each is documented in [`MIGRATIONS.md`](MIGRATIONS.md). Do not broaden those
+exclusions or add another without equivalent migration guidance and review. The task still fails on
+every other incompatibility. It does not prove behavioral compatibility, and missing external
+dependency classes are ignored, so the migration review and SSE regression tests remain mandatory.
 
 SSE releases additionally require manual live validation with valid Trading paper/Market Data and
 Broker sandbox credentials. Supply bounded RFC 3339 Trading and corporate-actions replay windows

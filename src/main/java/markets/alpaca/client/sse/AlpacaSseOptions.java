@@ -106,10 +106,21 @@ public final class AlpacaSseOptions {
       return this;
     }
 
+    /**
+     * Sets the initial SSE resume cursor.
+     *
+     * <p>Unicode is supported; HTTP control characters are rejected because the cursor is sent in
+     * {@code Last-Event-ID}.
+     */
     public Builder initialLastEventId(String initialLastEventId) {
-      if (initialLastEventId != null
-          && (initialLastEventId.indexOf('\r') >= 0 || initialLastEventId.indexOf('\n') >= 0)) {
-        throw new IllegalArgumentException("initialLastEventId must not contain CR or LF");
+      if (initialLastEventId != null) {
+        for (int index = 0; index < initialLastEventId.length(); index++) {
+          char character = initialLastEventId.charAt(index);
+          if (character <= 0x1f || character == 0x7f) {
+            throw new IllegalArgumentException(
+                "initialLastEventId must not contain HTTP control characters");
+          }
+        }
       }
       this.initialLastEventId = initialLastEventId;
       return this;

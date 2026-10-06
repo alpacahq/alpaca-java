@@ -49,7 +49,10 @@ Generator scratch still lands under `build/generated/`; only the OpenAPI package
 under `src/main/java/markets/alpaca/client/openapi/` are synced into the source
 tree. If regeneration changes tracked files, commit them (or run `checkGenerated`
 in CI to catch drift). `checkGenerated` also runs `checkSseContracts`, so adopted SSE operations
-cannot silently lose their handwritten support decision or binding.
+cannot silently lose their handwritten support decision or binding. The contract check also pins
+ordered parameter wire signatures (including location, requiredness, schema, and serialization
+behavior), resolved schema constraints such as enum/default/pattern, response schemas, and exact
+authentication alternatives consumed by each handwritten SSE client.
 
 ## Adopting upstream changes
 

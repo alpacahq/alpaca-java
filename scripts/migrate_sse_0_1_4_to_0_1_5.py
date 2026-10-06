@@ -28,6 +28,9 @@ BROKER_TYPE_DECLARATION = re.compile(
     r"\b(?:class|interface|enum|record|@interface)\s+BrokerSseSubscription\b"
 )
 JAVA_IDENTIFIER = r"[A-Za-z_$][\w$]*"
+TYPE_DECLARATION = re.compile(
+    rf"\b(?:class|interface|enum|record|@interface)\s+{JAVA_IDENTIFIER}\b"
+)
 JAVA_TYPE = (
     rf"{JAVA_IDENTIFIER}(?:\s*\.\s*{JAVA_IDENTIFIER})*"
     rf"(?:\s*<[^;{{}}()=]+>)?(?:\s*\[\s*\])*"
@@ -177,6 +180,161 @@ def _is_bare_receiver(mask: str, offset: int) -> bool:
     return index < 0 or mask[index] != "."
 
 
+def _brace_pairs(mask: str) -> dict[int, int]:
+    pairs: dict[int, int] = {}
+    stack: list[int] = []
+    for index, character in enumerate(mask):
+        if character == "{":
+            stack.append(index)
+        elif character == "}" and stack:
+            pairs[stack.pop()] = index
+    return pairs
+
+
+def _parenthesis_pairs(mask: str) -> dict[int, int]:
+    pairs: dict[int, int] = {}
+    stack: list[int] = []
+    for index, character in enumerate(mask):
+        if character == "(":
+            stack.append(index)
+        elif character == ")" and stack:
+            pairs[stack.pop()] = index
+    return pairs
+
+
+def _is_control_header_binder(
+    mask: str, binder: int, parenthesis_pairs: dict[int, int]
+) -> bool:
+    """Return whether a declaration is inside a control-flow header.
+
+    The scanner deliberately leaves these declarations for manual review. In
+    particular, an unbraced for-loop variable stops being visible after the
+    loop even though both locations have the same brace ancestry.
+    """
+    for opening, closing in parenthesis_pairs.items():
+        if not opening < binder < closing:
+            continue
+        keyword = re.search(rf"(?P<keyword>{JAVA_IDENTIFIER})\s*$", mask[:opening])
+        if keyword and keyword.group("keyword") in {
+            "catch",
+            "for",
+            "if",
+            "switch",
+            "synchronized",
+            "try",
+            "while",
+        }:
+            return True
+    return False
+
+
+def _type_bodies(mask: str, brace_pairs: dict[int, int]) -> tuple[tuple[int, int], ...]:
+    bodies: list[tuple[int, int]] = []
+    for declaration in TYPE_DECLARATION.finditer(mask):
+        opening = mask.find("{", declaration.end())
+        semicolon = mask.find(";", declaration.end())
+        if opening < 0 or (semicolon >= 0 and semicolon < opening):
+            continue
+        closing = brace_pairs.get(opening)
+        if closing is not None:
+            bodies.append((opening, closing))
+    return tuple(bodies)
+
+
+def _enclosing_type(
+    type_bodies: tuple[tuple[int, int], ...], offset: int
+) -> tuple[int, int] | None:
+    containing = (body for body in type_bodies if body[0] < offset < body[1])
+    return max(containing, key=lambda body: body[0], default=None)
+
+
+def _brace_ancestry(brace_pairs: dict[int, int], offset: int) -> tuple[int, ...]:
+    return tuple(
+        opening
+        for opening, closing in sorted(brace_pairs.items())
+        if opening < offset < closing
+    )
+
+
+def _matching_open_parenthesis(mask: str, closing: int) -> int | None:
+    depth = 0
+    for index in range(closing, -1, -1):
+        if mask[index] == ")":
+            depth += 1
+        elif mask[index] == "(":
+            depth -= 1
+            if depth == 0:
+                return index
+    return None
+
+
+def _header_parameter_span(mask: str, body_opening: int) -> tuple[int, int] | None:
+    boundary = max(mask.rfind("{", 0, body_opening), mask.rfind(";", 0, body_opening))
+    closing = mask.rfind(")", boundary + 1, body_opening)
+    if closing < 0:
+        return None
+    suffix = mask[closing + 1 : body_opening]
+    if not re.fullmatch(r"\s*(?:(?:throws\s+[^{};]+)|->)?\s*", suffix):
+        return None
+    opening = _matching_open_parenthesis(mask, closing)
+    if opening is None or opening <= boundary:
+        return None
+    return opening + 1, closing
+
+
+def _is_expression_lambda_parameter(mask: str, binder: int) -> bool:
+    arrow = mask.find("->", binder)
+    if arrow < 0:
+        return False
+    boundaries = [
+        offset
+        for offset in (mask.find(";", binder), mask.find("{", binder))
+        if offset >= 0
+    ]
+    return not boundaries or arrow < min(boundaries)
+
+
+def _binder_visible_to_call(
+    mask: str,
+    binder: int,
+    call: int,
+    brace_pairs: dict[int, int],
+    parenthesis_pairs: dict[int, int],
+    type_bodies: tuple[tuple[int, int], ...],
+) -> bool:
+    if binder >= call:
+        return False
+    call_type = _enclosing_type(type_bodies, call)
+    if call_type is None or _enclosing_type(type_bodies, binder) != call_type:
+        return False
+
+    call_ancestry = _brace_ancestry(brace_pairs, call)
+    binder_ancestry = _brace_ancestry(brace_pairs, binder)
+    type_depth = call_ancestry.index(call_type[0]) + 1
+
+    if _is_control_header_binder(mask, binder, parenthesis_pairs):
+        return False
+    if _is_expression_lambda_parameter(mask, binder):
+        return False
+
+    header_bodies = []
+    for body_opening in sorted(brace_pairs):
+        span = _header_parameter_span(mask, body_opening)
+        if span is not None and span[0] <= binder < span[1]:
+            header_bodies.append(body_opening)
+    if header_bodies:
+        return any(body_opening in call_ancestry for body_opening in header_bodies)
+
+    # Explicit local declarations in the same block or one of its lexical parents.
+    if (
+        len(binder_ancestry) > type_depth
+        and call_ancestry[: len(binder_ancestry)] == binder_ancestry
+    ):
+        return True
+
+    return False
+
+
 def _contains_masked_syntax(text: str, mask: str, start: int, end: int) -> bool:
     return any(
         original != masked and not original.isspace()
@@ -188,7 +346,9 @@ def _diagnostic_patterns(
     mask: str, *, sse_context: bool
 ) -> Iterable[tuple[int, str, str]]:
     generated_sse = re.compile(
-        r"\.\s*(?:subscribeTo[A-Za-z0-9_]*SSE|getV1EventsNta|getAccountActivityEvent)\s*\("
+        r"\.\s*(?:(?:subscribeTo|suscribeTo)[A-Za-z0-9_]*SSE"
+        r"|getV1EventsNta|getAccountActivityEvent)"
+        r"(?:Call|WithHttpInfo|Async)?\s*\("
     )
     match = generated_sse.search(mask)
     if match:
@@ -246,16 +406,46 @@ def analyze_text(text: str, path: str = "<memory>") -> Analysis:
     has_shadowing_type = bool(BROKER_TYPE_DECLARATION.search(mask))
     broker_binders = _broker_binders(mask, has_exact_import=has_exact_import)
     all_binders = _all_binders(mask)
+    brace_pairs = _brace_pairs(mask)
+    parenthesis_pairs = _parenthesis_pairs(mask)
+    type_bodies = _type_bodies(mask, brace_pairs)
 
     replacements: list[tuple[int, int, str]] = []
     findings: list[Finding] = []
     for call in CANCEL_CALL.finditer(mask):
         receiver = call.group(1)
+        visible_broker_binders = [
+            binder
+            for binder in broker_binders.get(receiver, ())
+            if _binder_visible_to_call(
+                mask,
+                binder,
+                call.start(),
+                brace_pairs,
+                parenthesis_pairs,
+                type_bodies,
+            )
+        ]
+        visible_binders = [
+            binder
+            for binder in all_binders.get(receiver, ())
+            if _binder_visible_to_call(
+                mask,
+                binder,
+                call.start(),
+                brace_pairs,
+                parenthesis_pairs,
+                type_bodies,
+            )
+        ]
         safe = (
             _is_bare_receiver(mask, call.start())
             and not has_shadowing_type
             and len(broker_binders.get(receiver, ())) == 1
             and len(all_binders.get(receiver, ())) == 1
+            and len(visible_broker_binders) == 1
+            and len(visible_binders) == 1
+            and set(visible_broker_binders) == set(visible_binders)
             and not _contains_masked_syntax(text, mask, call.start(), call.end())
         )
         if safe:
