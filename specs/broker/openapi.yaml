@@ -17012,7 +17012,7 @@ paths:
       responses:
         '200':
           content:
-            application/json:
+            text/event-stream:
               schema:
                 $ref: '#/components/schemas/NonTradeActivityEvent'
           description: OK

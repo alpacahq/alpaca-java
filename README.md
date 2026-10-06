@@ -10,13 +10,15 @@
 
 Java client for [Alpaca Markets](https://alpaca.markets) APIs.
 
-REST clients are generated at build time from Alpaca OpenAPI specs. WebSocket stream clients and
-Broker Events SSE helpers are handwritten and committed in `src/main/java/markets/alpaca/client/`.
+REST clients are generated at build time from Alpaca OpenAPI specs. WebSocket clients and the
+Trading, Broker, and Market Data corporate-actions SSE clients are handwritten and committed in
+`src/main/java/markets/alpaca/client/`.
 
 ## Documentation
 
 - [Getting started](https://alpacahq.github.io/alpaca-java/getting-started) — installation, credentials, and examples
 - [API reference](https://alpacahq.github.io/alpaca-java/api) — classes, methods, and generated REST models
+- [Migration guides](MIGRATIONS.md) — compatibility and upgrade guidance, including SSE `0.1.5`
 - [Runnable examples](examples/README.md) — local Trading, Market Data, Broker, and pagination workflows
 - [LLM usage guide](LLMS.md) — guidance for coding assistants
 - [Documentation development](docs/README.md) — local Docusaurus setup
@@ -56,7 +58,7 @@ repositories {
 }
 
 dependencies {
-    implementation("markets.alpaca:alpaca-java:0.1.2-SNAPSHOT")
+    implementation("markets.alpaca:alpaca-java:0.1.5-SNAPSHOT")
 }
 ```
 

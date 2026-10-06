@@ -5,9 +5,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import markets.alpaca.client.AlpacaClientFactory;
 import markets.alpaca.client.AlpacaCredentials;
 import markets.alpaca.client.BrokerApiEnvironment;
@@ -15,7 +13,8 @@ import markets.alpaca.client.broker.sse.BrokerSseDateOptions;
 import markets.alpaca.client.broker.sse.BrokerSseEventListener;
 import markets.alpaca.client.openapi.broker.api.AccountsApi;
 import markets.alpaca.client.openapi.broker.api.TradingApi;
-import okhttp3.Response;
+import markets.alpaca.client.sse.AlpacaSseCloseResult;
+import markets.alpaca.client.sse.AlpacaSseState;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -46,11 +45,19 @@ class BrokerIntegrationIT {
   static void setupClient() {
     String keyId = credential("APCA_BROKER_KEY_ID");
     String secretKey = credential("APCA_BROKER_SECRET_KEY");
+    boolean credentialsPresent =
+        keyId != null && !keyId.isBlank() && secretKey != null && !secretKey.isBlank();
 
-    assumeTrue(
-        keyId != null && !keyId.isBlank() && secretKey != null && !secretKey.isBlank(),
-        "Skipping Broker integration tests — set APCA_BROKER_KEY_ID and APCA_BROKER_SECRET_KEY "
-            + "(env vars or local.properties) to run");
+    if (Boolean.getBoolean("alpaca.requireSseIntegration")) {
+      assertTrue(
+          credentialsPresent,
+          "Strict SSE integration requires APCA_BROKER_KEY_ID and APCA_BROKER_SECRET_KEY");
+    } else {
+      assumeTrue(
+          credentialsPresent,
+          "Skipping Broker integration tests — set APCA_BROKER_KEY_ID and APCA_BROKER_SECRET_KEY "
+              + "(env vars or local.properties) to run");
+    }
 
     brokerClient =
         AlpacaClientFactory.brokerClient(
@@ -110,34 +117,19 @@ class BrokerIntegrationIT {
   @Test
   void brokerSse_subscribeToTradeEvents_opensStream() throws Exception {
     var brokerEvents = AlpacaClientFactory.brokerEventsSseClient(brokerClient);
-    var completed = new CountDownLatch(1);
-    var failure = new AtomicReference<Throwable>();
-    var failureResponseCode = new AtomicReference<Integer>();
-
-    try (var subscription =
+    var subscription =
         brokerEvents.subscribeToTradeEvents(
-            BrokerSseDateOptions.empty(),
-            new BrokerSseEventListener<>() {
-              @Override
-              public void onOpen() {
-                completed.countDown();
-              }
-
-              @Override
-              public void onFailure(Throwable throwable, Response response) {
-                failure.set(throwable);
-                if (response != null) failureResponseCode.set(response.code());
-                completed.countDown();
-              }
-            })) {
-      assertTrue(
-          completed.await(20, TimeUnit.SECONDS), "Broker SSE stream did not open within 20s");
-    }
-
-    if (failure.get() != null) {
-      fail(
-          "Broker SSE stream failed with response code " + failureResponseCode.get(),
-          failure.get());
+            BrokerSseDateOptions.empty(), new BrokerSseEventListener<>() {});
+    try {
+      var connection = subscription.opened().get(20, TimeUnit.SECONDS);
+      assertEquals(200, connection.statusCode(), "Broker SSE must return HTTP 200");
+      assertEquals(AlpacaSseState.OPEN, subscription.state());
+    } finally {
+      subscription.close();
+      assertEquals(
+          AlpacaSseCloseResult.Reason.USER_CLOSED,
+          subscription.completion().get(10, TimeUnit.SECONDS).reason());
+      assertEquals(AlpacaSseState.CLOSED, subscription.state());
     }
   }
 }

@@ -13,6 +13,7 @@ openapi-generator    = "7.25.0"
 spotbugs-gradle-plugin = "6.5.12"
 spotless-gradle-plugin = "8.10.3"
 snakeyaml             = "2.7"
+japicmp               = "0.26.3"
 
 [libraries]
 okhttp                  = { module = "com.squareup.okhttp3:okhttp",                    version.ref = "okhttp" }
@@ -28,6 +29,7 @@ mockwebserver           = { module = "com.squareup.okhttp3:mockwebserver",      
 junit-jupiter           = { module = "org.junit.jupiter:junit-jupiter",                version.ref = "junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher",     version.ref = "junit-platform" }
 snakeyaml               = { module = "org.yaml:snakeyaml",                            version.ref = "snakeyaml" }
+japicmp                 = { module = "com.github.siom79.japicmp:japicmp",              version.ref = "japicmp" }
 
 [plugins]
 openapi-generator = { id = "org.openapi.generator", version.ref = "openapi-generator" }

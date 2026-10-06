@@ -12,6 +12,7 @@ this SDK, read `LLMS.md` instead.
 ./gradlew generateDataApi          # generate Market Data only
 ./gradlew generateTradingApi       # generate Trading only
 ./gradlew checkGenerated           # fail if specs/ or generated OpenAPI sources are stale
+./gradlew checkSseContracts        # verify pinned SSE operations against handwritten coverage
 ./gradlew adoptOpenApiDryRun       # semantic diff vs upstream OAS (no writes)
 ./gradlew adoptOpenApi             # adopt additive upstream changes + regenerate
 ./gradlew adoptOpenApiBreaking     # adopt including breaking changes + regenerate
@@ -19,6 +20,7 @@ this SDK, read `LLMS.md` instead.
 ./gradlew integrationTest          # live read-only integration tests
 ./gradlew compileExamples          # compile examples without packaging
 ./gradlew generateJavadocs         # generate the API reference
+./gradlew checkApiCompatibility    # compare the complete public JAR with released 0.1.4
 ```
 
 `compileJava` depends on `generateApis`, so a normal build always regenerates from
@@ -31,7 +33,10 @@ fix, generator-version change, or corrupted/stale generated output.
 ## Architecture invariants
 
 - Handwritten, committed SDK code lives in `src/main/java/markets/alpaca/client/`, including
-  `data/`, `http/`, `rest/`, `trading/`, `broker/sse/`, and `ws/`.
+  `data/`, `data/sse/`, `http/`, `rest/`, `sse/`, `trading/`, `trading/sse/`, `broker/sse/`, and
+  `ws/`.
+- `markets.alpaca.client.sse.internal` is implementation-only. It is excluded from published
+  Javadocs and API compatibility checks; public types and examples must not expose or recommend it.
 - Pinned OpenAPI documents live in `specs/{broker,data,trading}/openapi.yaml` (post-preprocess).
 - Generated REST clients live in `src/main/java/markets/alpaca/client/openapi/{broker,data,trading}`
   under packages `markets.alpaca.client.openapi.*`. Never hand-edit those trees; regenerate with
@@ -41,6 +46,9 @@ fix, generator-version change, or corrupted/stale generated output.
   base URL.
 - Add common SDK behavior to handwritten packages. For generated behavior, fix a spec defect in
   preprocessing or add a handwritten wrapper for a generator limitation.
+- SSE currently reuses API-key authentication from generated clients. Unlike the JS/TS v5 SDK,
+  Java does not yet have an SDK-wide OAuth token-provider abstraction; do not add an SSE-only token
+  path that would make REST and streaming credentials inconsistent.
 - WebSocket price and fractional-size fields use `BigDecimal`, never `double` or `float`.
 
 ## Generation and OpenAPI specs

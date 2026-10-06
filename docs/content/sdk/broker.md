@@ -296,6 +296,42 @@ var subscription = events.subscribeToTradeEvents(
 subscription.close();
 ```
 
+Existing constructors retain one-connection behavior. Configure `AlpacaSseOptions` through
+`AlpacaClientFactory` to enable reconnects, timeouts, or custom resource limits. Enriched
+listener callbacks expose SSE IDs/types, comments, and reconnect diagnostics while preserving the
+original `onEvent(T)` callback. `subscription.opened()` awaits the initial accepted connection;
+`connection()` retains the latest connection metadata across reconnects and closure.
+`BrokerSseSubscription` also implements `AlpacaSseSubscription`, so shared lifecycle utilities can
+handle Trading, Market Data, and Broker subscriptions uniformly without giving up the legacy Broker
+methods.
+
+Malformed event payloads are reported through `onFailure` without closing an otherwise healthy
+Broker stream, preserving the original wrapper behavior and original deserialization cause.
+Protocol and non-retryable HTTP failures are terminal; retryable HTTP and transport failures follow
+the configured reconnect policy. When reconnect is enabled, the malformed event's SSE ID becomes
+the transport cursor sent in `Last-Event-ID` after invoking the failure callback—even if that
+callback throws. Broker endpoints document endpoint-specific query cursors rather than
+`Last-Event-ID`; applications that require gap replay should reconnect with the appropriate
+`since_id` or `since_ulid` option and deduplicate events. Activity V2
+details without OAS discriminants use a unique-most-specific field match and fail on ties. The
+deprecated `/v1/events/transfers/status` operation is not wrapped; use the supported funding-status
+stream.
+
+New listeners can use `onEventFailure(...)` for malformed-event ID/type metadata,
+`onHttpFailure(...)` for structured HTTP failures, `onRetryChanged(...)` for server retry hints,
+and `onClosed(AlpacaSseCloseResult)` for structured normal completion. Default delegation preserves
+legacy shapes: HTTP failures supply a bounded compatibility response and no throwable; user close
+supplies `IOException("canceled")` and no response; other normal endings call `onClosed()`. A rich
+override receives one callback without also invoking its legacy target.
+
+`subscription.eventSource()` is a compatibility facade supporting only `request()` and `cancel()`;
+it is not the live OkHttp implementation. Prefer `subscription.close()`. See
+[Migrating SSE from 0.1.4 to 0.1.5](./sse-migration) for callback, threading, and codemod guidance.
+
+Use `getAccountActivityEventAsync(accountId, eventId)` to re-fetch one previously observed
+Activity V2 event without invoking the generated SSE response decoder. The default timeout is 30
+seconds; use the overload accepting `Duration` to choose another positive limit.
+
 For the broader live-events model, listener callback guidance, and how Broker SSE differs from the
 WebSocket stream clients, see [Streaming and events](./streaming).
 

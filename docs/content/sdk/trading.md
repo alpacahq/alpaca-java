@@ -142,6 +142,45 @@ var history = portfolio.getAccountPortfolioHistory(
 System.out.println(history.getEquity());
 ```
 
+## Streaming account activities
+
+Use `TradingEventsSseClient` for typed account activities, including historical cursor queries and
+live updates. This SSE endpoint is different from the WebSocket order-update stream below.
+
+```java
+import markets.alpaca.client.sse.AlpacaSseEvent;
+import markets.alpaca.client.sse.AlpacaSseListener;
+import markets.alpaca.client.openapi.trading.model.ActivityEventV2;
+
+var activities = client.tradingEventsSseClient();
+var subscription = activities.subscribeToActivities(
+    new AlpacaSseListener<ActivityEventV2>() {
+        @Override
+        public void onEvent(AlpacaSseEvent<ActivityEventV2> event) {
+            System.out.println(event.data().getActivityType());
+        }
+    });
+
+subscription.close();
+```
+
+Use `TradingActivitySseRequest.fromEventId(...)` for an ID cursor that continues live, or
+`throughEventId(sinceId, untilId)` for a bounded ID range. The builder supports date/time ranges:
+`until` requires `since`, `untilId` requires `sinceId`, and cursor families cannot be mixed.
+
+`subscription.opened()` provides an awaitable initial connection with URI, status, and headers;
+`connection()` reports the latest accepted connection after reconnects.
+
+Do not call the generated `EventsApi.subscribeToActivitiesSSE(...)` method: OpenAPI represents the
+response as an array, so generated execution waits for a live response to end. The handwritten
+client parses incrementally, supports cancellation, and reconnects transiently failed live streams
+while transmitting the committed cursor as the documented `since_id` query parameter and in the
+standard `Last-Event-ID` header. Date-bounded requests retain their original date range on retry and
+can replay already processed events. Malformed payloads terminate the subscription;
+persisted workflows should inspect `completion()` and deduplicate by event ID after reconnect.
+Activity details normally use type/subtype dispatch; OAS schemas without discriminants use a
+unique-most-specific field match and fail on ties.
+
 ## Streaming trade updates
 
 Trading stream updates arrive through a WebSocket client. Use the `PAPER` stream for paper keys and
