@@ -14,7 +14,9 @@ public final class ActivityDetailSchemaResolver {
       case "ACATC" -> "AcatcActivityV2";
       case "ACATS" -> "AcatsActivityV2";
       case "CGD" -> oneOf(detail, "", "LTCG", "STCG") ? "CGDActivityV2" : null;
-      case "CSW" -> "CSWActivityV2";
+      // The pinned OAS documents CSD but does not yet define a CSD detail schema. Preserve the
+      // event with the structurally compatible CSW model until the contract supplies one.
+      case "CSD", "CSW" -> "CSWActivityV2";
       case "DIV" ->
           switch (detail) {
             case "CDIV", "ROC" -> "CDIVActivityV2";

@@ -179,7 +179,9 @@ standard `Last-Event-ID` header. Date-bounded requests retain their original dat
 can replay already processed events. Malformed payloads terminate the subscription;
 persisted workflows should inspect `completion()` and deduplicate by event ID after reconnect.
 Activity details normally use type/subtype dispatch; OAS schemas without discriminants use a
-unique-most-specific field match and fail on ties.
+unique-most-specific field match and fail on ties. The pinned OAS does not yet define a dedicated
+detail schema for `CSD`; these events retain activity type `CSD` but temporarily expose details as
+`CSWActivityV2`. Undeclared detail fields remain available through `getAdditionalProperties()`.
 
 ## Streaming trade updates
 

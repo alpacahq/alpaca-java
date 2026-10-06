@@ -110,6 +110,9 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   SSE clients disable inherited OkHttp read and whole-call timeouts in favor of SDK SSE deadlines.
 - Delivered-event cursor commitment and reconnect-deadline reset are atomic, and Broker
   single-activity timeout cannot be overwritten by a callback delivered after termination.
+- Trading and Broker Activity V2 decoders preserve `CSD` events by temporarily representing their
+  details as `CSWActivityV2`. The activity type remains `CSD`, and undeclared detail fields remain
+  available through `getAdditionalProperties()`, pending a dedicated upstream CSD detail schema.
 
 ### Behavioral compatibility and migration
 - Existing Broker listener signatures remain available. Rich callbacks delegate to the legacy

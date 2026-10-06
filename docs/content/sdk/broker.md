@@ -314,8 +314,10 @@ callback throws. Broker endpoints document endpoint-specific query cursors rathe
 `Last-Event-ID`; applications that require gap replay should reconnect with the appropriate
 `since_id` or `since_ulid` option and deduplicate events. Activity V2
 details without OAS discriminants use a unique-most-specific field match and fail on ties. The
-deprecated `/v1/events/transfers/status` operation is not wrapped; use the supported funding-status
-stream.
+activity type remains `CSD` for cash deposits, but because the pinned OAS lacks a dedicated CSD
+detail schema, those details are temporarily represented as `CSWActivityV2`; undeclared fields
+remain available through `getAdditionalProperties()`. The deprecated `/v1/events/transfers/status`
+operation is not wrapped; use the supported funding-status stream.
 
 New listeners can use `onEventFailure(...)` for malformed-event ID/type metadata,
 `onHttpFailure(...)` for structured HTTP failures, `onRetryChanged(...)` for server retry hints,
