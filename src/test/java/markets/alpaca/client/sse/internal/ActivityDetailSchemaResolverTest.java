@@ -13,11 +13,11 @@ class ActivityDetailSchemaResolverTest {
         "FixedIncomeInterestActivityV2", ActivityDetailSchemaResolver.resolve("INT", "FI"));
     assertEquals("CDIVActivityV2", ActivityDetailSchemaResolver.resolve("DIV", "ROC"));
     assertEquals("ForwardSplitActivityV2", ActivityDetailSchemaResolver.resolve("SPLIT", "FSPLIT"));
+    assertEquals("CSWActivityV2", ActivityDetailSchemaResolver.resolve("CSD", null));
 
     assertNull(ActivityDetailSchemaResolver.resolve("INT", "MGN"));
     assertNull(ActivityDetailSchemaResolver.resolve("DIV", null));
     assertNull(ActivityDetailSchemaResolver.resolve("SPLIT", "UNKNOWN"));
-    assertNull(ActivityDetailSchemaResolver.resolve("CSD", null));
     assertNull(ActivityDetailSchemaResolver.resolve("CFEE", null));
   }
 }

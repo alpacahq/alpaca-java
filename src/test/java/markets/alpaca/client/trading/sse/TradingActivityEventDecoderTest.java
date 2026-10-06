@@ -6,6 +6,7 @@ import markets.alpaca.client.openapi.trading.model.ActivityV2DetailNTA;
 import markets.alpaca.client.openapi.trading.model.ActivityV2DetailTRD;
 import markets.alpaca.client.openapi.trading.model.CDIVActivityV2;
 import markets.alpaca.client.openapi.trading.model.CGDActivityV2;
+import markets.alpaca.client.openapi.trading.model.CSWActivityV2;
 import markets.alpaca.client.openapi.trading.model.DIVSPDActivityV2;
 import markets.alpaca.client.openapi.trading.model.FEEActivityV2;
 import markets.alpaca.client.openapi.trading.model.FixedIncomeRedemptionActivityV2;
@@ -43,6 +44,26 @@ class TradingActivityEventDecoderTest {
   void registryCoversEveryGeneratedNtaCandidate() {
     assertEquals(
         ActivityV2DetailNTA.schemas.keySet(), TradingActivityEventDecoder.candidateSchemaNames());
+    assertFalse(
+        ActivityV2DetailNTA.schemas.containsKey("CSDActivityV2"),
+        "Remove the temporary CSD-to-CSW mapping when generation provides CSDActivityV2");
+  }
+
+  @Test
+  void preservesCsdEventsThroughTemporaryCswCompatibilityModel() throws Exception {
+    var event =
+        decoder.decode(
+            eventJson(
+                "CSD",
+                null,
+                """
+                {"system_date":"2026-10-01","deposit_source":"ach"}
+                """));
+
+    assertEquals("CSD", event.getActivityType());
+    var nta = assertInstanceOf(ActivityV2DetailNTA.class, event.getDetails().getActualInstance());
+    var details = assertInstanceOf(CSWActivityV2.class, nta.getActualInstance());
+    assertEquals("ach", details.getAdditionalProperty("deposit_source"));
   }
 
   @Test

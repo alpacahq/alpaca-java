@@ -353,7 +353,9 @@ Malformed Trading activity payloads fail the subscription. Activity detail model
 the OAS type/subtype mapping. The two schemas whose OAS definitions currently lack discriminants
 (fixed-income redemption and rights distribution) use a unique-most-specific structural fallback;
 ties fail explicitly instead of being guessed. The same decoder behavior applies to Broker Activity
-V2 events.
+V2 events. Until the upstream contract provides a dedicated CSD detail schema, `CSD` events retain
+their activity type but expose details through `CSWActivityV2`; additional payload fields remain
+available through `getAdditionalProperties()`.
 
 ## Broker Events SSE
 
