@@ -8,12 +8,14 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,6 +33,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.SocketPolicy;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -854,6 +857,129 @@ class SseTransportTest {
   }
 
   @Test
+  void reconnectCallbackExecutorRejectionAfterPreHeaderFailureFailsSubscription() throws Exception {
+    server.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
+    var options =
+        AlpacaSseOptions.builder()
+            .reconnectPolicy(
+                AlpacaSseReconnectPolicy.builder()
+                    .initialAttempts(1)
+                    .establishedAttempts(0)
+                    .initialBackoff(Duration.ofMillis(1))
+                    .maxBackoff(Duration.ofMillis(1))
+                    .jitterRatio(0)
+                    .build())
+            .build();
+
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            options,
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {},
+            command -> {
+              throw new RejectedExecutionException("rejected reconnect callback");
+            });
+
+    var failure =
+        assertThrows(
+            ExecutionException.class, () -> subscription.completion().get(2, TimeUnit.SECONDS));
+    assertInstanceOf(AlpacaSseCallbackException.class, failure.getCause());
+    assertEquals(AlpacaSseState.FAILED, subscription.state());
+    assertEquals(1, server.getRequestCount());
+  }
+
+  @Test
+  void reconnectCallbackExecutorRejectionAfterEstablishedStreamFailsSubscription()
+      throws Exception {
+    server.enqueue(new MockResponse().setHeader("Content-Type", "text/event-stream").setBody(""));
+    var callbackCount = new AtomicInteger();
+
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            reconnectOptions(Duration.ofMillis(1)),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {},
+            command -> {
+              if (callbackCount.getAndIncrement() == 0) {
+                command.run();
+              } else {
+                throw new RejectedExecutionException("rejected established reconnect callback");
+              }
+            });
+
+    subscription.opened().get(1, TimeUnit.SECONDS);
+    var failure =
+        assertThrows(
+            ExecutionException.class, () -> subscription.completion().get(2, TimeUnit.SECONDS));
+    assertInstanceOf(AlpacaSseCallbackException.class, failure.getCause());
+    assertEquals(AlpacaSseState.FAILED, subscription.state());
+    assertEquals(1, server.getRequestCount());
+  }
+
+  @Test
+  void closeBeforeOpenSettlesCompletionBeforeOpenedContinuations() throws Exception {
+    server.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {});
+    var observedCompletion =
+        subscription
+            .opened()
+            .handle((connection, failure) -> subscription.completion().join().reason());
+
+    CompletableFuture.runAsync(subscription::close).get(1, TimeUnit.SECONDS);
+
+    assertEquals(
+        AlpacaSseCloseResult.Reason.USER_CLOSED, observedCompletion.get(1, TimeUnit.SECONDS));
+    assertTrue(subscription.opened().isCompletedExceptionally());
+  }
+
+  @Test
+  void failureBeforeOpenSettlesCompletionBeforeOpenedContinuations() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(403)
+            .setHeadersDelay(100, TimeUnit.MILLISECONDS)
+            .setBody("forbidden"));
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {});
+    var observedCompletion =
+        subscription
+            .opened()
+            .handle(
+                (connection, failure) -> {
+                  assertNotNull(failure);
+                  try {
+                    subscription.completion().join();
+                    fail("failed subscription completion must be exceptional");
+                  } catch (CompletionException expected) {
+                    // The important contract is that this synchronous continuation cannot block.
+                  }
+                  return subscription.completion().isDone();
+                });
+
+    assertTrue(observedCompletion.get(2, TimeUnit.SECONDS));
+    assertEquals(AlpacaSseState.FAILED, subscription.state());
+  }
+
+  @Test
   void immediateCloseStressDoesNotLeaveConnectingSubscriptions() {
     assertTimeoutPreemptively(
         Duration.ofSeconds(30),
@@ -960,6 +1086,129 @@ class SseTransportTest {
     assertThrows(
         ExecutionException.class, () -> subscription.completion().get(2, TimeUnit.SECONDS));
     assertEquals(2, server.getRequestCount());
+  }
+
+  @Test
+  void establishedElapsedBudgetExpiresAfterReconnectHeadersWithoutAnEvent() throws Exception {
+    server.enqueue(new MockResponse().setHeader("Content-Type", "text/event-stream").setBody(""));
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody(": keepalive\n\n".repeat(100))
+            .throttleBody(1, 10, TimeUnit.MILLISECONDS));
+    var options =
+        AlpacaSseOptions.builder()
+            .reconnectPolicy(
+                AlpacaSseReconnectPolicy.builder()
+                    .maxElapsedTime(Duration.ofMillis(150))
+                    .initialBackoff(Duration.ofMillis(10))
+                    .maxBackoff(Duration.ofMillis(10))
+                    .jitterRatio(0)
+                    .build())
+            .build();
+
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            options,
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {});
+
+    subscription.opened().get(1, TimeUnit.SECONDS);
+    assertThrows(
+        ExecutionException.class, () -> subscription.completion().get(2, TimeUnit.SECONDS));
+    assertEquals(AlpacaSseState.FAILED, subscription.state());
+    assertEquals(2, server.getRequestCount());
+  }
+
+  @Test
+  void deliveredEventClearsEstablishedReconnectDeadline() throws Exception {
+    server.enqueue(new MockResponse().setHeader("Content-Type", "text/event-stream").setBody(""));
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("data: recovered\n\n" + ": keepalive\n\n".repeat(100))
+            .throttleBody(1, 2, TimeUnit.MILLISECONDS));
+    var options =
+        AlpacaSseOptions.builder()
+            .reconnectPolicy(
+                AlpacaSseReconnectPolicy.builder()
+                    .maxElapsedTime(Duration.ofMillis(200))
+                    .initialBackoff(Duration.ofMillis(1))
+                    .maxBackoff(Duration.ofMillis(1))
+                    .jitterRatio(0)
+                    .build())
+            .build();
+    var delivered = new CountDownLatch(1);
+
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            options,
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onEvent(AlpacaSseEvent<String> event) {
+                delivered.countDown();
+              }
+            });
+
+    assertTrue(delivered.await(1, TimeUnit.SECONDS));
+    assertThrows(
+        TimeoutException.class, () -> subscription.completion().get(300, TimeUnit.MILLISECONDS));
+    assertEquals(AlpacaSseState.OPEN, subscription.state());
+    subscription.close();
+  }
+
+  @Test
+  void staleReconnectDeadlineCannotFailALaterReconnectCycle() throws Exception {
+    server.enqueue(new MockResponse().setHeader("Content-Type", "text/event-stream").setBody(""));
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("data: recovered\n\n: " + "x".repeat(20) + "\n\n")
+            .throttleBody(1, 3, TimeUnit.MILLISECONDS));
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody(": keepalive\n\n".repeat(100))
+            .throttleBody(1, 5, TimeUnit.MILLISECONDS));
+    var options =
+        AlpacaSseOptions.builder()
+            .reconnectPolicy(
+                AlpacaSseReconnectPolicy.builder()
+                    .maxElapsedTime(Duration.ofMillis(300))
+                    .initialBackoff(Duration.ofMillis(1))
+                    .maxBackoff(Duration.ofMillis(1))
+                    .jitterRatio(0)
+                    .build())
+            .build();
+    var reconnects = new CountDownLatch(2);
+
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            options,
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onReconnecting(int attempt, Duration delay) {
+                reconnects.countDown();
+              }
+            });
+
+    assertTrue(reconnects.await(2, TimeUnit.SECONDS));
+    assertThrows(
+        TimeoutException.class, () -> subscription.completion().get(200, TimeUnit.MILLISECONDS));
+    assertEquals(AlpacaSseState.OPEN, subscription.state());
+    assertEquals(3, server.getRequestCount());
+    subscription.close();
   }
 
   @Test

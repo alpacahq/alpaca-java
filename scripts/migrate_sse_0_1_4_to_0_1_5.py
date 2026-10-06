@@ -20,10 +20,31 @@ BROKER_SUBSCRIPTION = "markets.alpaca.client.broker.sse.BrokerSseSubscription"
 EXACT_IMPORT = re.compile(
     rf"(?m)^\s*import\s+{re.escape(BROKER_SUBSCRIPTION)}\s*;"
 )
-DECLARATION = re.compile(
-    rf"\b(?:BrokerSseSubscription|{re.escape(BROKER_SUBSCRIPTION)})\s+"
-    r"([A-Za-z_$][\w$]*)\b"
+BROKER_DECLARATION = re.compile(
+    rf"\b(?P<type>BrokerSseSubscription|{re.escape(BROKER_SUBSCRIPTION)})\s+"
+    r"(?P<name>[A-Za-z_$][\w$]*)\b(?!\s*\()"
 )
+JAVA_IDENTIFIER = r"[A-Za-z_$][\w$]*"
+JAVA_TYPE = (
+    rf"{JAVA_IDENTIFIER}(?:\s*\.\s*{JAVA_IDENTIFIER})*"
+    rf"(?:\s*<[^;{{}}()=]+>)?(?:\s*\[\s*\])*"
+)
+ANY_DECLARATION = re.compile(
+    rf"(?<![\w$.])(?P<type>{JAVA_TYPE})\s+(?:\.\.\.\s*)?"
+    rf"(?P<name>{JAVA_IDENTIFIER})\b(?!\s*\()"
+)
+NON_TYPE_KEYWORDS = {
+    "assert",
+    "break",
+    "case",
+    "continue",
+    "delete",
+    "else",
+    "new",
+    "return",
+    "throw",
+    "yield",
+}
 CANCEL_CALL = re.compile(
     r"\b([A-Za-z_$][\w$]*)\s*\.\s*eventSource\s*\(\s*\)"
     r"\s*\.\s*cancel\s*\(\s*\)"
@@ -114,6 +135,52 @@ def _line(text: str, offset: int) -> int:
     return text.count("\n", 0, offset) + 1
 
 
+def _broker_binders(mask: str, *, has_exact_import: bool) -> dict[str, list[int]]:
+    binders: dict[str, list[int]] = {}
+    for declaration in BROKER_DECLARATION.finditer(mask):
+        type_name = declaration.group("type")
+        if type_name == BROKER_SUBSCRIPTION or has_exact_import:
+            binders.setdefault(declaration.group("name"), []).append(
+                declaration.start("name")
+            )
+    return binders
+
+
+def _all_binders(mask: str) -> dict[str, set[int]]:
+    """Conservatively find explicit declarations and inferred lambda parameters."""
+    binders: dict[str, set[int]] = {}
+    for declaration in ANY_DECLARATION.finditer(mask):
+        if declaration.group("type") in NON_TYPE_KEYWORDS:
+            continue
+        binders.setdefault(declaration.group("name"), set()).add(
+            declaration.start("name")
+        )
+
+    inferred_lambda = re.compile(
+        rf"(?<![\w$])(?P<name>{JAVA_IDENTIFIER})\s*->"
+        rf"|(?P<name_parenthesized>{JAVA_IDENTIFIER})"
+        rf"(?=\s*(?:,\s*{JAVA_IDENTIFIER}\s*)*\)\s*->)"
+    )
+    for parameter in inferred_lambda.finditer(mask):
+        group = "name" if parameter.group("name") is not None else "name_parenthesized"
+        binders.setdefault(parameter.group(group), set()).add(parameter.start(group))
+    return binders
+
+
+def _is_bare_receiver(mask: str, offset: int) -> bool:
+    index = offset - 1
+    while index >= 0 and mask[index].isspace():
+        index -= 1
+    return index < 0 or mask[index] != "."
+
+
+def _contains_masked_syntax(text: str, mask: str, start: int, end: int) -> bool:
+    return any(
+        original != masked and not original.isspace()
+        for original, masked in zip(text[start:end], mask[start:end])
+    )
+
+
 def _diagnostic_patterns(
     mask: str, *, sse_context: bool
 ) -> Iterable[tuple[int, str, str]]:
@@ -173,19 +240,19 @@ def _diagnostic_patterns(
 def analyze_text(text: str, path: str = "<memory>") -> Analysis:
     mask = _code_mask(text)
     has_exact_import = bool(EXACT_IMPORT.search(mask))
-    declarations: dict[str, list[re.Match[str]]] = {}
-    for declaration in DECLARATION.finditer(mask):
-        type_text = declaration.group(0)
-        if "BrokerSseSubscription" in type_text and (
-            BROKER_SUBSCRIPTION in type_text or has_exact_import
-        ):
-            declarations.setdefault(declaration.group(1), []).append(declaration)
+    broker_binders = _broker_binders(mask, has_exact_import=has_exact_import)
+    all_binders = _all_binders(mask)
 
     replacements: list[tuple[int, int, str]] = []
     findings: list[Finding] = []
     for call in CANCEL_CALL.finditer(mask):
         receiver = call.group(1)
-        safe = len(declarations.get(receiver, ())) == 1
+        safe = (
+            _is_bare_receiver(mask, call.start())
+            and len(broker_binders.get(receiver, ())) == 1
+            and len(all_binders.get(receiver, ())) == 1
+            and not _contains_masked_syntax(text, mask, call.start(), call.end())
+        )
         if safe:
             replacements.append((call.start(), call.end(), f"{receiver}.close()"))
             findings.append(

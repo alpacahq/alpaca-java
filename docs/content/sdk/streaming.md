@@ -337,11 +337,12 @@ work by event ID. `until` or `untilId` makes a request bounded;
 normal EOF then completes the subscription instead of reconnecting. Configure retry budgets,
 initial resume ID, idle timeout, and resource limits with `AlpacaSseOptions` factory overloads.
 `AlpacaSseReconnectPolicy.maxElapsedTime(...)` bounds one initial-open or established reconnect
-cycle, including connection attempts and backoff; `AlpacaSseOptions.maxDuration(...)` separately
-bounds the lifetime of the whole subscription. `maxBackoff(...)` caps client exponential backoff,
-server SSE `retry:` values, and HTTP `Retry-After` values. The connection timeout covers successful
-response-header validation and bounded non-success response-body capture, so a server cannot keep a
-subscription opening indefinitely by stalling an error body.
+cycle. An established cycle remains bounded through backoff, reconnect headers, comments, and
+silence until an event is delivered; `AlpacaSseOptions.maxDuration(...)` separately bounds the
+lifetime of the whole subscription. `maxBackoff(...)` caps client exponential backoff, server SSE
+`retry:` values, and HTTP `Retry-After` values. The connection timeout covers successful
+response-header validation and bounded non-success response-body capture, so a server cannot keep
+a subscription opening indefinitely by stalling an error body.
 
 Malformed Trading activity payloads fail the subscription. Activity detail models are selected by
 the OAS type/subtype mapping. The two schemas whose OAS definitions currently lack discriminants
