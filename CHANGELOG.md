@@ -16,8 +16,9 @@ the policy below applies strictly.
 | New endpoint or model coverage from a spec version update                                                     | MINOR        |
 | Bug fix, dependency update, or preprocessing fix                                                              | PATCH        |
 
-Packages whose name contains `.internal` are implementation details, are omitted from published
-Javadocs and API compatibility checks, and are not covered by this compatibility policy.
+`markets.alpaca.client.sse.internal` is implementation-only, is omitted from published Javadocs and
+API compatibility checks, and is not covered by this compatibility policy. Other public types
+remain covered regardless of an `.internal` package-name segment unless documented otherwise.
 
 ---
 
@@ -75,7 +76,9 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   and timers do not wait for user callbacks. Because response parsing is backpressured, detection
   of a remote end and its following reconnect can wait for the active event callback.
 - Activity V2 events use discriminant-aware decoders with a unique-most-specific structural
-  fallback instead of ambiguous generated `oneOf` matching; tied matches fail closed.
+  fallback instead of ambiguous generated `oneOf` matching; tied matches fail closed. Documented
+  `DIVROC` events resolve to `CDIVActivityV2`, and unknown envelope properties retain the generated
+  model's `additionalProperties` value shapes.
 - SSE resume state includes completed data-less `id:` blocks, and idle timers are scoped to active
   response bodies rather than reconnect backoff.
 - Broker malformed events report failure, advance the transport cursor, and continue. Reconnect
@@ -88,9 +91,13 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - `BrokerSseSubscription` implements the shared subscription interface while retaining its
   Broker-specific compatibility surface. Reconnect delay caps now apply to client backoff, server
   `retry:`, and HTTP `Retry-After` values.
-- The migration codemod rewrites only a uniquely bound, bare `BrokerSseSubscription` identifier;
-  qualified, shadowed, same-named local/nested types, inferred, commented, or otherwise uncertain
-  chains are report-only. Missing inputs fail closed.
+- The migration codemod rewrites only a uniquely bound, bare `BrokerSseSubscription` parameter or
+  local variable in the call's lexical scope. Fields, qualified, shadowed, same-named local/nested
+  types, lambda-bound, commented, or otherwise uncertain chains are report-only. Missing inputs fail
+  closed.
+- Terminal listener startup uses a bounded SDK dispatcher. Lifecycle futures remain authoritative;
+  dispatcher saturation rejects pending terminal listener delivery with a warning instead of
+  creating unbounded threads.
 
 ### Fixed
 - Closing during initial connection or reconnect can no longer publish an uncancelled call after the
@@ -102,6 +109,8 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Connection deadlines now cover bounded non-success response-body reads, timeout failures retain
   their cancellation cause, and elapsed reconnect-budget expiry preserves the preceding transport
   or HTTP failure instead of starting an immediately cancelled request.
+- Accepting response headers invalidates already-started connect-timeout work, preventing a stale
+  scheduler task from cancelling the accepted stream at the deadline boundary.
 - Established reconnect elapsed-time budgets remain active after accepted headers until event
   delivery, including while the server sends only comments or remains silent.
 - Callback-executor rejection during reconnect and Broker single-activity timeout now always settle
@@ -110,9 +119,17 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   SSE clients disable inherited OkHttp read and whole-call timeouts in favor of SDK SSE deadlines.
 - Delivered-event cursor commitment and reconnect-deadline reset are atomic, and Broker
   single-activity timeout cannot be overwritten by a callback delivered after termination.
+- Canceled idle-timeout tasks are removed from the shared scheduler, and Unicode SSE IDs can be
+  replayed without stranding reconnects. HTTP-incompatible cursor controls and request/scheduler
+  construction failures now terminate with a protocol failure.
 - Trading and Broker Activity V2 decoders preserve `CSD` events by temporarily representing their
   details as `CSWActivityV2`. The activity type remains `CSD`, and undeclared detail fields remain
   available through `getAdditionalProperties()`, pending a dedicated upstream CSD detail schema.
+- SSE contract verification pins each supported stream's ordered parameter wire signatures and
+  resolved schema constraints, response schema shapes, exact authentication alternatives, and
+  consumed API-key/HTTP-Basic definitions in addition to inventory and handwritten bindings.
+- Pull-request and frozen-snapshot CI enforce source and binary API compatibility before publication;
+  reviewed exclusions enumerate exact removed generated symbols.
 
 ### Behavioral compatibility and migration
 - Existing Broker listener signatures remain available. Rich callbacks delegate to the legacy
