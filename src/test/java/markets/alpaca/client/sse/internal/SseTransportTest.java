@@ -1033,7 +1033,8 @@ class SseTransportTest {
   }
 
   @Test
-  void productionExecutorsRemoveCanceledTimersAndBoundCallbackWork() throws Exception {
+  void productionExecutorsRemoveCanceledTimersBoundCallbacksAndIsolateCompletion()
+      throws Exception {
     ScheduledThreadPoolExecutor scheduler = SseTransport.createScheduler();
     ThreadPoolExecutor openingExecutor = SseTransport.createOpeningCallbackExecutor();
     ThreadPoolExecutor terminalExecutor = SseTransport.createTerminalCallbackExecutor();
@@ -1041,7 +1042,8 @@ class SseTransportTest {
     var releaseWorkers = new CountDownLatch(1);
     var workersStarted = new CountDownLatch(terminalExecutor.getMaximumPoolSize());
     var releaseCompletionWorkers = new CountDownLatch(1);
-    var completionWorkersStarted = new CountDownLatch(completionExecutor.getMaximumPoolSize());
+    int concurrentCompletions = 8;
+    var completionWorkersStarted = new CountDownLatch(concurrentCompletions);
 
     try {
       ScheduledFuture<?> delayed = scheduler.schedule(() -> {}, 1, TimeUnit.HOURS);
@@ -1053,7 +1055,8 @@ class SseTransportTest {
       assertEquals(
           terminalExecutor.getQueue().remainingCapacity(),
           openingExecutor.getQueue().remainingCapacity());
-      assertEquals(terminalExecutor.getMaximumPoolSize(), completionExecutor.getMaximumPoolSize());
+      assertEquals(0, completionExecutor.getCorePoolSize());
+      assertEquals(0, completionExecutor.getQueue().remainingCapacity());
 
       for (int index = 0; index < terminalExecutor.getMaximumPoolSize(); index++) {
         terminalExecutor.execute(
@@ -1074,7 +1077,7 @@ class SseTransportTest {
       assertThrows(RejectedExecutionException.class, () -> terminalExecutor.execute(() -> {}));
       assertEquals(terminalExecutor.getMaximumPoolSize(), terminalExecutor.getLargestPoolSize());
 
-      for (int index = 0; index < completionExecutor.getMaximumPoolSize(); index++) {
+      for (int index = 0; index < concurrentCompletions; index++) {
         completionExecutor.execute(
             () -> {
               completionWorkersStarted.countDown();
@@ -1086,15 +1089,10 @@ class SseTransportTest {
             });
       }
       assertTrue(completionWorkersStarted.await(1, TimeUnit.SECONDS));
-      int queuedCompletions = 300;
-      for (int index = 0; index < queuedCompletions; index++) {
-        completionExecutor.execute(() -> {});
-      }
-      assertEquals(queuedCompletions, completionExecutor.getQueue().size());
-      assertEquals(
-          completionExecutor.getMaximumPoolSize(), completionExecutor.getLargestPoolSize());
+      assertTrue(completionExecutor.getLargestPoolSize() >= concurrentCompletions);
+      assertEquals(0, completionExecutor.getQueue().size());
       releaseCompletionWorkers.countDown();
-      awaitCondition(() -> completionExecutor.getQueue().isEmpty(), Duration.ofSeconds(1));
+      awaitCondition(() -> completionExecutor.getActiveCount() == 0, Duration.ofSeconds(1));
     } finally {
       releaseWorkers.countDown();
       releaseCompletionWorkers.countDown();
@@ -1681,6 +1679,110 @@ class SseTransportTest {
   }
 
   @Test
+  void preOpenCompletionContinuationCanAwaitOpenedFailure() throws Exception {
+    server.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.builder()
+                .reconnectPolicy(AlpacaSseReconnectPolicy.disabled())
+                .maxDuration(Duration.ofMillis(100))
+                .build(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {});
+    var opened = subscription.opened();
+    var continuation =
+        subscription
+            .completion()
+            .handle(
+                (result, failure) -> {
+                  assertNotNull(failure);
+                  assertNotNull(
+                      opened.handle((connection, openingFailure) -> openingFailure).join());
+                  return null;
+                });
+
+    continuation.get(2, TimeUnit.SECONDS);
+    assertThrows(ExecutionException.class, () -> opened.get(1, TimeUnit.SECONDS));
+    assertThrows(
+        ExecutionException.class, () -> subscription.completion().get(1, TimeUnit.SECONDS));
+  }
+
+  @Test
+  void listenerCanCloseAnotherSubscriptionSharingItsCallbackExecutor() throws Exception {
+    ExecutorService callbackExecutor = Executors.newSingleThreadExecutor();
+    markets.alpaca.client.sse.AlpacaSseSubscription first = null;
+    markets.alpaca.client.sse.AlpacaSseSubscription second = null;
+    var secondClosed = new CountDownLatch(1);
+    var firstEventReturned = new CountDownLatch(1);
+
+    try {
+      server.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
+      second =
+          SseTransport.open(
+              httpClient,
+              new Request.Builder().url(server.url("/second")).build(),
+              AlpacaSseOptions.reconnectDisabled(),
+              false,
+              data -> data,
+              new AlpacaSseListener<>() {
+                @Override
+                public void onClosed(AlpacaSseCloseResult result) {
+                  secondClosed.countDown();
+                }
+              },
+              callbackExecutor);
+      var secondRequest = server.takeRequest(1, TimeUnit.SECONDS);
+      assertNotNull(secondRequest);
+      assertEquals("/second", secondRequest.getPath());
+      var secondCompletion =
+          second
+              .completion()
+              .thenRun(
+                  () -> {
+                    try {
+                      assertTrue(secondClosed.await(2, TimeUnit.SECONDS));
+                    } catch (InterruptedException failure) {
+                      Thread.currentThread().interrupt();
+                      throw new AssertionError(
+                          "interrupted while waiting for the second terminal callback", failure);
+                    }
+                  });
+
+      server.enqueue(
+          new MockResponse()
+              .setHeader("Content-Type", "text/event-stream")
+              .setBody("data: close-second\n\n"));
+      var secondToClose = second;
+      first =
+          SseTransport.open(
+              httpClient,
+              new Request.Builder().url(server.url("/first")).build(),
+              AlpacaSseOptions.reconnectDisabled(),
+              false,
+              data -> data,
+              new AlpacaSseListener<>() {
+                @Override
+                public void onEvent(AlpacaSseEvent<String> event) {
+                  secondToClose.close();
+                  firstEventReturned.countDown();
+                }
+              },
+              callbackExecutor);
+
+      assertTrue(firstEventReturned.await(2, TimeUnit.SECONDS));
+      secondCompletion.get(3, TimeUnit.SECONDS);
+      assertTrue(secondClosed.await(1, TimeUnit.SECONDS));
+    } finally {
+      if (first != null) first.close();
+      if (second != null) second.close();
+      callbackExecutor.shutdownNow();
+    }
+  }
+
+  @Test
   void completionContinuationCanAwaitClosedWhenEventCallbackClosesSubscription() throws Exception {
     server.enqueue(
         new MockResponse()
@@ -1739,78 +1841,12 @@ class SseTransportTest {
   }
 
   @Test
-  void blockedCompletionContinuationsDoNotStallOtherSubscriptions() throws Exception {
-    ThreadPoolExecutor completionExecutor = SseTransport.createCompletionExecutor();
-    int workerCount = completionExecutor.getMaximumPoolSize();
-    completionExecutor.shutdownNow();
-    var blockers = new markets.alpaca.client.sse.AlpacaSseSubscription[workerCount];
-    var releaseContinuations = new CountDownLatch(1);
-    var continuationsEntered = new CountDownLatch(workerCount);
-    ExecutorService closeExecutor = Executors.newFixedThreadPool(workerCount);
-    ExecutorService targetCloseExecutor = Executors.newSingleThreadExecutor();
-    markets.alpaca.client.sse.AlpacaSseSubscription target = null;
-    for (int index = 0; index <= workerCount; index++) {
-      server.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
-    }
-
-    try {
-      for (int index = 0; index < workerCount; index++) {
-        blockers[index] =
-            SseTransport.open(
-                httpClient,
-                new Request.Builder().url(server.url("/blocker-" + index)).build(),
-                AlpacaSseOptions.reconnectDisabled(),
-                false,
-                data -> data,
-                new AlpacaSseListener<>() {});
-        blockers[index]
-            .completion()
-            .thenRun(
-                () -> {
-                  continuationsEntered.countDown();
-                  try {
-                    releaseContinuations.await();
-                  } catch (InterruptedException failure) {
-                    Thread.currentThread().interrupt();
-                  }
-                });
-        closeExecutor.execute(blockers[index]::close);
-      }
-
-      assertTrue(continuationsEntered.await(2, TimeUnit.SECONDS));
-      target =
-          SseTransport.open(
-              httpClient,
-              new Request.Builder().url(server.url("/target")).build(),
-              AlpacaSseOptions.reconnectDisabled(),
-              false,
-              data -> data,
-              new AlpacaSseListener<>() {});
-
-      CompletableFuture.runAsync(target::close, targetCloseExecutor).get(1, TimeUnit.SECONDS);
-      assertTrue(target.completion().isDone());
-    } finally {
-      releaseContinuations.countDown();
-      closeExecutor.shutdownNow();
-      targetCloseExecutor.shutdownNow();
-      for (var blocker : blockers) {
-        if (blocker != null) blocker.close();
-      }
-      if (target != null) target.close();
-    }
-  }
-
-  @Test
   void completionContinuationsCanCloseOtherSubscriptionsWithoutDeadlock() throws Exception {
-    ThreadPoolExecutor completionExecutor = SseTransport.createCompletionExecutor();
-    int workerCount = completionExecutor.getMaximumPoolSize();
-    completionExecutor.shutdownNow();
+    int workerCount = 8;
     var parents = new markets.alpaca.client.sse.AlpacaSseSubscription[workerCount];
     var children = new markets.alpaca.client.sse.AlpacaSseSubscription[workerCount];
     var continuations = new CompletableFuture<?>[workerCount];
-    var closes = new CompletableFuture<?>[workerCount];
     var continuationsEntered = new CountDownLatch(workerCount);
-    ExecutorService closeExecutor = Executors.newFixedThreadPool(workerCount);
     for (int index = 0; index < workerCount * 2; index++) {
       server.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
     }
@@ -1851,20 +1887,16 @@ class SseTransportTest {
                     });
       }
 
-      for (int index = 0; index < workerCount; index++) {
-        closes[index] = CompletableFuture.runAsync(parents[index]::close, closeExecutor);
+      for (var parent : parents) {
+        parent.close();
       }
       for (var continuation : continuations) {
         continuation.get(3, TimeUnit.SECONDS);
-      }
-      for (var close : closes) {
-        close.get(3, TimeUnit.SECONDS);
       }
       for (var child : children) {
         assertTrue(child.completion().isDone());
       }
     } finally {
-      closeExecutor.shutdownNow();
       for (var parent : parents) {
         if (parent != null) parent.close();
       }

@@ -69,8 +69,10 @@ CANCEL_CALL = re.compile(
     r"\b([A-Za-z_$][\w$]*)\s*\.\s*eventSource\s*\(\s*\)"
     r"\s*\.\s*cancel\s*\(\s*\)"
 )
-HANDWRITTEN_SINGLE_EVENT_CALL = re.compile(
-    rf"\b(?P<receiver>{JAVA_IDENTIFIER})\s*\.\s*getAccountActivityEventAsync\s*\("
+HANDWRITTEN_SINGLE_EVENT_USAGE = re.compile(
+    rf"\b(?P<receiver>{JAVA_IDENTIFIER})\s*"
+    rf"(?P<separator>\.|::)\s*getAccountActivityEventAsync"
+    rf"(?:\s*\(|\b)"
 )
 
 
@@ -205,6 +207,28 @@ def _all_binders(mask: str) -> dict[str, set[int]]:
 
 def _is_bare_receiver(mask: str, offset: int) -> bool:
     index = offset - 1
+    while index >= 0 and mask[index].isspace():
+        index -= 1
+    return index < 0 or mask[index] != "."
+
+
+def _is_bare_or_this_receiver(mask: str, offset: int) -> bool:
+    index = offset - 1
+    while index >= 0 and mask[index].isspace():
+        index -= 1
+    if index < 0 or mask[index] != ".":
+        return True
+
+    index -= 1
+    while index >= 0 and mask[index].isspace():
+        index -= 1
+    if index < 3 or mask[index - 3 : index + 1] != "this":
+        return False
+
+    this_start = index - 3
+    if this_start > 0 and (mask[this_start - 1].isalnum() or mask[this_start - 1] in "_$"):
+        return False
+    index = this_start - 1
     while index >= 0 and mask[index].isspace():
         index -= 1
     return index < 0 or mask[index] != "."
@@ -394,10 +418,13 @@ def _contains_masked_syntax(text: str, mask: str, start: int, end: int) -> bool:
 def _diagnostic_patterns(
     mask: str, *, sse_context: bool, ignored_generated_sse_offsets: set[int]
 ) -> Iterable[tuple[int, str, str]]:
-    generated_sse = re.compile(
-        r"\.\s*(?:(?:subscribeTo|suscribeTo)[A-Za-z0-9_]*SSE"
+    generated_method = (
+        r"(?:(?:subscribeTo|suscribeTo)[A-Za-z0-9_]*SSE"
         r"|getV1EventsNta|getAccountActivityEvent)"
-        r"(?:Call|WithHttpInfo|Async)?\s*\("
+        r"(?:Call|WithHttpInfo|Async)?"
+    )
+    generated_sse = re.compile(
+        rf"(?:\.\s*{generated_method}\s*\(|::\s*{generated_method}\b)"
     )
     match = next(
         (
@@ -411,7 +438,7 @@ def _diagnostic_patterns(
         yield (
             match.start(),
             "SSE006",
-            "generated blocking SSE operation should be replaced with a handwritten SSE client",
+            "generated SSE method usage should be replaced with a handwritten SSE client",
         )
     if not sse_context:
         return
@@ -539,21 +566,21 @@ def analyze_text(text: str, path: str = "<memory>") -> Analysis:
 
     ignored_generated_sse_offsets: set[int] = set()
     if not has_shadowing_client_type:
-        for call in HANDWRITTEN_SINGLE_EVENT_CALL.finditer(mask):
-            receiver = call.group("receiver")
+        for usage in HANDWRITTEN_SINGLE_EVENT_USAGE.finditer(mask):
+            receiver = usage.group("receiver")
             visible_client_binders = [
                 binder
                 for binder in broker_client_binders.get(receiver, ())
                 if _binder_visible_to_call(
                     mask,
                     binder,
-                    call.start(),
+                    usage.start(),
                     brace_pairs,
                     parenthesis_pairs,
                     type_bodies,
                 )
                 or _field_binder_visible_to_call(
-                    mask, binder, call.start(), brace_pairs, type_bodies
+                    mask, binder, usage.start(), brace_pairs, type_bodies
                 )
             ]
             visible_binders = [
@@ -562,17 +589,17 @@ def analyze_text(text: str, path: str = "<memory>") -> Analysis:
                 if _binder_visible_to_call(
                     mask,
                     binder,
-                    call.start(),
+                    usage.start(),
                     brace_pairs,
                     parenthesis_pairs,
                     type_bodies,
                 )
                 or _field_binder_visible_to_call(
-                    mask, binder, call.start(), brace_pairs, type_bodies
+                    mask, binder, usage.start(), brace_pairs, type_bodies
                 )
             ]
             if (
-                _is_bare_receiver(mask, call.start("receiver"))
+                _is_bare_or_this_receiver(mask, usage.start("receiver"))
                 and len(broker_client_binders.get(receiver, ())) == 1
                 and len(visible_client_binders) == 1
                 and (
@@ -586,16 +613,14 @@ def analyze_text(text: str, path: str = "<memory>") -> Analysis:
                         and _field_binder_visible_to_call(
                             mask,
                             visible_client_binders[0],
-                            call.start(),
+                            usage.start(),
                             brace_pairs,
                             type_bodies,
                         )
                     )
                 )
             ):
-                ignored_generated_sse_offsets.add(
-                    mask.index(".", call.end("receiver"), call.end())
-                )
+                ignored_generated_sse_offsets.add(usage.start("separator"))
 
     sse_context = "BrokerSseEventListener" in mask or "eventSource" in mask
     for offset, code, message in _diagnostic_patterns(

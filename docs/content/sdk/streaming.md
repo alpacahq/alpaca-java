@@ -56,15 +56,16 @@ the active callback path, so a callback may close the subscription even when a s
 completion continuation waits for the ordered terminal listener.
 
 The SDK opening and terminal dispatchers have finite workers and queue capacity so blocked listeners
-cannot create unbounded threads. Lifecycle completion normally settles on the thread ending that
-subscription, so a blocking synchronous future continuation cannot occupy a shared completion
-worker needed by unrelated subscriptions. Settlement is handed off to a fixed-size dispatcher only
-when termination originates inside a listener, avoiding a cycle with ordered terminal delivery.
-Keep synchronous future continuations short, or use an async continuation with an
-application-owned executor for blocking work. Opening-dispatch rejection fails the subscription
-with an `AlpacaSseCallbackException`. Under terminal-dispatch saturation, lifecycle completion
-remains authoritative, the pending terminal listener callback is rejected, and the SDK logs a
-warning.
+cannot create unbounded threads. Lifecycle completion instead uses a separate elastic,
+direct-handoff executor: a blocked synchronous continuation for one subscription cannot queue
+another subscription's settlement or occupy the scheduler. Synchronous lifecycle continuations
+must remain short because concurrently blocked continuations consume additional daemon workers. The
+documented waits for related `opened()` or terminal-listener delivery are supported; use an async
+continuation with an application-owned executor for unrelated or potentially unbounded blocking
+work.
+Opening-dispatch rejection fails the subscription with an `AlpacaSseCallbackException`. Under
+terminal-dispatch saturation, lifecycle completion remains authoritative, the pending terminal
+listener callback is rejected, and the SDK logs a warning.
 
 The SSE transport retains the supplied OkHttp client's interceptors, proxy, TLS, dispatcher, and
 connection pool, but disables inherited read and whole-call timeouts because they would terminate
@@ -368,6 +369,9 @@ ID-bounded stream fails closed if an empty `id:` removed its resume cursor. `unt
 makes a request bounded;
 normal EOF then completes the subscription instead of reconnecting. Configure retry budgets,
 initial resume ID, idle timeout, and resource limits with `AlpacaSseOptions` factory overloads.
+A non-empty initial resume ID cannot be combined with a date-bounded Trading request because
+backend consumption of `Last-Event-ID` is not documented and date/ID cursor families cannot be
+mixed safely. Use an ID-bounded request instead; its initial ID must not be after `untilId`.
 `AlpacaSseReconnectPolicy.maxElapsedTime(...)` bounds one initial-open or established reconnect
 cycle. An established cycle remains bounded through backoff, reconnect headers, comments, and
 silence until an event is delivered; `AlpacaSseOptions.maxDuration(...)` separately bounds the
@@ -382,7 +386,9 @@ the OAS type/subtype mapping. The two schemas whose OAS definitions currently la
 ties fail explicitly instead of being guessed. The same decoder behavior applies to Broker Activity
 V2 events. Until the upstream contract provides a dedicated CSD detail schema, `CSD` events retain
 their activity type but expose details through `CSWActivityV2`; additional payload fields remain
-available through `getAdditionalProperties()`.
+available through `getAdditionalProperties()`. The OAS-valid `DIVTXEX` type likewise retains its
+activity type and uses the structurally compatible `CDIVActivityV2` detail model until a dedicated
+schema exists.
 
 ## Broker Events SSE
 

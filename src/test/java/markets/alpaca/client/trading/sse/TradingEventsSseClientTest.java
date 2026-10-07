@@ -88,6 +88,82 @@ class TradingEventsSseClientTest {
   }
 
   @Test
+  void rejectsInitialEventIdWithDateBoundedRequestBeforeOpeningConnection() {
+    var apiClient =
+        AlpacaClientFactory.tradingClient(
+            new AlpacaCredentials("trading-key", "trading-secret"), httpClient);
+    apiClient.setBasePath(baseUrl());
+    var client =
+        new TradingEventsSseClient(
+            apiClient,
+            AlpacaSseOptions.builder().initialLastEventId("01J9RPMV5TKB8WX3M4F1KZ7QH2").build());
+    var request =
+        TradingActivitySseRequest.builder()
+            .since(OffsetDateTime.parse("2026-10-01T00:00:00Z"))
+            .until(OffsetDateTime.parse("2026-10-02T00:00:00Z"))
+            .build();
+
+    var failure =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> client.subscribeToActivities(request, new AlpacaSseListener<>() {}));
+
+    assertTrue(failure.getMessage().contains("use an ID-bounded request"));
+    assertEquals(0, server.getRequestCount());
+  }
+
+  @Test
+  void rejectsInitialEventIdAfterUpperBoundBeforeOpeningConnection() {
+    var apiClient =
+        AlpacaClientFactory.tradingClient(
+            new AlpacaCredentials("trading-key", "trading-secret"), httpClient);
+    apiClient.setBasePath(baseUrl());
+    var client =
+        new TradingEventsSseClient(
+            apiClient,
+            AlpacaSseOptions.builder().initialLastEventId("01J9RPMV5TKB8WX3M4F1KZ7QH4").build());
+    var request =
+        TradingActivitySseRequest.throughEventId(
+            "01J9RPMV5TKB8WX3M4F1KZ7QH1", "01J9RPMV5TKB8WX3M4F1KZ7QH3");
+
+    var failure =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> client.subscribeToActivities(request, new AlpacaSseListener<>() {}));
+
+    assertEquals(
+        "options.initialLastEventId must not be after request.untilId", failure.getMessage());
+    assertEquals(0, server.getRequestCount());
+  }
+
+  @Test
+  void initialEventIdResumesWithinIdBoundedRequest() throws Exception {
+    server.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
+    var apiClient =
+        AlpacaClientFactory.tradingClient(
+            new AlpacaCredentials("trading-key", "trading-secret"), httpClient);
+    apiClient.setBasePath(baseUrl());
+    String initialEventId = "01J9RPMV5TKB8WX3M4F1KZ7QH2";
+    var client =
+        new TradingEventsSseClient(
+            apiClient, AlpacaSseOptions.builder().initialLastEventId(initialEventId).build());
+
+    try (var subscription =
+        client.subscribeToActivities(
+            TradingActivitySseRequest.throughEventId(
+                "01J9RPMV5TKB8WX3M4F1KZ7QH1", "01J9RPMV5TKB8WX3M4F1KZ7QH3"),
+            new AlpacaSseListener<>() {})) {
+      var request = server.takeRequest(2, TimeUnit.SECONDS);
+
+      assertNotNull(request);
+      assertEquals(initialEventId, request.getRequestUrl().queryParameter("since_id"));
+      assertEquals(
+          "01J9RPMV5TKB8WX3M4F1KZ7QH3", request.getRequestUrl().queryParameter("until_id"));
+      assertEquals(initialEventId, request.getHeader("Last-Event-ID"));
+    }
+  }
+
+  @Test
   void reconnectReplacesUnboundedDateCursorWithDocumentedEventIdCursor() throws Exception {
     server.enqueue(
         new MockResponse()

@@ -25,6 +25,9 @@ public final class ActivityDetailSchemaResolver {
             default -> null;
           };
       case "DIVROC" -> "CDIVActivityV2";
+      // The pinned OAS accepts DIVTXEX but has no dedicated detail schema. Tax-exempt dividends
+      // use the cash-dividend detail shape; explicit dispatch avoids its structural tie with SPD.
+      case "DIVTXEX" -> "CDIVActivityV2";
       case "DIVNRA" -> "DIVNRAActivityV2";
       case "FEE" ->
           oneOf(detail, "REG", "TAF", "LCT", "ORF", "OCC", "NRC", "NRV", "COM", "CAT")
