@@ -123,6 +123,21 @@ class AnalysisTests(unittest.TestCase):
         self.assertIn("subscription.close();", result.text)
         self.assertEqual(["SSE000"], [finding.code for finding in result.findings])
 
+    def test_does_not_rewrite_foreign_qualified_subscription_with_sdk_import(self):
+        source = (
+            IMPORT
+            + "class Example {\n"
+            + "  void close(other.pkg.BrokerSseSubscription subscription) {\n"
+            + "    subscription.eventSource().cancel();\n"
+            + "  }\n"
+            + "}\n"
+        )
+
+        result = migrate.analyze_text(source)
+
+        self.assertEqual(source, result.text)
+        self.assertEqual(["SSE001"], [finding.code for finding in result.findings])
+
     def test_does_not_treat_subscription_return_method_as_a_binder(self):
         source = (
             IMPORT
@@ -632,6 +647,20 @@ class AnalysisTests(unittest.TestCase):
                 self.assertEqual(
                     ["SSE006"], [finding.code for finding in result.findings]
                 )
+
+    def test_reports_foreign_qualified_handwritten_client_with_sdk_import(self):
+        source = """
+            import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+            class Example {
+              void fetch(other.pkg.BrokerEventsSseClient client) {
+                client.getAccountActivityEventAsync(null, "event");
+              }
+            }
+        """
+
+        result = migrate.analyze_text(source)
+
+        self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
 
     def test_reports_shadowing_handwritten_client_type_parameter(self):
         declarations = (

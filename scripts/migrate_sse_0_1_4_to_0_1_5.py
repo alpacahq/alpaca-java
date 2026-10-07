@@ -25,7 +25,7 @@ EXACT_CLIENT_IMPORT = re.compile(
     rf"(?m)^\s*import\s+{re.escape(BROKER_EVENTS_CLIENT)}\s*;"
 )
 BROKER_DECLARATION = re.compile(
-    rf"\b(?P<type>BrokerSseSubscription|{re.escape(BROKER_SUBSCRIPTION)})\s+"
+    rf"(?<![\w$.])(?P<type>BrokerSseSubscription|{re.escape(BROKER_SUBSCRIPTION)})\s+"
     r"(?P<name>[A-Za-z_$][\w$]*)\b(?!\s*\()"
 )
 BROKER_TYPE_DECLARATION = re.compile(
@@ -35,7 +35,7 @@ BROKER_TYPE_PARAMETER = re.compile(
     r"(?:<|,)\s*BrokerSseSubscription\b(?=\s*(?:extends\b|,|>))"
 )
 BROKER_CLIENT_DECLARATION = re.compile(
-    rf"\b(?P<type>BrokerEventsSseClient|{re.escape(BROKER_EVENTS_CLIENT)})\s+"
+    rf"(?<![\w$.])(?P<type>BrokerEventsSseClient|{re.escape(BROKER_EVENTS_CLIENT)})\s+"
     r"(?P<name>[A-Za-z_$][\w$]*)\b(?!\s*\()"
 )
 BROKER_CLIENT_TYPE_DECLARATION = re.compile(
