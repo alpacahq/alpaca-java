@@ -51,7 +51,9 @@ single-thread executor across subscriptions intentionally serializes their callb
 Terminal listener delivery is admitted before lifecycle futures notify synchronous continuations,
 but invocation waits until lifecycle completion is settled. Closing a subscription whose opening
 callback is waiting in the bounded dispatcher releases its HTTP response thread; already-admitted
-listener callbacks remain ordered and may complete later.
+listener callbacks remain ordered and may complete later. Lifecycle completion is settled away from
+the active callback path, so a callback may close the subscription even when a synchronous
+completion continuation waits for the ordered terminal listener.
 
 The SDK opening and terminal dispatchers have finite workers and queue capacity so blocked listeners
 cannot create unbounded threads. Opening-dispatch rejection fails the subscription with an
@@ -352,10 +354,14 @@ Live Trading SSE reconnects on transient failures by default. It follows the SSE
 persisting completed `id:` fields (including data-less ID blocks) and sending the cursor as the
 documented `since_id` query parameter and in `Last-Event-ID` on the replacement request. Resume
 state advances after a payload is successfully decoded and dispatched, or when a completed
-data-less `id:` block is observed. Malformed Trading payloads do not advance it. Date-bounded
+data-less `id:` block is observed. An empty `id:` resets an unbounded stream's cursor, so reconnect
+does not restore the request's original `since` or `since_id`. Malformed Trading payloads do not
+advance it. Date-bounded
 requests retain their original date range on retry and can replay already processed events. Server
 replay can be inclusive, so applications requiring exactly-once effects must deduplicate persisted
-work by event ID. `until` or `untilId` makes a request bounded;
+work by event ID. Because the Trading API requires `since_id` with `until_id`, an interrupted
+ID-bounded stream fails closed if an empty `id:` removed its resume cursor. `until` or `untilId`
+makes a request bounded;
 normal EOF then completes the subscription instead of reconnecting. Configure retry budgets,
 initial resume ID, idle timeout, and resource limits with `AlpacaSseOptions` factory overloads.
 `AlpacaSseReconnectPolicy.maxElapsedTime(...)` bounds one initial-open or established reconnect

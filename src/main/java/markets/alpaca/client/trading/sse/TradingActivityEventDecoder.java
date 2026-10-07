@@ -72,6 +72,24 @@ import markets.alpaca.client.sse.internal.GeneratedModelAdditionalProperties;
  */
 final class TradingActivityEventDecoder {
 
+  private static final Set<String> HANDLED_ENVELOPE_FIELDS =
+      Set.of(
+          "activity_subtype",
+          "activity_type",
+          "at",
+          "currency",
+          "event_id",
+          "executed_at",
+          "net_amount",
+          "previous_id",
+          "price",
+          "qty",
+          "ref_id",
+          "settle_date",
+          "status",
+          "swap_fee_bps",
+          "swap_rate",
+          "details");
   private static final List<Candidate> CANDIDATES =
       List.of(
           candidate(
@@ -245,7 +263,7 @@ final class TradingActivityEventDecoder {
     event.setSwapFeeBps(decimal(root, "swap_fee_bps"));
     event.setSwapRate(decimal(root, "swap_rate"));
     GeneratedModelAdditionalProperties.copy(
-        root, ActivityEventV2.openapiFields, JSON.getGson(), event::putAdditionalProperty);
+        root, HANDLED_ENVELOPE_FIELDS, JSON.getGson(), event::putAdditionalProperty);
     return event;
   }
 

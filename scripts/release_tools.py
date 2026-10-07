@@ -23,10 +23,6 @@ _SNAPSHOT_PATTERN = re.compile(
     rf"^({_COMPONENT})\.({_COMPONENT})\.({_COMPONENT})-SNAPSHOT$"
 )
 _VERSION_PROPERTY_PATTERN = re.compile(r"^\s*version\s*=(.*)$")
-_API_BASELINE_PROPERTY_PATTERN = re.compile(r"^\s*apiBaselineVersion\s*=(.*)$")
-_README_SNAPSHOT_PATTERN = re.compile(
-    r'(implementation\("markets\.alpaca:alpaca-java:)([^"]+)("\))'
-)
 _DECIMAL_PATTERN = re.compile(rf"^{_COMPONENT}$")
 _FORBIDDEN_XML_DECLARATION_PATTERN = re.compile(
     r"<!\s*(?:DOCTYPE|ENTITY)\b", re.IGNORECASE
@@ -474,7 +470,7 @@ def read_snapshot_version(properties_path: Path) -> str:
 
 
 def update_next_snapshot(properties_path: Path, release_version: str) -> VersionUpdate:
-    """Advance the next snapshot and its released API baseline without downgrading."""
+    """Safely advance the effective final version property without downgrading."""
     release_parts = parse_release_version(release_version)
     next_parts = (
         release_parts[0],
@@ -503,82 +499,26 @@ def update_next_snapshot(properties_path: Path, release_version: str) -> Version
     current_parts = current_match.groups()
     comparison = compare_semver_parts(current_parts, next_parts)
 
+    if comparison == 0:
+        return VersionUpdate(next_version, "equal", False)
     if comparison > 0:
         return VersionUpdate(next_version, "ahead", False)
 
-    baseline_matches: list[tuple[int, str]] = []
-    for index, line in enumerate(lines):
-        match = _API_BASELINE_PROPERTY_PATTERN.fullmatch(line.rstrip("\r\n"))
-        if match is not None:
-            baseline_matches.append((index, match.group(1).strip()))
-    if not baseline_matches:
-        raise ReleaseToolError("no apiBaselineVersion property was found")
-
-    baseline_index, current_baseline = baseline_matches[-1]
-    current_baseline_parts = parse_release_version(current_baseline)
-    if compare_semver_parts(current_baseline_parts, release_parts) > 0:
-        raise ReleaseToolError(
-            f"API baseline {current_baseline} is ahead of release {release_version}"
-        )
-
-    def replace_property(index: int, name: str, value: str) -> None:
-        original_line = lines[index]
-        if original_line.endswith("\r\n"):
-            newline = "\r\n"
-        elif original_line.endswith("\n"):
-            newline = "\n"
-        elif original_line.endswith("\r"):
-            newline = "\r"
-        else:
-            newline = ""
-        lines[index] = f"{name}={value}{newline}"
-
-    if comparison < 0:
-        replace_property(version_index, "version", next_version)
-    baseline_changed = current_baseline != release_version
-    if baseline_changed:
-        replace_property(baseline_index, "apiBaselineVersion", release_version)
-
-    changed = comparison < 0 or baseline_changed
-    if not changed:
-        return VersionUpdate(next_version, "equal", False)
-
+    original_line = lines[version_index]
+    if original_line.endswith("\r\n"):
+        newline = "\r\n"
+    elif original_line.endswith("\n"):
+        newline = "\n"
+    elif original_line.endswith("\r"):
+        newline = "\r"
+    else:
+        newline = ""
+    lines[version_index] = f"version={next_version}{newline}"
     updated_text = "".join(lines)
     if has_utf8_bom:
         updated_text = "\ufeff" + updated_text
     _atomic_write_text(properties_path, updated_text)
-    return VersionUpdate(
-        next_version, "behind" if comparison < 0 else "equal", True
-    )
-
-
-def update_snapshot_readme(readme_path: Path, next_version: str) -> bool:
-    """Synchronize the single documented snapshot dependency without downgrading."""
-    text, has_utf8_bom = _read_utf8_document(readme_path)
-    matches = list(_README_SNAPSHOT_PATTERN.finditer(text))
-    if len(matches) != 1:
-        raise ReleaseToolError(
-            "README must contain exactly one alpaca-java implementation dependency"
-        )
-    current_version = matches[0].group(2)
-    current_match = _SNAPSHOT_PATTERN.fullmatch(current_version)
-    next_match = _SNAPSHOT_PATTERN.fullmatch(next_version)
-    if current_match is None or next_match is None:
-        raise ReleaseToolError("README dependency and next version must be semantic SNAPSHOTs")
-    comparison = compare_semver_parts(current_match.groups(), next_match.groups())
-    if comparison > 0:
-        raise ReleaseToolError(
-            f"README snapshot {current_version} is ahead of {next_version}"
-        )
-    if comparison == 0:
-        return False
-
-    match = matches[0]
-    updated_text = text[: match.start(2)] + next_version + text[match.end(2) :]
-    if has_utf8_bom:
-        updated_text = "\ufeff" + updated_text
-    _atomic_write_text(readme_path, updated_text)
-    return True
+    return VersionUpdate(next_version, "behind", True)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -596,7 +536,6 @@ def build_parser() -> argparse.ArgumentParser:
 
     update_version = subparsers.add_parser("update-version")
     update_version.add_argument("--properties", required=True)
-    update_version.add_argument("--readme", required=True)
     update_version.add_argument("--release-version", required=True)
     update_version.add_argument("--github-output")
 
@@ -650,12 +589,9 @@ def main(argv: list[str] | None = None) -> int:
             update = update_next_snapshot(
                 Path(arguments.properties), arguments.release_version
             )
-            readme_changed = update_snapshot_readme(
-                Path(arguments.readme), update.version
-            )
             values = (
                 f"version={update.version}\n"
-                f"should_push={str(update.changed or readme_changed).lower()}\n"
+                f"should_push={str(update.changed).lower()}\n"
                 f"status={update.status}\n"
             )
             _write_github_output(

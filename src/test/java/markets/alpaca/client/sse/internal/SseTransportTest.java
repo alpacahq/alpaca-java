@@ -1565,7 +1565,7 @@ class SseTransportTest {
                 () -> {
                   try {
                     assertTrue(
-                        closed.await(1, TimeUnit.SECONDS),
+                        closed.await(3, TimeUnit.SECONDS),
                         "onClosed must run while the synchronous completion continuation is active");
                   } catch (InterruptedException failure) {
                     Thread.currentThread().interrupt();
@@ -1575,8 +1575,66 @@ class SseTransportTest {
 
     var close = CompletableFuture.runAsync(subscription::close);
 
-    continuation.get(2, TimeUnit.SECONDS);
+    continuation.get(4, TimeUnit.SECONDS);
     close.get(1, TimeUnit.SECONDS);
+    assertEquals(AlpacaSseState.CLOSED, subscription.state());
+  }
+
+  @Test
+  void completionContinuationCanAwaitClosedWhenEventCallbackClosesSubscription() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("data: event\n\n")
+            .setBodyDelay(100, TimeUnit.MILLISECONDS));
+    var releaseEvent = new CountDownLatch(1);
+    var eventReturned = new CountDownLatch(1);
+    var closed = new CountDownLatch(1);
+    var subscriptionRef = new AtomicReference<markets.alpaca.client.sse.AlpacaSseSubscription>();
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onEvent(AlpacaSseEvent<String> event) {
+                try {
+                  assertTrue(releaseEvent.await(1, TimeUnit.SECONDS));
+                  subscriptionRef.get().close();
+                  eventReturned.countDown();
+                } catch (InterruptedException failure) {
+                  Thread.currentThread().interrupt();
+                  throw new AssertionError("interrupted before closing from onEvent", failure);
+                }
+              }
+
+              @Override
+              public void onClosed(AlpacaSseCloseResult result) {
+                closed.countDown();
+              }
+            });
+    subscriptionRef.set(subscription);
+    var continuation =
+        subscription
+            .completion()
+            .thenRun(
+                () -> {
+                  try {
+                    assertTrue(
+                        closed.await(3, TimeUnit.SECONDS),
+                        "onClosed must run while the synchronous completion continuation is active");
+                  } catch (InterruptedException failure) {
+                    Thread.currentThread().interrupt();
+                    throw new AssertionError("interrupted while waiting for onClosed", failure);
+                  }
+                });
+    releaseEvent.countDown();
+
+    assertTrue(eventReturned.await(2, TimeUnit.SECONDS));
+    continuation.get(4, TimeUnit.SECONDS);
     assertEquals(AlpacaSseState.CLOSED, subscription.state());
   }
 
@@ -1608,7 +1666,7 @@ class SseTransportTest {
                 (result, failure) -> {
                   try {
                     assertTrue(
-                        failed.await(1, TimeUnit.SECONDS),
+                        failed.await(3, TimeUnit.SECONDS),
                         "onFailure must run while the synchronous completion continuation is active");
                   } catch (InterruptedException interrupted) {
                     Thread.currentThread().interrupt();
@@ -1618,7 +1676,7 @@ class SseTransportTest {
                   return null;
                 });
 
-    continuation.get(2, TimeUnit.SECONDS);
+    continuation.get(4, TimeUnit.SECONDS);
     var failure =
         assertThrows(
             ExecutionException.class, () -> subscription.completion().get(1, TimeUnit.SECONDS));

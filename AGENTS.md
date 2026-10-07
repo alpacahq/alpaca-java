@@ -20,7 +20,7 @@ this SDK, read `LLMS.md` instead.
 ./gradlew integrationTest          # live read-only integration tests
 ./gradlew compileExamples          # compile examples without packaging
 ./gradlew generateJavadocs         # generate the API reference
-./gradlew checkApiCompatibility    # compare the complete public JAR with configured baseline
+./gradlew checkApiCompatibility    # compare the complete public JAR with released 0.1.4
 ```
 
 `compileJava` depends on `generateApis`, so a normal build always regenerates from

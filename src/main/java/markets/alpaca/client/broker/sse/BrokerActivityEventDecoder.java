@@ -23,6 +23,26 @@ import markets.alpaca.client.sse.internal.GeneratedModelAdditionalProperties;
 /** Discriminant-aware decoder for Broker Activity V2 generated models. */
 final class BrokerActivityEventDecoder {
 
+  private static final Set<String> HANDLED_ENVELOPE_FIELDS =
+      Set.of(
+          "account_id",
+          "activity_subtype",
+          "activity_type",
+          "at",
+          "currency",
+          "event_id",
+          "executed_at",
+          "net_amount",
+          "previous_id",
+          "price",
+          "qty",
+          "ref_id",
+          "settle_date",
+          "status",
+          "swap_fee_bps",
+          "swap_rate",
+          "details");
+
   ActivityEventV2 decode(String data) throws IOException {
     JsonObject root = JsonParser.parseString(data).getAsJsonObject();
     String type = string(root, "activity_type");
@@ -116,7 +136,7 @@ final class BrokerActivityEventDecoder {
     event.setSwapFeeBps(decimal(root, "swap_fee_bps"));
     event.setSwapRate(decimal(root, "swap_rate"));
     GeneratedModelAdditionalProperties.copy(
-        root, ActivityEventV2.openapiFields, JSON.getGson(), event::putAdditionalProperty);
+        root, HANDLED_ENVELOPE_FIELDS, JSON.getGson(), event::putAdditionalProperty);
     return event;
   }
 
