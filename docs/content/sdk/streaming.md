@@ -56,12 +56,15 @@ the active callback path, so a callback may close the subscription even when a s
 completion continuation waits for the ordered terminal listener.
 
 The SDK opening and terminal dispatchers have finite workers and queue capacity so blocked listeners
-cannot create unbounded threads. Lifecycle completion also uses a fixed-size dispatcher; recursive
-completion from one of its continuations is settled inline to avoid pool starvation. Keep
-synchronous future continuations short, or use an async continuation with an application-owned
-executor for blocking work. Opening-dispatch rejection fails the subscription with an
-`AlpacaSseCallbackException`. Under terminal-dispatch saturation, lifecycle completion remains
-authoritative, the pending terminal listener callback is rejected, and the SDK logs a warning.
+cannot create unbounded threads. Lifecycle completion normally settles on the thread ending that
+subscription, so a blocking synchronous future continuation cannot occupy a shared completion
+worker needed by unrelated subscriptions. Settlement is handed off to a fixed-size dispatcher only
+when termination originates inside a listener, avoiding a cycle with ordered terminal delivery.
+Keep synchronous future continuations short, or use an async continuation with an
+application-owned executor for blocking work. Opening-dispatch rejection fails the subscription
+with an `AlpacaSseCallbackException`. Under terminal-dispatch saturation, lifecycle completion
+remains authoritative, the pending terminal listener callback is rejected, and the SDK logs a
+warning.
 
 The SSE transport retains the supplied OkHttp client's interceptors, proxy, TLS, dispatcher, and
 connection pool, but disables inherited read and whole-call timeouts because they would terminate

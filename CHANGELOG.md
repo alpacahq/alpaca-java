@@ -118,9 +118,9 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   listener callback path, so a callback can close while a completion continuation awaits the
   ordered terminal listener.
 - Terminal callbacks now verify lifecycle completion even when an existing callback drain consumes
-  them. Completion settlement uses fixed workers with queued work, and recursive settlement from a
-  synchronous future continuation runs inline to avoid worker starvation without creating
-  unbounded lifecycle threads.
+  them. Completion normally settles on the terminating thread so blocked synchronous continuations
+  cannot starve unrelated subscriptions; termination from an active listener is handed off to fixed
+  workers to preserve ordered callback progress without creating unbounded lifecycle threads.
 - An empty Trading SSE `id:` now clears the original unbounded `since`/`since_id` on reconnect
   instead of replaying the subscription's initial cursor; ID-bounded streams fail closed when the
   API's required `since_id` can no longer be supplied.

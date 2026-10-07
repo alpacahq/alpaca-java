@@ -57,8 +57,6 @@ public final class SseTransport {
   private static final Executor DIRECT_EXECUTOR = Runnable::run;
   private static final int CALLBACK_DISPATCH_THREADS = 4;
   private static final int CALLBACK_DISPATCH_QUEUE_CAPACITY = 256;
-  private static final ThreadLocal<Boolean> COMPLETION_WORKER =
-      ThreadLocal.withInitial(() -> false);
   private static final ScheduledExecutorService SCHEDULER = createScheduler();
   private static final ExecutorService OPENING_CALLBACK_EXECUTOR = createOpeningCallbackExecutor();
   private static final ExecutorService TERMINAL_CALLBACK_EXECUTOR =
@@ -103,13 +101,7 @@ public final class SseTransport {
         TimeUnit.MILLISECONDS,
         new LinkedBlockingQueue<>(),
         runnable -> {
-          Thread thread =
-              new Thread(
-                  () -> {
-                    COMPLETION_WORKER.set(true);
-                    runnable.run();
-                  },
-                  "alpaca-sse-completion");
+          Thread thread = new Thread(runnable, "alpaca-sse-completion");
           thread.setDaemon(true);
           return thread;
         },
@@ -1209,10 +1201,11 @@ public final class SseTransport {
     }
 
     private void settleCompletion(Runnable settlement) {
-      if (Boolean.TRUE.equals(COMPLETION_WORKER.get())) {
-        settlement.run();
-      } else {
+      if (callbackDispatcher.invokingOnCurrentThread()
+          || completionExecutor != COMPLETION_EXECUTOR) {
         completionExecutor.execute(settlement);
+      } else {
+        settlement.run();
       }
     }
 
@@ -1330,7 +1323,12 @@ public final class SseTransport {
 
     private final class SerialCallbackDispatcher {
       private final ArrayDeque<CallbackTask> queue = new ArrayDeque<>();
+      private final ThreadLocal<Boolean> invoking = ThreadLocal.withInitial(() -> false);
       private boolean draining;
+
+      boolean invokingOnCurrentThread() {
+        return Boolean.TRUE.equals(invoking.get());
+      }
 
       synchronized EnqueuedCallback enqueue(String name, Runnable callback) {
         CallbackTask task = new CallbackTask(name, callback);
@@ -1350,6 +1348,8 @@ public final class SseTransport {
               return;
             }
           }
+          boolean alreadyInvoking = invokingOnCurrentThread();
+          invoking.set(true);
           try {
             task.callback.run();
             task.completion.complete(null);
@@ -1358,6 +1358,12 @@ public final class SseTransport {
             task.completion.complete(null);
           } catch (Throwable failure) {
             task.completion.completeExceptionally(failure);
+          } finally {
+            if (alreadyInvoking) {
+              invoking.set(true);
+            } else {
+              invoking.remove();
+            }
           }
         }
       }
