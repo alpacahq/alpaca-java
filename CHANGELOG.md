@@ -100,6 +100,11 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   creating unbounded threads.
 
 ### Fixed
+- Concurrent `close()` calls now return only after lifecycle completion settles, including when a
+  failure wins the terminal transition. Accepted initial and reconnect responses retain their
+  successful opening future and ordered open callback ahead of terminal listener delivery.
+- Broker admin-action SSE events now use their required `type` discriminator instead of the
+  ambiguous generated `oneOf` adapter, while retaining the generated public wrapper type.
 - Closing during initial connection or reconnect can no longer publish an uncancelled call after the
   terminal transition, and closing from a listener while awaiting `completion()` no longer
   deadlocks.

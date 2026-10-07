@@ -28,6 +28,10 @@ public interface AlpacaSseSubscription extends AutoCloseable {
   /**
    * Completes with the first accepted connection.
    *
+   * <p>Once the response is accepted, this future completes successfully with that connection even
+   * if closure races with opening. The ordered {@code onOpen} callback remains ahead of the
+   * terminal listener callback.
+   *
    * <p>If the subscription terminates before opening, {@link #completion()} is settled before this
    * future is cancelled or completed exceptionally. A synchronous opening continuation may
    * therefore safely inspect terminal completion.
@@ -46,8 +50,12 @@ public interface AlpacaSseSubscription extends AutoCloseable {
   CompletableFuture<AlpacaSseCloseResult> completion();
 
   /**
-   * Selects {@link AlpacaSseCloseResult.Reason#USER_CLOSED}, cancels transport work, and completes
-   * {@link #completion()} before returning.
+   * Selects {@link AlpacaSseCloseResult.Reason#USER_CLOSED} when this call wins the terminal
+   * transition, cancels transport work, and waits for {@link #completion()} to settle before
+   * returning.
+   *
+   * <p>If another terminal transition wins concurrently, this method observes its normal or
+   * exceptional completion without rethrowing the terminal failure.
    */
   @Override
   void close();
