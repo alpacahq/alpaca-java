@@ -175,8 +175,11 @@ Do not call the generated `EventsApi.subscribeToActivitiesSSE(...)` method: Open
 response as an array, so generated execution waits for a live response to end. The handwritten
 client parses incrementally, supports cancellation, and reconnects transiently failed live streams
 while transmitting the committed cursor as the documented `since_id` query parameter and in the
-standard `Last-Event-ID` header. Date-bounded requests retain their original date range on retry and
-can replay already processed events. Malformed payloads terminate the subscription;
+standard `Last-Event-ID` header. If an empty SSE `id:` clears that cursor, an unbounded request
+retains its original `since` or `sinceId` lower bound rather than reconnecting without replay;
+deduplicate because this can redeliver earlier events. Date-bounded requests similarly retain their
+original date range on retry and can replay already processed events. Malformed payloads terminate
+the subscription;
 persisted workflows should inspect `completion()` and deduplicate by event ID after reconnect.
 `AlpacaSseOptions.initialLastEventId` must be non-empty and cannot be combined with a date-bounded
 request; use an ID-bounded request and ensure the initial ID is not after `untilId`.

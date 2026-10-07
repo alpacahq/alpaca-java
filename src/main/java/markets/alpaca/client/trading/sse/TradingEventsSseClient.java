@@ -95,10 +95,14 @@ public final class TradingEventsSseClient {
         decoder::decode,
         listener,
         callbackExecutor,
-        TradingEventsSseClient::withResumeCursor);
+        (baseRequest, eventId) -> withResumeCursor(baseRequest, eventId, initialEventId));
   }
 
   static Request withResumeCursor(Request request, String eventId) {
+    return withResumeCursor(request, eventId, null);
+  }
+
+  private static Request withResumeCursor(Request request, String eventId, String fallbackEventId) {
     Request resumedRequest = SseTransport.withLastEventIdHeader(request, eventId);
     if (eventId == null) {
       return resumedRequest;
@@ -114,6 +118,20 @@ public final class TradingEventsSseClient {
       throw new AlpacaSseProtocolException(
           "Cannot resume an ID-bounded Trading activity stream after an empty SSE id");
     }
+    if (eventId.isEmpty()) {
+      if (fallbackEventId != null) {
+        var fallbackUrl =
+            request
+                .url()
+                .newBuilder()
+                .removeAllQueryParameters("since")
+                .removeAllQueryParameters("since_id")
+                .setQueryParameter("since_id", fallbackEventId)
+                .build();
+        return resumedRequest.newBuilder().url(fallbackUrl).build();
+      }
+      return resumedRequest;
+    }
 
     var urlBuilder =
         request
@@ -121,9 +139,7 @@ public final class TradingEventsSseClient {
             .newBuilder()
             .removeAllQueryParameters("since")
             .removeAllQueryParameters("since_id");
-    if (!eventId.isEmpty()) {
-      urlBuilder.setQueryParameter("since_id", eventId);
-    }
+    urlBuilder.setQueryParameter("since_id", eventId);
     var url = urlBuilder.build();
     return resumedRequest.newBuilder().url(url).build();
   }
