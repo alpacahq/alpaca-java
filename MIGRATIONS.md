@@ -16,15 +16,18 @@ requires one explicit, unshadowed `BrokerSseSubscription` parameter or local-var
 call's lexical scope and a bare identifier receiver. Fields, qualified, chained, inferred,
 lambda-bound, out-of-scope, same-named local/nested types, or otherwise uncertain cases are reported
 as `SSE001` for manual review. Control-flow header declarations are also report-only because an
-unbraced statement's scope cannot be established safely by this text scanner. The type may use the
-exact import or its fully qualified class name. Missing paths and explicit non-Java inputs fail
-closed. The tool does not attempt to rewrite behavioral callback or threading changes.
+unbraced statement's scope cannot be established safely by this text scanner. Same-named type
+parameters and files containing Java Unicode escapes are report-only as well. The type may use the
+exact import or its fully qualified class name. Rewrites preserve the source file's existing line
+endings. Missing paths and explicit non-Java inputs fail closed. The tool does not attempt to
+rewrite behavioral callback or threading changes.
 Diagnostic `SSE006` reports generated SSE method invocations and method references that should move
 to handwritten streaming clients. It does not report a uniquely bound imported or fully qualified
 `BrokerEventsSseClient.getAccountActivityEventAsync` receiver when used directly. A
 `this.receiver` call is suppressed only when the scanner can prove that the current class declares
 that handwritten-client field; inherited, other-qualified, and otherwise ambiguous receivers
-remain findings. Every generated SSE use in a file is reported.
+remain findings. Unqualified inherited calls in generated API subclasses are also reported. Every
+generated SSE use in a file is reported.
 
 `BrokerSseSubscription` also implements `AlpacaSseSubscription` in `0.1.5`. This is additive and
 requires no source migration; it allows domain-neutral lifecycle code to accept existing Broker

@@ -210,7 +210,7 @@ class TradingEventsSseClientTest {
   }
 
   @Test
-  void reconnectAfterEmptyEventIdDoesNotRestoreOriginalUnboundedCursor() throws Exception {
+  void reconnectAfterEmptyEventIdRetainsOriginalUnboundedCursor() throws Exception {
     server.enqueue(
         new MockResponse()
             .setHeader("Content-Type", "text/event-stream")
@@ -248,8 +248,75 @@ class TradingEventsSseClientTest {
       assertNotNull(initial);
       assertNotNull(reconnect);
       assertNotNull(initial.getRequestUrl().queryParameter("since"));
-      assertNull(reconnect.getRequestUrl().queryParameter("since"));
+      assertEquals(
+          initial.getRequestUrl().queryParameter("since"),
+          reconnect.getRequestUrl().queryParameter("since"));
       assertNull(reconnect.getRequestUrl().queryParameter("since_id"));
+      assertNull(reconnect.getHeader("Last-Event-ID"));
+    }
+  }
+
+  @Test
+  void emptyEventIdRetainsOriginalUnboundedIdCursor() {
+    var request =
+        new Request.Builder()
+            .url(
+                server
+                    .url("/v2beta1/events/activities")
+                    .newBuilder()
+                    .addQueryParameter("since_id", "01J9RPMV5TKB8WX3M4F1KZ7QH2")
+                    .build())
+            .header("Last-Event-ID", "replacement")
+            .build();
+
+    var resumed = TradingEventsSseClient.withResumeCursor(request, "");
+
+    assertEquals("01J9RPMV5TKB8WX3M4F1KZ7QH2", resumed.url().queryParameter("since_id"));
+    assertNull(resumed.header("Last-Event-ID"));
+  }
+
+  @Test
+  void reconnectAfterEmptyEventIdRetainsInitialOptionAsLowerBound() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("id:\ndata: " + fillJson() + "\n\n"));
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBodyDelay(5, TimeUnit.SECONDS)
+            .setBody(":\n\n"));
+    var apiClient =
+        AlpacaClientFactory.tradingClient(
+            new AlpacaCredentials("trading-key", "trading-secret"), httpClient);
+    apiClient.setBasePath(baseUrl());
+    String initialEventId = "01J9RPMV5TKB8WX3M4F1KZ7QH2";
+    var policy =
+        AlpacaSseReconnectPolicy.builder()
+            .initialAttempts(0)
+            .establishedAttempts(1)
+            .initialBackoff(Duration.ofMillis(1))
+            .maxBackoff(Duration.ofMillis(1))
+            .jitterRatio(0)
+            .build();
+    var options =
+        AlpacaSseOptions.builder()
+            .initialLastEventId(initialEventId)
+            .reconnectPolicy(policy)
+            .build();
+    var client = new TradingEventsSseClient(apiClient, options);
+
+    try (var subscription =
+        client.subscribeToActivities(
+            TradingActivitySseRequest.builder().build(), new AlpacaSseListener<>() {})) {
+      var initial = server.takeRequest(3, TimeUnit.SECONDS);
+      var reconnect = server.takeRequest(3, TimeUnit.SECONDS);
+
+      assertNotNull(initial);
+      assertNotNull(reconnect);
+      assertEquals(initialEventId, initial.getRequestUrl().queryParameter("since_id"));
+      assertEquals(initialEventId, reconnect.getRequestUrl().queryParameter("since_id"));
+      assertEquals(initialEventId, initial.getHeader("Last-Event-ID"));
       assertNull(reconnect.getHeader("Last-Event-ID"));
     }
   }

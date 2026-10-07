@@ -31,6 +31,10 @@ BROKER_DECLARATION = re.compile(
 BROKER_TYPE_DECLARATION = re.compile(
     r"\b(?:class|interface|enum|record|@interface)\s+BrokerSseSubscription\b"
 )
+BROKER_TYPE_PARAMETER = re.compile(
+    r"(?:<|,)\s*(?:@\s*[A-Za-z_$][\w$]*(?:\s*\([^)]*\))?\s*)*"
+    r"BrokerSseSubscription\b(?=\s*(?:extends\b|,|>))"
+)
 BROKER_CLIENT_DECLARATION = re.compile(
     rf"\b(?P<type>BrokerEventsSseClient|{re.escape(BROKER_EVENTS_CLIENT)})\s+"
     r"(?P<name>[A-Za-z_$][\w$]*)\b(?!\s*\()"
@@ -39,8 +43,10 @@ BROKER_CLIENT_TYPE_DECLARATION = re.compile(
     r"\b(?:class|interface|enum|record|@interface)\s+BrokerEventsSseClient\b"
 )
 BROKER_CLIENT_TYPE_PARAMETER = re.compile(
-    r"(?:<|,)\s*BrokerEventsSseClient\s+extends\b"
+    r"(?:<|,)\s*(?:@\s*[A-Za-z_$][\w$]*(?:\s*\([^)]*\))?\s*)*"
+    r"BrokerEventsSseClient\b(?=\s*(?:extends\b|,|>))"
 )
+JAVA_UNICODE_ESCAPE = re.compile(r"\\u+[0-9A-Fa-f]{4}")
 JAVA_IDENTIFIER = r"[A-Za-z_$][\w$]*"
 TYPE_DECLARATION = re.compile(
     rf"\b(?:class|interface|enum|record|@interface)\s+{JAVA_IDENTIFIER}\b"
@@ -480,6 +486,26 @@ def _contains_masked_syntax(text: str, mask: str, start: int, end: int) -> bool:
     )
 
 
+def _generated_api_subclass_bodies(mask: str) -> tuple[tuple[int, int], ...]:
+    brace_pairs = _brace_pairs(mask)
+    bodies: list[tuple[int, int]] = []
+    generated_api = re.compile(
+        r"\bextends\s+(?:(?:markets\s*\.\s*alpaca\s*\.\s*client\s*\.\s*openapi\s*\.\s*"
+        r"(?:broker|trading)\s*\.\s*api\s*\.\s*)?EventsApi|"
+        r"(?:markets\s*\.\s*alpaca\s*\.\s*client\s*\.\s*openapi\s*\.\s*data\s*\.\s*"
+        r"api\s*\.\s*)?CorporateActionsApi)\b"
+    )
+    for declaration in TYPE_DECLARATION.finditer(mask):
+        opening = mask.find("{", declaration.end())
+        semicolon = mask.find(";", declaration.end())
+        if opening < 0 or (semicolon >= 0 and semicolon < opening):
+            continue
+        closing = brace_pairs.get(opening)
+        if closing is not None and generated_api.search(mask[declaration.end() : opening]):
+            bodies.append((opening, closing))
+    return tuple(bodies)
+
+
 def _diagnostic_patterns(
     mask: str, *, sse_context: bool, ignored_generated_sse_offsets: set[int]
 ) -> Iterable[tuple[int, str, str]]:
@@ -499,12 +525,40 @@ def _diagnostic_patterns(
             "SSE006",
             "generated SSE method usage should be replaced with a handwritten SSE client",
         )
+    unqualified_generated_sse = re.compile(rf"(?<![\w$]){generated_method}\s*\(")
+    generated_subclasses = _generated_api_subclass_bodies(mask)
+    for match in unqualified_generated_sse.finditer(mask):
+        if not _is_bare_receiver(mask, match.start()):
+            continue
+        if any(opening < match.start() < closing for opening, closing in generated_subclasses):
+            yield (
+                match.start(),
+                "SSE006",
+                "inherited generated SSE method usage should be replaced with a handwritten "
+                "SSE client",
+            )
     if not sse_context:
         return
 
     checks = (
         (
             re.compile(r"\bEventSource\b.*(?:=|instanceof|==).*eventSource\s*\(", re.DOTALL),
+            "SSE002",
+            "EventSource identity, assignment, or cast requires manual review",
+        ),
+        (
+            re.compile(
+                rf"\(\s*(?:okhttp3\s*\.\s*sse\s*\.\s*)?EventSource\s*\)\s*"
+                rf"(?:{JAVA_IDENTIFIER}\s*\.\s*)+eventSource\s*\("
+            ),
+            "SSE002",
+            "EventSource identity, assignment, or cast requires manual review",
+        ),
+        (
+            re.compile(
+                rf"(?:(?:{JAVA_IDENTIFIER}\s*\.\s*)+eventSource\s*\(\s*\)\s*(?:==|!=)"
+                rf"|(?:==|!=)\s*(?:{JAVA_IDENTIFIER}\s*\.\s*)+eventSource\s*\(\s*\))"
+            ),
             "SSE002",
             "EventSource identity, assignment, or cast requires manual review",
         ),
@@ -545,7 +599,9 @@ def _diagnostic_patterns(
 def analyze_text(text: str, path: str = "<memory>") -> Analysis:
     mask = _code_mask(text)
     has_exact_import = bool(EXACT_IMPORT.search(mask))
-    has_shadowing_type = bool(BROKER_TYPE_DECLARATION.search(mask))
+    has_shadowing_type = bool(
+        BROKER_TYPE_DECLARATION.search(mask) or BROKER_TYPE_PARAMETER.search(mask)
+    )
     has_exact_client_import = bool(EXACT_CLIENT_IMPORT.search(mask))
     has_shadowing_client_type = bool(
         BROKER_CLIENT_TYPE_DECLARATION.search(mask)
@@ -597,6 +653,7 @@ def analyze_text(text: str, path: str = "<memory>") -> Analysis:
             and len(visible_binders) == 1
             and set(visible_broker_binders) == set(visible_binders)
             and not _contains_masked_syntax(text, mask, call.start(), call.end())
+            and not JAVA_UNICODE_ESCAPE.search(text)
         )
         if safe:
             replacements.append((call.start(), call.end(), f"{receiver}.close()"))
@@ -728,7 +785,9 @@ def _java_files(paths: Iterable[Path]) -> list[Path]:
             files.update(
                 candidate
                 for candidate in path.rglob("*.java")
-                if not {".git", ".gradle", "build"}.intersection(candidate.parts)
+                if not {".git", ".gradle", "build"}.intersection(
+                    candidate.relative_to(path).parts
+                )
             )
     return sorted(files)
 
@@ -760,11 +819,13 @@ def main(argv: list[str] | None = None) -> int:
 
     findings: list[Finding] = []
     for path in _java_files(arguments.paths):
-        original = path.read_text(encoding="utf-8")
+        with path.open("r", encoding="utf-8", newline="") as source:
+            original = source.read()
         analysis = analyze_text(original, str(path))
         findings.extend(analysis.findings)
         if arguments.write and analysis.text != original:
-            path.write_text(analysis.text, encoding="utf-8")
+            with path.open("w", encoding="utf-8", newline="") as destination:
+                destination.write(analysis.text)
 
     if arguments.json:
         print(json.dumps([asdict(finding) for finding in findings], indent=2))
