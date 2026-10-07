@@ -57,10 +57,11 @@ ambiguous imports,
 `EventSource` casts/identity assumptions, raw Gson exception checks, deep OkHttp `Response` use,
 blocking callbacks, generated SSE invocations or method references, and listeners overriding both
 rich and legacy callbacks. Invocations and method references on a uniquely bound imported or fully
-qualified `BrokerEventsSseClient`, using either a bare receiver or `this.receiver`, are recognized
-as the handwritten replacement and are not reported as generated SSE usage. Other qualified
-receivers remain report-only. These deliberate false negatives keep `--write` source-safe; migrate
-`SSE001` findings manually.
+qualified `BrokerEventsSseClient` using a bare receiver are recognized as the handwritten
+replacement. A `this.receiver` call is recognized only when the scanner can prove the current class
+declares that handwritten-client field; inherited and other-qualified receivers remain report-only.
+Every generated SSE invocation or method reference is reported. These deliberate false positives
+keep `--write` source-safe; migrate `SSE001` findings manually.
 Missing input paths and explicit non-Java files fail with exit code 2 instead of producing an empty
 success report.
 
@@ -186,9 +187,18 @@ saturated by blocked terminal callbacks, the SDK preserves the already-settled l
 rejects the pending listener delivery, and logs a warning. Keep callbacks non-blocking or supply an
 application-owned executor; lifecycle futures are the authoritative termination signal.
 
+Each subscription derives an HTTP client with a private, one-call daemon dispatcher and shuts that
+dispatcher down at terminal completion. Close streams through `AlpacaSseSubscription`; the supplied
+client's `dispatcher().cancelAll()` does not own SSE calls. The derived client retains caller
+interceptors but removes the application-level `AlpacaRetryInterceptor` so it cannot layer retries
+beneath `AlpacaSseReconnectPolicy`. Configure any other custom retry interceptor to exclude SSE
+requests.
+
 A listener `RuntimeException` is logged and considered an application error, not a transport
-failure. The event is considered delivered and its resume ID advances. An executor rejection is a
-terminal `AlpacaSseCallbackException`. Persist work transactionally and deduplicate by event ID
+failure. A non-runtime fatal throwable is logged at severe level and makes non-terminal dispatch
+fail; terminal lifecycle completion remains authoritative when a terminal listener fails. The event
+is considered delivered after a runtime failure and its resume ID advances. An executor rejection
+is a terminal `AlpacaSseCallbackException`. Persist work transactionally and deduplicate by event ID
 when exactly-once effects matter.
 
 ## Reconnect and decode behavior
@@ -198,9 +208,10 @@ documented `since_id` query parameter and in `Last-Event-ID`. Date-bounded retri
 original date range and can replay events. Existing Broker constructors keep the `0.1.4`
 one-connection default; pass `AlpacaSseOptions` to opt into Broker reconnects.
 
-Do not combine a non-empty `AlpacaSseOptions.initialLastEventId` with a date-bounded Trading
-request; `0.1.5` rejects that ambiguous combination before opening a connection. Use an ID-bounded
-request instead, and keep the initial ID at or before its `untilId`.
+`AlpacaSseOptions.initialLastEventId` rejects an empty value. Do not combine an initial ID with a
+date-bounded Trading request; `0.1.5` rejects that ambiguous combination before opening a
+connection. Use an ID-bounded request instead, and keep the initial ID at or before its `untilId`.
+Corporate Actions also rejects an initial ID after an ID-bounded request's `untilId`.
 
 Trading malformed payloads terminate the subscription without advancing the event cursor. Broker
 malformed payloads invoke `onEventFailure`, advance the cursor after callback invocation, and keep

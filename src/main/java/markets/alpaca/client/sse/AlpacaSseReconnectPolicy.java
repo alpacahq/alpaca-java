@@ -62,6 +62,12 @@ public final class AlpacaSseReconnectPolicy {
     return establishedAttempts;
   }
 
+  /**
+   * Returns the first client backoff and the minimum accepted server-directed reconnect delay.
+   *
+   * <p>SSE {@code retry:} and HTTP {@code Retry-After} values below this duration are raised to
+   * this value to prevent tight reconnect loops.
+   */
   public Duration initialBackoff() {
     return initialBackoff;
   }
@@ -114,7 +120,8 @@ public final class AlpacaSseReconnectPolicy {
 
     double value = Math.max(0, Math.min(1, random.getAsDouble()));
     double factor = (1 - jitterRatio) + (value * jitterRatio * 2);
-    return Duration.ofMillis(Math.min(Math.round(base * factor), maxBackoff.toMillis()));
+    long jittered = Math.max(1, Math.round(base * factor));
+    return Duration.ofMillis(Math.min(jittered, maxBackoff.toMillis()));
   }
 
   /** Builder for {@link AlpacaSseReconnectPolicy}. */
@@ -139,14 +146,21 @@ public final class AlpacaSseReconnectPolicy {
       return this;
     }
 
+    /**
+     * Sets the first client backoff and minimum server-directed delay; must be a whole number of
+     * milliseconds and at least 1 ms.
+     */
     public Builder initialBackoff(Duration initialBackoff) {
-      this.initialBackoff = positive(initialBackoff, "initialBackoff");
+      this.initialBackoff = backoff(initialBackoff, "initialBackoff");
       return this;
     }
 
-    /** Sets the cap for client and server-directed reconnect delays. */
+    /**
+     * Sets the cap for client and server-directed reconnect delays; must be a whole number of
+     * milliseconds and at least 1 ms.
+     */
     public Builder maxBackoff(Duration maxBackoff) {
-      this.maxBackoff = positive(maxBackoff, "maxBackoff");
+      this.maxBackoff = backoff(maxBackoff, "maxBackoff");
       return this;
     }
 
@@ -191,6 +205,17 @@ public final class AlpacaSseReconnectPolicy {
       Objects.requireNonNull(value, name + " must not be null");
       if (value.isZero() || value.isNegative()) {
         throw new IllegalArgumentException(name + " must be positive");
+      }
+      return value;
+    }
+
+    private static Duration backoff(Duration value, String name) {
+      value = positive(value, name);
+      if (value.compareTo(Duration.ofMillis(1)) < 0) {
+        throw new IllegalArgumentException(name + " must be at least 1 millisecond");
+      }
+      if (value.getNano() % 1_000_000 != 0) {
+        throw new IllegalArgumentException(name + " must use whole-millisecond precision");
       }
       return value;
     }

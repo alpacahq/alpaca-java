@@ -319,7 +319,8 @@ The stream environment is explicit and independent from the generated Market Dat
 For replay or bounded history, use `CorporateActionsSseRequest.fromEventId(...)` or
 `throughEventId(...)`; corporate-action cursor IDs must be uppercase ULIDs. Reconnects resume with
 standard `Last-Event-ID` semantics and may redeliver the inclusive cursor event, so deduplicate
-event IDs when exactly-once effects matter.
+event IDs when exactly-once effects matter. An `AlpacaSseOptions.initialLastEventId` must be
+non-empty and cannot be after an ID-bounded request's `untilId`.
 
 Option live streaming is not currently exposed by this SDK. Use generated `OptionApi` for option
 REST data, and add a handwritten option stream client under `src/main/java/markets/alpaca/client/ws/`

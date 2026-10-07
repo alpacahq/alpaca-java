@@ -53,8 +53,13 @@ Use production Trading or Broker environments only when explicitly requested.
   Await startup with `subscription.opened()` and a caller-controlled timeout; inspect
   `connection()` for the latest accepted response metadata. Prefer options-only factory overloads
   unless callbacks need an application-owned executor. SSE callbacks are serialized and
-  backpressured; listener exceptions are logged and still advance a delivered event's cursor, while
-  callback-executor rejection is terminal. `maxBackoff` caps client, SSE `retry:`, and HTTP
+  backpressured; listener runtime exceptions are logged and still advance a delivered event's
+  cursor, while fatal throwables are logged and callback-executor rejection is terminal. Each SSE
+  subscription owns and terminally shuts down a one-call daemon OkHttp dispatcher, so streams do
+  not consume REST dispatch slots. The SDK HTTP retry interceptor is removed from derived SSE
+  clients to avoid layered application retries; configure custom retry interceptors to exclude SSE
+  requests.
+  `initialBackoff` floors server-directed delays and `maxBackoff` caps client, SSE `retry:`, and HTTP
   `Retry-After` delays; the connection timeout also bounds non-success response-body capture.
   `BrokerSseSubscription` implements the shared lifecycle interface. Prefer its `close()` method
   over the legacy `eventSource()` facade. For `0.1.4` upgrades, follow

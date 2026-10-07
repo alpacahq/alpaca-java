@@ -12,6 +12,7 @@ import markets.alpaca.client.openapi.data.model.CorporateActionEvent;
 import markets.alpaca.client.openapi.data.model.CorporateActionEventType;
 import markets.alpaca.client.sse.AlpacaSseEvent;
 import markets.alpaca.client.sse.AlpacaSseListener;
+import markets.alpaca.client.sse.AlpacaSseOptions;
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -23,6 +24,7 @@ class CorporateActionsSseClientTest {
 
   private static final String SINCE_ID = "01J9RPMV5TKB8WX3M4F1KZ7QH2";
   private static final String UNTIL_ID = "01J9RVB6Y4ZK8M3N7QD2WX1RFP";
+  private static final String AFTER_UNTIL_ID = "01J9RVB6Y4ZK8M3N7QD2WX1RFZ";
 
   private MockWebServer server;
   private OkHttpClient httpClient;
@@ -117,6 +119,30 @@ class CorporateActionsSseClientTest {
     assertThrows(
         IllegalArgumentException.class,
         () -> CorporateActionsSseRequest.throughEventId(UNTIL_ID, SINCE_ID));
+  }
+
+  @Test
+  void rejectsInitialCursorAfterBoundedUpperIdBeforeOpening() {
+    var dataClient =
+        AlpacaClientFactory.dataClient(
+            new AlpacaCredentials("data-key", "data-secret"), httpClient);
+    var client =
+        new CorporateActionsSseClient(
+            dataClient,
+            MarketDataSseEnvironment.custom(baseUrl()),
+            AlpacaSseOptions.builder().initialLastEventId(AFTER_UNTIL_ID).build());
+
+    var failure =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                client.subscribeToCorporateActions(
+                    CorporateActionsSseRequest.throughEventId(SINCE_ID, UNTIL_ID),
+                    new AlpacaSseListener<>() {}));
+
+    assertEquals(
+        "options.initialLastEventId must not be after request.untilId", failure.getMessage());
+    assertEquals(0, server.getRequestCount());
   }
 
   private String baseUrl() {

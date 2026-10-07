@@ -22,6 +22,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 class SseDomainContractTest {
@@ -30,6 +31,19 @@ class SseDomainContractTest {
       new AlpacaCredentials("test-key", "test-secret");
   private static final String SINCE_ID = "01J9RPMV5TKB8WX3M4F1KZ7QH2";
   private static final String UNTIL_ID = "01J9RVB6Y4ZK8M3N7QD2WX1RFP";
+
+  @Test
+  void jitterCannotReducePositiveReconnectDelayToZero() {
+    var policy =
+        AlpacaSseReconnectPolicy.builder()
+            .initialBackoff(Duration.ofMillis(1))
+            .maxBackoff(Duration.ofMillis(1))
+            .jitterRatio(1)
+            .random(() -> 0)
+            .build();
+
+    assertEquals(Duration.ofMillis(1), policy.delayForAttempt(1));
+  }
 
   @TestFactory
   Stream<DynamicTest> subscriptionsOpenResumeAndCancelConsistently() {

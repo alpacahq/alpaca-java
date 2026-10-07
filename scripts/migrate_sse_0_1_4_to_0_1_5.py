@@ -49,8 +49,12 @@ JAVA_TYPE = (
     rf"{JAVA_IDENTIFIER}(?:\s*\.\s*{JAVA_IDENTIFIER})*"
     rf"(?:\s*<[^;{{}}()=]+>)?(?:\s*\[\s*\])*"
 )
+JAVA_MODIFIER = (
+    r"(?:public|protected|private|static|final|abstract|synchronized|native|strictfp|"
+    r"transient|volatile|sealed|non-sealed|default)"
+)
 ANY_DECLARATION = re.compile(
-    rf"(?<![\w$.])(?P<type>{JAVA_TYPE})\s+(?:\.\.\.\s*)?"
+    rf"(?<![\w$.])(?:{JAVA_MODIFIER}\s+)*(?P<type>{JAVA_TYPE})\s+(?:\.\.\.\s*)?"
     rf"(?P<name>{JAVA_IDENTIFIER})\b(?!\s*\()"
 )
 NON_TYPE_KEYWORDS = {
@@ -160,6 +164,40 @@ def _line(text: str, offset: int) -> int:
     return text.count("\n", 0, offset) + 1
 
 
+def _secondary_declarators(mask: str, declaration_end: int) -> tuple[tuple[str, int], ...]:
+    """Return comma-separated names from a declaration statement, if unambiguous."""
+    semicolon = mask.find(";", declaration_end)
+    opening_brace = mask.find("{", declaration_end)
+    if semicolon < 0 or (opening_brace >= 0 and opening_brace < semicolon):
+        return ()
+
+    tail = mask[declaration_end:semicolon]
+    results: list[tuple[str, int]] = []
+    round_depth = square_depth = angle_depth = 0
+    for index, character in enumerate(tail):
+        if character == "(":
+            round_depth += 1
+        elif character == ")":
+            round_depth = max(0, round_depth - 1)
+        elif character == "[":
+            square_depth += 1
+        elif character == "]":
+            square_depth = max(0, square_depth - 1)
+        elif character == "<":
+            angle_depth += 1
+        elif character == ">":
+            angle_depth = max(0, angle_depth - 1)
+        elif character == "," and round_depth == square_depth == angle_depth == 0:
+            declarator = re.match(
+                rf"\s*(?:\[\s*\]\s*)?(?P<name>{JAVA_IDENTIFIER})\b",
+                tail[index + 1 :],
+            )
+            if declarator is not None:
+                offset = declaration_end + index + 1 + declarator.start("name")
+                results.append((declarator.group("name"), offset))
+    return tuple(results)
+
+
 def _broker_binders(mask: str, *, has_exact_import: bool) -> dict[str, list[int]]:
     binders: dict[str, list[int]] = {}
     for declaration in BROKER_DECLARATION.finditer(mask):
@@ -168,6 +206,8 @@ def _broker_binders(mask: str, *, has_exact_import: bool) -> dict[str, list[int]
             binders.setdefault(declaration.group("name"), []).append(
                 declaration.start("name")
             )
+            for name, offset in _secondary_declarators(mask, declaration.end()):
+                binders.setdefault(name, []).append(offset)
     return binders
 
 
@@ -181,6 +221,8 @@ def _broker_client_binders(
             binders.setdefault(declaration.group("name"), []).append(
                 declaration.start("name")
             )
+            for name, offset in _secondary_declarators(mask, declaration.end()):
+                binders.setdefault(name, []).append(offset)
     return binders
 
 
@@ -193,6 +235,8 @@ def _all_binders(mask: str) -> dict[str, set[int]]:
         binders.setdefault(declaration.group("name"), set()).add(
             declaration.start("name")
         )
+        for name, offset in _secondary_declarators(mask, declaration.end()):
+            binders.setdefault(name, set()).add(offset)
 
     inferred_lambda = re.compile(
         rf"(?<![\w$])(?P<name>{JAVA_IDENTIFIER})\s*->"
@@ -212,26 +256,26 @@ def _is_bare_receiver(mask: str, offset: int) -> bool:
     return index < 0 or mask[index] != "."
 
 
-def _is_bare_or_this_receiver(mask: str, offset: int) -> bool:
+def _receiver_qualification(mask: str, offset: int) -> str:
     index = offset - 1
     while index >= 0 and mask[index].isspace():
         index -= 1
     if index < 0 or mask[index] != ".":
-        return True
+        return "bare"
 
     index -= 1
     while index >= 0 and mask[index].isspace():
         index -= 1
     if index < 3 or mask[index - 3 : index + 1] != "this":
-        return False
+        return "qualified"
 
     this_start = index - 3
     if this_start > 0 and (mask[this_start - 1].isalnum() or mask[this_start - 1] in "_$"):
-        return False
+        return "qualified"
     index = this_start - 1
     while index >= 0 and mask[index].isspace():
         index -= 1
-    return index < 0 or mask[index] != "."
+    return "this" if index < 0 or mask[index] != "." else "qualified"
 
 
 def _brace_pairs(mask: str) -> dict[int, int]:
@@ -283,7 +327,7 @@ def _is_control_header_binder(
 
 
 def _type_bodies(mask: str, brace_pairs: dict[int, int]) -> tuple[tuple[int, int], ...]:
-    bodies: list[tuple[int, int]] = []
+    bodies: set[tuple[int, int]] = set()
     for declaration in TYPE_DECLARATION.finditer(mask):
         opening = mask.find("{", declaration.end())
         semicolon = mask.find(";", declaration.end())
@@ -291,8 +335,25 @@ def _type_bodies(mask: str, brace_pairs: dict[int, int]) -> tuple[tuple[int, int
             continue
         closing = brace_pairs.get(opening)
         if closing is not None:
-            bodies.append((opening, closing))
-    return tuple(bodies)
+            bodies.add((opening, closing))
+
+    for opening, closing in brace_pairs.items():
+        previous = opening - 1
+        while previous >= 0 and mask[previous].isspace():
+            previous -= 1
+        if previous < 0 or mask[previous] != ")":
+            continue
+        arguments_opening = _matching_open_parenthesis(mask, previous)
+        if arguments_opening is None:
+            continue
+        boundary = max(
+            mask.rfind("{", 0, arguments_opening),
+            mask.rfind(";", 0, arguments_opening),
+        )
+        constructor_prefix = mask[boundary + 1 : arguments_opening]
+        if re.search(r"\bnew\b[^{};()]*$", constructor_prefix):
+            bodies.add((opening, closing))
+    return tuple(sorted(bodies))
 
 
 def _enclosing_type(
@@ -399,6 +460,10 @@ def _field_binder_visible_to_call(
     call_type = _enclosing_type(type_bodies, call)
     if call_type is None or _enclosing_type(type_bodies, binder) != call_type:
         return False
+    for body_opening in sorted(brace_pairs):
+        span = _header_parameter_span(mask, body_opening)
+        if span is not None and span[0] <= binder < span[1]:
+            return False
     call_ancestry = _brace_ancestry(brace_pairs, call)
     binder_ancestry = _brace_ancestry(brace_pairs, binder)
     type_depth = call_ancestry.index(call_type[0]) + 1
@@ -426,15 +491,9 @@ def _diagnostic_patterns(
     generated_sse = re.compile(
         rf"(?:\.\s*{generated_method}\s*\(|::\s*{generated_method}\b)"
     )
-    match = next(
-        (
-            candidate
-            for candidate in generated_sse.finditer(mask)
-            if candidate.start() not in ignored_generated_sse_offsets
-        ),
-        None,
-    )
-    if match is not None:
+    for match in generated_sse.finditer(mask):
+        if match.start() in ignored_generated_sse_offsets:
+            continue
         yield (
             match.start(),
             "SSE006",
@@ -568,6 +627,7 @@ def analyze_text(text: str, path: str = "<memory>") -> Analysis:
     if not has_shadowing_client_type:
         for usage in HANDWRITTEN_SINGLE_EVENT_USAGE.finditer(mask):
             receiver = usage.group("receiver")
+            qualification = _receiver_qualification(mask, usage.start("receiver"))
             visible_client_binders = [
                 binder
                 for binder in broker_client_binders.get(receiver, ())
@@ -598,8 +658,22 @@ def analyze_text(text: str, path: str = "<memory>") -> Analysis:
                     mask, binder, usage.start(), brace_pairs, type_bodies
                 )
             ]
-            if (
-                _is_bare_or_this_receiver(mask, usage.start("receiver"))
+            visible_client_field_binders = [
+                binder
+                for binder in broker_client_binders.get(receiver, ())
+                if _field_binder_visible_to_call(
+                    mask, binder, usage.start(), brace_pairs, type_bodies
+                )
+            ]
+            visible_field_binders = [
+                binder
+                for binder in all_binders.get(receiver, ())
+                if _field_binder_visible_to_call(
+                    mask, binder, usage.start(), brace_pairs, type_bodies
+                )
+            ]
+            bare_receiver_is_handwritten = (
+                qualification == "bare"
                 and len(broker_client_binders.get(receiver, ())) == 1
                 and len(visible_client_binders) == 1
                 and (
@@ -619,6 +693,15 @@ def analyze_text(text: str, path: str = "<memory>") -> Analysis:
                         )
                     )
                 )
+            )
+            this_receiver_is_handwritten = (
+                qualification == "this"
+                and len(visible_client_field_binders) == 1
+                and len(visible_field_binders) == 1
+                and set(visible_client_field_binders) == set(visible_field_binders)
+            )
+            if (
+                bare_receiver_is_handwritten or this_receiver_is_handwritten
             ):
                 ignored_generated_sse_offsets.add(usage.start("separator"))
 

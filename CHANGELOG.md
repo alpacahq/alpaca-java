@@ -89,8 +89,16 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - The public SSE subscription boundary is an interface; transport implementation classes under
   `markets.alpaca.client.sse.internal` are excluded from Javadocs and compatibility guarantees.
 - `BrokerSseSubscription` implements the shared subscription interface while retaining its
-  Broker-specific compatibility surface. Reconnect delay caps now apply to client backoff, server
-  `retry:`, and HTTP `Retry-After` values.
+  Broker-specific compatibility surface. Reconnect delay caps apply to client backoff, server
+  `retry:`, and HTTP `Retry-After` values; `initialBackoff` floors server-directed delays to prevent
+  tight reconnect loops. Backoff durations require whole-millisecond precision and a value of at
+  least 1 ms, matching the transport scheduler's precision. Jitter cannot reduce a positive delay
+  to zero, and `Retry-After: 0` is handled by the SSE policy before OkHttp can follow it immediately.
+- Each SSE subscription uses and terminally shuts down a private, one-call daemon OkHttp dispatcher,
+  so long-lived streams do not consume the supplied client's REST dispatch slots, compete for a
+  process-wide SSE limit, or keep the JVM alive. The SDK's HTTP retry interceptor is removed from
+  the derived SSE client so application-level retries are not layered beneath the SSE reconnect
+  policy.
 - The migration codemod rewrites only a uniquely bound, bare `BrokerSseSubscription` parameter or
   local variable in the call's lexical scope. Fields, qualified, shadowed, same-named local/nested
   types, lambda-bound, commented, or otherwise uncertain chains are report-only. Missing inputs fail
@@ -126,17 +134,18 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - An empty Trading SSE `id:` now clears the original unbounded `since`/`since_id` on reconnect
   instead of replaying the subscription's initial cursor; ID-bounded streams fail closed when the
   API's required `since_id` can no longer be supplied.
-- Trading rejects an initial resume ID combined with a date-bounded request, or one after an
-  ID-bounded request's `untilId`, instead of relying on undocumented header-only replay or sending
-  an invalid cursor range.
+- Empty initial resume IDs are rejected. Trading rejects an initial ID combined with a date-bounded
+  request, and Trading and Corporate Actions reject one after an ID-bounded request's `untilId`,
+  instead of relying on undocumented header-only replay or sending an invalid cursor range.
 - Trading and Broker activity decoders preserve newly generated but not-yet-handled envelope fields
   through `additionalProperties` instead of silently dropping them after regeneration.
 - Trading and Broker activity decoders preserve OAS-valid `DIVTXEX` events through the compatible
   generated `CDIVActivityV2` detail model until the OAS supplies a dedicated schema.
 - Migration diagnostic `SSE006` covers generated SSE invocations and method references without
   flagging a uniquely bound handwritten
-  `BrokerEventsSseClient.getAccountActivityEventAsync(...)` receiver, including `this.receiver`
-  usage.
+  `BrokerEventsSseClient.getAccountActivityEventAsync(...)` receiver. `this.receiver` is suppressed
+  only for a proven handwritten field declared on the current class; every generated use is
+  reported.
 - Terminal lifecycle state, timers, and cancellation no longer wait behind user callbacks or block
   the shared scheduler. Terminal listener delivery remains serialized after callbacks already in
   progress, and no new callbacks are admitted after termination.
@@ -149,6 +158,7 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   delivery, including while the server sends only comments or remains silent.
 - Callback-executor rejection during reconnect and Broker single-activity timeout now always settle
   their public futures; terminal completion settles before pre-open `opened()` continuations run.
+  Fatal listener throwables are logged even when terminal listener delivery is asynchronous.
 - Initial reconnect and open-stream idle budgets remain active while lifecycle callbacks execute.
   SSE clients disable inherited OkHttp read and whole-call timeouts in favor of SDK SSE deadlines.
 - Delivered-event cursor commitment and reconnect-deadline reset are atomic, and Broker
