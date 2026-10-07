@@ -48,6 +48,10 @@ callback runs after callbacks already admitted. If a failure wins a concurrent t
 remain independent of callback execution. Event callbacks backpressure response parsing, however,
 so a blocked callback can delay detection of remote EOF and the following reconnect. Sharing one
 single-thread executor across subscriptions intentionally serializes their callbacks.
+Terminal listener delivery is admitted before lifecycle futures notify synchronous continuations,
+but invocation waits until lifecycle completion is settled. Closing a subscription whose opening
+callback is waiting in the bounded dispatcher releases its HTTP response thread; already-admitted
+listener callbacks remain ordered and may complete later.
 
 The SDK opening and terminal dispatchers have finite workers and queue capacity so blocked listeners
 cannot create unbounded threads. Opening-dispatch rejection fails the subscription with an

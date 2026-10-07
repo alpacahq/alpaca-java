@@ -55,12 +55,14 @@ candidate commit:
 
 ```bash
 ./gradlew build
-./gradlew checkApiCompatibility -PapiBaselineVersion=0.1.4
+./gradlew checkApiCompatibility
 ```
 
 The API compatibility task compares the complete public JAR, including handwritten streaming
-surfaces, and fails on source or binary incompatibility. Update the baseline property only when the
-previous published release changes. The member-specific exclusions in
+surfaces, and fails on source or binary incompatibility. `apiBaselineVersion` in
+`gradle.properties` names the previous published release; the post-release bump advances it to the
+release that was just published. Override it only for an explicit historical comparison. The
+member-specific exclusions in
 `alpaca.quality.gradle` cover only reviewed OpenAPI corrections inherited before this gate existed;
 each is documented in [`MIGRATIONS.md`](MIGRATIONS.md). Do not broaden those exclusions or add
 another without equivalent migration guidance and review. The task still fails on every other
@@ -109,9 +111,9 @@ tagged commit (a non-empty `## [version]` section, or a non-empty `## [Unrelease
 rejects an existing release POM, tests release tools, archives the committed OpenAPI pins under
 `specs/`, builds the release, checks its public API against the previous reachable semantic release
 tag, signs and publishes it, creates or publishes the GitHub Release, and opens a pull request that
-advances `gradle.properties` to the next patch `-SNAPSHOT` and, when needed, promotes `[Unreleased]`
-to the dated release section on `main`. Merge that PR through normal branch protection; its Build
-workflow publishes the next snapshot.
+advances the project and compatibility-baseline properties, updates the README snapshot dependency,
+and, when needed, promotes `[Unreleased]` to the dated release section on `main`. Merge that PR
+through normal branch protection; its Build workflow publishes the next snapshot.
 
 GitHub Release bodies are composed as the curated changelog section, then GitHub’s
 `**Full Changelog**` compare link for the tag range (not the auto-generated PR list).
@@ -124,8 +126,9 @@ Three changelog states stop the workflow rather than guess:
   the section or delete the heading and re-dispatch.
 - `[Unreleased]` on `main` no longer matching the notes published for the tag, which happens when
   other work merges between tagging and the bump job. Promote the section manually.
-- An open `release/start-*` pull request whose `gradle.properties` or `CHANGELOG.md` differs from
-  what this release requires. Update that pull request manually; the workflow never rewrites it.
+- An open `release/start-*` pull request whose `gradle.properties`, `README.md`, or `CHANGELOG.md`
+  differs from what this release requires. Update that pull request manually; the workflow never
+  rewrites it.
 
 When `main` already has a `## [version]` section whose content differs from the notes published for
 the tag, the bump job warns instead of failing: the version bump still needs to land, and the

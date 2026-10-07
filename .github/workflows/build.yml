@@ -37,6 +37,7 @@ jobs:
             RELEASING.md
             TESTING.md
             CHANGELOG.md
+            MIGRATIONS.md
             examples/README.md
             docs/README.md
 
@@ -113,7 +114,7 @@ jobs:
         run: ./gradlew build
 
       - name: API compatibility
-        run: ./gradlew checkApiCompatibility -PapiBaselineVersion=0.1.4
+        run: ./gradlew checkApiCompatibility
 
   publish-snapshot:
     name: Publish snapshot to Maven Central
@@ -227,7 +228,6 @@ jobs:
         run: |
           set -euo pipefail
           ./gradlew build checkApiCompatibility \
-            -PapiBaselineVersion=0.1.4 \
             -Palpaca.preprocessedSpecInputs=true \
             "-PbrokerSpec=$SPEC_DIR/broker/openapi.yaml" \
             "-PdataSpec=$SPEC_DIR/data/openapi.yaml" \

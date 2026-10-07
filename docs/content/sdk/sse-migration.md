@@ -159,6 +159,11 @@ Lifecycle completion is deliberately separate from listener delivery:
 - terminal listener delivery remains ordered after callbacks that were already admitted;
 - no event, comment, retry, or reconnect callback is admitted after the terminal transition.
 
+Terminal listener delivery is admitted before lifecycle futures notify synchronous continuations,
+then waits for lifecycle completion to settle before invoking the listener. Closing while opening
+callback startup is queued also releases the HTTP response thread without violating callback order;
+the already-admitted callbacks may finish later.
+
 Once response headers are accepted, `opened()` succeeds with that connection even if closure races
 with opening. Its admitted `onOpen` callback starts independently before `opened()` continuations
 run and remains ordered before the terminal listener callback. A synchronous continuation can

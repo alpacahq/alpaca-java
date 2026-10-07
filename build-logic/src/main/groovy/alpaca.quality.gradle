@@ -10,7 +10,7 @@ plugins {
     id 'com.diffplug.spotless'
 }
 
-def apiBaselineVersion = providers.gradleProperty('apiBaselineVersion').orElse('0.1.4')
+def apiBaselineVersion = providers.gradleProperty('apiBaselineVersion')
 // Reviewed generated-surface breaks adopted on main before this compatibility gate existed.
 // Keep these member-specific: broad class/package exclusions would hide future regressions.
 def reviewedApiCompatibilityExclusions = [

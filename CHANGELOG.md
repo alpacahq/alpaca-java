@@ -100,6 +100,12 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   from blocking ordered `onOpen`/terminal delivery. Lifecycle futures remain authoritative;
   terminal-dispatch saturation rejects pending terminal listener delivery with a warning instead of
   creating unbounded threads.
+- Closing releases an HTTP response thread waiting for opening-dispatch capacity. Terminal listener
+  delivery is admitted before synchronous lifecycle-completion continuations run, while invocation
+  remains ordered after lifecycle completion and any previously admitted callback.
+- API compatibility now reads its released baseline from `gradle.properties`; the post-release bump
+  advances that baseline and the README snapshot dependency alongside the next development version.
+  Markdown link checking includes the top-level migration index.
 
 ### Fixed
 - Concurrent `close()` calls now return only after lifecycle completion settles, including when a
