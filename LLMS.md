@@ -61,6 +61,11 @@ Use production Trading or Broker environments only when explicitly requested.
   [`docs/content/sdk/sse-migration.md`](docs/content/sdk/sse-migration.md).
   Lifecycle timers and cancellation do not wait for callbacks, but an active data callback
   backpressures response parsing and can delay detection of remote EOF and the following reconnect.
+  Keep synchronous `opened()`/`completion()` continuations short; use an async continuation with an
+  application-owned executor for unrelated or potentially unbounded work. Do not combine a Trading
+  initial resume ID with a date-bounded request, and keep it at or before `untilId` for an ID-bounded
+  request.
+  `DIVTXEX` details temporarily use `CDIVActivityV2` while retaining the original activity type.
 - `AlpacaHttpConfig.defaultClient()` is the normal HTTP client. Retries are opt-in; default retry
   methods are only `GET`, `HEAD`, `OPTIONS`, and `TRACE`. Do not retry state-changing calls unless
   the workflow itself is idempotent.

@@ -48,6 +48,9 @@ class TradingActivityEventDecoderTest {
     assertFalse(
         ActivityV2DetailNTA.schemas.containsKey("CSDActivityV2"),
         "Remove the temporary CSD-to-CSW mapping when generation provides CSDActivityV2");
+    assertFalse(
+        ActivityV2DetailNTA.schemas.containsKey("DIVTXEXActivityV2"),
+        "Remove the temporary DIVTXEX-to-CDIV mapping when generation provides DIVTXEXActivityV2");
   }
 
   @Test
@@ -72,7 +75,14 @@ class TradingActivityEventDecoderTest {
     assertDividend("DIV", "CDIV", CDIVActivityV2.class, dividendDetails(true));
     assertDividend("DIV", "SPD", DIVSPDActivityV2.class, dividendDetails(true));
     assertDividend("DIVROC", null, CDIVActivityV2.class, dividendDetails(true));
+    assertDividend("DIVTXEX", null, CDIVActivityV2.class, dividendDetails(true));
     assertDividend("CGD", "LTCG", CGDActivityV2.class, dividendDetails(false));
+  }
+
+  @Test
+  void rejectsMalformedTaxExemptDividendDetails() {
+    assertThrows(
+        IllegalArgumentException.class, () -> decoder.decode(eventJson("DIVTXEX", null, "{}")));
   }
 
   @Test

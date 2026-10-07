@@ -118,16 +118,25 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   listener callback path, so a callback can close while a completion continuation awaits the
   ordered terminal listener.
 - Terminal callbacks now verify lifecycle completion even when an existing callback drain consumes
-  them. Completion normally settles on the terminating thread so blocked synchronous continuations
-  cannot starve unrelated subscriptions; termination from an active listener is handed off to fixed
-  workers to preserve ordered callback progress without creating unbounded lifecycle threads.
+  them. Completion settlement uses isolated, direct-handoff workers so a blocked synchronous
+  continuation cannot queue another subscription's settlement or occupy the scheduler. Synchronous
+  lifecycle continuations must remain short because concurrently blocked continuations consume
+  additional daemon workers; unrelated or potentially unbounded work belongs on an
+  application-owned executor through an asynchronous continuation.
 - An empty Trading SSE `id:` now clears the original unbounded `since`/`since_id` on reconnect
   instead of replaying the subscription's initial cursor; ID-bounded streams fail closed when the
   API's required `since_id` can no longer be supplied.
+- Trading rejects an initial resume ID combined with a date-bounded request, or one after an
+  ID-bounded request's `untilId`, instead of relying on undocumented header-only replay or sending
+  an invalid cursor range.
 - Trading and Broker activity decoders preserve newly generated but not-yet-handled envelope fields
   through `additionalProperties` instead of silently dropping them after regeneration.
-- The migration scanner no longer reports generated-call warning `SSE006` for a uniquely bound
-  handwritten `BrokerEventsSseClient.getAccountActivityEventAsync(...)` receiver.
+- Trading and Broker activity decoders preserve OAS-valid `DIVTXEX` events through the compatible
+  generated `CDIVActivityV2` detail model until the OAS supplies a dedicated schema.
+- Migration diagnostic `SSE006` covers generated SSE invocations and method references without
+  flagging a uniquely bound handwritten
+  `BrokerEventsSseClient.getAccountActivityEventAsync(...)` receiver, including `this.receiver`
+  usage.
 - Terminal lifecycle state, timers, and cancellation no longer wait behind user callbacks or block
   the shared scheduler. Terminal listener delivery remains serialized after callbacks already in
   progress, and no new callbacks are admitted after termination.
