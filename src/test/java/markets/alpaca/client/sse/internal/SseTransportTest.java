@@ -1739,14 +1739,78 @@ class SseTransportTest {
   }
 
   @Test
-  void completionWorkersCanCloseOtherSubscriptionsWithoutPoolDeadlock() throws Exception {
+  void blockedCompletionContinuationsDoNotStallOtherSubscriptions() throws Exception {
+    ThreadPoolExecutor completionExecutor = SseTransport.createCompletionExecutor();
+    int workerCount = completionExecutor.getMaximumPoolSize();
+    completionExecutor.shutdownNow();
+    var blockers = new markets.alpaca.client.sse.AlpacaSseSubscription[workerCount];
+    var releaseContinuations = new CountDownLatch(1);
+    var continuationsEntered = new CountDownLatch(workerCount);
+    ExecutorService closeExecutor = Executors.newFixedThreadPool(workerCount);
+    ExecutorService targetCloseExecutor = Executors.newSingleThreadExecutor();
+    markets.alpaca.client.sse.AlpacaSseSubscription target = null;
+    for (int index = 0; index <= workerCount; index++) {
+      server.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
+    }
+
+    try {
+      for (int index = 0; index < workerCount; index++) {
+        blockers[index] =
+            SseTransport.open(
+                httpClient,
+                new Request.Builder().url(server.url("/blocker-" + index)).build(),
+                AlpacaSseOptions.reconnectDisabled(),
+                false,
+                data -> data,
+                new AlpacaSseListener<>() {});
+        blockers[index]
+            .completion()
+            .thenRun(
+                () -> {
+                  continuationsEntered.countDown();
+                  try {
+                    releaseContinuations.await();
+                  } catch (InterruptedException failure) {
+                    Thread.currentThread().interrupt();
+                  }
+                });
+        closeExecutor.execute(blockers[index]::close);
+      }
+
+      assertTrue(continuationsEntered.await(2, TimeUnit.SECONDS));
+      target =
+          SseTransport.open(
+              httpClient,
+              new Request.Builder().url(server.url("/target")).build(),
+              AlpacaSseOptions.reconnectDisabled(),
+              false,
+              data -> data,
+              new AlpacaSseListener<>() {});
+
+      CompletableFuture.runAsync(target::close, targetCloseExecutor).get(1, TimeUnit.SECONDS);
+      assertTrue(target.completion().isDone());
+    } finally {
+      releaseContinuations.countDown();
+      closeExecutor.shutdownNow();
+      targetCloseExecutor.shutdownNow();
+      for (var blocker : blockers) {
+        if (blocker != null) blocker.close();
+      }
+      if (target != null) target.close();
+    }
+  }
+
+  @Test
+  void completionContinuationsCanCloseOtherSubscriptionsWithoutDeadlock() throws Exception {
     ThreadPoolExecutor completionExecutor = SseTransport.createCompletionExecutor();
     int workerCount = completionExecutor.getMaximumPoolSize();
     completionExecutor.shutdownNow();
     var parents = new markets.alpaca.client.sse.AlpacaSseSubscription[workerCount];
     var children = new markets.alpaca.client.sse.AlpacaSseSubscription[workerCount];
     var continuations = new CompletableFuture<?>[workerCount];
+    var closes = new CompletableFuture<?>[workerCount];
     var continuationsEntered = new CountDownLatch(workerCount);
+    ExecutorService closeExecutor = Executors.newFixedThreadPool(workerCount);
     for (int index = 0; index < workerCount * 2; index++) {
       server.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
     }
@@ -1787,16 +1851,20 @@ class SseTransportTest {
                     });
       }
 
-      for (var parent : parents) {
-        parent.close();
+      for (int index = 0; index < workerCount; index++) {
+        closes[index] = CompletableFuture.runAsync(parents[index]::close, closeExecutor);
       }
       for (var continuation : continuations) {
         continuation.get(3, TimeUnit.SECONDS);
+      }
+      for (var close : closes) {
+        close.get(3, TimeUnit.SECONDS);
       }
       for (var child : children) {
         assertTrue(child.completion().isDone());
       }
     } finally {
+      closeExecutor.shutdownNow();
       for (var parent : parents) {
         if (parent != null) parent.close();
       }
