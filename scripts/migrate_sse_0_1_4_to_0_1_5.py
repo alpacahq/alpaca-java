@@ -32,9 +32,7 @@ BROKER_TYPE_DECLARATION = re.compile(
     r"\b(?:class|interface|enum|record|@interface)\s+BrokerSseSubscription\b"
 )
 BROKER_TYPE_PARAMETER = re.compile(
-    r"(?:<|,)\s*(?:@\s*[A-Za-z_$][\w$]*(?:\s*\.\s*[A-Za-z_$][\w$]*)*"
-    r"(?:\s*\([^>]*?\))?\s*)*"
-    r"BrokerSseSubscription\b(?=\s*(?:extends\b|,|>))"
+    r"(?:<|,)\s*BrokerSseSubscription\b(?=\s*(?:extends\b|,|>))"
 )
 BROKER_CLIENT_DECLARATION = re.compile(
     rf"\b(?P<type>BrokerEventsSseClient|{re.escape(BROKER_EVENTS_CLIENT)})\s+"
@@ -44,14 +42,13 @@ BROKER_CLIENT_TYPE_DECLARATION = re.compile(
     r"\b(?:class|interface|enum|record|@interface)\s+BrokerEventsSseClient\b"
 )
 BROKER_CLIENT_TYPE_PARAMETER = re.compile(
-    r"(?:<|,)\s*(?:@\s*[A-Za-z_$][\w$]*(?:\s*\.\s*[A-Za-z_$][\w$]*)*"
-    r"(?:\s*\([^>]*?\))?\s*)*"
-    r"BrokerEventsSseClient\b(?=\s*(?:extends\b|,|>))"
+    r"(?:<|,)\s*BrokerEventsSseClient\b(?=\s*(?:extends\b|,|>))"
 )
 JAVA_UNICODE_ESCAPE = re.compile(r"\\u+[0-9A-Fa-f]{4}")
 JAVA_IDENTIFIER = r"[A-Za-z_$][\w$]*"
-ANNOTATION_ARGUMENTS = re.compile(
-    rf"@\s*{JAVA_IDENTIFIER}(?:\s*\.\s*{JAVA_IDENTIFIER})*\s*(?P<opening>\()"
+TYPE_ANNOTATION = re.compile(
+    rf"@\s*{JAVA_IDENTIFIER}(?:\s*\.\s*{JAVA_IDENTIFIER})*"
+    r"(?:\s*(?P<opening>\())?"
 )
 TYPE_DECLARATION = re.compile(
     rf"\b(?:class|interface|enum|record|@interface)\s+{JAVA_IDENTIFIER}\b"
@@ -320,15 +317,19 @@ def _parenthesis_pairs(mask: str) -> dict[int, int]:
     return pairs
 
 
-def _mask_annotation_arguments(mask: str) -> str:
+def _mask_type_annotations(mask: str) -> str:
+    """Blank annotations before applying the deliberately simple type-parameter regexes."""
     result = list(mask)
     parenthesis_pairs = _parenthesis_pairs(mask)
-    for annotation in ANNOTATION_ARGUMENTS.finditer(mask):
-        opening = annotation.start("opening")
-        closing = parenthesis_pairs.get(opening)
-        if closing is None:
-            continue
-        for index in range(opening, closing + 1):
+    for annotation in TYPE_ANNOTATION.finditer(mask):
+        end = annotation.end()
+        if annotation.group("opening") is not None:
+            opening = annotation.start("opening")
+            closing = parenthesis_pairs.get(opening)
+            if closing is None:
+                continue
+            end = closing + 1
+        for index in range(annotation.start(), end):
             if result[index] != "\n":
                 result[index] = " "
     return "".join(result)
@@ -604,7 +605,7 @@ def _diagnostic_patterns(
 
 def analyze_text(text: str, path: str = "<memory>") -> Analysis:
     mask = _code_mask(text)
-    type_parameter_mask = _mask_annotation_arguments(mask)
+    type_parameter_mask = _mask_type_annotations(mask)
     has_exact_import = bool(EXACT_IMPORT.search(mask))
     has_shadowing_type = bool(
         BROKER_TYPE_DECLARATION.search(mask)
