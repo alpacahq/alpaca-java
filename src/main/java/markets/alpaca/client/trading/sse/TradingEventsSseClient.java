@@ -130,6 +130,11 @@ public final class TradingEventsSseClient {
                 .build();
         return resumedRequest.newBuilder().url(fallbackUrl).build();
       }
+      if (request.url().queryParameter("since") == null
+          && request.url().queryParameter("since_id") == null) {
+        throw new AlpacaSseProtocolException(
+            "Cannot resume a cursorless Trading activity stream after an empty SSE id");
+      }
       return resumedRequest;
     }
 

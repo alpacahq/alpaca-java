@@ -26,8 +26,9 @@ to handwritten streaming clients. It does not report a uniquely bound imported o
 `BrokerEventsSseClient.getAccountActivityEventAsync` receiver when used directly. A
 `this.receiver` call is suppressed only when the scanner can prove that the current class declares
 that handwritten-client field; inherited, other-qualified, and otherwise ambiguous receivers
-remain findings. Unqualified inherited calls in generated API subclasses are also reported. Every
-generated SSE use in a file is reported.
+remain findings. Unqualified generated-method calls are reported conservatively, including calls
+from indirect and anonymous generated API subclasses. Every generated SSE use in a file is
+reported.
 
 `BrokerSseSubscription` also implements `AlpacaSseSubscription` in `0.1.5`. This is additive and
 requires no source migration; it allows domain-neutral lifecycle code to accept existing Broker
