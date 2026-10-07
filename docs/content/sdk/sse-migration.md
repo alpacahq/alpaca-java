@@ -56,7 +56,9 @@ an unbraced statement's scope cannot be established safely by this text scanner.
 ambiguous imports,
 `EventSource` casts/identity assumptions, raw Gson exception checks, deep OkHttp `Response` use,
 blocking callbacks, generated SSE calls, and listeners overriding both rich and legacy callbacks.
-These deliberate false negatives keep `--write` source-safe; migrate `SSE001` findings manually.
+Calls on a uniquely bound imported or fully qualified `BrokerEventsSseClient` are recognized as the
+handwritten replacement and are not reported as generated blocking calls. These deliberate false
+negatives keep `--write` source-safe; migrate `SSE001` findings manually.
 Missing input paths and explicit non-Java files fail with exit code 2 instead of producing an empty
 success report.
 
