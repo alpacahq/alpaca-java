@@ -179,7 +179,8 @@ standard `Last-Event-ID` header. If an empty SSE `id:` clears that cursor, an un
 retains its original `since` or `sinceId` lower bound rather than reconnecting without replay;
 deduplicate because this can redeliver earlier events. Date-bounded requests similarly retain their
 original date range on retry and can replay already processed events. Malformed payloads terminate
-the subscription;
+the subscription. A cursorless live stream fails closed after an empty `id:` because the endpoint
+does not replay history without a lower bound;
 persisted workflows should inspect `completion()` and deduplicate by event ID after reconnect.
 `AlpacaSseOptions.initialLastEventId` must be non-empty and cannot be combined with a date-bounded
 request; use an ID-bounded request and ensure the initial ID is not after `untilId`.
