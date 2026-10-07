@@ -309,6 +309,11 @@ class AnalysisTests(unittest.TestCase):
             "BrokerSseSubscription",
             "BrokerSseSubscription extends LegacySubscription",
             "@TypeUse BrokerSseSubscription extends LegacySubscription",
+            "@com.acme.TypeUse BrokerSseSubscription extends LegacySubscription",
+            '@com.acme.TypeUse(value = Nested.value("x")) '
+            "BrokerSseSubscription extends LegacySubscription",
+            "@com.acme.TypeUse(value = 1 > 0, types = {A.class, B.class}) "
+            "BrokerSseSubscription extends LegacySubscription",
         )
 
         for declaration in declarations:
@@ -349,6 +354,25 @@ class AnalysisTests(unittest.TestCase):
             + "  BrokerSseSubscription subscription;\n"
             + '  String text = "subscription.eventSource().cancel()";\n'
             + "  // subscription.eventSource().cancel();\n"
+            + "}\n"
+        )
+
+        result = migrate.analyze_text(source)
+
+        self.assertEqual(source, result.text)
+        self.assertEqual((), result.findings)
+
+    def test_ignores_cancel_chain_inside_text_block_with_escaped_triple_quotes(self):
+        source = (
+            IMPORT
+            + "class Example {\n"
+            + "  void close(BrokerSseSubscription subscription) {\n"
+            + '    String text = """\n'
+            + '      \\"""\n'
+            + "      subscription.eventSource().cancel();\n"
+            + '      \\"""\n'
+            + '      """;\n'
+            + "  }\n"
             + "}\n"
         )
 
@@ -443,7 +467,7 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(["SSE006", "SSE006"], [finding.code for finding in result.findings])
         self.assertEqual([4, 5], [finding.line for finding in result.findings])
 
-    def test_reports_unqualified_generated_sse_call_in_generated_api_subclass(self):
+    def test_reports_unqualified_generated_sse_calls(self):
         sources = (
             """
                 class Example extends EventsApi {
@@ -460,6 +484,23 @@ class AnalysisTests(unittest.TestCase):
                   }
                 }
             """,
+            """
+                class Base extends EventsApi {}
+                class Example extends Base {
+                  void open() {
+                    subscribeToActivitiesSSE(null, null, null, null);
+                  }
+                }
+            """,
+            """
+                class Example {
+                  Object api = new EventsApi() {
+                    void open() {
+                      subscribeToActivitiesSSE(null, null, null, null);
+                    }
+                  };
+                }
+            """,
         )
 
         for source in sources:
@@ -468,7 +509,7 @@ class AnalysisTests(unittest.TestCase):
                 self.assertEqual(
                     ["SSE006"], [finding.code for finding in result.findings]
                 )
-                self.assertIn("inherited generated", result.findings[0].message)
+                self.assertIn("unqualified generated", result.findings[0].message)
 
     def test_reports_event_source_direct_cast_and_both_identity_directions(self):
         source = """
@@ -488,6 +529,20 @@ class AnalysisTests(unittest.TestCase):
         self.assertGreaterEqual(
             [finding.code for finding in result.findings].count("SSE002"), 3
         )
+
+    def test_reports_chained_event_source_identity_without_type_token(self):
+        source = """
+            class Example {
+              BrokerSseSubscription subscription;
+              void compare(Object expected, java.util.List<Holder> subscriptions) {
+                boolean same = expected == subscriptions.get(0).eventSource();
+              }
+            }
+        """
+
+        result = migrate.analyze_text(source)
+
+        self.assertIn("SSE002", [finding.code for finding in result.findings])
 
     def test_ignores_single_event_call_on_handwritten_broker_client(self):
         sources = (
@@ -579,18 +634,31 @@ class AnalysisTests(unittest.TestCase):
                 )
 
     def test_reports_shadowing_handwritten_client_type_parameter(self):
-        source = """
-            import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
-            class Example<BrokerEventsSseClient extends AccountsApi> {
-              void fetch(BrokerEventsSseClient client) {
-                client.getAccountActivityEventAsync(null, "event");
-              }
-            }
-        """
+        declarations = (
+            "BrokerEventsSseClient extends AccountsApi",
+            "@com.acme.TypeUse BrokerEventsSseClient extends AccountsApi",
+            '@com.acme.TypeUse(value = Nested.value("x")) '
+            "BrokerEventsSseClient extends AccountsApi",
+            "@com.acme.TypeUse(value = 1 > 0, types = {A.class, B.class}) "
+            "BrokerEventsSseClient extends AccountsApi",
+        )
 
-        result = migrate.analyze_text(source)
+        for declaration in declarations:
+            with self.subTest(declaration=declaration):
+                source = f"""
+                    import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+                    class Example<{declaration}> {{
+                      void fetch(BrokerEventsSseClient client) {{
+                        client.getAccountActivityEventAsync(null, "event");
+                      }}
+                    }}
+                """
 
-        self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
+                result = migrate.analyze_text(source)
+
+                self.assertEqual(
+                    ["SSE006"], [finding.code for finding in result.findings]
+                )
 
     def test_reports_qualified_handwritten_client_receiver(self):
         source = """

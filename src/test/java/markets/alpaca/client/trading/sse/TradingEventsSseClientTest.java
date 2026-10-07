@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import markets.alpaca.client.AlpacaClientFactory;
 import markets.alpaca.client.AlpacaCredentials;
@@ -318,6 +319,45 @@ class TradingEventsSseClientTest {
       assertEquals(initialEventId, reconnect.getRequestUrl().queryParameter("since_id"));
       assertEquals(initialEventId, initial.getHeader("Last-Event-ID"));
       assertNull(reconnect.getHeader("Last-Event-ID"));
+    }
+  }
+
+  @Test
+  void reconnectAfterEmptyEventIdFailsClosedWithoutAnyLowerBound() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("id:\ndata: " + fillJson() + "\n\n"));
+    var apiClient =
+        AlpacaClientFactory.tradingClient(
+            new AlpacaCredentials("trading-key", "trading-secret"), httpClient);
+    apiClient.setBasePath(baseUrl());
+    var policy =
+        AlpacaSseReconnectPolicy.builder()
+            .initialAttempts(0)
+            .establishedAttempts(1)
+            .initialBackoff(Duration.ofMillis(1))
+            .maxBackoff(Duration.ofMillis(1))
+            .jitterRatio(0)
+            .build();
+    var client =
+        new TradingEventsSseClient(
+            apiClient, AlpacaSseOptions.builder().reconnectPolicy(policy).build());
+
+    try (var subscription =
+        client.subscribeToActivities(
+            TradingActivitySseRequest.live(), new AlpacaSseListener<>() {})) {
+      var failure =
+          assertThrows(
+              ExecutionException.class, () -> subscription.completion().get(3, TimeUnit.SECONDS));
+
+      var protocolFailure = assertInstanceOf(AlpacaSseProtocolException.class, failure.getCause());
+      var resumeFailure =
+          assertInstanceOf(AlpacaSseProtocolException.class, protocolFailure.getCause());
+      assertEquals(
+          "Cannot resume a cursorless Trading activity stream after an empty SSE id",
+          resumeFailure.getMessage());
+      assertEquals(1, server.getRequestCount());
     }
   }
 

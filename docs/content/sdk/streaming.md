@@ -377,8 +377,9 @@ events emitted during backoff. That safe replay can redeliver earlier events. Ma
 payloads do not advance the cursor. Date-bounded requests likewise retain their original date range
 on retry and can replay already processed events. Server replay can be inclusive, so applications
 requiring exactly-once effects must deduplicate persisted work by event ID. Because the Trading API
-requires `since_id` with `until_id`, an interrupted ID-bounded stream fails closed if an empty `id:`
-removed its resume cursor. `until` or `untilId` makes a request bounded;
+returns no history without a lower bound, a cursorless live stream fails closed after an empty
+`id:` rather than reconnecting with a silent gap. An interrupted ID-bounded stream also fails closed
+because the API requires `since_id` with `until_id`. `until` or `untilId` makes a request bounded;
 normal EOF then completes the subscription instead of reconnecting. Configure retry budgets,
 initial resume ID, idle timeout, and resource limits with `AlpacaSseOptions` factory overloads.
 An initial resume ID must not be empty and cannot be combined with a date-bounded Trading request

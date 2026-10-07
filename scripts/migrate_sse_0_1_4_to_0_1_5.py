@@ -32,7 +32,8 @@ BROKER_TYPE_DECLARATION = re.compile(
     r"\b(?:class|interface|enum|record|@interface)\s+BrokerSseSubscription\b"
 )
 BROKER_TYPE_PARAMETER = re.compile(
-    r"(?:<|,)\s*(?:@\s*[A-Za-z_$][\w$]*(?:\s*\([^)]*\))?\s*)*"
+    r"(?:<|,)\s*(?:@\s*[A-Za-z_$][\w$]*(?:\s*\.\s*[A-Za-z_$][\w$]*)*"
+    r"(?:\s*\([^>]*?\))?\s*)*"
     r"BrokerSseSubscription\b(?=\s*(?:extends\b|,|>))"
 )
 BROKER_CLIENT_DECLARATION = re.compile(
@@ -43,11 +44,15 @@ BROKER_CLIENT_TYPE_DECLARATION = re.compile(
     r"\b(?:class|interface|enum|record|@interface)\s+BrokerEventsSseClient\b"
 )
 BROKER_CLIENT_TYPE_PARAMETER = re.compile(
-    r"(?:<|,)\s*(?:@\s*[A-Za-z_$][\w$]*(?:\s*\([^)]*\))?\s*)*"
+    r"(?:<|,)\s*(?:@\s*[A-Za-z_$][\w$]*(?:\s*\.\s*[A-Za-z_$][\w$]*)*"
+    r"(?:\s*\([^>]*?\))?\s*)*"
     r"BrokerEventsSseClient\b(?=\s*(?:extends\b|,|>))"
 )
 JAVA_UNICODE_ESCAPE = re.compile(r"\\u+[0-9A-Fa-f]{4}")
 JAVA_IDENTIFIER = r"[A-Za-z_$][\w$]*"
+ANNOTATION_ARGUMENTS = re.compile(
+    rf"@\s*{JAVA_IDENTIFIER}(?:\s*\.\s*{JAVA_IDENTIFIER})*\s*(?P<opening>\()"
+)
 TYPE_DECLARATION = re.compile(
     rf"\b(?:class|interface|enum|record|@interface)\s+{JAVA_IDENTIFIER}\b"
 )
@@ -101,6 +106,15 @@ class Analysis:
     findings: tuple[Finding, ...]
 
 
+def _is_escaped(text: str, offset: int) -> bool:
+    backslashes = 0
+    index = offset - 1
+    while index >= 0 and text[index] == "\\":
+        backslashes += 1
+        index -= 1
+    return backslashes % 2 == 1
+
+
 def _code_mask(text: str) -> str:
     """Return text with comments and literals blanked while preserving offsets."""
     result = list(text)
@@ -142,7 +156,7 @@ def _code_mask(text: str) -> str:
             if char != "\n":
                 result[index] = " "
         elif state == "text_block":
-            if text.startswith('"""', index):
+            if text.startswith('"""', index) and not _is_escaped(text, index):
                 result[index : index + 3] = "   "
                 state = "code"
                 index += 3
@@ -304,6 +318,20 @@ def _parenthesis_pairs(mask: str) -> dict[int, int]:
         elif character == ")" and stack:
             pairs[stack.pop()] = index
     return pairs
+
+
+def _mask_annotation_arguments(mask: str) -> str:
+    result = list(mask)
+    parenthesis_pairs = _parenthesis_pairs(mask)
+    for annotation in ANNOTATION_ARGUMENTS.finditer(mask):
+        opening = annotation.start("opening")
+        closing = parenthesis_pairs.get(opening)
+        if closing is None:
+            continue
+        for index in range(opening, closing + 1):
+            if result[index] != "\n":
+                result[index] = " "
+    return "".join(result)
 
 
 def _is_control_header_binder(
@@ -486,26 +514,6 @@ def _contains_masked_syntax(text: str, mask: str, start: int, end: int) -> bool:
     )
 
 
-def _generated_api_subclass_bodies(mask: str) -> tuple[tuple[int, int], ...]:
-    brace_pairs = _brace_pairs(mask)
-    bodies: list[tuple[int, int]] = []
-    generated_api = re.compile(
-        r"\bextends\s+(?:(?:markets\s*\.\s*alpaca\s*\.\s*client\s*\.\s*openapi\s*\.\s*"
-        r"(?:broker|trading)\s*\.\s*api\s*\.\s*)?EventsApi|"
-        r"(?:markets\s*\.\s*alpaca\s*\.\s*client\s*\.\s*openapi\s*\.\s*data\s*\.\s*"
-        r"api\s*\.\s*)?CorporateActionsApi)\b"
-    )
-    for declaration in TYPE_DECLARATION.finditer(mask):
-        opening = mask.find("{", declaration.end())
-        semicolon = mask.find(";", declaration.end())
-        if opening < 0 or (semicolon >= 0 and semicolon < opening):
-            continue
-        closing = brace_pairs.get(opening)
-        if closing is not None and generated_api.search(mask[declaration.end() : opening]):
-            bodies.append((opening, closing))
-    return tuple(bodies)
-
-
 def _diagnostic_patterns(
     mask: str, *, sse_context: bool, ignored_generated_sse_offsets: set[int]
 ) -> Iterable[tuple[int, str, str]]:
@@ -526,17 +534,15 @@ def _diagnostic_patterns(
             "generated SSE method usage should be replaced with a handwritten SSE client",
         )
     unqualified_generated_sse = re.compile(rf"(?<![\w$]){generated_method}\s*\(")
-    generated_subclasses = _generated_api_subclass_bodies(mask)
     for match in unqualified_generated_sse.finditer(mask):
         if not _is_bare_receiver(mask, match.start()):
             continue
-        if any(opening < match.start() < closing for opening, closing in generated_subclasses):
-            yield (
-                match.start(),
-                "SSE006",
-                "inherited generated SSE method usage should be replaced with a handwritten "
-                "SSE client",
-            )
+        yield (
+            match.start(),
+            "SSE006",
+            "unqualified generated SSE method usage should be replaced with a handwritten "
+            "SSE client",
+        )
     if not sse_context:
         return
 
@@ -549,15 +555,15 @@ def _diagnostic_patterns(
         (
             re.compile(
                 rf"\(\s*(?:okhttp3\s*\.\s*sse\s*\.\s*)?EventSource\s*\)\s*"
-                rf"(?:{JAVA_IDENTIFIER}\s*\.\s*)+eventSource\s*\("
+                r"[^;{}]*?eventSource\s*\("
             ),
             "SSE002",
             "EventSource identity, assignment, or cast requires manual review",
         ),
         (
             re.compile(
-                rf"(?:(?:{JAVA_IDENTIFIER}\s*\.\s*)+eventSource\s*\(\s*\)\s*(?:==|!=)"
-                rf"|(?:==|!=)\s*(?:{JAVA_IDENTIFIER}\s*\.\s*)+eventSource\s*\(\s*\))"
+                r"(?:eventSource\s*\([^;{}]*?(?:==|!=)"
+                r"|(?:==|!=)[^;{}]*?eventSource\s*\()"
             ),
             "SSE002",
             "EventSource identity, assignment, or cast requires manual review",
@@ -598,14 +604,16 @@ def _diagnostic_patterns(
 
 def analyze_text(text: str, path: str = "<memory>") -> Analysis:
     mask = _code_mask(text)
+    type_parameter_mask = _mask_annotation_arguments(mask)
     has_exact_import = bool(EXACT_IMPORT.search(mask))
     has_shadowing_type = bool(
-        BROKER_TYPE_DECLARATION.search(mask) or BROKER_TYPE_PARAMETER.search(mask)
+        BROKER_TYPE_DECLARATION.search(mask)
+        or BROKER_TYPE_PARAMETER.search(type_parameter_mask)
     )
     has_exact_client_import = bool(EXACT_CLIENT_IMPORT.search(mask))
     has_shadowing_client_type = bool(
         BROKER_CLIENT_TYPE_DECLARATION.search(mask)
-        or BROKER_CLIENT_TYPE_PARAMETER.search(mask)
+        or BROKER_CLIENT_TYPE_PARAMETER.search(type_parameter_mask)
     )
     broker_binders = _broker_binders(mask, has_exact_import=has_exact_import)
     broker_client_binders = _broker_client_binders(

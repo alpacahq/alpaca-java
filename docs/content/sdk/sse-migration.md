@@ -62,9 +62,10 @@ rich and legacy callbacks. Invocations and method references on a uniquely bound
 qualified `BrokerEventsSseClient` using a bare receiver are recognized as the handwritten
 replacement. A `this.receiver` call is recognized only when the scanner can prove the current class
 declares that handwritten-client field; inherited and other-qualified receivers remain report-only.
-Unqualified inherited calls in generated API subclasses are also reported. Every generated SSE
-invocation or method reference is reported. These deliberate false positives keep `--write`
-source-safe; migrate `SSE001` findings manually.
+Unqualified generated-method calls are reported conservatively, including calls from indirect and
+anonymous generated API subclasses. Every generated SSE invocation or method reference is
+reported. These deliberate false positives keep `--write` source-safe; migrate `SSE001` findings
+manually.
 Missing input paths and explicit non-Java files fail with exit code 2 instead of producing an empty
 success report.
 
@@ -212,8 +213,9 @@ documented `since_id` query parameter and in `Last-Event-ID`. Date-bounded retri
 original date range and can replay events. If an empty SSE `id:` clears the committed cursor, an
 unbounded request retains its original `since` or `sinceId` lower bound on reconnect rather than
 risk a cursorless gap; deduplicate because this safe replay can redeliver earlier events. Existing
-Broker constructors keep the `0.1.4` one-connection default; pass `AlpacaSseOptions` to opt into
-Broker reconnects.
+cursorless live requests fail closed after an empty `id:` because the Trading endpoint does not
+replay history without a lower bound. Existing Broker constructors keep the `0.1.4` one-connection
+default; pass `AlpacaSseOptions` to opt into Broker reconnects.
 
 `AlpacaSseOptions.initialLastEventId` rejects an empty value. Do not combine an initial ID with a
 date-bounded Trading request; `0.1.5` rejects that ambiguous combination before opening a
