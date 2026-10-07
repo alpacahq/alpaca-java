@@ -8,6 +8,7 @@ import markets.alpaca.client.openapi.trading.http.ApiException;
 import markets.alpaca.client.openapi.trading.model.ActivityEventV2;
 import markets.alpaca.client.sse.AlpacaSseListener;
 import markets.alpaca.client.sse.AlpacaSseOptions;
+import markets.alpaca.client.sse.AlpacaSseProtocolException;
 import markets.alpaca.client.sse.AlpacaSseSubscription;
 import markets.alpaca.client.sse.internal.SseTransport;
 import okhttp3.OkHttpClient;
@@ -83,26 +84,33 @@ public final class TradingEventsSseClient {
         TradingEventsSseClient::withResumeCursor);
   }
 
-  private static Request withResumeCursor(Request request, String eventId) {
+  static Request withResumeCursor(Request request, String eventId) {
     Request resumedRequest = SseTransport.withLastEventIdHeader(request, eventId);
-    if (eventId == null || eventId.isEmpty()) {
+    if (eventId == null) {
       return resumedRequest;
     }
-
     boolean boundedByDate =
         request.url().queryParameter("until") != null
             && request.url().queryParameter("until_id") == null;
     if (boundedByDate) {
       return resumedRequest;
     }
+    boolean boundedById = request.url().queryParameter("until_id") != null;
+    if (boundedById && eventId.isEmpty()) {
+      throw new AlpacaSseProtocolException(
+          "Cannot resume an ID-bounded Trading activity stream after an empty SSE id");
+    }
 
-    var url =
+    var urlBuilder =
         request
             .url()
             .newBuilder()
             .removeAllQueryParameters("since")
-            .setQueryParameter("since_id", eventId)
-            .build();
+            .removeAllQueryParameters("since_id");
+    if (!eventId.isEmpty()) {
+      urlBuilder.setQueryParameter("since_id", eventId);
+    }
+    var url = urlBuilder.build();
     return resumedRequest.newBuilder().url(url).build();
   }
 }

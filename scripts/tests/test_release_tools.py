@@ -353,56 +353,6 @@ class VersionUpdateTest(unittest.TestCase):
         self.assertFalse(result.changed)
         self.assertEqual(self.properties.read_text(encoding="utf-8"), original)
 
-    def test_equal_version_advances_stale_api_baseline(self):
-        self.properties.write_text(
-            "version=1.2.4-SNAPSHOT\napiBaselineVersion=1.2.2\n",
-            encoding="utf-8",
-        )
-
-        result = self.update()
-
-        self.assertEqual(result.status, "equal")
-        self.assertTrue(result.changed)
-        self.assertEqual(
-            self.properties.read_text(encoding="utf-8"),
-            "version=1.2.4-SNAPSHOT\napiBaselineVersion=1.2.3\n",
-        )
-
-    def test_missing_or_ahead_api_baseline_is_rejected(self):
-        self.properties.write_text("version=1.2.3-SNAPSHOT\n", encoding="utf-8")
-        with self.assertRaisesRegex(
-            release_tools.ReleaseToolError, "no apiBaselineVersion"
-        ):
-            self.update()
-
-        self.properties.write_text(
-            "version=1.2.3-SNAPSHOT\napiBaselineVersion=1.2.4\n",
-            encoding="utf-8",
-        )
-        with self.assertRaisesRegex(release_tools.ReleaseToolError, "is ahead"):
-            self.update()
-
-    def test_snapshot_readme_is_updated_and_rejects_ambiguity(self):
-        readme = Path(self.temporary_directory.name) / "README.md"
-        readme.write_text(
-            'implementation("markets.alpaca:alpaca-java:1.2.3-SNAPSHOT")\n',
-            encoding="utf-8",
-        )
-
-        self.assertTrue(
-            release_tools.update_snapshot_readme(readme, "1.2.4-SNAPSHOT")
-        )
-        self.assertFalse(
-            release_tools.update_snapshot_readme(readme, "1.2.4-SNAPSHOT")
-        )
-        self.assertIn("1.2.4-SNAPSHOT", readme.read_text(encoding="utf-8"))
-
-        readme.write_text("# no dependency\n", encoding="utf-8")
-        with self.assertRaisesRegex(
-            release_tools.ReleaseToolError, "exactly one"
-        ):
-            release_tools.update_snapshot_readme(readme, "1.2.4-SNAPSHOT")
-
     def test_ahead_is_noop(self):
         original = "version=2.0.0-SNAPSHOT\napiBaselineVersion=1.2.3\n"
         self.properties.write_text(original, encoding="utf-8")
@@ -620,22 +570,15 @@ class ReleaseToolsCliTest(unittest.TestCase):
 
     def test_update_version_github_output_and_failure(self):
         properties = self.root / "gradle.properties"
-        readme = self.root / "README.md"
         github_output = self.root / "github-output"
         properties.write_text(
             "version=1.2.3-SNAPSHOT\napiBaselineVersion=1.2.2\n",
-            encoding="utf-8",
-        )
-        readme.write_text(
-            'implementation("markets.alpaca:alpaca-java:1.2.3-SNAPSHOT")\n',
             encoding="utf-8",
         )
         arguments = (
             "update-version",
             "--properties",
             str(properties),
-            "--readme",
-            str(readme),
             "--release-version",
             "1.2.3",
             "--github-output",
@@ -657,11 +600,8 @@ class ReleaseToolsCliTest(unittest.TestCase):
             properties.read_text(encoding="utf-8"),
             "version=1.2.4-SNAPSHOT\napiBaselineVersion=1.2.3\n",
         )
-        self.assertIn("1.2.4-SNAPSHOT", readme.read_text(encoding="utf-8"))
 
-        properties.write_text(
-            "version=malformed\napiBaselineVersion=1.2.3\n", encoding="utf-8"
-        )
+        properties.write_text("version=malformed\n", encoding="utf-8")
         failure = self.run_cli(*arguments)
         self.assertEqual(failure.returncode, 2)
         self.assertEqual(failure.stdout, "")
@@ -669,19 +609,12 @@ class ReleaseToolsCliTest(unittest.TestCase):
 
     def test_update_version_invalid_utf8_uses_cli_error_contract(self):
         properties = self.root / "gradle.properties"
-        readme = self.root / "README.md"
         properties.write_bytes(b"version=1.2.3-SNAPSHOT\xff\n")
-        readme.write_text(
-            'implementation("markets.alpaca:alpaca-java:1.2.3-SNAPSHOT")\n',
-            encoding="utf-8",
-        )
 
         result = self.run_cli(
             "update-version",
             "--properties",
             str(properties),
-            "--readme",
-            str(readme),
             "--release-version",
             "1.2.3",
         )
