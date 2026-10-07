@@ -166,7 +166,9 @@ then waits for lifecycle completion to settle before invoking the listener. Clos
 callback startup is queued also releases the HTTP response thread without violating callback order;
 the already-admitted callbacks may finish later. Completion settlement is handed off from an active
 callback, so a callback may close even when a synchronous completion continuation waits for the
-ordered terminal listener.
+ordered terminal listener. Other lifecycle paths settle on their initiating thread, preventing a
+blocking synchronous continuation from consuming a shared completion worker needed by unrelated
+subscriptions. Use an async continuation with an application-owned executor for blocking work.
 
 Once response headers are accepted, `opened()` succeeds with that connection even if closure races
 with opening. Its admitted `onOpen` callback starts independently before `opened()` continuations
