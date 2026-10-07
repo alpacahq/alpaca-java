@@ -109,11 +109,14 @@ public final class AlpacaSseOptions {
     /**
      * Sets the initial SSE resume cursor.
      *
-     * <p>Unicode is supported; HTTP control characters are rejected because the cursor is sent in
-     * {@code Last-Event-ID}.
+     * <p>The cursor must not be empty. Unicode is supported; HTTP control characters are rejected
+     * because the cursor is sent in {@code Last-Event-ID}.
      */
     public Builder initialLastEventId(String initialLastEventId) {
       if (initialLastEventId != null) {
+        if (initialLastEventId.isEmpty()) {
+          throw new IllegalArgumentException("initialLastEventId must not be empty");
+        }
         for (int index = 0; index < initialLastEventId.length(); index++) {
           char character = initialLastEventId.charAt(index);
           if (character <= 0x1f || character == 0x7f) {

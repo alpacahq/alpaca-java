@@ -390,6 +390,21 @@ class AnalysisTests(unittest.TestCase):
                 self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
                 self.assertIn("method usage", result.findings[0].message)
 
+    def test_reports_every_generated_sse_usage(self):
+        source = """
+            class Example {
+              void open(EventsApi first, EventsApi second) {
+                first.subscribeToActivitiesSSE(null, null, null, null);
+                second.getV1EventsNtaCall();
+              }
+            }
+        """
+
+        result = migrate.analyze_text(source)
+
+        self.assertEqual(["SSE006", "SSE006"], [finding.code for finding in result.findings])
+        self.assertEqual([4, 5], [finding.line for finding in result.findings])
+
     def test_ignores_single_event_call_on_handwritten_broker_client(self):
         sources = (
             """
@@ -434,6 +449,15 @@ class AnalysisTests(unittest.TestCase):
                   }
                   GeneratedOperation bind() {
                     return this.client::getAccountActivityEventAsync;
+                  }
+                }
+            """,
+            """
+                import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+                class Example {
+                  private BrokerEventsSseClient client;
+                  void fetch(BrokerEventsSseClient client) {
+                    this.client.getAccountActivityEventAsync(null, "event");
                   }
                 }
             """,
@@ -492,6 +516,102 @@ class AnalysisTests(unittest.TestCase):
               GeneratedOperation bind(Example other) {
                 other.client.getAccountActivityEventAsync(null, "event");
                 return other.client::getAccountActivityEventAsync;
+              }
+            }
+        """
+
+        result = migrate.analyze_text(source)
+
+        self.assertEqual(["SSE006", "SSE006"], [finding.code for finding in result.findings])
+
+    def test_reports_this_receiver_without_matching_handwritten_field(self):
+        sources = (
+            """
+                import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+                class Base {
+                  protected AccountsApi client;
+                }
+                class Example extends Base {
+                  void fetch(BrokerEventsSseClient client) {
+                    this.client.getAccountActivityEventAsync(null, "event");
+                  }
+                }
+            """,
+            """
+                import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+                class Example {
+                  private AccountsApi client;
+                  void fetch(BrokerEventsSseClient client) {
+                    this.client.getAccountActivityEventAsync(null, "event");
+                  }
+                }
+            """,
+        )
+
+        for source in sources:
+            with self.subTest(source=source):
+                result = migrate.analyze_text(source)
+                self.assertEqual(
+                    ["SSE006"], [finding.code for finding in result.findings]
+                )
+
+    def test_reports_secondary_generated_declarator_inside_anonymous_class(self):
+        source = """
+            class Example {
+              AccountsApi generated, client;
+              Runnable task = new Runnable() {
+                public void run() {
+                  client.getAccountActivityEventAsync(null, "event");
+                }
+              };
+            }
+        """
+
+        result = migrate.analyze_text(source)
+
+        self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
+
+    def test_this_receiver_uses_anonymous_class_field_type(self):
+        generated_source = """
+            import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+            class Example {
+              BrokerEventsSseClient client;
+              Runnable task = new Runnable() {
+                AccountsApi client;
+                public void run() {
+                  this.client.getAccountActivityEventAsync(null, "event");
+                }
+              };
+            }
+        """
+        handwritten_source = """
+            import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+            class Example {
+              AccountsApi client;
+              Runnable task = register(new Runnable() {
+                BrokerEventsSseClient client;
+                public void run() {
+                  this.client.getAccountActivityEventAsync(null, "event");
+                }
+              });
+            }
+        """
+
+        result = migrate.analyze_text(generated_source)
+
+        self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
+        self.assertEqual((), migrate.analyze_text(handwritten_source).findings)
+
+    def test_initializer_argument_is_not_treated_as_secondary_declarator(self):
+        source = """
+            import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+            class Base {
+              protected AccountsApi client;
+            }
+            class Example extends Base {
+              BrokerEventsSseClient adapter = createAdapter("value", client);
+              void fetch() {
+                client.getAccountActivityEventAsync(null, "event");
               }
             }
         """

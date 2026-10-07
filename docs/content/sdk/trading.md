@@ -178,8 +178,8 @@ while transmitting the committed cursor as the documented `since_id` query param
 standard `Last-Event-ID` header. Date-bounded requests retain their original date range on retry and
 can replay already processed events. Malformed payloads terminate the subscription;
 persisted workflows should inspect `completion()` and deduplicate by event ID after reconnect.
-A non-empty `AlpacaSseOptions.initialLastEventId` cannot be combined with a date-bounded request;
-use an ID-bounded request and ensure the initial ID is not after `untilId`.
+`AlpacaSseOptions.initialLastEventId` must be non-empty and cannot be combined with a date-bounded
+request; use an ID-bounded request and ensure the initial ID is not after `untilId`.
 Activity details normally use type/subtype dispatch; OAS schemas without discriminants use a
 unique-most-specific field match and fail on ties. The pinned OAS does not yet define a dedicated
 detail schema for `CSD`; these events retain activity type `CSD` but temporarily expose details as

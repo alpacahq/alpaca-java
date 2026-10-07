@@ -22,12 +22,14 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.BiFunction;
 import java.util.function.LongSupplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import markets.alpaca.client.http.AlpacaRetryInterceptor;
 import markets.alpaca.client.sse.AlpacaSseCallbackException;
 import markets.alpaca.client.sse.AlpacaSseCloseResult;
 import markets.alpaca.client.sse.AlpacaSseConnectionInfo;
@@ -42,7 +44,9 @@ import markets.alpaca.client.sse.AlpacaSseState;
 import markets.alpaca.client.sse.AlpacaSseSubscription;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Dispatcher;
 import okhttp3.Headers;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -54,7 +58,9 @@ import okio.BufferedSource;
 public final class SseTransport {
 
   private static final Logger LOG = Logger.getLogger(SseTransport.class.getName());
+  private static final String ORIGINAL_RETRY_AFTER_HEADER = "X-Alpaca-Sse-Original-Retry-After";
   private static final Executor DIRECT_EXECUTOR = Runnable::run;
+  private static final AtomicLong HTTP_THREAD_SEQUENCE = new AtomicLong();
   private static final int CALLBACK_DISPATCH_THREADS = 4;
   private static final int CALLBACK_DISPATCH_QUEUE_CAPACITY = 256;
   private static final ScheduledExecutorService SCHEDULER = createScheduler();
@@ -71,6 +77,45 @@ public final class SseTransport {
           });
 
   private SseTransport() {}
+
+  static Dispatcher createHttpDispatcher() {
+    var executor =
+        Executors.newSingleThreadExecutor(
+            runnable -> {
+              Thread thread =
+                  new Thread(runnable, "alpaca-sse-http-" + HTTP_THREAD_SEQUENCE.incrementAndGet());
+              thread.setDaemon(true);
+              return thread;
+            });
+    var dispatcher = new Dispatcher(executor);
+    dispatcher.setMaxRequests(1);
+    dispatcher.setMaxRequestsPerHost(1);
+    return dispatcher;
+  }
+
+  private static Response restoreZeroRetryAfter(Interceptor.Chain chain) throws IOException {
+    Response response = chain.proceed(chain.request());
+    String originalRetryAfter = response.header(ORIGINAL_RETRY_AFTER_HEADER);
+    if (originalRetryAfter == null) return response;
+    return response
+        .newBuilder()
+        .removeHeader(ORIGINAL_RETRY_AFTER_HEADER)
+        .header("Retry-After", originalRetryAfter)
+        .build();
+  }
+
+  private static Response suppressImmediateZeroRetryAfterFollowUp(Interceptor.Chain chain)
+      throws IOException {
+    Response response = chain.proceed(chain.request());
+    String retryAfter = response.header("Retry-After");
+    Response.Builder sanitized = response.newBuilder().removeHeader(ORIGINAL_RETRY_AFTER_HEADER);
+    if (retryAfter != null && retryAfter.matches("0+")) {
+      // OkHttp otherwise retries this response immediately inside one Call, bypassing the SSE
+      // reconnect policy. The application interceptor restores the server value before decoding.
+      sanitized.header(ORIGINAL_RETRY_AFTER_HEADER, retryAfter).header("Retry-After", "1");
+    }
+    return sanitized.build();
+  }
 
   static ScheduledThreadPoolExecutor createScheduler() {
     var scheduler =
@@ -384,6 +429,7 @@ public final class SseTransport {
 
   private static final class Session<T> implements AlpacaSseSubscription, Callback {
     private final OkHttpClient httpClient;
+    private final Dispatcher httpDispatcher;
     private final Request originalRequest;
     private final AlpacaSseOptions options;
     private final boolean bounded;
@@ -445,9 +491,18 @@ public final class SseTransport {
         Executor terminalCallbackExecutor,
         Executor completionExecutor,
         LongSupplier nanoTime) {
+      var httpClientBuilder =
+          Objects.requireNonNull(httpClient, "httpClient must not be null").newBuilder();
+      httpClientBuilder
+          .interceptors()
+          .removeIf(interceptor -> interceptor instanceof AlpacaRetryInterceptor);
+      httpClientBuilder
+          .addInterceptor(SseTransport::restoreZeroRetryAfter)
+          .addNetworkInterceptor(SseTransport::suppressImmediateZeroRetryAfterFollowUp);
+      this.httpDispatcher = createHttpDispatcher();
       this.httpClient =
-          Objects.requireNonNull(httpClient, "httpClient must not be null")
-              .newBuilder()
+          httpClientBuilder
+              .dispatcher(httpDispatcher)
               .callTimeout(Duration.ZERO)
               .readTimeout(Duration.ZERO)
               .retryOnConnectionFailure(false)
@@ -822,13 +877,14 @@ public final class SseTransport {
             initialDeadlineFailure = failure;
           }
           attempt = established ? ++reconnectAttempt : ++initialAttempt;
+          boolean serverDirectedDelay = retryAfter != null || serverRetry != null;
           Duration candidateDelay =
               retryAfter != null
                   ? retryAfter
                   : serverRetry != null
                       ? serverRetry
                       : options.reconnectPolicy().delayForAttempt(attempt);
-          candidateDelay = capReconnectDelay(candidateDelay);
+          candidateDelay = boundReconnectDelay(candidateDelay, serverDirectedDelay);
           if (!options.reconnectPolicy().allowsAttempt(established, attempt)
               || !budgetAllowsDelayLocked(established, candidateDelay)) {
             attempt = -1;
@@ -877,7 +933,10 @@ public final class SseTransport {
       if (reconnectSchedulingFailure != null) fail(reconnectSchedulingFailure);
     }
 
-    private Duration capReconnectDelay(Duration delay) {
+    private Duration boundReconnectDelay(Duration delay, boolean serverDirected) {
+      if (serverDirected && delay.compareTo(options.reconnectPolicy().initialBackoff()) < 0) {
+        delay = options.reconnectPolicy().initialBackoff();
+      }
       Duration maximum = options.reconnectPolicy().maxBackoff();
       return delay.compareTo(maximum) > 0 ? maximum : delay;
     }
@@ -1218,6 +1277,8 @@ public final class SseTransport {
     private void cancelActiveWorkLocked() {
       if (call != null) call.cancel();
       call = null;
+      httpDispatcher.cancelAll();
+      httpDispatcher.executorService().shutdown();
       timedOutCall = null;
       cancel(connectTimeout);
       connectTimeout = null;
@@ -1347,6 +1408,7 @@ public final class SseTransport {
             LOG.log(Level.WARNING, "SSE listener callback failed: " + task.name, failure);
             task.completion.complete(null);
           } catch (Throwable failure) {
+            LOG.log(Level.SEVERE, "SSE listener callback failed fatally: " + task.name, failure);
             task.completion.completeExceptionally(failure);
           }
         }

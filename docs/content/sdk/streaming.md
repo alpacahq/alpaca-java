@@ -67,14 +67,25 @@ Opening-dispatch rejection fails the subscription with an `AlpacaSseCallbackExce
 terminal-dispatch saturation, lifecycle completion remains authoritative, the pending terminal
 listener callback is rejected, and the SDK logs a warning.
 
-The SSE transport retains the supplied OkHttp client's interceptors, proxy, TLS, dispatcher, and
-connection pool, but disables inherited read and whole-call timeouts because they would terminate
-healthy long-lived responses. Use `AlpacaSseOptions` for connection, idle, reconnect-cycle, and
-whole-subscription deadlines.
+The SSE transport retains the supplied OkHttp client's application interceptors, proxy, TLS, and
+connection pool, but each subscription uses its own one-call daemon dispatcher. The dispatcher is
+shut down when that subscription reaches a terminal state. This prevents long-lived streams from
+consuming REST dispatch slots, imposing a process-wide stream limit, or keeping the JVM alive.
+Cancel SSE through `AlpacaSseSubscription`; `cancelAll()` on the supplied client's dispatcher does
+not own derived SSE calls.
+
+The SDK removes its application-level `AlpacaRetryInterceptor` from the derived SSE client so it
+cannot layer retries beneath the SSE reconnect policy. Other caller-supplied interceptors remain
+installed; configure any custom retry interceptor to exclude SSE requests so reconnect attempts and
+backoff stay under `AlpacaSseOptions`. The transport also disables inherited read and whole-call
+timeouts because they would terminate healthy long-lived responses. Use `AlpacaSseOptions` for
+connection, idle, reconnect-cycle, and whole-subscription deadlines.
 
 If a listener throws a `RuntimeException`, the SDK logs it and considers the event delivered, so
-its resume ID advances. A callback-executor rejection is terminal. Applications should handle
-their own callback failures, persist work transactionally, and deduplicate by SSE event ID.
+its resume ID advances. Fatal non-runtime throwables are logged at severe level and make
+non-terminal dispatch fail; terminal lifecycle completion remains authoritative when a terminal
+listener fails. A callback-executor rejection is terminal. Applications should handle their own
+callback failures, persist work transactionally, and deduplicate by SSE event ID.
 
 SSE subscriptions return immediately while the HTTP connection opens. Use `opened()` with a
 caller-chosen timeout instead of building a startup latch; it yields immutable response URI, status,
@@ -369,16 +380,20 @@ ID-bounded stream fails closed if an empty `id:` removed its resume cursor. `unt
 makes a request bounded;
 normal EOF then completes the subscription instead of reconnecting. Configure retry budgets,
 initial resume ID, idle timeout, and resource limits with `AlpacaSseOptions` factory overloads.
-A non-empty initial resume ID cannot be combined with a date-bounded Trading request because
-backend consumption of `Last-Event-ID` is not documented and date/ID cursor families cannot be
-mixed safely. Use an ID-bounded request instead; its initial ID must not be after `untilId`.
+An initial resume ID must not be empty and cannot be combined with a date-bounded Trading request
+because backend consumption of `Last-Event-ID` is not documented and date/ID cursor families cannot
+be mixed safely. Use an ID-bounded request instead; its initial ID must not be after `untilId`.
 `AlpacaSseReconnectPolicy.maxElapsedTime(...)` bounds one initial-open or established reconnect
 cycle. An established cycle remains bounded through backoff, reconnect headers, comments, and
 silence until an event is delivered; `AlpacaSseOptions.maxDuration(...)` separately bounds the
-lifetime of the whole subscription. `maxBackoff(...)` caps client exponential backoff, server SSE
-`retry:` values, and HTTP `Retry-After` values. The connection timeout covers successful
-response-header validation and bounded non-success response-body capture, so a server cannot keep
-a subscription opening indefinitely by stalling an error body.
+lifetime of the whole subscription. `initialBackoff(...)` and `maxBackoff(...)` require
+whole-millisecond values of at least 1 ms. The initial backoff is also the minimum server-directed
+delay, preventing `retry: 0` or `Retry-After: 0` from creating a tight SDK reconnect loop; the
+transport handles `Retry-After: 0` before OkHttp's immediate follow-up can bypass the configured
+attempt policy. Jitter never reduces a positive client delay to zero. The maximum caps client
+exponential backoff and server-provided delays. The connection timeout covers successful
+response-header validation and bounded non-success response-body capture, so a server cannot keep a
+subscription opening indefinitely by stalling an error body.
 
 Malformed Trading activity payloads fail the subscription. Activity detail models are selected by
 the OAS type/subtype mapping. The two schemas whose OAS definitions currently lack discriminants
