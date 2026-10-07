@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -23,6 +22,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.LockSupport;
 import java.util.function.BiFunction;
 import java.util.function.LongSupplier;
 import java.util.logging.Level;
@@ -60,6 +60,8 @@ public final class SseTransport {
   private static final ExecutorService OPENING_CALLBACK_EXECUTOR = createOpeningCallbackExecutor();
   private static final ExecutorService TERMINAL_CALLBACK_EXECUTOR =
       createTerminalCallbackExecutor();
+  private static final ExecutorService COMPLETION_EXECUTOR =
+      createBoundedCallbackExecutor("alpaca-sse-completion");
   private static final ExecutorService LIFECYCLE_EXECUTOR =
       Executors.newCachedThreadPool(
           runnable -> {
@@ -935,14 +937,11 @@ public final class SseTransport {
       return true;
     }
 
-    private void enqueueTerminal(String name, Runnable callback) {
-      EnqueuedCallback enqueued =
-          callbackDispatcher.enqueue(
-              name,
-              () -> {
-                awaitTerminalSettlement();
-                callback.run();
-              });
+    private EnqueuedCallback admitTerminal(String name, Runnable callback) {
+      return callbackDispatcher.enqueue(name, callback);
+    }
+
+    private void startTerminal(EnqueuedCallback enqueued) {
       if (!enqueued.startDrain()) return;
       try {
         terminalCallbackExecutor.execute(
@@ -950,7 +949,10 @@ public final class SseTransport {
               try {
                 start(enqueued);
               } catch (AlpacaSseCallbackException failure) {
-                LOG.log(Level.WARNING, "SSE terminal callback executor failed: " + name, failure);
+                LOG.log(
+                    Level.WARNING,
+                    "SSE terminal callback executor failed: " + enqueued.task().name,
+                    failure);
               }
             });
       } catch (RejectedExecutionException failure) {
@@ -958,7 +960,7 @@ public final class SseTransport {
         LOG.log(
             Level.WARNING,
             "SSE terminal callback dispatcher rejected "
-                + name
+                + enqueued.task().name
                 + "; lifecycle completion is unaffected",
             failure);
       }
@@ -1086,8 +1088,11 @@ public final class SseTransport {
         awaitTerminalSettlement();
         return;
       }
-      enqueueTerminal("onClosed", () -> listener.onClosed(result));
-      completion.complete(result);
+      EnqueuedCallback terminalCallback =
+          admitTerminal("onClosed", () -> listener.onClosed(result));
+      settleCompletion(() -> completion.complete(result));
+      awaitTerminalSettlement();
+      startTerminal(terminalCallback);
       if (acceptedConnection != null) {
         openedFuture.complete(acceptedConnection);
       } else if (!openedFuture.isDone()) {
@@ -1131,8 +1136,11 @@ public final class SseTransport {
         state.set(AlpacaSseState.FAILED);
         acceptedConnection = hasOpened ? connection.get() : null;
       }
-      enqueueTerminal("onFailure", () -> listener.onFailure(failure));
-      completion.completeExceptionally(failure);
+      EnqueuedCallback terminalCallback =
+          admitTerminal("onFailure", () -> listener.onFailure(failure));
+      settleCompletion(() -> completion.completeExceptionally(failure));
+      awaitTerminalSettlement();
+      startTerminal(terminalCallback);
       if (acceptedConnection != null) {
         openedFuture.complete(acceptedConnection);
       } else {
@@ -1140,13 +1148,25 @@ public final class SseTransport {
       }
     }
 
-    private void awaitTerminalSettlement() {
+    private void settleCompletion(Runnable settlement) {
       try {
-        completion.join();
-      } catch (CompletionException ignored) {
-        // close() observes a failure that already won the terminal transition but does not rethrow
-        // it.
+        COMPLETION_EXECUTOR.execute(settlement);
+      } catch (RejectedExecutionException rejected) {
+        LOG.log(
+            Level.WARNING,
+            "SSE completion dispatcher saturated; using lifecycle fallback",
+            rejected);
+        LIFECYCLE_EXECUTOR.execute(settlement);
       }
+    }
+
+    private void awaitTerminalSettlement() {
+      boolean interrupted = false;
+      while (!completion.isDone()) {
+        interrupted |= Thread.interrupted();
+        LockSupport.parkNanos(100_000L);
+      }
+      if (interrupted) Thread.currentThread().interrupt();
     }
 
     private void cancelActiveWorkLocked() {
@@ -1182,20 +1202,20 @@ public final class SseTransport {
     private void commitLastEventId(String id) {
       synchronized (lifecycleLock) {
         if (terminal) return;
-        lastEventId.set(id == null || id.isEmpty() ? null : id);
+        lastEventId.set(id);
       }
     }
 
     private void commitDeliveredEvent(String id) {
       synchronized (lifecycleLock) {
-        lastEventId.set(id == null || id.isEmpty() ? null : id);
+        lastEventId.set(id);
         if (!terminal) resetReconnectCycleLocked();
       }
     }
 
     private void commitDecodedEventId(String id) {
       synchronized (lifecycleLock) {
-        lastEventId.set(id == null || id.isEmpty() ? null : id);
+        lastEventId.set(id);
         if (!terminal) resetReconnectCycleLocked();
       }
     }
@@ -1336,7 +1356,7 @@ public final class SseTransport {
 
     @Override
     public Optional<String> lastEventId() {
-      return Optional.ofNullable(lastEventId.get());
+      return Optional.ofNullable(lastEventId.get()).filter(id -> !id.isEmpty());
     }
 
     @Override

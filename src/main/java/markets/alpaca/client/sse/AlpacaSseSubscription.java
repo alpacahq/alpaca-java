@@ -45,7 +45,9 @@ public interface AlpacaSseSubscription extends AutoCloseable {
    *
    * <p>Normal and user closure complete successfully; terminal failures complete exceptionally.
    * Lifecycle completion is resolved before the serialized terminal listener callback and does not
-   * wait for an active user callback.
+   * wait for an active user callback. Settlement is handed off from the active callback path, so a
+   * synchronous completion continuation may wait for the ordered terminal listener even when the
+   * active callback initiated closure.
    */
   CompletableFuture<AlpacaSseCloseResult> completion();
 

@@ -103,9 +103,7 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Closing releases an HTTP response thread waiting for opening-dispatch capacity. Terminal listener
   delivery is admitted before synchronous lifecycle-completion continuations run, while invocation
   remains ordered after lifecycle completion and any previously admitted callback.
-- API compatibility now reads its released baseline from `gradle.properties`; the post-release bump
-  advances that baseline and the README snapshot dependency alongside the next development version.
-  Markdown link checking includes the top-level migration index.
+- Markdown link checking includes the top-level migration index.
 
 ### Fixed
 - Concurrent `close()` calls now return only after lifecycle completion settles, including when a
@@ -116,6 +114,14 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Closing during initial connection or reconnect can no longer publish an uncancelled call after the
   terminal transition, and closing from a listener while awaiting `completion()` no longer
   deadlocks.
+- Lifecycle completion settlement no longer runs synchronous future continuations on an active
+  listener callback path, so a callback can close while a completion continuation awaits the
+  ordered terminal listener.
+- An empty Trading SSE `id:` now clears the original unbounded `since`/`since_id` on reconnect
+  instead of replaying the subscription's initial cursor; ID-bounded streams fail closed when the
+  API's required `since_id` can no longer be supplied.
+- Trading and Broker activity decoders preserve newly generated but not-yet-handled envelope fields
+  through `additionalProperties` instead of silently dropping them after regeneration.
 - Terminal lifecycle state, timers, and cancellation no longer wait behind user callbacks or block
   the shared scheduler. Terminal listener delivery remains serialized after callbacks already in
   progress, and no new callbacks are admitted after termination.

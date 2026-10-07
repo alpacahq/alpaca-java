@@ -2,6 +2,7 @@ package markets.alpaca.client.trading.sse;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import markets.alpaca.client.openapi.trading.model.ActivityEventV2;
 import markets.alpaca.client.openapi.trading.model.ActivityV2DetailNTA;
 import markets.alpaca.client.openapi.trading.model.ActivityV2DetailTRD;
 import markets.alpaca.client.openapi.trading.model.CDIVActivityV2;
@@ -98,6 +99,19 @@ class TradingActivityEventDecoderTest {
     assertInstanceOf(java.util.Map.class, event.getAdditionalProperty("future_object"));
     assertTrue(event.getAdditionalProperties().containsKey("future_null"));
     assertNull(event.getAdditionalProperty("future_null"));
+  }
+
+  @Test
+  void preservesUnhandledEnvelopePropertyWhenRegenerationMarksItKnown() throws Exception {
+    assertTrue(ActivityEventV2.openapiFields.add("future_known"));
+    try {
+      var event =
+          decoder.decode(eventJson("FILL", null, "{}", "\"future_known\":\"regenerated-value\","));
+
+      assertEquals("regenerated-value", event.getAdditionalProperty("future_known"));
+    } finally {
+      ActivityEventV2.openapiFields.remove("future_known");
+    }
   }
 
   @Test

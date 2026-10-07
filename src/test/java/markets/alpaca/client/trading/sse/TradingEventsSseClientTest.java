@@ -13,8 +13,10 @@ import markets.alpaca.client.openapi.trading.model.ActivityEventV2;
 import markets.alpaca.client.sse.AlpacaSseEvent;
 import markets.alpaca.client.sse.AlpacaSseListener;
 import markets.alpaca.client.sse.AlpacaSseOptions;
+import markets.alpaca.client.sse.AlpacaSseProtocolException;
 import markets.alpaca.client.sse.AlpacaSseReconnectPolicy;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
@@ -129,6 +131,74 @@ class TradingEventsSseClientTest {
           "01J9RPMV5TKB8WX3M4F1KZ7QH2", reconnect.getRequestUrl().queryParameter("since_id"));
       assertEquals("01J9RPMV5TKB8WX3M4F1KZ7QH2", reconnect.getHeader("Last-Event-ID"));
     }
+  }
+
+  @Test
+  void reconnectAfterEmptyEventIdDoesNotRestoreOriginalUnboundedCursor() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("id:\ndata: " + fillJson() + "\n\n"));
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBodyDelay(5, TimeUnit.SECONDS)
+            .setBody(":\n\n"));
+    var apiClient =
+        AlpacaClientFactory.tradingClient(
+            new AlpacaCredentials("trading-key", "trading-secret"), httpClient);
+    apiClient.setBasePath(baseUrl());
+    var policy =
+        AlpacaSseReconnectPolicy.builder()
+            .initialAttempts(0)
+            .establishedAttempts(1)
+            .initialBackoff(Duration.ofMillis(1))
+            .maxBackoff(Duration.ofMillis(1))
+            .jitterRatio(0)
+            .build();
+    var client =
+        new TradingEventsSseClient(
+            apiClient, AlpacaSseOptions.builder().reconnectPolicy(policy).build());
+
+    try (var subscription =
+        client.subscribeToActivities(
+            TradingActivitySseRequest.builder()
+                .since(OffsetDateTime.parse("2026-10-01T00:00:00Z"))
+                .build(),
+            new AlpacaSseListener<>() {})) {
+      var initial = server.takeRequest(3, TimeUnit.SECONDS);
+      var reconnect = server.takeRequest(3, TimeUnit.SECONDS);
+
+      assertNotNull(initial);
+      assertNotNull(reconnect);
+      assertNotNull(initial.getRequestUrl().queryParameter("since"));
+      assertNull(reconnect.getRequestUrl().queryParameter("since"));
+      assertNull(reconnect.getRequestUrl().queryParameter("since_id"));
+      assertNull(reconnect.getHeader("Last-Event-ID"));
+    }
+  }
+
+  @Test
+  void emptyEventIdFailsClosedForIdBoundedRequest() {
+    var request =
+        new Request.Builder()
+            .url(
+                server
+                    .url("/v2beta1/events/activities")
+                    .newBuilder()
+                    .addQueryParameter("since_id", "01J9RPMV5TKB8WX3M4F1KZ7QH2")
+                    .addQueryParameter("until_id", "01J9RPMV5TKB8WX3M4F1KZ7QH3")
+                    .build())
+            .build();
+
+    var failure =
+        assertThrows(
+            AlpacaSseProtocolException.class,
+            () -> TradingEventsSseClient.withResumeCursor(request, ""));
+
+    assertEquals(
+        "Cannot resume an ID-bounded Trading activity stream after an empty SSE id",
+        failure.getMessage());
   }
 
   private String baseUrl() {
