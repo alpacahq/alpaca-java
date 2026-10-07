@@ -35,9 +35,11 @@ needs.
 WebSocket callbacks run on OkHttp's reader thread by default. SSE callbacks are serialized per
 subscription, and stream parsing waits for each callback to complete to provide backpressure. The
 default SSE executor runs callbacks directly: event delivery runs on the transport thread, while
-terminal delivery that is not already queued behind an active callback starts through a bounded SDK
-terminal-dispatch worker. If a handler writes to a database, calls a network service, or performs
-blocking work, use a factory overload that accepts an application-owned `Executor`.
+opening and terminal delivery that is not already queued behind an active callback starts through
+separate bounded SDK dispatchers. The opening callback is admitted before `opened()` continuations
+run, so a continuation may close the subscription without preventing ordered `onOpen` and
+`onClosed` delivery. If a handler writes to a database, calls a network service, or performs blocking
+work, use a factory overload that accepts an application-owned `Executor`.
 
 Transport lifecycle does not wait for user callbacks: `close()` cancels transport work and waits
 for lifecycle completion to settle before returning, while the serialized terminal listener
@@ -47,10 +49,12 @@ remain independent of callback execution. Event callbacks backpressure response 
 so a blocked callback can delay detection of remote EOF and the following reconnect. Sharing one
 single-thread executor across subscriptions intentionally serializes their callbacks.
 
-The SDK terminal dispatcher has finite workers and queue capacity so blocked listeners cannot
-create unbounded threads. Under dispatcher saturation, lifecycle completion remains authoritative,
-the pending terminal listener callback is rejected, and the SDK logs a warning. Applications that
-must perform blocking terminal work should provide and monitor their own callback executor.
+The SDK opening and terminal dispatchers have finite workers and queue capacity so blocked listeners
+cannot create unbounded threads. Opening-dispatch rejection fails the subscription with an
+`AlpacaSseCallbackException`. Under terminal-dispatch saturation, lifecycle completion remains
+authoritative, the pending terminal listener callback is rejected, and the SDK logs a warning.
+Applications that must perform blocking lifecycle work should provide and monitor their own callback
+executor.
 
 The SSE transport retains the supplied OkHttp client's interceptors, proxy, TLS, dispatcher, and
 connection pool, but disables inherited read and whole-call timeouts because they would terminate

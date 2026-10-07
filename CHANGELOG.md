@@ -95,8 +95,10 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   local variable in the call's lexical scope. Fields, qualified, shadowed, same-named local/nested
   types, lambda-bound, commented, or otherwise uncertain chains are report-only. Missing inputs fail
   closed.
-- Terminal listener startup uses a bounded SDK dispatcher. Lifecycle futures remain authoritative;
-  dispatcher saturation rejects pending terminal listener delivery with a warning instead of
+- Opening and terminal listener startup use separate bounded SDK dispatchers. Opening callbacks are
+  admitted before `opened()` continuations run, preventing a synchronous close-and-wait continuation
+  from blocking ordered `onOpen`/terminal delivery. Lifecycle futures remain authoritative;
+  terminal-dispatch saturation rejects pending terminal listener delivery with a warning instead of
   creating unbounded threads.
 
 ### Fixed
