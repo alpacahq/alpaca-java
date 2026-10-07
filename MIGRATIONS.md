@@ -21,8 +21,10 @@ exact import or its fully qualified class name. Missing paths and explicit non-J
 closed. The tool does not attempt to rewrite behavioral callback or threading changes.
 Diagnostic `SSE006` reports generated SSE method invocations and method references that should move
 to handwritten streaming clients. It does not report a uniquely bound imported or fully qualified
-`BrokerEventsSseClient.getAccountActivityEventAsync` receiver when used directly or through
-`this.receiver`; other qualified receivers remain findings.
+`BrokerEventsSseClient.getAccountActivityEventAsync` receiver when used directly. A
+`this.receiver` call is suppressed only when the scanner can prove that the current class declares
+that handwritten-client field; inherited, other-qualified, and otherwise ambiguous receivers
+remain findings. Every generated SSE use in a file is reported.
 
 `BrokerSseSubscription` also implements `AlpacaSseSubscription` in `0.1.5`. This is additive and
 requires no source migration; it allows domain-neutral lifecycle code to accept existing Broker

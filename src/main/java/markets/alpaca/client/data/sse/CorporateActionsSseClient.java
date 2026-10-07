@@ -73,15 +73,24 @@ public final class CorporateActionsSseClient {
     return subscribeToCorporateActions(CorporateActionsSseRequest.live(), listener);
   }
 
-  /** Opens a corporate-actions stream with filters and history/boundary cursors. */
+  /**
+   * Opens a corporate-actions stream with filters and history/boundary cursors.
+   *
+   * <p>For an ID-bounded request, an initial event ID in the client options must not be after the
+   * request's upper bound.
+   */
   public AlpacaSseSubscription subscribeToCorporateActions(
       CorporateActionsSseRequest request, AlpacaSseListener<CorporateActionEvent> listener)
       throws ApiException {
     Objects.requireNonNull(request, "request must not be null");
     Objects.requireNonNull(listener, "listener must not be null");
-    if (options.initialLastEventId() != null && !options.initialLastEventId().isEmpty()) {
-      CorporateActionsSseRequest.validateEventId(
-          options.initialLastEventId(), "options.initialLastEventId");
+    String initialEventId = options.initialLastEventId();
+    if (initialEventId != null) {
+      CorporateActionsSseRequest.validateEventId(initialEventId, "options.initialLastEventId");
+      if (request.untilId() != null && initialEventId.compareTo(request.untilId()) > 0) {
+        throw new IllegalArgumentException(
+            "options.initialLastEventId must not be after request.untilId");
+      }
     }
     return SseTransport.open(
         httpClient,

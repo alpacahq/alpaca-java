@@ -94,8 +94,9 @@ header aligns the Java and JS/TS v5 client model, but release notes must not cla
 backend consumes that header unless separate public documentation, recorded API-owner
 confirmation, or a controlled live result establishes it. Replay correctness relies on the
 documented query cursor.
-Date-bounded Trading requests must reject a non-empty initial event ID rather than claiming
-header-only replay; ID-bounded requests must reject an initial ID after `untilId`.
+Initial event IDs must be non-empty. Date-bounded Trading requests must reject an initial event ID
+rather than claiming header-only replay; Trading and Corporate Actions ID-bounded requests must
+reject an initial ID after `untilId`.
 
 SSE lifecycle futures use an elastic, direct-handoff SDK completion executor so one subscription's
 blocked synchronous continuation cannot queue another subscription's settlement or occupy the
