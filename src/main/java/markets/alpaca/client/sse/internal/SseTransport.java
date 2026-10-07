@@ -54,9 +54,10 @@ public final class SseTransport {
 
   private static final Logger LOG = Logger.getLogger(SseTransport.class.getName());
   private static final Executor DIRECT_EXECUTOR = Runnable::run;
-  private static final int TERMINAL_CALLBACK_THREADS = 4;
-  private static final int TERMINAL_CALLBACK_QUEUE_CAPACITY = 256;
+  private static final int CALLBACK_DISPATCH_THREADS = 4;
+  private static final int CALLBACK_DISPATCH_QUEUE_CAPACITY = 256;
   private static final ScheduledExecutorService SCHEDULER = createScheduler();
+  private static final ExecutorService OPENING_CALLBACK_EXECUTOR = createOpeningCallbackExecutor();
   private static final ExecutorService TERMINAL_CALLBACK_EXECUTOR =
       createTerminalCallbackExecutor();
   private static final ExecutorService LIFECYCLE_EXECUTOR =
@@ -83,14 +84,22 @@ public final class SseTransport {
   }
 
   static ThreadPoolExecutor createTerminalCallbackExecutor() {
+    return createBoundedCallbackExecutor("alpaca-sse-terminal-callback");
+  }
+
+  static ThreadPoolExecutor createOpeningCallbackExecutor() {
+    return createBoundedCallbackExecutor("alpaca-sse-opening-callback");
+  }
+
+  private static ThreadPoolExecutor createBoundedCallbackExecutor(String threadName) {
     return new ThreadPoolExecutor(
-        TERMINAL_CALLBACK_THREADS,
-        TERMINAL_CALLBACK_THREADS,
+        CALLBACK_DISPATCH_THREADS,
+        CALLBACK_DISPATCH_THREADS,
         0,
         TimeUnit.MILLISECONDS,
-        new ArrayBlockingQueue<>(TERMINAL_CALLBACK_QUEUE_CAPACITY),
+        new ArrayBlockingQueue<>(CALLBACK_DISPATCH_QUEUE_CAPACITY),
         runnable -> {
-          Thread thread = new Thread(runnable, "alpaca-sse-terminal-callback");
+          Thread thread = new Thread(runnable, threadName);
           thread.setDaemon(true);
           return thread;
         },
@@ -200,6 +209,7 @@ public final class SseTransport {
             decodeFailurePolicy,
             resumeRequest,
             SCHEDULER,
+            OPENING_CALLBACK_EXECUTOR,
             TERMINAL_CALLBACK_EXECUTOR,
             System::nanoTime);
     session.start();
@@ -222,6 +232,7 @@ public final class SseTransport {
         decoder,
         listener,
         SCHEDULER,
+        OPENING_CALLBACK_EXECUTOR,
         TERMINAL_CALLBACK_EXECUTOR,
         nanoTime);
   }
@@ -243,6 +254,7 @@ public final class SseTransport {
         decoder,
         listener,
         scheduler,
+        OPENING_CALLBACK_EXECUTOR,
         TERMINAL_CALLBACK_EXECUTOR,
         nanoTime);
   }
@@ -257,6 +269,30 @@ public final class SseTransport {
       ScheduledExecutorService scheduler,
       Executor terminalCallbackExecutor,
       LongSupplier nanoTime) {
+    return openForTesting(
+        httpClient,
+        request,
+        options,
+        bounded,
+        decoder,
+        listener,
+        scheduler,
+        OPENING_CALLBACK_EXECUTOR,
+        terminalCallbackExecutor,
+        nanoTime);
+  }
+
+  static <T> AlpacaSseSubscription openForTesting(
+      OkHttpClient httpClient,
+      Request request,
+      AlpacaSseOptions options,
+      boolean bounded,
+      SseDecoder<T> decoder,
+      AlpacaSseListener<T> listener,
+      ScheduledExecutorService scheduler,
+      Executor openingCallbackExecutor,
+      Executor terminalCallbackExecutor,
+      LongSupplier nanoTime) {
     var session =
         new Session<>(
             httpClient,
@@ -269,6 +305,7 @@ public final class SseTransport {
             SseDecodeFailurePolicy.TERMINATE,
             SseTransport::withLastEventIdHeader,
             scheduler,
+            openingCallbackExecutor,
             terminalCallbackExecutor,
             nanoTime);
     session.start();
@@ -309,6 +346,7 @@ public final class SseTransport {
     private final SseDecodeFailurePolicy decodeFailurePolicy;
     private final BiFunction<Request, String, Request> resumeRequest;
     private final ScheduledExecutorService scheduler;
+    private final Executor openingCallbackExecutor;
     private final Executor terminalCallbackExecutor;
     private final LongSupplier nanoTime;
     private final Object lifecycleLock = new Object();
@@ -355,6 +393,7 @@ public final class SseTransport {
         SseDecodeFailurePolicy decodeFailurePolicy,
         BiFunction<Request, String, Request> resumeRequest,
         ScheduledExecutorService scheduler,
+        Executor openingCallbackExecutor,
         Executor terminalCallbackExecutor,
         LongSupplier nanoTime) {
       this.httpClient =
@@ -375,6 +414,9 @@ public final class SseTransport {
           Objects.requireNonNull(decodeFailurePolicy, "decodeFailurePolicy must not be null");
       this.resumeRequest = Objects.requireNonNull(resumeRequest, "resumeRequest must not be null");
       this.scheduler = Objects.requireNonNull(scheduler, "scheduler must not be null");
+      this.openingCallbackExecutor =
+          Objects.requireNonNull(
+              openingCallbackExecutor, "openingCallbackExecutor must not be null");
       this.terminalCallbackExecutor =
           Objects.requireNonNull(
               terminalCallbackExecutor, "terminalCallbackExecutor must not be null");
@@ -569,8 +611,9 @@ public final class SseTransport {
                   reconnect ? "onReconnected" : "onOpen",
                   reconnect ? listener::onReconnected : listener::onOpen);
         }
+        startIndependently(openCallback);
         if (!reconnect) openedFuture.complete(connectionInfo);
-        startAndAwait(openCallback);
+        await(openCallback);
         readBody(response.body());
         if (terminal) return;
         if (bounded) {
@@ -917,6 +960,58 @@ public final class SseTransport {
 
     private void startAndAwait(EnqueuedCallback enqueued) {
       start(enqueued);
+      await(enqueued);
+    }
+
+    private void startIndependently(EnqueuedCallback enqueued) {
+      if (!enqueued.startDrain()) return;
+      var handoff = new CompletableFuture<Void>();
+      try {
+        openingCallbackExecutor.execute(
+            () -> {
+              try {
+                callbackExecutor.execute(
+                    () -> {
+                      handoff.complete(null);
+                      callbackDispatcher.drain();
+                    });
+                handoff.complete(null);
+              } catch (RuntimeException failure) {
+                var rejected =
+                    failure instanceof RejectedExecutionException rejection
+                        ? rejection
+                        : new RejectedExecutionException(
+                            "SSE callback executor failed " + enqueued.task().name, failure);
+                callbackDispatcher.rejectPending(rejected);
+                handoff.completeExceptionally(
+                    new AlpacaSseCallbackException(
+                        "SSE callback executor rejected " + enqueued.task().name, rejected));
+              }
+            });
+      } catch (RuntimeException failure) {
+        var rejected =
+            failure instanceof RejectedExecutionException rejection
+                ? rejection
+                : new RejectedExecutionException(
+                    "SSE opening callback dispatcher failed " + enqueued.task().name, failure);
+        callbackDispatcher.rejectPending(rejected);
+        handoff.completeExceptionally(
+            new AlpacaSseCallbackException(
+                "SSE opening callback dispatcher rejected " + enqueued.task().name, rejected));
+      }
+      try {
+        handoff.get();
+      } catch (InterruptedException failure) {
+        Thread.currentThread().interrupt();
+        throw new AlpacaSseCallbackException(
+            "Interrupted while starting " + enqueued.task().name, failure);
+      } catch (ExecutionException failure) {
+        throw new AlpacaSseCallbackException(
+            "Failed to start " + enqueued.task().name, failure.getCause());
+      }
+    }
+
+    private void await(EnqueuedCallback enqueued) {
       try {
         enqueued.task().completion.get();
       } catch (InterruptedException failure) {
@@ -966,6 +1061,7 @@ public final class SseTransport {
       }
       completion.complete(result);
       if (acceptedConnection != null) {
+        enqueueTerminal("onClosed", () -> listener.onClosed(result));
         openedFuture.complete(acceptedConnection);
       } else if (!openedFuture.isDone()) {
         if (result.reason() == AlpacaSseCloseResult.Reason.USER_CLOSED) {
@@ -975,7 +1071,9 @@ public final class SseTransport {
               new AlpacaSseException("SSE subscription closed before opening: " + result.reason()));
         }
       }
-      enqueueTerminal("onClosed", () -> listener.onClosed(result));
+      if (acceptedConnection == null) {
+        enqueueTerminal("onClosed", () -> listener.onClosed(result));
+      }
     }
 
     private void fail(Throwable failure) {
@@ -1011,11 +1109,12 @@ public final class SseTransport {
       }
       completion.completeExceptionally(failure);
       if (acceptedConnection != null) {
+        enqueueTerminal("onFailure", () -> listener.onFailure(failure));
         openedFuture.complete(acceptedConnection);
       } else {
         openedFuture.completeExceptionally(failure);
+        enqueueTerminal("onFailure", () -> listener.onFailure(failure));
       }
-      enqueueTerminal("onFailure", () -> listener.onFailure(failure));
     }
 
     private void awaitTerminalSettlement() {
