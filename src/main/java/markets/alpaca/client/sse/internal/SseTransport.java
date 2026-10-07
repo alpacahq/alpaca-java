@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -56,12 +57,13 @@ public final class SseTransport {
   private static final Executor DIRECT_EXECUTOR = Runnable::run;
   private static final int CALLBACK_DISPATCH_THREADS = 4;
   private static final int CALLBACK_DISPATCH_QUEUE_CAPACITY = 256;
+  private static final ThreadLocal<Boolean> COMPLETION_WORKER =
+      ThreadLocal.withInitial(() -> false);
   private static final ScheduledExecutorService SCHEDULER = createScheduler();
   private static final ExecutorService OPENING_CALLBACK_EXECUTOR = createOpeningCallbackExecutor();
   private static final ExecutorService TERMINAL_CALLBACK_EXECUTOR =
       createTerminalCallbackExecutor();
-  private static final ExecutorService COMPLETION_EXECUTOR =
-      createBoundedCallbackExecutor("alpaca-sse-completion");
+  private static final ExecutorService COMPLETION_EXECUTOR = createCompletionExecutor();
   private static final ExecutorService LIFECYCLE_EXECUTOR =
       Executors.newCachedThreadPool(
           runnable -> {
@@ -91,6 +93,27 @@ public final class SseTransport {
 
   static ThreadPoolExecutor createOpeningCallbackExecutor() {
     return createBoundedCallbackExecutor("alpaca-sse-opening-callback");
+  }
+
+  static ThreadPoolExecutor createCompletionExecutor() {
+    return new ThreadPoolExecutor(
+        CALLBACK_DISPATCH_THREADS,
+        CALLBACK_DISPATCH_THREADS,
+        0,
+        TimeUnit.MILLISECONDS,
+        new LinkedBlockingQueue<>(),
+        runnable -> {
+          Thread thread =
+              new Thread(
+                  () -> {
+                    COMPLETION_WORKER.set(true);
+                    runnable.run();
+                  },
+                  "alpaca-sse-completion");
+          thread.setDaemon(true);
+          return thread;
+        },
+        new ThreadPoolExecutor.AbortPolicy());
   }
 
   private static ThreadPoolExecutor createBoundedCallbackExecutor(String threadName) {
@@ -213,6 +236,7 @@ public final class SseTransport {
             SCHEDULER,
             OPENING_CALLBACK_EXECUTOR,
             TERMINAL_CALLBACK_EXECUTOR,
+            COMPLETION_EXECUTOR,
             System::nanoTime);
     session.start();
     return session;
@@ -295,6 +319,32 @@ public final class SseTransport {
       Executor openingCallbackExecutor,
       Executor terminalCallbackExecutor,
       LongSupplier nanoTime) {
+    return openForTesting(
+        httpClient,
+        request,
+        options,
+        bounded,
+        decoder,
+        listener,
+        scheduler,
+        openingCallbackExecutor,
+        terminalCallbackExecutor,
+        COMPLETION_EXECUTOR,
+        nanoTime);
+  }
+
+  static <T> AlpacaSseSubscription openForTesting(
+      OkHttpClient httpClient,
+      Request request,
+      AlpacaSseOptions options,
+      boolean bounded,
+      SseDecoder<T> decoder,
+      AlpacaSseListener<T> listener,
+      ScheduledExecutorService scheduler,
+      Executor openingCallbackExecutor,
+      Executor terminalCallbackExecutor,
+      Executor completionExecutor,
+      LongSupplier nanoTime) {
     var session =
         new Session<>(
             httpClient,
@@ -309,6 +359,7 @@ public final class SseTransport {
             scheduler,
             openingCallbackExecutor,
             terminalCallbackExecutor,
+            completionExecutor,
             nanoTime);
     session.start();
     return session;
@@ -350,6 +401,7 @@ public final class SseTransport {
     private final ScheduledExecutorService scheduler;
     private final Executor openingCallbackExecutor;
     private final Executor terminalCallbackExecutor;
+    private final Executor completionExecutor;
     private final LongSupplier nanoTime;
     private final Object lifecycleLock = new Object();
     private final SerialCallbackDispatcher callbackDispatcher = new SerialCallbackDispatcher();
@@ -397,6 +449,7 @@ public final class SseTransport {
         ScheduledExecutorService scheduler,
         Executor openingCallbackExecutor,
         Executor terminalCallbackExecutor,
+        Executor completionExecutor,
         LongSupplier nanoTime) {
       this.httpClient =
           Objects.requireNonNull(httpClient, "httpClient must not be null")
@@ -422,6 +475,8 @@ public final class SseTransport {
       this.terminalCallbackExecutor =
           Objects.requireNonNull(
               terminalCallbackExecutor, "terminalCallbackExecutor must not be null");
+      this.completionExecutor =
+          Objects.requireNonNull(completionExecutor, "completionExecutor must not be null");
       this.nanoTime = Objects.requireNonNull(nanoTime, "nanoTime must not be null");
       this.lastEventId = new AtomicReference<>(options.initialLastEventId());
     }
@@ -938,7 +993,12 @@ public final class SseTransport {
     }
 
     private EnqueuedCallback admitTerminal(String name, Runnable callback) {
-      return callbackDispatcher.enqueue(name, callback);
+      return callbackDispatcher.enqueue(
+          name,
+          () -> {
+            awaitTerminalSettlement();
+            callback.run();
+          });
     }
 
     private void startTerminal(EnqueuedCallback enqueued) {
@@ -1090,9 +1150,9 @@ public final class SseTransport {
       }
       EnqueuedCallback terminalCallback =
           admitTerminal("onClosed", () -> listener.onClosed(result));
+      startTerminal(terminalCallback);
       settleCompletion(() -> completion.complete(result));
       awaitTerminalSettlement();
-      startTerminal(terminalCallback);
       if (acceptedConnection != null) {
         openedFuture.complete(acceptedConnection);
       } else if (!openedFuture.isDone()) {
@@ -1138,9 +1198,9 @@ public final class SseTransport {
       }
       EnqueuedCallback terminalCallback =
           admitTerminal("onFailure", () -> listener.onFailure(failure));
+      startTerminal(terminalCallback);
       settleCompletion(() -> completion.completeExceptionally(failure));
       awaitTerminalSettlement();
-      startTerminal(terminalCallback);
       if (acceptedConnection != null) {
         openedFuture.complete(acceptedConnection);
       } else {
@@ -1149,14 +1209,10 @@ public final class SseTransport {
     }
 
     private void settleCompletion(Runnable settlement) {
-      try {
-        COMPLETION_EXECUTOR.execute(settlement);
-      } catch (RejectedExecutionException rejected) {
-        LOG.log(
-            Level.WARNING,
-            "SSE completion dispatcher saturated; using lifecycle fallback",
-            rejected);
-        LIFECYCLE_EXECUTOR.execute(settlement);
+      if (Boolean.TRUE.equals(COMPLETION_WORKER.get())) {
+        settlement.run();
+      } else {
+        completionExecutor.execute(settlement);
       }
     }
 

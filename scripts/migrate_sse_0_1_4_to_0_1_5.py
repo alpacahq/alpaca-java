@@ -17,8 +17,12 @@ from typing import Iterable
 
 
 BROKER_SUBSCRIPTION = "markets.alpaca.client.broker.sse.BrokerSseSubscription"
+BROKER_EVENTS_CLIENT = "markets.alpaca.client.broker.sse.BrokerEventsSseClient"
 EXACT_IMPORT = re.compile(
     rf"(?m)^\s*import\s+{re.escape(BROKER_SUBSCRIPTION)}\s*;"
+)
+EXACT_CLIENT_IMPORT = re.compile(
+    rf"(?m)^\s*import\s+{re.escape(BROKER_EVENTS_CLIENT)}\s*;"
 )
 BROKER_DECLARATION = re.compile(
     rf"\b(?P<type>BrokerSseSubscription|{re.escape(BROKER_SUBSCRIPTION)})\s+"
@@ -26,6 +30,16 @@ BROKER_DECLARATION = re.compile(
 )
 BROKER_TYPE_DECLARATION = re.compile(
     r"\b(?:class|interface|enum|record|@interface)\s+BrokerSseSubscription\b"
+)
+BROKER_CLIENT_DECLARATION = re.compile(
+    rf"\b(?P<type>BrokerEventsSseClient|{re.escape(BROKER_EVENTS_CLIENT)})\s+"
+    r"(?P<name>[A-Za-z_$][\w$]*)\b(?!\s*\()"
+)
+BROKER_CLIENT_TYPE_DECLARATION = re.compile(
+    r"\b(?:class|interface|enum|record|@interface)\s+BrokerEventsSseClient\b"
+)
+BROKER_CLIENT_TYPE_PARAMETER = re.compile(
+    r"(?:<|,)\s*BrokerEventsSseClient\s+extends\b"
 )
 JAVA_IDENTIFIER = r"[A-Za-z_$][\w$]*"
 TYPE_DECLARATION = re.compile(
@@ -54,6 +68,9 @@ NON_TYPE_KEYWORDS = {
 CANCEL_CALL = re.compile(
     r"\b([A-Za-z_$][\w$]*)\s*\.\s*eventSource\s*\(\s*\)"
     r"\s*\.\s*cancel\s*\(\s*\)"
+)
+HANDWRITTEN_SINGLE_EVENT_CALL = re.compile(
+    rf"\b(?P<receiver>{JAVA_IDENTIFIER})\s*\.\s*getAccountActivityEventAsync\s*\("
 )
 
 
@@ -146,6 +163,19 @@ def _broker_binders(mask: str, *, has_exact_import: bool) -> dict[str, list[int]
     for declaration in BROKER_DECLARATION.finditer(mask):
         type_name = declaration.group("type")
         if type_name == BROKER_SUBSCRIPTION or has_exact_import:
+            binders.setdefault(declaration.group("name"), []).append(
+                declaration.start("name")
+            )
+    return binders
+
+
+def _broker_client_binders(
+    mask: str, *, has_exact_import: bool
+) -> dict[str, list[int]]:
+    binders: dict[str, list[int]] = {}
+    for declaration in BROKER_CLIENT_DECLARATION.finditer(mask):
+        type_name = declaration.group("type")
+        if type_name == BROKER_EVENTS_CLIENT or has_exact_import:
             binders.setdefault(declaration.group("name"), []).append(
                 declaration.start("name")
             )
@@ -335,6 +365,25 @@ def _binder_visible_to_call(
     return False
 
 
+def _field_binder_visible_to_call(
+    mask: str,
+    binder: int,
+    call: int,
+    brace_pairs: dict[int, int],
+    type_bodies: tuple[tuple[int, int], ...],
+) -> bool:
+    call_type = _enclosing_type(type_bodies, call)
+    if call_type is None or _enclosing_type(type_bodies, binder) != call_type:
+        return False
+    call_ancestry = _brace_ancestry(brace_pairs, call)
+    binder_ancestry = _brace_ancestry(brace_pairs, binder)
+    type_depth = call_ancestry.index(call_type[0]) + 1
+    return (
+        len(binder_ancestry) == type_depth
+        and binder_ancestry == call_ancestry[:type_depth]
+    )
+
+
 def _contains_masked_syntax(text: str, mask: str, start: int, end: int) -> bool:
     return any(
         original != masked and not original.isspace()
@@ -343,15 +392,22 @@ def _contains_masked_syntax(text: str, mask: str, start: int, end: int) -> bool:
 
 
 def _diagnostic_patterns(
-    mask: str, *, sse_context: bool
+    mask: str, *, sse_context: bool, ignored_generated_sse_offsets: set[int]
 ) -> Iterable[tuple[int, str, str]]:
     generated_sse = re.compile(
         r"\.\s*(?:(?:subscribeTo|suscribeTo)[A-Za-z0-9_]*SSE"
         r"|getV1EventsNta|getAccountActivityEvent)"
         r"(?:Call|WithHttpInfo|Async)?\s*\("
     )
-    match = generated_sse.search(mask)
-    if match:
+    match = next(
+        (
+            candidate
+            for candidate in generated_sse.finditer(mask)
+            if candidate.start() not in ignored_generated_sse_offsets
+        ),
+        None,
+    )
+    if match is not None:
         yield (
             match.start(),
             "SSE006",
@@ -404,7 +460,15 @@ def analyze_text(text: str, path: str = "<memory>") -> Analysis:
     mask = _code_mask(text)
     has_exact_import = bool(EXACT_IMPORT.search(mask))
     has_shadowing_type = bool(BROKER_TYPE_DECLARATION.search(mask))
+    has_exact_client_import = bool(EXACT_CLIENT_IMPORT.search(mask))
+    has_shadowing_client_type = bool(
+        BROKER_CLIENT_TYPE_DECLARATION.search(mask)
+        or BROKER_CLIENT_TYPE_PARAMETER.search(mask)
+    )
     broker_binders = _broker_binders(mask, has_exact_import=has_exact_import)
+    broker_client_binders = _broker_client_binders(
+        mask, has_exact_import=has_exact_client_import
+    )
     all_binders = _all_binders(mask)
     brace_pairs = _brace_pairs(mask)
     parenthesis_pairs = _parenthesis_pairs(mask)
@@ -473,8 +537,72 @@ def analyze_text(text: str, path: str = "<memory>") -> Analysis:
     for start, end, replacement in reversed(replacements):
         migrated = migrated[:start] + replacement + migrated[end:]
 
+    ignored_generated_sse_offsets: set[int] = set()
+    if not has_shadowing_client_type:
+        for call in HANDWRITTEN_SINGLE_EVENT_CALL.finditer(mask):
+            receiver = call.group("receiver")
+            visible_client_binders = [
+                binder
+                for binder in broker_client_binders.get(receiver, ())
+                if _binder_visible_to_call(
+                    mask,
+                    binder,
+                    call.start(),
+                    brace_pairs,
+                    parenthesis_pairs,
+                    type_bodies,
+                )
+                or _field_binder_visible_to_call(
+                    mask, binder, call.start(), brace_pairs, type_bodies
+                )
+            ]
+            visible_binders = [
+                binder
+                for binder in all_binders.get(receiver, ())
+                if _binder_visible_to_call(
+                    mask,
+                    binder,
+                    call.start(),
+                    brace_pairs,
+                    parenthesis_pairs,
+                    type_bodies,
+                )
+                or _field_binder_visible_to_call(
+                    mask, binder, call.start(), brace_pairs, type_bodies
+                )
+            ]
+            if (
+                _is_bare_receiver(mask, call.start("receiver"))
+                and len(broker_client_binders.get(receiver, ())) == 1
+                and len(visible_client_binders) == 1
+                and (
+                    (
+                        len(all_binders.get(receiver, ())) == 1
+                        and len(visible_binders) == 1
+                        and set(visible_client_binders) == set(visible_binders)
+                    )
+                    or (
+                        receiver not in all_binders
+                        and _field_binder_visible_to_call(
+                            mask,
+                            visible_client_binders[0],
+                            call.start(),
+                            brace_pairs,
+                            type_bodies,
+                        )
+                    )
+                )
+            ):
+                ignored_generated_sse_offsets.add(
+                    mask.index(".", call.end("receiver"), call.end())
+                )
+
     sse_context = "BrokerSseEventListener" in mask or "eventSource" in mask
-    for offset, code, message in _diagnostic_patterns(mask, sse_context=sse_context):
+    for offset, code, message in _diagnostic_patterns(
+        mask,
+        sse_context=sse_context,
+        ignored_generated_sse_offsets=ignored_generated_sse_offsets,
+    ):
         findings.append(Finding(path, _line(text, offset), code, message))
 
     return Analysis(
