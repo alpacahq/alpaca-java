@@ -317,7 +317,11 @@ details without OAS discriminants use a unique-most-specific field match and fai
 activity type remains `CSD` for cash deposits, but because the pinned OAS lacks a dedicated CSD
 detail schema, those details are temporarily represented as `CSWActivityV2`; undeclared fields
 remain available through `getAdditionalProperties()`. The deprecated `/v1/events/transfers/status`
-operation is not wrapped; use the supported funding-status stream.
+operation is not wrapped; use the supported funding-status stream. Admin-action events use their
+required `type` field to select the generated legacy-note, liquidation, or transaction-cancel
+model while retaining `SubscribeToAdminActionSSE200ResponseInner` as the listener type. Missing,
+unknown, or schema-invalid admin-action types invoke the malformed-event callback and follow the
+same continue-and-advance policy as other Broker decode failures.
 
 New listeners can use `onEventFailure(...)` for malformed-event ID/type metadata,
 `onHttpFailure(...)` for structured HTTP failures, `onRetryChanged(...)` for server retry hints,

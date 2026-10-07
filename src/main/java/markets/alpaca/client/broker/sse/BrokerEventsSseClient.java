@@ -208,7 +208,7 @@ public final class BrokerEventsSseClient {
             .subscribeToAdminActionSSECall(
                 options.since(), options.until(), options.sinceId(), options.untilId(), null)
             .request(),
-        SubscribeToAdminActionSSE200ResponseInner.class,
+        new BrokerAdminActionEventDecoder()::decode,
         listener);
   }
 

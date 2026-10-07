@@ -1317,6 +1317,170 @@ class SseTransportTest {
   }
 
   @Test
+  void concurrentCloseCallersReturnOnlyAfterCompletionSettles() {
+    assertTimeoutPreemptively(
+        Duration.ofSeconds(30),
+        () -> {
+          for (int iteration = 0; iteration < 100; iteration++) {
+            server.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
+            var subscription =
+                SseTransport.open(
+                    httpClient,
+                    new Request.Builder().url(server.url("/events")).build(),
+                    AlpacaSseOptions.reconnectDisabled(),
+                    false,
+                    data -> data,
+                    new AlpacaSseListener<>() {});
+            var ready = new CountDownLatch(2);
+            var start = new CountDownLatch(1);
+            ExecutorService closers = Executors.newFixedThreadPool(2);
+            try {
+              var first =
+                  closers.submit(
+                      () -> {
+                        ready.countDown();
+                        start.await();
+                        subscription.close();
+                        return subscription.completion().isDone();
+                      });
+              var second =
+                  closers.submit(
+                      () -> {
+                        ready.countDown();
+                        start.await();
+                        subscription.close();
+                        return subscription.completion().isDone();
+                      });
+              assertTrue(ready.await(1, TimeUnit.SECONDS));
+              start.countDown();
+              assertTrue(first.get(1, TimeUnit.SECONDS));
+              assertTrue(second.get(1, TimeUnit.SECONDS));
+            } finally {
+              closers.shutdownNow();
+            }
+            assertEquals(
+                AlpacaSseCloseResult.Reason.USER_CLOSED, subscription.completion().join().reason());
+          }
+        });
+  }
+
+  @Test
+  void closingFromOpenedContinuationPreservesAcceptedConnectionAndCallbackOrder() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setHeadersDelay(100, TimeUnit.MILLISECONDS)
+            .setBodyDelay(5, TimeUnit.SECONDS)
+            .setBody(":\n\n"));
+    var callbacks = new java.util.concurrent.CopyOnWriteArrayList<String>();
+    var closed = new CountDownLatch(1);
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onOpen() {
+                callbacks.add("open");
+              }
+
+              @Override
+              public void onClosed(AlpacaSseCloseResult result) {
+                callbacks.add("closed");
+                closed.countDown();
+              }
+            });
+
+    var accepted = subscription.opened();
+    var closedFromOpened = accepted.thenRun(subscription::close);
+
+    closedFromOpened.get(2, TimeUnit.SECONDS);
+    assertNotNull(accepted.get(1, TimeUnit.SECONDS));
+    assertEquals(
+        AlpacaSseCloseResult.Reason.USER_CLOSED,
+        subscription.completion().get(1, TimeUnit.SECONDS).reason());
+    assertTrue(closed.await(2, TimeUnit.SECONDS));
+    assertEquals(java.util.List.of("open", "closed"), callbacks);
+  }
+
+  @Test
+  void closingFromReconnectedCallbackPreservesLifecycleOrder() throws Exception {
+    server.enqueue(new MockResponse().setHeader("Content-Type", "text/event-stream").setBody(""));
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBodyDelay(5, TimeUnit.SECONDS)
+            .setBody(":\n\n"));
+    var callbacks = new java.util.concurrent.CopyOnWriteArrayList<String>();
+    var closed = new CountDownLatch(1);
+    var subscriptionReady = new CountDownLatch(1);
+    var subscriptionRef = new AtomicReference<markets.alpaca.client.sse.AlpacaSseSubscription>();
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            reconnectOptions(Duration.ofMillis(100)),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onOpen() {
+                callbacks.add("open");
+              }
+
+              @Override
+              public void onReconnected() {
+                callbacks.add("reconnected");
+                try {
+                  subscriptionReady.await();
+                } catch (InterruptedException failure) {
+                  Thread.currentThread().interrupt();
+                  throw new AssertionError("interrupted before subscription publication", failure);
+                }
+                subscriptionRef.get().close();
+              }
+
+              @Override
+              public void onClosed(AlpacaSseCloseResult result) {
+                callbacks.add("closed");
+                closed.countDown();
+              }
+            });
+    subscriptionRef.set(subscription);
+    subscriptionReady.countDown();
+
+    assertTrue(closed.await(3, TimeUnit.SECONDS));
+    assertEquals(
+        AlpacaSseCloseResult.Reason.USER_CLOSED,
+        subscription.completion().get(1, TimeUnit.SECONDS).reason());
+    assertTrue(subscription.opened().isDone());
+    assertEquals(java.util.List.of("open", "reconnected", "closed"), callbacks);
+  }
+
+  @Test
+  void closeAfterFailureReturnsWithExceptionalCompletionAlreadySettled() throws Exception {
+    server.enqueue(new MockResponse().setResponseCode(403).setBody("forbidden"));
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {});
+
+    assertThrows(
+        ExecutionException.class, () -> subscription.completion().get(2, TimeUnit.SECONDS));
+    subscription.close();
+
+    assertTrue(subscription.completion().isCompletedExceptionally());
+    assertEquals(AlpacaSseState.FAILED, subscription.state());
+  }
+
+  @Test
   void immediateCloseStressDoesNotLeaveConnectingSubscriptions() {
     assertTimeoutPreemptively(
         Duration.ofSeconds(30),

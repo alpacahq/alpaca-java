@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import markets.alpaca.client.AlpacaClientFactory;
 import markets.alpaca.client.AlpacaCredentials;
+import markets.alpaca.client.openapi.broker.model.AdminActionLiquidation;
+import markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner;
 import markets.alpaca.client.openapi.broker.model.TradeUpdateEventV2;
 import markets.alpaca.client.sse.AlpacaSseCallbackException;
 import markets.alpaca.client.sse.AlpacaSseCloseResult;
@@ -97,6 +99,52 @@ class BrokerEventsSseClientTest {
     assertTrue(userAgent.startsWith("APCA-JAVA/"));
     assertNotNull(received.get());
     assertEquals("evt-1", received.get().getEventId());
+  }
+
+  @Test
+  void subscribeToAdminActions_decodesDiscriminatedConcreteEvent() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody(
+                "data: "
+                    + BrokerAdminActionEventDecoderTest.adminActionJson(
+                        "liquidation_admin_event",
+                        """
+                        {
+                          "available_qty":"0.0001",
+                          "error":"",
+                          "reason":"risk",
+                          "requested_qty":"0.0001",
+                          "symbol":"TSLA"
+                        }
+                        """)
+                    + "\n\n"));
+
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS, httpClient);
+    brokerClient.setBasePath(serverBasePath());
+    var sse = new BrokerEventsSseClient(brokerClient);
+    var received = new AtomicReference<SubscribeToAdminActionSSE200ResponseInner>();
+    var eventLatch = new CountDownLatch(1);
+
+    try (var subscription =
+        sse.subscribeToAdminActions(
+            BrokerSseDateTimeOptions.empty(),
+            new BrokerSseEventListener<>() {
+              @Override
+              public void onEvent(SubscribeToAdminActionSSE200ResponseInner event) {
+                received.set(event);
+                eventLatch.countDown();
+              }
+            })) {
+      assertTrue(eventLatch.await(3, TimeUnit.SECONDS), "admin-action event must be delivered");
+    }
+
+    assertInstanceOf(AdminActionLiquidation.class, received.get().getActualInstance());
+    var request = server.takeRequest(3, TimeUnit.SECONDS);
+    assertNotNull(request);
+    assertEquals("/v2/events/admin-actions", request.getPath());
   }
 
   @Test

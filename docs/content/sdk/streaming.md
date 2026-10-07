@@ -39,12 +39,13 @@ terminal delivery that is not already queued behind an active callback starts th
 terminal-dispatch worker. If a handler writes to a database, calls a network service, or performs
 blocking work, use a factory overload that accepts an application-owned `Executor`.
 
-Transport lifecycle does not wait for user callbacks: `close()` completes the subscription and
-cancels transport work before returning, while the serialized terminal listener callback runs
-after callbacks already in progress. Lifecycle timers also remain independent of callback
-execution. Event callbacks backpressure response parsing, however, so a blocked callback can delay
-detection of remote EOF and the following reconnect. Sharing one single-thread executor across
-subscriptions intentionally serializes their callbacks.
+Transport lifecycle does not wait for user callbacks: `close()` cancels transport work and waits
+for lifecycle completion to settle before returning, while the serialized terminal listener
+callback runs after callbacks already admitted. If a failure wins a concurrent terminal transition,
+`close()` observes its settled exceptional completion without rethrowing it. Lifecycle timers also
+remain independent of callback execution. Event callbacks backpressure response parsing, however,
+so a blocked callback can delay detection of remote EOF and the following reconnect. Sharing one
+single-thread executor across subscriptions intentionally serializes their callbacks.
 
 The SDK terminal dispatcher has finite workers and queue capacity so blocked listeners cannot
 create unbounded threads. Under dispatcher saturation, lifecycle completion remains authoritative,
@@ -64,6 +65,8 @@ SSE subscriptions return immediately while the HTTP connection opens. Use `opene
 caller-chosen timeout instead of building a startup latch; it yields immutable response URI, status,
 and header metadata. `connection()` reports the most recently accepted connection and changes after
 reconnects, while `opened()` always retains the initial connection.
+Once response headers are accepted, `opened()` completes successfully and the ordered `onOpen`
+callback remains ahead of a concurrent terminal callback.
 
 ```java
 var connection = subscription.opened().get(10, TimeUnit.SECONDS);
@@ -393,6 +396,9 @@ callbacks are serialized and provide backpressure; use a dedicated executor for 
 retaining Broker-specific compatibility methods.
 For compatibility, a malformed Broker event invokes `onFailure` for that event and the healthy
 connection continues. Its SSE ID becomes the `Last-Event-ID` transport cursor after the callback.
+Admin-action streams retain the generated `SubscribeToAdminActionSSE200ResponseInner` listener
+type, while the required `type` field selects its concrete generated model without relying on the
+ambiguous generated `oneOf` adapter.
 Broker endpoints document endpoint-specific `since_id`/`since_ulid` query cursors, so applications
 that require gap replay should reconnect with the appropriate request option and deduplicate.
 Protocol and non-retryable HTTP failures are terminal;
