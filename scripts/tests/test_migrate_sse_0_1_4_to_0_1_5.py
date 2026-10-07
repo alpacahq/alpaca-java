@@ -369,6 +369,27 @@ class AnalysisTests(unittest.TestCase):
                 result = migrate.analyze_text(source)
                 self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
 
+    def test_reports_generated_sse_method_references(self):
+        methods = (
+            "subscribeToActivitiesSSE",
+            "subscribeToCorporateActionsSSECall",
+            "subscribeToAccountStatusSSEAsync",
+            "suscribeToAccountStatusSSEWithHttpInfo",
+            "getV1EventsNtaCall",
+            "getAccountActivityEventAsync",
+        )
+
+        for method in methods:
+            with self.subTest(method=method):
+                source = (
+                    "class Example { GeneratedOperation bind(EventsApi api) { "
+                    f"return api::{method};"
+                    " } }"
+                )
+                result = migrate.analyze_text(source)
+                self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
+                self.assertIn("method usage", result.findings[0].message)
+
     def test_ignores_single_event_call_on_handwritten_broker_client(self):
         sources = (
             """
@@ -396,6 +417,26 @@ class AnalysisTests(unittest.TestCase):
                   private BrokerEventsSseClient client;
                 }
             """,
+            """
+                import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+                class Example {
+                  GeneratedOperation bind(BrokerEventsSseClient client) {
+                    return client::getAccountActivityEventAsync;
+                  }
+                }
+            """,
+            """
+                import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+                class Example {
+                  private BrokerEventsSseClient client;
+                  void fetch() {
+                    this.client.getAccountActivityEventAsync(null, "event");
+                  }
+                  GeneratedOperation bind() {
+                    return this.client::getAccountActivityEventAsync;
+                  }
+                }
+            """,
         )
 
         for source in sources:
@@ -403,9 +444,36 @@ class AnalysisTests(unittest.TestCase):
                 self.assertEqual((), migrate.analyze_text(source).findings)
 
     def test_reports_ambiguous_handwritten_client_lookalike(self):
+        sources = (
+            """
+                class BrokerEventsSseClient {}
+                class Example {
+                  void fetch(BrokerEventsSseClient client) {
+                    client.getAccountActivityEventAsync(null, "event");
+                  }
+                }
+            """,
+            """
+                class BrokerEventsSseClient {}
+                class Example {
+                  GeneratedOperation bind(BrokerEventsSseClient client) {
+                    return client::getAccountActivityEventAsync;
+                  }
+                }
+            """,
+        )
+
+        for source in sources:
+            with self.subTest(source=source):
+                result = migrate.analyze_text(source)
+                self.assertEqual(
+                    ["SSE006"], [finding.code for finding in result.findings]
+                )
+
+    def test_reports_shadowing_handwritten_client_type_parameter(self):
         source = """
-            class BrokerEventsSseClient {}
-            class Example {
+            import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+            class Example<BrokerEventsSseClient extends AccountsApi> {
               void fetch(BrokerEventsSseClient client) {
                 client.getAccountActivityEventAsync(null, "event");
               }
@@ -416,12 +484,14 @@ class AnalysisTests(unittest.TestCase):
 
         self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
 
-    def test_reports_shadowing_handwritten_client_type_parameter(self):
+    def test_reports_qualified_handwritten_client_receiver(self):
         source = """
             import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
-            class Example<BrokerEventsSseClient extends AccountsApi> {
-              void fetch(BrokerEventsSseClient client) {
-                client.getAccountActivityEventAsync(null, "event");
+            class Example {
+              private BrokerEventsSseClient client;
+              GeneratedOperation bind(Example other) {
+                other.client.getAccountActivityEventAsync(null, "event");
+                return other.client::getAccountActivityEventAsync;
               }
             }
         """

@@ -15,11 +15,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -94,12 +94,14 @@ public final class SseTransport {
   }
 
   static ThreadPoolExecutor createCompletionExecutor() {
+    // Do not queue terminal settlements behind synchronous continuations from other subscriptions.
+    // Threads are reused when continuations return; callers are documented to keep them short.
     return new ThreadPoolExecutor(
-        CALLBACK_DISPATCH_THREADS,
-        CALLBACK_DISPATCH_THREADS,
         0,
-        TimeUnit.MILLISECONDS,
-        new LinkedBlockingQueue<>(),
+        Integer.MAX_VALUE,
+        60,
+        TimeUnit.SECONDS,
+        new SynchronousQueue<>(),
         runnable -> {
           Thread thread = new Thread(runnable, "alpaca-sse-completion");
           thread.setDaemon(true);
@@ -1201,12 +1203,7 @@ public final class SseTransport {
     }
 
     private void settleCompletion(Runnable settlement) {
-      if (callbackDispatcher.invokingOnCurrentThread()
-          || completionExecutor != COMPLETION_EXECUTOR) {
-        completionExecutor.execute(settlement);
-      } else {
-        settlement.run();
-      }
+      completionExecutor.execute(settlement);
     }
 
     private void awaitTerminalSettlement() {
@@ -1323,12 +1320,7 @@ public final class SseTransport {
 
     private final class SerialCallbackDispatcher {
       private final ArrayDeque<CallbackTask> queue = new ArrayDeque<>();
-      private final ThreadLocal<Boolean> invoking = ThreadLocal.withInitial(() -> false);
       private boolean draining;
-
-      boolean invokingOnCurrentThread() {
-        return Boolean.TRUE.equals(invoking.get());
-      }
 
       synchronized EnqueuedCallback enqueue(String name, Runnable callback) {
         CallbackTask task = new CallbackTask(name, callback);
@@ -1348,8 +1340,6 @@ public final class SseTransport {
               return;
             }
           }
-          boolean alreadyInvoking = invokingOnCurrentThread();
-          invoking.set(true);
           try {
             task.callback.run();
             task.completion.complete(null);
@@ -1358,12 +1348,6 @@ public final class SseTransport {
             task.completion.complete(null);
           } catch (Throwable failure) {
             task.completion.completeExceptionally(failure);
-          } finally {
-            if (alreadyInvoking) {
-              invoking.set(true);
-            } else {
-              invoking.remove();
-            }
           }
         }
       }

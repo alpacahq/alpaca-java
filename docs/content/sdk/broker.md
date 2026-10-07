@@ -316,7 +316,9 @@ callback throws. Broker endpoints document endpoint-specific query cursors rathe
 details without OAS discriminants use a unique-most-specific field match and fail on ties. The
 activity type remains `CSD` for cash deposits, but because the pinned OAS lacks a dedicated CSD
 detail schema, those details are temporarily represented as `CSWActivityV2`; undeclared fields
-remain available through `getAdditionalProperties()`. The deprecated `/v1/events/transfers/status`
+remain available through `getAdditionalProperties()`. Tax-exempt dividend events similarly retain
+activity type `DIVTXEX` while using `CDIVActivityV2` details until a dedicated schema exists. The
+deprecated `/v1/events/transfers/status`
 operation is not wrapped; use the supported funding-status stream. Admin-action events use their
 required `type` field to select the generated legacy-note, liquidation, or transaction-cancel
 model while retaining `SubscribeToAdminActionSSE200ResponseInner` as the listener type. Missing,
@@ -336,7 +338,9 @@ it is not the live OkHttp implementation. Prefer `subscription.close()`. See
 
 Use `getAccountActivityEventAsync(accountId, eventId)` to re-fetch one previously observed
 Activity V2 event without invoking the generated SSE response decoder. The default timeout is 30
-seconds; use the overload accepting `Duration` to choose another positive limit.
+seconds; use the overload accepting `Duration` to choose another positive limit. Keep synchronous
+future continuations short and non-blocking, or use an async continuation with an application-owned
+executor.
 
 For the broader live-events model, listener callback guidance, and how Broker SSE differs from the
 WebSocket stream clients, see [Streaming and events](./streaming).

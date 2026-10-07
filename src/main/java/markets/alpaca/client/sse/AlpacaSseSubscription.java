@@ -32,6 +32,10 @@ public interface AlpacaSseSubscription extends AutoCloseable {
    * if closure races with opening. The ordered {@code onOpen} callback remains ahead of the
    * terminal listener callback.
    *
+   * <p>Keep synchronous continuations short. The lifecycle dependency above is supported, but use
+   * an asynchronous continuation such as {@code thenApplyAsync} with an application-owned executor
+   * for unrelated or potentially unbounded blocking work.
+   *
    * <p>If the subscription terminates before opening, {@link #completion()} is settled before this
    * future is cancelled or completed exceptionally. A synchronous opening continuation may
    * therefore safely inspect terminal completion.
@@ -48,6 +52,12 @@ public interface AlpacaSseSubscription extends AutoCloseable {
    * wait for an active user callback. Settlement is handed off from the active callback path, so a
    * synchronous completion continuation may wait for the ordered terminal listener even when the
    * active callback initiated closure.
+   *
+   * <p>Synchronous continuations run on isolated SDK lifecycle workers and must remain short. The
+   * ordered-terminal wait above is supported, and one subscription's blocked continuation does not
+   * queue another subscription's settlement. Use an asynchronous continuation such as {@code
+   * thenApplyAsync} with an application-owned executor for unrelated or potentially unbounded
+   * blocking work.
    */
   CompletableFuture<AlpacaSseCloseResult> completion();
 

@@ -441,13 +441,23 @@ public final class BrokerEventsSseClient {
 
   /**
    * Fetches one previously observed Broker activity event through its single-event SSE endpoint.
+   *
+   * <p>Keep synchronous continuations on the returned future short and non-blocking. Use an
+   * asynchronous continuation such as {@code thenApplyAsync} with an application-owned executor for
+   * blocking work.
    */
   public CompletableFuture<ActivityEventV2> getAccountActivityEventAsync(
       UUID accountId, String eventId) throws ApiException {
     return getAccountActivityEventAsync(accountId, eventId, Duration.ofSeconds(30));
   }
 
-  /** Fetches one Broker activity event, failing if no event arrives before {@code timeout}. */
+  /**
+   * Fetches one Broker activity event, failing if no event arrives before {@code timeout}.
+   *
+   * <p>Keep synchronous continuations on the returned future short and non-blocking. Use an
+   * asynchronous continuation such as {@code thenApplyAsync} with an application-owned executor for
+   * blocking work.
+   */
   public CompletableFuture<ActivityEventV2> getAccountActivityEventAsync(
       UUID accountId, String eventId, Duration timeout) throws ApiException {
     Objects.requireNonNull(timeout, "timeout must not be null");

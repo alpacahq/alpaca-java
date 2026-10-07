@@ -19,6 +19,10 @@ as `SSE001` for manual review. Control-flow header declarations are also report-
 unbraced statement's scope cannot be established safely by this text scanner. The type may use the
 exact import or its fully qualified class name. Missing paths and explicit non-Java inputs fail
 closed. The tool does not attempt to rewrite behavioral callback or threading changes.
+Diagnostic `SSE006` reports generated SSE method invocations and method references that should move
+to handwritten streaming clients. It does not report a uniquely bound imported or fully qualified
+`BrokerEventsSseClient.getAccountActivityEventAsync` receiver when used directly or through
+`this.receiver`; other qualified receivers remain findings.
 
 `BrokerSseSubscription` also implements `AlpacaSseSubscription` in `0.1.5`. This is additive and
 requires no source migration; it allows domain-neutral lifecycle code to accept existing Broker

@@ -55,10 +55,12 @@ declaration it cannot prove unique. Control-flow header declarations are also re
 an unbraced statement's scope cannot be established safely by this text scanner. It also reports
 ambiguous imports,
 `EventSource` casts/identity assumptions, raw Gson exception checks, deep OkHttp `Response` use,
-blocking callbacks, generated SSE calls, and listeners overriding both rich and legacy callbacks.
-Calls on a uniquely bound imported or fully qualified `BrokerEventsSseClient` are recognized as the
-handwritten replacement and are not reported as generated blocking calls. These deliberate false
-negatives keep `--write` source-safe; migrate `SSE001` findings manually.
+blocking callbacks, generated SSE invocations or method references, and listeners overriding both
+rich and legacy callbacks. Invocations and method references on a uniquely bound imported or fully
+qualified `BrokerEventsSseClient`, using either a bare receiver or `this.receiver`, are recognized
+as the handwritten replacement and are not reported as generated SSE usage. Other qualified
+receivers remain report-only. These deliberate false negatives keep `--write` source-safe; migrate
+`SSE001` findings manually.
 Missing input paths and explicit non-Java files fail with exit code 2 instead of producing an empty
 success report.
 
@@ -166,9 +168,12 @@ then waits for lifecycle completion to settle before invoking the listener. Clos
 callback startup is queued also releases the HTTP response thread without violating callback order;
 the already-admitted callbacks may finish later. Completion settlement is handed off from an active
 callback, so a callback may close even when a synchronous completion continuation waits for the
-ordered terminal listener. Other lifecycle paths settle on their initiating thread, preventing a
-blocking synchronous continuation from consuming a shared completion worker needed by unrelated
-subscriptions. Use an async continuation with an application-owned executor for blocking work.
+ordered terminal listener. Lifecycle completion uses isolated, direct-handoff SDK workers, so a
+blocked continuation for one subscription cannot queue another subscription's settlement or occupy
+the scheduler. Synchronous continuations must remain short because concurrently blocked
+continuations consume additional daemon workers. The related lifecycle wait above is supported; use
+an async continuation with an application-owned executor for unrelated or potentially unbounded
+blocking work.
 
 Once response headers are accepted, `opened()` succeeds with that connection even if closure races
 with opening. Its admitted `onOpen` callback starts independently before `opened()` continuations
@@ -193,12 +198,18 @@ documented `since_id` query parameter and in `Last-Event-ID`. Date-bounded retri
 original date range and can replay events. Existing Broker constructors keep the `0.1.4`
 one-connection default; pass `AlpacaSseOptions` to opt into Broker reconnects.
 
+Do not combine a non-empty `AlpacaSseOptions.initialLastEventId` with a date-bounded Trading
+request; `0.1.5` rejects that ambiguous combination before opening a connection. Use an ID-bounded
+request instead, and keep the initial ID at or before its `untilId`.
+
 Trading malformed payloads terminate the subscription without advancing the event cursor. Broker
 malformed payloads invoke `onEventFailure`, advance the cursor after callback invocation, and keep
 the healthy connection open. If that callback throws, the cursor still advances.
 Broker admin-action events retain `SubscribeToAdminActionSSE200ResponseInner` but now select its
 concrete generated model from the required `type` field; missing, unknown, or schema-invalid types
 follow that same malformed-event policy.
+Both Trading and Broker retain activity type `DIVTXEX` while representing its details as
+`CDIVActivityV2`; the pinned OAS accepts the type but does not provide a dedicated detail schema.
 
 Servers may replay the last event inclusively. Resume support provides at-least-once delivery, not
 exactly-once processing.

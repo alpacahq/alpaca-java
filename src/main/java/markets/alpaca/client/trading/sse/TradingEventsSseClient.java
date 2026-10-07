@@ -60,15 +60,30 @@ public final class TradingEventsSseClient {
     return subscribeToActivities(TradingActivitySseRequest.live(), listener);
   }
 
-  /** Opens an activity stream with the supplied history/boundary cursors. */
+  /**
+   * Opens an activity stream with the supplied history/boundary cursors.
+   *
+   * <p>A non-empty initial event ID in the client options cannot be combined with a date-bounded
+   * request. For an ID-bounded request, that initial ID must not be after the request's upper
+   * bound.
+   */
   public AlpacaSseSubscription subscribeToActivities(
       TradingActivitySseRequest request, AlpacaSseListener<ActivityEventV2> listener)
       throws ApiException {
     Objects.requireNonNull(request, "request must not be null");
     Objects.requireNonNull(listener, "listener must not be null");
-    if (options.initialLastEventId() != null && !options.initialLastEventId().isEmpty()) {
-      TradingActivitySseRequest.validateEventId(
-          options.initialLastEventId(), "options.initialLastEventId");
+    String initialEventId = options.initialLastEventId();
+    if (initialEventId != null && !initialEventId.isEmpty()) {
+      TradingActivitySseRequest.validateEventId(initialEventId, "options.initialLastEventId");
+      if (request.until() != null) {
+        throw new IllegalArgumentException(
+            "options.initialLastEventId cannot be combined with a date-bounded Trading activity "
+                + "request; use an ID-bounded request");
+      }
+      if (request.untilId() != null && initialEventId.compareTo(request.untilId()) > 0) {
+        throw new IllegalArgumentException(
+            "options.initialLastEventId must not be after request.untilId");
+      }
     }
     return SseTransport.open(
         httpClient,

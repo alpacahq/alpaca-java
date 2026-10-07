@@ -12,6 +12,7 @@ class ActivityDetailSchemaResolverTest {
     assertEquals(
         "FixedIncomeInterestActivityV2", ActivityDetailSchemaResolver.resolve("INT", "FI"));
     assertEquals("CDIVActivityV2", ActivityDetailSchemaResolver.resolve("DIV", "ROC"));
+    assertEquals("CDIVActivityV2", ActivityDetailSchemaResolver.resolve("DIVTXEX", null));
     assertEquals("ForwardSplitActivityV2", ActivityDetailSchemaResolver.resolve("SPLIT", "FSPLIT"));
     assertEquals("CSWActivityV2", ActivityDetailSchemaResolver.resolve("CSD", null));
 

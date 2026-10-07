@@ -94,6 +94,17 @@ header aligns the Java and JS/TS v5 client model, but release notes must not cla
 backend consumes that header unless separate public documentation, recorded API-owner
 confirmation, or a controlled live result establishes it. Replay correctness relies on the
 documented query cursor.
+Date-bounded Trading requests must reject a non-empty initial event ID rather than claiming
+header-only replay; ID-bounded requests must reject an initial ID after `untilId`.
+
+SSE lifecycle futures use an elastic, direct-handoff SDK completion executor so one subscription's
+blocked synchronous continuation cannot queue another subscription's settlement or occupy the
+scheduler. Release documentation must keep the Java contract explicit: synchronous continuations
+remain short because concurrently blocked continuations consume additional daemon workers;
+documented waits for related lifecycle signals are supported, while unrelated or potentially
+unbounded work uses an async continuation with an application-owned executor. Deterministic tests
+cover callback ordering, more concurrent settlements than the callback-dispatch worker count,
+pre-open future dependencies, recursive closure, and shared callback executors.
 
 ## Release workflow
 
