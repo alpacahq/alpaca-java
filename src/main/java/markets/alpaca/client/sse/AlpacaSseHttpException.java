@@ -1,8 +1,11 @@
 package markets.alpaca.client.sse;
 
 import java.time.Duration;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /** Terminal or retryable non-SSE HTTP response, captured before its body was closed. */
 public final class AlpacaSseHttpException extends AlpacaSseException {
@@ -22,7 +25,14 @@ public final class AlpacaSseHttpException extends AlpacaSseException {
     super("SSE request failed with HTTP " + statusCode);
     this.statusCode = statusCode;
     this.requestId = requestId;
-    this.headers = Map.copyOf(headers);
+    Objects.requireNonNull(headers, "headers must not be null");
+    var copiedHeaders = new LinkedHashMap<String, List<String>>();
+    headers.forEach(
+        (name, values) ->
+            copiedHeaders.put(
+                Objects.requireNonNull(name, "header name must not be null"),
+                List.copyOf(Objects.requireNonNull(values, "header values must not be null"))));
+    this.headers = Collections.unmodifiableMap(copiedHeaders);
     this.retryAfter = retryAfter;
     this.responseBody = responseBody;
   }

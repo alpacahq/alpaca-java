@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CountDownLatch;
@@ -478,6 +479,12 @@ class SseTransportTest {
     assertEquals(403, httpFailure.statusCode());
     assertEquals("request-1", httpFailure.requestId());
     assertEquals("forbidden", httpFailure.responseBody());
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> httpFailure.headers().put("another", java.util.List.of("value")));
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> httpFailure.headers().values().iterator().next().add("another"));
   }
 
   @Test
@@ -1465,13 +1472,15 @@ class SseTransportTest {
       awaitCondition(
           () -> subscription.connection().isPresent() && openingExecutor.getQueue().size() == 1,
           Duration.ofSeconds(2));
+      assertEquals(1, SseTransport.runningHttpCallsForTesting(subscription));
 
       subscription.close();
 
       assertEquals(
           AlpacaSseCloseResult.Reason.USER_CLOSED,
           subscription.completion().get(1, TimeUnit.SECONDS).reason());
-      awaitCondition(() -> httpClient.dispatcher().runningCallsCount() == 0, Duration.ofSeconds(2));
+      awaitCondition(
+          () -> SseTransport.runningHttpCallsForTesting(subscription) == 0, Duration.ofSeconds(2));
       assertFalse(openedCallback.get());
     } finally {
       releaseOpeningWorker.countDown();
@@ -1534,6 +1543,47 @@ class SseTransportTest {
     assertThrows(
         IllegalArgumentException.class,
         () -> AlpacaSseReconnectPolicy.builder().maxBackoff(Duration.ofNanos(1_500_000)).build());
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            AlpacaSseReconnectPolicy.builder()
+                .initialBackoff(Duration.ofSeconds(Long.MAX_VALUE))
+                .build());
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            AlpacaSseReconnectPolicy.builder()
+                .maxBackoff(Duration.ofSeconds(Long.MAX_VALUE))
+                .build());
+  }
+
+  @Test
+  void lifecycleTimeoutsSupportTheFullPositiveDurationRange() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBodyDelay(5, TimeUnit.SECONDS)
+            .setBody(":\n\n"));
+    Duration veryLarge = Duration.ofSeconds(Long.MAX_VALUE);
+    var options =
+        AlpacaSseOptions.builder()
+            .reconnectPolicy(AlpacaSseReconnectPolicy.disabled())
+            .connectTimeout(veryLarge)
+            .idleTimeout(veryLarge)
+            .maxDuration(veryLarge)
+            .build();
+
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            options,
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {});
+
+    assertNotNull(subscription.opened().get(1, TimeUnit.SECONDS));
+    subscription.close();
   }
 
   @Test
@@ -1739,7 +1789,9 @@ class SseTransportTest {
 
     assertEquals(
         AlpacaSseCloseResult.Reason.USER_CLOSED, observedCompletion.get(1, TimeUnit.SECONDS));
-    assertTrue(subscription.opened().isCompletedExceptionally());
+    var opened = subscription.opened();
+    assertTrue(opened.isCancelled());
+    assertThrows(CancellationException.class, () -> opened.get(1, TimeUnit.SECONDS));
   }
 
   @Test

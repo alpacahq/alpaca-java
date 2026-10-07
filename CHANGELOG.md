@@ -131,9 +131,10 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   lifecycle continuations must remain short because concurrently blocked continuations consume
   additional daemon workers; unrelated or potentially unbounded work belongs on an
   application-owned executor through an asynchronous continuation.
-- An empty Trading SSE `id:` now clears the original unbounded `since`/`since_id` on reconnect
-  instead of replaying the subscription's initial cursor; ID-bounded streams fail closed when the
-  API's required `since_id` can no longer be supplied.
+- An empty Trading SSE `id:` clears `Last-Event-ID` but retains an unbounded request's original
+  `since`/`since_id` lower bound, including `initialLastEventId`, so reconnect cannot silently skip
+  activity emitted during backoff. This safe replay can redeliver earlier events. ID-bounded streams
+  fail closed when the API's required current `since_id` can no longer be supplied.
 - Empty initial resume IDs are rejected. Trading rejects an initial ID combined with a date-bounded
   request, and Trading and Corporate Actions reject one after an ID-bounded request's `untilId`,
   instead of relying on undocumented header-only replay or sending an invalid cursor range.
@@ -166,6 +167,13 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Canceled idle-timeout tasks are removed from the shared scheduler, and Unicode SSE IDs can be
   replayed without stranding reconnects. HTTP-incompatible cursor controls and request/scheduler
   construction failures now terminate with a protocol failure.
+- Pre-open user closure is preserved as cancellation on defensive `opened()` futures. Lifecycle
+  deadlines use saturating nanosecond scheduling so positive sub-millisecond and very large
+  `Duration` values do not truncate or fail asynchronously, and HTTP-failure header values are
+  deeply immutable.
+- The migration tool preserves CRLF line endings, scans checkouts beneath ancestor directories
+  named `build`, treats same-named type parameters and Java Unicode escapes as report-only, and
+  diagnoses inherited generated SSE calls plus additional `EventSource` casts and identity checks.
 - Trading and Broker Activity V2 decoders preserve `CSD` events by temporarily representing their
   details as `CSWActivityV2`. The activity type remains `CSD`, and undeclared detail fields remain
   available through `getAdditionalProperties()`, pending a dedicated upstream CSD detail schema.

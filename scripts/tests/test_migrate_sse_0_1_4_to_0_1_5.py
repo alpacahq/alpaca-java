@@ -304,6 +304,44 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(source, result.text)
         self.assertIn("SSE001", [finding.code for finding in result.findings])
 
+    def test_reports_same_named_type_parameter_without_rewriting(self):
+        declarations = (
+            "BrokerSseSubscription",
+            "BrokerSseSubscription extends LegacySubscription",
+            "@TypeUse BrokerSseSubscription extends LegacySubscription",
+        )
+
+        for declaration in declarations:
+            with self.subTest(declaration=declaration):
+                source = (
+                    IMPORT
+                    + f"class Example<{declaration}> {{\n"
+                    + "  void close(BrokerSseSubscription subscription) {\n"
+                    + "    subscription.eventSource().cancel();\n"
+                    + "  }\n"
+                    + "}\n"
+                )
+                result = migrate.analyze_text(source)
+
+                self.assertEqual(source, result.text)
+                self.assertIn("SSE001", [finding.code for finding in result.findings])
+
+    def test_unicode_escape_disables_automatic_rewrites(self):
+        source = (
+            IMPORT
+            + "class Example {\n"
+            + '  String marker = "\\u0041";\n'
+            + "  void close(BrokerSseSubscription subscription) {\n"
+            + "    subscription.eventSource().cancel();\n"
+            + "  }\n"
+            + "}\n"
+        )
+
+        result = migrate.analyze_text(source)
+
+        self.assertEqual(source, result.text)
+        self.assertIn("SSE001", [finding.code for finding in result.findings])
+
     def test_ignores_lookalikes_in_comments_and_literals(self):
         source = (
             IMPORT
@@ -404,6 +442,52 @@ class AnalysisTests(unittest.TestCase):
 
         self.assertEqual(["SSE006", "SSE006"], [finding.code for finding in result.findings])
         self.assertEqual([4, 5], [finding.line for finding in result.findings])
+
+    def test_reports_unqualified_generated_sse_call_in_generated_api_subclass(self):
+        sources = (
+            """
+                class Example extends EventsApi {
+                  void open() {
+                    subscribeToActivitiesSSE(null, null, null, null);
+                  }
+                }
+            """,
+            """
+                class Example extends
+                    markets.alpaca.client.openapi.data.api.CorporateActionsApi {
+                  void open() {
+                    subscribeToCorporateActionsSSE(null, null, null);
+                  }
+                }
+            """,
+        )
+
+        for source in sources:
+            with self.subTest(source=source):
+                result = migrate.analyze_text(source)
+                self.assertEqual(
+                    ["SSE006"], [finding.code for finding in result.findings]
+                )
+                self.assertIn("inherited generated", result.findings[0].message)
+
+    def test_reports_event_source_direct_cast_and_both_identity_directions(self):
+        source = """
+            class Example {
+              BrokerSseSubscription subscription;
+              EventSource source;
+              void compare() {
+                Object cast = (okhttp3.sse.EventSource) subscription.eventSource();
+                boolean left = subscription.eventSource() == source;
+                boolean right = source != subscription.eventSource();
+              }
+            }
+        """
+
+        result = migrate.analyze_text(source)
+
+        self.assertGreaterEqual(
+            [finding.code for finding in result.findings].count("SSE002"), 3
+        )
 
     def test_ignores_single_event_call_on_handwritten_broker_client(self):
         sources = (
@@ -647,6 +731,48 @@ class CliTests(unittest.TestCase):
             with redirect_stdout(io.StringIO()):
                 self.assertEqual(0, migrate.main(["--write", str(path)]))
             self.assertIn("subscription.close()", path.read_text(encoding="utf-8"))
+
+    def test_write_preserves_crlf_line_endings(self):
+        source = (
+            IMPORT
+            + "class Example {\n"
+            + "  void close(BrokerSseSubscription subscription) {\n"
+            + "    subscription.eventSource().cancel();\n"
+            + "  }\n"
+            + "}\n"
+        ).replace("\n", "\r\n")
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "Example.java"
+            path.write_bytes(source.encode("utf-8"))
+
+            with redirect_stdout(io.StringIO()):
+                self.assertEqual(0, migrate.main(["--write", str(path)]))
+
+            rewritten = path.read_bytes()
+            self.assertIn(b"subscription.close();\r\n", rewritten)
+            self.assertNotIn(b"\n", rewritten.replace(b"\r\n", b""))
+
+    def test_scans_checkout_nested_beneath_build_directory(self):
+        source = (
+            IMPORT
+            + "class Example {\n"
+            + "  void close(BrokerSseSubscription subscription) {\n"
+            + "    subscription.eventSource().cancel();\n"
+            + "  }\n"
+            + "}\n"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            checkout = Path(directory) / "build" / "checkout"
+            path = checkout / "src" / "Example.java"
+            path.parent.mkdir(parents=True)
+            path.write_text(source, encoding="utf-8")
+
+            output = io.StringIO()
+            with redirect_stdout(output):
+                exit_code = migrate.main(["--check", "--json", str(checkout)])
+
+            self.assertEqual(1, exit_code)
+            self.assertEqual(["SSE000"], [item["code"] for item in json.loads(output.getvalue())])
 
     def test_missing_input_path_fails_closed(self):
         with redirect_stderr(io.StringIO()):

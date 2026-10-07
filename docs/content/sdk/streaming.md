@@ -92,7 +92,8 @@ caller-chosen timeout instead of building a startup latch; it yields immutable r
 and header metadata. `connection()` reports the most recently accepted connection and changes after
 reconnects, while `opened()` always retains the initial connection.
 Once response headers are accepted, `opened()` completes successfully and the ordered `onOpen`
-callback remains ahead of a concurrent terminal callback.
+callback remains ahead of a concurrent terminal callback. User closure before the first response
+cancels the returned defensive future; cancelling that copy does not close the subscription.
 
 ```java
 var connection = subscription.opened().get(10, TimeUnit.SECONDS);
@@ -370,14 +371,14 @@ Live Trading SSE reconnects on transient failures by default. It follows the SSE
 persisting completed `id:` fields (including data-less ID blocks) and sending the cursor as the
 documented `since_id` query parameter and in `Last-Event-ID` on the replacement request. Resume
 state advances after a payload is successfully decoded and dispatched, or when a completed
-data-less `id:` block is observed. An empty `id:` resets an unbounded stream's cursor, so reconnect
-does not restore the request's original `since` or `since_id`. Malformed Trading payloads do not
-advance it. Date-bounded
-requests retain their original date range on retry and can replay already processed events. Server
-replay can be inclusive, so applications requiring exactly-once effects must deduplicate persisted
-work by event ID. Because the Trading API requires `since_id` with `until_id`, an interrupted
-ID-bounded stream fails closed if an empty `id:` removed its resume cursor. `until` or `untilId`
-makes a request bounded;
+data-less `id:` block is observed. An empty `id:` clears `Last-Event-ID`; an unbounded stream then
+retains its request's original `since` or `since_id` lower bound so a reconnect cannot silently skip
+events emitted during backoff. That safe replay can redeliver earlier events. Malformed Trading
+payloads do not advance the cursor. Date-bounded requests likewise retain their original date range
+on retry and can replay already processed events. Server replay can be inclusive, so applications
+requiring exactly-once effects must deduplicate persisted work by event ID. Because the Trading API
+requires `since_id` with `until_id`, an interrupted ID-bounded stream fails closed if an empty `id:`
+removed its resume cursor. `until` or `untilId` makes a request bounded;
 normal EOF then completes the subscription instead of reconnecting. Configure retry budgets,
 initial resume ID, idle timeout, and resource limits with `AlpacaSseOptions` factory overloads.
 An initial resume ID must not be empty and cannot be combined with a date-bounded Trading request

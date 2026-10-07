@@ -404,6 +404,13 @@ public final class SseTransport {
     return session;
   }
 
+  static int runningHttpCallsForTesting(AlpacaSseSubscription subscription) {
+    if (!(subscription instanceof Session<?> session)) {
+      throw new IllegalArgumentException("subscription was not created by SseTransport");
+    }
+    return session.httpDispatcher.runningCallsCount();
+  }
+
   public static Request withLastEventIdHeader(Request request, String resumeId) {
     Objects.requireNonNull(request, "request must not be null");
     validateLastEventId(resumeId);
@@ -543,8 +550,8 @@ public final class SseTransport {
                     () ->
                         LIFECYCLE_EXECUTOR.execute(
                             () -> fail(new SocketTimeoutException("SSE maximum duration elapsed"))),
-                    options.maxDuration().toMillis(),
-                    TimeUnit.MILLISECONDS);
+                    durationToNanos(options.maxDuration()),
+                    TimeUnit.NANOSECONDS);
           }
         } catch (RuntimeException failure) {
           schedulingFailure =
@@ -575,16 +582,13 @@ public final class SseTransport {
                     resumeRequest.apply(originalRequest, resumeId),
                     "resumeRequest must not return null");
             Call preparedCall = httpClient.newCall(resumedRequest);
-            long connectTimeoutMillis =
-                Math.min(
-                    options.connectTimeout().toMillis(),
-                    remainingBudgetMillisLocked(hasOpened, options.connectTimeout().toMillis()));
+            Duration connectDeadline = remainingBudgetLocked(hasOpened, options.connectTimeout());
             long timeoutGeneration = ++connectTimeoutGeneration;
             ScheduledFuture<?> preparedTimeout =
                 scheduler.schedule(
                     () -> cancelConnectIfCurrent(preparedCall, timeoutGeneration),
-                    connectTimeoutMillis,
-                    TimeUnit.MILLISECONDS);
+                    durationToNanos(connectDeadline),
+                    TimeUnit.NANOSECONDS);
             state.set(hasOpened ? AlpacaSseState.RECONNECTING : AlpacaSseState.CONNECTING);
             call = preparedCall;
             timedOutCall = null;
@@ -1030,8 +1034,8 @@ public final class SseTransport {
                             failIdleTimeout(
                                 generation,
                                 new SocketTimeoutException("SSE idle timeout elapsed"))),
-                options.idleTimeout().toMillis(),
-                TimeUnit.MILLISECONDS);
+                durationToNanos(options.idleTimeout()),
+                TimeUnit.NANOSECONDS);
       }
     }
 
@@ -1360,17 +1364,12 @@ public final class SseTransport {
       return maximum != null && elapsedLocked(established).compareTo(maximum) >= 0;
     }
 
-    private long remainingBudgetMillisLocked(boolean established, long fallbackMillis) {
+    private Duration remainingBudgetLocked(boolean established, Duration fallback) {
       Duration maximum = options.reconnectPolicy().maxElapsedTime();
-      if (maximum == null) return fallbackMillis;
+      if (maximum == null) return fallback;
       Duration remaining = maximum.minus(elapsedLocked(established));
-      if (remaining.isZero() || remaining.isNegative()) return 0;
-      try {
-        long millis = remaining.toMillis();
-        return millis == 0 ? 1 : millis;
-      } catch (ArithmeticException overflow) {
-        return fallbackMillis;
-      }
+      if (remaining.isZero() || remaining.isNegative()) return Duration.ZERO;
+      return remaining.compareTo(fallback) < 0 ? remaining : fallback;
     }
 
     private Duration elapsedLocked(boolean established) {
@@ -1474,7 +1473,7 @@ public final class SseTransport {
 
     @Override
     public CompletableFuture<AlpacaSseConnectionInfo> opened() {
-      return openedFuture.copy();
+      return defensiveCopy(openedFuture);
     }
 
     @Override
@@ -1511,6 +1510,21 @@ public final class SseTransport {
 
     private static void cancel(ScheduledFuture<?> future) {
       if (future != null) future.cancel(false);
+    }
+
+    private static <T> CompletableFuture<T> defensiveCopy(CompletableFuture<T> source) {
+      var copy = new CompletableFuture<T>();
+      source.whenComplete(
+          (value, failure) -> {
+            if (source.isCancelled()) {
+              copy.cancel(false);
+            } else if (failure != null) {
+              copy.completeExceptionally(failure);
+            } else {
+              copy.complete(value);
+            }
+          });
+      return copy;
     }
 
     private static long durationToNanos(Duration duration) {

@@ -217,6 +217,11 @@ public final class AlpacaSseReconnectPolicy {
       if (value.getNano() % 1_000_000 != 0) {
         throw new IllegalArgumentException(name + " must use whole-millisecond precision");
       }
+      try {
+        value.toMillis();
+      } catch (ArithmeticException overflow) {
+        throw new IllegalArgumentException(name + " is too large", overflow);
+      }
       return value;
     }
 

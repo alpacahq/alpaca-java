@@ -52,16 +52,19 @@ the file. It reports `SSE001` and leaves unchanged qualified or chained access
 (`this.subscription` or `other.subscription`), fields, out-of-scope declarations, shadowed names or
 same-named local/nested types, `var`, lambda parameters, comments inside the call chain, and any
 declaration it cannot prove unique. Control-flow header declarations are also report-only because
-an unbraced statement's scope cannot be established safely by this text scanner. It also reports
-ambiguous imports,
+an unbraced statement's scope cannot be established safely by this text scanner. Same-named type
+parameters and files containing Java Unicode escapes are report-only because Java performs Unicode
+translation before tokenization. Rewrites preserve the source file's existing line endings. The
+tool also reports ambiguous imports,
 `EventSource` casts/identity assumptions, raw Gson exception checks, deep OkHttp `Response` use,
 blocking callbacks, generated SSE invocations or method references, and listeners overriding both
 rich and legacy callbacks. Invocations and method references on a uniquely bound imported or fully
 qualified `BrokerEventsSseClient` using a bare receiver are recognized as the handwritten
 replacement. A `this.receiver` call is recognized only when the scanner can prove the current class
 declares that handwritten-client field; inherited and other-qualified receivers remain report-only.
-Every generated SSE invocation or method reference is reported. These deliberate false positives
-keep `--write` source-safe; migrate `SSE001` findings manually.
+Unqualified inherited calls in generated API subclasses are also reported. Every generated SSE
+invocation or method reference is reported. These deliberate false positives keep `--write`
+source-safe; migrate `SSE001` findings manually.
 Missing input paths and explicit non-Java files fail with exit code 2 instead of producing an empty
 success report.
 
@@ -76,7 +79,8 @@ System.out.printf("%d %s%n", connection.statusCode(), connection.uri());
 ```
 
 `opened()` retains the first accepted connection. `connection()` returns the latest accepted
-connection after reconnects. Closing before the first response makes `opened()` exceptional.
+connection after reconnects. User closure before the first response cancels the defensive
+`opened()` future; cancelling a returned copy does not close the subscription.
 
 ### Prefer structured Broker callbacks
 
@@ -205,8 +209,11 @@ when exactly-once effects matter.
 
 Trading SSE reconnects on transient failures by default and sends its committed cursor as the
 documented `since_id` query parameter and in `Last-Event-ID`. Date-bounded retries retain the
-original date range and can replay events. Existing Broker constructors keep the `0.1.4`
-one-connection default; pass `AlpacaSseOptions` to opt into Broker reconnects.
+original date range and can replay events. If an empty SSE `id:` clears the committed cursor, an
+unbounded request retains its original `since` or `sinceId` lower bound on reconnect rather than
+risk a cursorless gap; deduplicate because this safe replay can redeliver earlier events. Existing
+Broker constructors keep the `0.1.4` one-connection default; pass `AlpacaSseOptions` to opt into
+Broker reconnects.
 
 `AlpacaSseOptions.initialLastEventId` rejects an empty value. Do not combine an initial ID with a
 date-bounded Trading request; `0.1.5` rejects that ambiguous combination before opening a
