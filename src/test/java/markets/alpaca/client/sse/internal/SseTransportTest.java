@@ -959,8 +959,9 @@ class SseTransportTest {
   }
 
   @Test
-  void productionExecutorsRemoveCanceledTimersAndBoundTerminalWork() throws Exception {
+  void productionExecutorsRemoveCanceledTimersAndBoundCallbackWork() throws Exception {
     ScheduledThreadPoolExecutor scheduler = SseTransport.createScheduler();
+    ThreadPoolExecutor openingExecutor = SseTransport.createOpeningCallbackExecutor();
     ThreadPoolExecutor terminalExecutor = SseTransport.createTerminalCallbackExecutor();
     var releaseWorkers = new CountDownLatch(1);
     var workersStarted = new CountDownLatch(terminalExecutor.getMaximumPoolSize());
@@ -971,6 +972,10 @@ class SseTransportTest {
       delayed.cancel(false);
       assertTrue(scheduler.getRemoveOnCancelPolicy());
       assertEquals(0, scheduler.getQueue().size());
+      assertEquals(terminalExecutor.getMaximumPoolSize(), openingExecutor.getMaximumPoolSize());
+      assertEquals(
+          terminalExecutor.getQueue().remainingCapacity(),
+          openingExecutor.getQueue().remainingCapacity());
 
       for (int index = 0; index < terminalExecutor.getMaximumPoolSize(); index++) {
         terminalExecutor.execute(
@@ -993,6 +998,7 @@ class SseTransportTest {
     } finally {
       releaseWorkers.countDown();
       scheduler.shutdownNow();
+      openingExecutor.shutdownNow();
       terminalExecutor.shutdownNow();
     }
   }
@@ -1037,6 +1043,44 @@ class SseTransportTest {
           subscription.completion().get(1, TimeUnit.SECONDS).reason());
       assertEquals(AlpacaSseState.CLOSED, subscription.state());
       assertFalse(closed.get());
+    } finally {
+      scheduler.shutdownNow();
+    }
+  }
+
+  @Test
+  void rejectedOpeningDispatchFailsWithoutStrandingAcceptedConnection() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBodyDelay(5, TimeUnit.SECONDS)
+            .setBody(":\n\n"));
+    ScheduledThreadPoolExecutor scheduler = SseTransport.createScheduler();
+    Executor rejectingOpeningExecutor =
+        ignored -> {
+          throw new RejectedExecutionException("saturated");
+        };
+
+    try {
+      var subscription =
+          SseTransport.openForTesting(
+              httpClient,
+              new Request.Builder().url(server.url("/events")).build(),
+              AlpacaSseOptions.reconnectDisabled(),
+              false,
+              data -> data,
+              new AlpacaSseListener<>() {},
+              scheduler,
+              rejectingOpeningExecutor,
+              Runnable::run,
+              System::nanoTime);
+
+      assertNotNull(subscription.opened().get(1, TimeUnit.SECONDS));
+      var failure =
+          assertThrows(
+              ExecutionException.class, () -> subscription.completion().get(1, TimeUnit.SECONDS));
+      assertInstanceOf(AlpacaSseCallbackException.class, failure.getCause());
+      assertEquals(AlpacaSseState.FAILED, subscription.state());
     } finally {
       scheduler.shutdownNow();
     }
@@ -1395,7 +1439,19 @@ class SseTransportTest {
             });
 
     var accepted = subscription.opened();
-    var closedFromOpened = accepted.thenRun(subscription::close);
+    var closedFromOpened =
+        accepted.thenRun(
+            () -> {
+              subscription.close();
+              try {
+                assertTrue(
+                    closed.await(1, TimeUnit.SECONDS),
+                    "onClosed must run while the synchronous opened continuation is active");
+              } catch (InterruptedException failure) {
+                Thread.currentThread().interrupt();
+                throw new AssertionError("interrupted while waiting for onClosed", failure);
+              }
+            });
 
     closedFromOpened.get(2, TimeUnit.SECONDS);
     assertNotNull(accepted.get(1, TimeUnit.SECONDS));
