@@ -117,11 +117,17 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Lifecycle completion settlement no longer runs synchronous future continuations on an active
   listener callback path, so a callback can close while a completion continuation awaits the
   ordered terminal listener.
+- Terminal callbacks now verify lifecycle completion even when an existing callback drain consumes
+  them. Completion settlement uses fixed workers with queued work, and recursive settlement from a
+  synchronous future continuation runs inline to avoid worker starvation without creating
+  unbounded lifecycle threads.
 - An empty Trading SSE `id:` now clears the original unbounded `since`/`since_id` on reconnect
   instead of replaying the subscription's initial cursor; ID-bounded streams fail closed when the
   API's required `since_id` can no longer be supplied.
 - Trading and Broker activity decoders preserve newly generated but not-yet-handled envelope fields
   through `additionalProperties` instead of silently dropping them after regeneration.
+- The migration scanner no longer reports generated-call warning `SSE006` for a uniquely bound
+  handwritten `BrokerEventsSseClient.getAccountActivityEventAsync(...)` receiver.
 - Terminal lifecycle state, timers, and cancellation no longer wait behind user callbacks or block
   the shared scheduler. Terminal listener delivery remains serialized after callbacks already in
   progress, and no new callbacks are admitted after termination.

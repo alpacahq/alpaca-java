@@ -369,6 +369,67 @@ class AnalysisTests(unittest.TestCase):
                 result = migrate.analyze_text(source)
                 self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
 
+    def test_ignores_single_event_call_on_handwritten_broker_client(self):
+        sources = (
+            """
+                import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+                class Example {
+                  void fetch(BrokerEventsSseClient client) {
+                    client.getAccountActivityEventAsync(null, "event");
+                  }
+                }
+            """,
+            """
+                class Example {
+                  void fetch(
+                      markets.alpaca.client.broker.sse.BrokerEventsSseClient client) {
+                    client.getAccountActivityEventAsync(null, "event");
+                  }
+                }
+            """,
+            """
+                import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+                class Example {
+                  void fetch() {
+                    client.getAccountActivityEventAsync(null, "event");
+                  }
+                  private BrokerEventsSseClient client;
+                }
+            """,
+        )
+
+        for source in sources:
+            with self.subTest(source=source):
+                self.assertEqual((), migrate.analyze_text(source).findings)
+
+    def test_reports_ambiguous_handwritten_client_lookalike(self):
+        source = """
+            class BrokerEventsSseClient {}
+            class Example {
+              void fetch(BrokerEventsSseClient client) {
+                client.getAccountActivityEventAsync(null, "event");
+              }
+            }
+        """
+
+        result = migrate.analyze_text(source)
+
+        self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
+
+    def test_reports_shadowing_handwritten_client_type_parameter(self):
+        source = """
+            import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+            class Example<BrokerEventsSseClient extends AccountsApi> {
+              void fetch(BrokerEventsSseClient client) {
+                client.getAccountActivityEventAsync(null, "event");
+              }
+            }
+        """
+
+        result = migrate.analyze_text(source)
+
+        self.assertEqual(["SSE006"], [finding.code for finding in result.findings])
+
 
 class CliTests(unittest.TestCase):
     def test_dry_run_check_json_and_write_modes(self):
