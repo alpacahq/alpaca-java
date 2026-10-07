@@ -7,6 +7,7 @@ import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CountDownLatch;
@@ -24,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import markets.alpaca.client.sse.AlpacaSseCallbackException;
 import markets.alpaca.client.sse.AlpacaSseCloseResult;
 import markets.alpaca.client.sse.AlpacaSseDeserializationException;
@@ -1060,6 +1062,7 @@ class SseTransportTest {
         ignored -> {
           throw new RejectedExecutionException("saturated");
         };
+    ThreadPoolExecutor terminalExecutor = SseTransport.createTerminalCallbackExecutor();
 
     try {
       var subscription =
@@ -1072,7 +1075,7 @@ class SseTransportTest {
               new AlpacaSseListener<>() {},
               scheduler,
               rejectingOpeningExecutor,
-              Runnable::run,
+              terminalExecutor,
               System::nanoTime);
 
       assertNotNull(subscription.opened().get(1, TimeUnit.SECONDS));
@@ -1083,6 +1086,77 @@ class SseTransportTest {
       assertEquals(AlpacaSseState.FAILED, subscription.state());
     } finally {
       scheduler.shutdownNow();
+      terminalExecutor.shutdownNow();
+    }
+  }
+
+  @Test
+  void closingWhileOpeningDispatchIsQueuedReleasesHttpCallbackThread() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBodyDelay(5, TimeUnit.SECONDS)
+            .setBody(":\n\n"));
+    ScheduledThreadPoolExecutor scheduler = SseTransport.createScheduler();
+    ThreadPoolExecutor openingExecutor =
+        new ThreadPoolExecutor(
+            1,
+            1,
+            0,
+            TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<>(1),
+            new ThreadPoolExecutor.AbortPolicy());
+    ThreadPoolExecutor terminalExecutor = SseTransport.createTerminalCallbackExecutor();
+    var openingWorkerStarted = new CountDownLatch(1);
+    var releaseOpeningWorker = new CountDownLatch(1);
+    var openedCallback = new AtomicBoolean();
+    openingExecutor.execute(
+        () -> {
+          openingWorkerStarted.countDown();
+          try {
+            releaseOpeningWorker.await();
+          } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+          }
+        });
+    assertTrue(openingWorkerStarted.await(1, TimeUnit.SECONDS));
+
+    var subscription =
+        SseTransport.openForTesting(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onOpen() {
+                openedCallback.set(true);
+              }
+            },
+            scheduler,
+            openingExecutor,
+            terminalExecutor,
+            System::nanoTime);
+
+    try {
+      awaitCondition(
+          () -> subscription.connection().isPresent() && openingExecutor.getQueue().size() == 1,
+          Duration.ofSeconds(2));
+
+      subscription.close();
+
+      assertEquals(
+          AlpacaSseCloseResult.Reason.USER_CLOSED,
+          subscription.completion().get(1, TimeUnit.SECONDS).reason());
+      awaitCondition(() -> httpClient.dispatcher().runningCallsCount() == 0, Duration.ofSeconds(2));
+      assertFalse(openedCallback.get());
+    } finally {
+      releaseOpeningWorker.countDown();
+      subscription.close();
+      scheduler.shutdownNow();
+      openingExecutor.shutdownNow();
+      terminalExecutor.shutdownNow();
     }
   }
 
@@ -1460,6 +1534,97 @@ class SseTransportTest {
         subscription.completion().get(1, TimeUnit.SECONDS).reason());
     assertTrue(closed.await(2, TimeUnit.SECONDS));
     assertEquals(java.util.List.of("open", "closed"), callbacks);
+  }
+
+  @Test
+  void completionContinuationCanAwaitClosedCallback() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBodyDelay(5, TimeUnit.SECONDS)
+            .setBody(":\n\n"));
+    var closed = new CountDownLatch(1);
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onClosed(AlpacaSseCloseResult result) {
+                closed.countDown();
+              }
+            });
+    subscription.opened().get(1, TimeUnit.SECONDS);
+    var continuation =
+        subscription
+            .completion()
+            .thenRun(
+                () -> {
+                  try {
+                    assertTrue(
+                        closed.await(1, TimeUnit.SECONDS),
+                        "onClosed must run while the synchronous completion continuation is active");
+                  } catch (InterruptedException failure) {
+                    Thread.currentThread().interrupt();
+                    throw new AssertionError("interrupted while waiting for onClosed", failure);
+                  }
+                });
+
+    var close = CompletableFuture.runAsync(subscription::close);
+
+    continuation.get(2, TimeUnit.SECONDS);
+    close.get(1, TimeUnit.SECONDS);
+    assertEquals(AlpacaSseState.CLOSED, subscription.state());
+  }
+
+  @Test
+  void exceptionalCompletionContinuationCanAwaitFailureCallback() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeadersDelay(100, TimeUnit.MILLISECONDS)
+            .setHeader("Content-Type", "application/json")
+            .setBody("{}"));
+    var failed = new CountDownLatch(1);
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onFailure(Throwable failure) {
+                failed.countDown();
+              }
+            });
+    var continuation =
+        subscription
+            .completion()
+            .handle(
+                (result, failure) -> {
+                  try {
+                    assertTrue(
+                        failed.await(1, TimeUnit.SECONDS),
+                        "onFailure must run while the synchronous completion continuation is active");
+                  } catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                    throw new AssertionError(
+                        "interrupted while waiting for onFailure", interrupted);
+                  }
+                  return null;
+                });
+
+    continuation.get(2, TimeUnit.SECONDS);
+    var failure =
+        assertThrows(
+            ExecutionException.class, () -> subscription.completion().get(1, TimeUnit.SECONDS));
+    assertInstanceOf(
+        markets.alpaca.client.sse.AlpacaSseProtocolException.class, failure.getCause());
+    assertEquals(AlpacaSseState.FAILED, subscription.state());
   }
 
   @Test
@@ -1897,6 +2062,17 @@ class SseTransportTest {
                 .jitterRatio(0)
                 .build())
         .build();
+  }
+
+  private static void awaitCondition(BooleanSupplier condition, Duration timeout)
+      throws InterruptedException, TimeoutException {
+    long deadline = System.nanoTime() + timeout.toNanos();
+    while (!condition.getAsBoolean()) {
+      if (System.nanoTime() >= deadline) {
+        throw new TimeoutException("condition was not met within " + timeout);
+      }
+      Thread.sleep(10);
+    }
   }
 
   private static final class GatedScheduler extends ScheduledThreadPoolExecutor {

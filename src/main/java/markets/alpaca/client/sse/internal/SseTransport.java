@@ -611,9 +611,9 @@ public final class SseTransport {
                   reconnect ? "onReconnected" : "onOpen",
                   reconnect ? listener::onReconnected : listener::onOpen);
         }
-        startIndependently(openCallback);
+        if (!startIndependently(openCallback)) return;
         if (!reconnect) openedFuture.complete(connectionInfo);
-        await(openCallback);
+        if (!awaitOpening(openCallback)) return;
         readBody(response.body());
         if (terminal) return;
         if (bounded) {
@@ -936,7 +936,13 @@ public final class SseTransport {
     }
 
     private void enqueueTerminal(String name, Runnable callback) {
-      EnqueuedCallback enqueued = callbackDispatcher.enqueue(name, callback);
+      EnqueuedCallback enqueued =
+          callbackDispatcher.enqueue(
+              name,
+              () -> {
+                awaitTerminalSettlement();
+                callback.run();
+              });
       if (!enqueued.startDrain()) return;
       try {
         terminalCallbackExecutor.execute(
@@ -963,8 +969,8 @@ public final class SseTransport {
       await(enqueued);
     }
 
-    private void startIndependently(EnqueuedCallback enqueued) {
-      if (!enqueued.startDrain()) return;
+    private boolean startIndependently(EnqueuedCallback enqueued) {
+      if (!enqueued.startDrain()) return !terminal;
       var handoff = new CompletableFuture<Void>();
       try {
         openingCallbackExecutor.execute(
@@ -1000,14 +1006,35 @@ public final class SseTransport {
                 "SSE opening callback dispatcher rejected " + enqueued.task().name, rejected));
       }
       try {
+        CompletableFuture.anyOf(handoff, completion).get();
+        if (terminal) return false;
         handoff.get();
+        return true;
       } catch (InterruptedException failure) {
         Thread.currentThread().interrupt();
         throw new AlpacaSseCallbackException(
             "Interrupted while starting " + enqueued.task().name, failure);
       } catch (ExecutionException failure) {
+        if (terminal) return false;
         throw new AlpacaSseCallbackException(
             "Failed to start " + enqueued.task().name, failure.getCause());
+      }
+    }
+
+    private boolean awaitOpening(EnqueuedCallback enqueued) {
+      try {
+        CompletableFuture.anyOf(enqueued.task().completion, completion).get();
+        if (terminal) return false;
+        enqueued.task().completion.get();
+        return true;
+      } catch (InterruptedException failure) {
+        Thread.currentThread().interrupt();
+        throw new AlpacaSseCallbackException(
+            "Interrupted while dispatching " + enqueued.task().name, failure);
+      } catch (ExecutionException failure) {
+        if (terminal) return false;
+        throw new AlpacaSseCallbackException(
+            "Failed to dispatch " + enqueued.task().name, failure.getCause());
       }
     }
 
@@ -1059,9 +1086,9 @@ public final class SseTransport {
         awaitTerminalSettlement();
         return;
       }
+      enqueueTerminal("onClosed", () -> listener.onClosed(result));
       completion.complete(result);
       if (acceptedConnection != null) {
-        enqueueTerminal("onClosed", () -> listener.onClosed(result));
         openedFuture.complete(acceptedConnection);
       } else if (!openedFuture.isDone()) {
         if (result.reason() == AlpacaSseCloseResult.Reason.USER_CLOSED) {
@@ -1070,9 +1097,6 @@ public final class SseTransport {
           openedFuture.completeExceptionally(
               new AlpacaSseException("SSE subscription closed before opening: " + result.reason()));
         }
-      }
-      if (acceptedConnection == null) {
-        enqueueTerminal("onClosed", () -> listener.onClosed(result));
       }
     }
 
@@ -1107,13 +1131,12 @@ public final class SseTransport {
         state.set(AlpacaSseState.FAILED);
         acceptedConnection = hasOpened ? connection.get() : null;
       }
+      enqueueTerminal("onFailure", () -> listener.onFailure(failure));
       completion.completeExceptionally(failure);
       if (acceptedConnection != null) {
-        enqueueTerminal("onFailure", () -> listener.onFailure(failure));
         openedFuture.complete(acceptedConnection);
       } else {
         openedFuture.completeExceptionally(failure);
-        enqueueTerminal("onFailure", () -> listener.onFailure(failure));
       }
     }
 

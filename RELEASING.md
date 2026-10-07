@@ -111,9 +111,9 @@ tagged commit (a non-empty `## [version]` section, or a non-empty `## [Unrelease
 rejects an existing release POM, tests release tools, archives the committed OpenAPI pins under
 `specs/`, builds the release, checks its public API against the previous reachable semantic release
 tag, signs and publishes it, creates or publishes the GitHub Release, and opens a pull request that
-advances `gradle.properties` to the next patch `-SNAPSHOT` and, when needed, promotes `[Unreleased]`
-to the dated release section on `main`. Merge that PR through normal branch protection; its Build
-workflow publishes the next snapshot.
+advances the project and compatibility-baseline properties, updates the README snapshot dependency,
+and, when needed, promotes `[Unreleased]` to the dated release section on `main`. Merge that PR
+through normal branch protection; its Build workflow publishes the next snapshot.
 
 GitHub Release bodies are composed as the curated changelog section, then GitHub’s
 `**Full Changelog**` compare link for the tag range (not the auto-generated PR list).
@@ -126,8 +126,9 @@ Three changelog states stop the workflow rather than guess:
   the section or delete the heading and re-dispatch.
 - `[Unreleased]` on `main` no longer matching the notes published for the tag, which happens when
   other work merges between tagging and the bump job. Promote the section manually.
-- An open `release/start-*` pull request whose `gradle.properties` or `CHANGELOG.md` differs from
-  what this release requires. Update that pull request manually; the workflow never rewrites it.
+- An open `release/start-*` pull request whose `gradle.properties`, `README.md`, or `CHANGELOG.md`
+  differs from what this release requires. Update that pull request manually; the workflow never
+  rewrites it.
 
 When `main` already has a `## [version]` section whose content differs from the notes published for
 the tag, the bump job warns instead of failing: the version bump still needs to land, and the
