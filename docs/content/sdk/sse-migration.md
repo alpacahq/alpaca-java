@@ -150,12 +150,16 @@ following reconnect.
 
 Lifecycle completion is deliberately separate from listener delivery:
 
-- `close()` selects `USER_CLOSED`, cancels active/future transport work, and completes
-  `completion()` before returning;
+- `close()` selects `USER_CLOSED` when it wins the terminal transition, cancels active/future
+  transport work, and waits for `completion()` to settle before returning; if failure already won,
+  it observes the exceptional completion without rethrowing it;
 - a timeout or terminal failure also completes lifecycle state without waiting for a blocked
   callback;
 - terminal listener delivery remains ordered after callbacks that were already admitted;
 - no event, comment, retry, or reconnect callback is admitted after the terminal transition.
+
+Once response headers are accepted, `opened()` succeeds with that connection even if closure races
+with opening. Its admitted `onOpen` callback remains ordered before the terminal listener callback.
 
 Terminal callbacks that are not already queued behind an active subscription callback are started
 through a bounded SDK dispatcher. If that dispatcher is saturated by blocked terminal callbacks,
@@ -178,6 +182,9 @@ one-connection default; pass `AlpacaSseOptions` to opt into Broker reconnects.
 Trading malformed payloads terminate the subscription without advancing the event cursor. Broker
 malformed payloads invoke `onEventFailure`, advance the cursor after callback invocation, and keep
 the healthy connection open. If that callback throws, the cursor still advances.
+Broker admin-action events retain `SubscribeToAdminActionSSE200ResponseInner` but now select its
+concrete generated model from the required `type` field; missing, unknown, or schema-invalid types
+follow that same malformed-event policy.
 
 Servers may replay the last event inclusively. Resume support provides at-least-once delivery, not
 exactly-once processing.

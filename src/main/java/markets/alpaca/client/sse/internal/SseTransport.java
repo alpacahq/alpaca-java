@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -553,7 +554,9 @@ public final class SseTransport {
         AlpacaSseConnectionInfo connectionInfo =
             new AlpacaSseConnectionInfo(
                 response.request().url().uri(), response.code(), response.headers().toMultimap());
+        resetIdleTimeout();
         boolean reconnect;
+        EnqueuedCallback openCallback;
         synchronized (lifecycleLock) {
           if (terminal || call != responseCall) return;
           reconnect = hasOpened;
@@ -561,12 +564,13 @@ public final class SseTransport {
           hasOpened = true;
           if (!reconnect) completeInitialCycleLocked();
           state.set(AlpacaSseState.OPEN);
+          openCallback =
+              callbackDispatcher.enqueue(
+                  reconnect ? "onReconnected" : "onOpen",
+                  reconnect ? listener::onReconnected : listener::onOpen);
         }
-        resetIdleTimeout();
         if (!reconnect) openedFuture.complete(connectionInfo);
-        dispatchNonTerminal(
-            reconnect ? "onReconnected" : "onOpen",
-            reconnect ? listener::onReconnected : listener::onOpen);
+        startAndAwait(openCallback);
         readBody(response.body());
         if (terminal) return;
         if (bounded) {
@@ -943,14 +947,27 @@ public final class SseTransport {
     }
 
     private void closeNormally(AlpacaSseCloseResult result) {
+      boolean settle;
+      AlpacaSseConnectionInfo acceptedConnection;
       synchronized (lifecycleLock) {
-        if (terminal) return;
-        terminal = true;
-        cancelActiveWorkLocked();
-        state.set(AlpacaSseState.CLOSED);
+        settle = !terminal;
+        if (settle) {
+          terminal = true;
+          cancelActiveWorkLocked();
+          state.set(AlpacaSseState.CLOSED);
+          acceptedConnection = hasOpened ? connection.get() : null;
+        } else {
+          acceptedConnection = null;
+        }
+      }
+      if (!settle) {
+        awaitTerminalSettlement();
+        return;
       }
       completion.complete(result);
-      if (!openedFuture.isDone()) {
+      if (acceptedConnection != null) {
+        openedFuture.complete(acceptedConnection);
+      } else if (!openedFuture.isDone()) {
         if (result.reason() == AlpacaSseCloseResult.Reason.USER_CLOSED) {
           openedFuture.cancel(false);
         } else {
@@ -974,6 +991,7 @@ public final class SseTransport {
         Long expectedIdleGeneration,
         Long expectedReconnectGeneration,
         Long expectedInitialGeneration) {
+      AlpacaSseConnectionInfo acceptedConnection;
       synchronized (lifecycleLock) {
         if (terminal
             || (expectedIdleGeneration != null
@@ -989,10 +1007,24 @@ public final class SseTransport {
         terminal = true;
         cancelActiveWorkLocked();
         state.set(AlpacaSseState.FAILED);
+        acceptedConnection = hasOpened ? connection.get() : null;
       }
       completion.completeExceptionally(failure);
-      openedFuture.completeExceptionally(failure);
+      if (acceptedConnection != null) {
+        openedFuture.complete(acceptedConnection);
+      } else {
+        openedFuture.completeExceptionally(failure);
+      }
       enqueueTerminal("onFailure", () -> listener.onFailure(failure));
+    }
+
+    private void awaitTerminalSettlement() {
+      try {
+        completion.join();
+      } catch (CompletionException ignored) {
+        // close() observes a failure that already won the terminal transition but does not rethrow
+        // it.
+      }
     }
 
     private void cancelActiveWorkLocked() {
