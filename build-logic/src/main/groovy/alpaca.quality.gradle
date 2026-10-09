@@ -1,10 +1,96 @@
 import com.github.spotbugs.snom.Confidence
 import com.github.spotbugs.snom.Effort
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.util.jar.JarFile
 
 plugins {
     id 'checkstyle'
     id 'com.github.spotbugs'
     id 'com.diffplug.spotless'
+}
+
+def apiBaselineVersion = providers.gradleProperty('apiBaselineVersion')
+// Reviewed generated-surface breaks adopted on main before this compatibility gate existed.
+// Keep these member-specific: broad class/package exclusions would hide future regressions.
+def reviewedApiCompatibilityExclusionsByBaseline = [
+    '0.1.4': [
+        'markets.alpaca.client.openapi.broker.api.EventsApi#suscribeToAccountStatusSSE' +
+            '(java.time.LocalDate,java.time.LocalDate,java.lang.Integer,java.lang.Integer,' +
+            'java.lang.String,java.lang.String,java.lang.String)',
+        'markets.alpaca.client.openapi.broker.api.EventsApi#suscribeToAccountStatusSSEAsync' +
+            '(java.time.LocalDate,java.time.LocalDate,java.lang.Integer,java.lang.Integer,' +
+            'java.lang.String,java.lang.String,java.lang.String,' +
+            'markets.alpaca.client.openapi.broker.http.ApiCallback)',
+        'markets.alpaca.client.openapi.broker.api.EventsApi#suscribeToAccountStatusSSECall' +
+            '(java.time.LocalDate,java.time.LocalDate,java.lang.Integer,java.lang.Integer,' +
+            'java.lang.String,java.lang.String,java.lang.String,' +
+            'markets.alpaca.client.openapi.broker.http.ApiCallback)',
+        'markets.alpaca.client.openapi.broker.api.EventsApi#suscribeToAccountStatusSSEWithHttpInfo' +
+            '(java.time.LocalDate,java.time.LocalDate,java.lang.Integer,java.lang.Integer,' +
+            'java.lang.String,java.lang.String,java.lang.String)',
+        'markets.alpaca.client.openapi.broker.api.IraApi#listIRAExcessContritbutions()',
+        'markets.alpaca.client.openapi.broker.api.IraApi#listIRAExcessContritbutionsAsync' +
+            '(markets.alpaca.client.openapi.broker.http.ApiCallback)',
+        'markets.alpaca.client.openapi.broker.api.IraApi#listIRAExcessContritbutionsCall' +
+            '(markets.alpaca.client.openapi.broker.http.ApiCallback)',
+        'markets.alpaca.client.openapi.broker.api.IraApi#listIRAExcessContritbutionsWithHttpInfo()',
+        'markets.alpaca.client.openapi.broker.model.Asset#SERIALIZED_NAME_EASY_TO_BORROW',
+        'markets.alpaca.client.openapi.broker.model.Asset#easyToBorrow(java.lang.Boolean)',
+        'markets.alpaca.client.openapi.broker.model.Asset#getEasyToBorrow()',
+        'markets.alpaca.client.openapi.broker.model.Asset#setEasyToBorrow(java.lang.Boolean)',
+        'markets.alpaca.client.openapi.trading.api.PositionsApi#deleteAllOpenPositions' +
+            '(java.lang.Boolean)',
+        'markets.alpaca.client.openapi.trading.model.Assets#SERIALIZED_NAME_EASY_TO_BORROW',
+        'markets.alpaca.client.openapi.trading.model.Assets#easyToBorrow(java.lang.Boolean)',
+        'markets.alpaca.client.openapi.trading.model.Assets#getEasyToBorrow()',
+        'markets.alpaca.client.openapi.trading.model.Assets#setEasyToBorrow(java.lang.Boolean)',
+        'markets.alpaca.client.openapi.trading.model.PositionClosedReponse',
+        'markets.alpaca.client.openapi.trading.model.PositionClosedReponse$CustomTypeAdapterFactory',
+        'markets.alpaca.client.openapi.trading.model.PositionClosedReponse$CustomTypeAdapterFactory$1',
+    ],
+]
+def apiCompatibilityTool = configurations.create('apiCompatibilityTool') {
+    canBeConsumed = false
+    canBeResolved = true
+    visible = false
+}
+
+dependencies.add(apiCompatibilityTool.name, libs.japicmp)
+
+def apiCompatibilityBaselineFile = layout.buildDirectory.file(
+    apiBaselineVersion.map {
+        "api-compatibility/alpaca-java-${it}.jar"
+    })
+def downloadApiCompatibilityBaseline = tasks.register('downloadApiCompatibilityBaseline') {
+    group = 'verification'
+    description = "Downloads the published alpaca-java ${apiBaselineVersion.get()} baseline"
+    inputs.property('apiBaselineVersion', apiBaselineVersion)
+    outputs.file(apiCompatibilityBaselineFile)
+
+    doLast {
+        String version = apiBaselineVersion.get()
+        if (!(version ==~ /[0-9A-Za-z][0-9A-Za-z.-]*/)) {
+            throw new GradleException("Invalid apiBaselineVersion: ${version}")
+        }
+        File destination = apiCompatibilityBaselineFile.get().asFile
+        destination.parentFile.mkdirs()
+        File temporary = new File(temporaryDir, destination.name)
+        URL source = new URI(
+            "https://repo.maven.apache.org/maven2/markets/alpaca/alpaca-java/" +
+                "${version}/alpaca-java-${version}.jar").toURL()
+        def connection = source.openConnection()
+        connection.connectTimeout = 15_000
+        connection.readTimeout = 30_000
+        connection.inputStream.withCloseable { input ->
+            Files.copy(input, temporary.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        }
+        new JarFile(temporary).withCloseable { ignored -> }
+        Files.move(
+            temporary.toPath(),
+            destination.toPath(),
+            StandardCopyOption.REPLACE_EXISTING)
+    }
 }
 
 spotless {
@@ -35,6 +121,38 @@ checkstyle {
 }
 
 pluginManager.withPlugin('java') {
+    tasks.register('checkApiCompatibility', JavaExec) {
+        group = 'verification'
+        description =
+            "Checks the complete public JAR against alpaca-java ${apiBaselineVersion.get()}"
+        dependsOn tasks.named('jar'), downloadApiCompatibilityBaseline
+        classpath = apiCompatibilityTool
+        mainClass = 'japicmp.JApiCmp'
+
+        doFirst {
+            def comparisonArgs = [
+                '--old', apiCompatibilityBaselineFile.get().asFile.absolutePath,
+                '--new', tasks.named('jar').get().archiveFile.get().asFile.absolutePath,
+                '--only-modified',
+                '--ignore-missing-classes',
+            ]
+            def reviewedExclusions =
+                reviewedApiCompatibilityExclusionsByBaseline[apiBaselineVersion.get()] ?: []
+            if (!reviewedExclusions.isEmpty()) {
+                comparisonArgs.addAll([
+                    '--exclude',
+                    reviewedExclusions.join(';'),
+                    '--no-error-on-exclusion-incompatibility',
+                ])
+            }
+            comparisonArgs.addAll([
+                '--error-on-binary-incompatibility',
+                '--error-on-source-incompatibility',
+            ])
+            setArgs(comparisonArgs)
+        }
+    }
+
     tasks.named('checkstyleMain').configure {
         source = fileTree('src/main/java') {
             include '**/*.java'
