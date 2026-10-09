@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import markets.alpaca.client.AlpacaClientFactory;
 import markets.alpaca.client.data.StockTradesRequest;
+import markets.alpaca.client.data.sse.MarketDataSseEnvironment;
 import markets.alpaca.client.openapi.data.api.CryptoApi;
 import markets.alpaca.client.openapi.data.api.NewsApi;
 import markets.alpaca.client.openapi.data.api.StockApi;
@@ -14,6 +15,7 @@ import markets.alpaca.client.openapi.data.model.CryptoHistoricalLoc;
 import markets.alpaca.client.openapi.data.model.CryptoLatestLoc;
 import markets.alpaca.client.openapi.data.model.Sort;
 import markets.alpaca.client.openapi.data.model.StockHistoricalFeed;
+import markets.alpaca.client.sse.AlpacaSseListener;
 import markets.alpaca.client.ws.AlpacaStreamEnvironment;
 import markets.alpaca.client.ws.StockSource;
 import markets.alpaca.client.ws.StockStreamListener;
@@ -22,7 +24,7 @@ import markets.alpaca.client.ws.model.StockQuote;
 
 /**
  * Market Data workflow: request historical/latest stock and crypto data, read news, and optionally
- * subscribe to live quotes.
+ * subscribe to live quotes or corporate-action events.
  */
 public final class MarketDataExample {
   private MarketDataExample() {}
@@ -99,6 +101,29 @@ public final class MarketDataExample {
     } else {
       ExampleSupport.printSection("Live Stock Stream");
       System.out.println("Skipped. Set APCA_EXAMPLE_STREAM=true to subscribe to live quotes.");
+    }
+
+    if (ExampleSupport.enabled("APCA_EXAMPLE_CORPORATE_ACTIONS_SSE")) {
+      openCorporateActionsStream(dataClient);
+    }
+  }
+
+  private static void openCorporateActionsStream(
+      markets.alpaca.client.openapi.data.http.ApiClient dataClient) throws Exception {
+    ExampleSupport.printSection("Corporate Actions SSE");
+    var events =
+        AlpacaClientFactory.corporateActionsSseClient(
+            dataClient, MarketDataSseEnvironment.PRODUCTION);
+    var subscription = events.subscribeToCorporateActions(new AlpacaSseListener<>() {});
+    try {
+      var connection = subscription.opened().get(10, TimeUnit.SECONDS);
+      System.out.printf(
+          "corporate-actions stream opened: %d %s%n", connection.statusCode(), connection.uri());
+    } finally {
+      subscription.close();
+      System.out.printf(
+          "corporate-actions stream closed: %s%n",
+          subscription.completion().get(10, TimeUnit.SECONDS).reason());
     }
   }
 

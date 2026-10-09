@@ -4,8 +4,12 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
 import markets.alpaca.client.data.AlpacaStocks;
+import markets.alpaca.client.data.sse.CorporateActionsSseClient;
+import markets.alpaca.client.data.sse.MarketDataSseEnvironment;
 import markets.alpaca.client.http.AlpacaHttpConfig;
+import markets.alpaca.client.sse.AlpacaSseOptions;
 import markets.alpaca.client.trading.AlpacaOrders;
+import markets.alpaca.client.trading.sse.TradingEventsSseClient;
 import markets.alpaca.client.ws.AlpacaCryptoStream;
 import markets.alpaca.client.ws.AlpacaNewsStream;
 import markets.alpaca.client.ws.AlpacaStockStream;
@@ -21,7 +25,7 @@ import markets.alpaca.client.ws.TradingStreamListener;
 import okhttp3.OkHttpClient;
 
 /**
- * Entry point for creating pre-configured Alpaca API clients (REST and WebSocket).
+ * Entry point for creating pre-configured Alpaca API clients (REST, WebSocket, and SSE).
  *
  * <p>For most applications, prefer {@link #client(AlpacaCredentials)} or {@link
  * AlpacaClient#builder(AlpacaCredentials)}. {@link AlpacaClient} is an immutable facade that owns
@@ -189,6 +193,12 @@ public final class AlpacaClientFactory {
     return brokerEventsSseClient(brokerClient(credentials));
   }
 
+  /** Creates a Broker Events SSE client with explicit transport options and direct callbacks. */
+  public static BrokerEventsSseClient brokerEventsSseClient(
+      AlpacaCredentials credentials, AlpacaSseOptions options) {
+    return brokerEventsSseClient(brokerClient(credentials), options);
+  }
+
   /**
    * Creates a Broker Events SSE client with HTTP Basic authentication and a custom listener
    * executor.
@@ -198,16 +208,36 @@ public final class AlpacaClientFactory {
     return brokerEventsSseClient(brokerClient(credentials), callbackExecutor);
   }
 
+  /** Creates a Broker Events SSE client with explicit transport options and listener executor. */
+  public static BrokerEventsSseClient brokerEventsSseClient(
+      AlpacaCredentials credentials, AlpacaSseOptions options, Executor callbackExecutor) {
+    return brokerEventsSseClient(brokerClient(credentials), options, callbackExecutor);
+  }
+
   /** Creates a Broker Events SSE client from an existing generated Broker {@code ApiClient}. */
   public static BrokerEventsSseClient brokerEventsSseClient(
       markets.alpaca.client.openapi.broker.http.ApiClient brokerClient) {
     return new BrokerEventsSseClient(brokerClient);
   }
 
+  /** Creates a Broker Events SSE client from an existing client with explicit transport options. */
+  public static BrokerEventsSseClient brokerEventsSseClient(
+      markets.alpaca.client.openapi.broker.http.ApiClient brokerClient, AlpacaSseOptions options) {
+    return new BrokerEventsSseClient(brokerClient, options);
+  }
+
   /** Creates a Broker Events SSE client from an existing Broker client and callback executor. */
   public static BrokerEventsSseClient brokerEventsSseClient(
       markets.alpaca.client.openapi.broker.http.ApiClient brokerClient, Executor callbackExecutor) {
     return new BrokerEventsSseClient(brokerClient, callbackExecutor);
+  }
+
+  /** Creates a Broker Events SSE client with explicit transport options and listener executor. */
+  public static BrokerEventsSseClient brokerEventsSseClient(
+      markets.alpaca.client.openapi.broker.http.ApiClient brokerClient,
+      AlpacaSseOptions options,
+      Executor callbackExecutor) {
+    return new BrokerEventsSseClient(brokerClient, options, callbackExecutor);
   }
 
   // -------------------------------------------------------------------------
@@ -261,6 +291,79 @@ public final class AlpacaClientFactory {
     return client;
   }
 
+  /** Creates a resilient Trading account-activity SSE client. */
+  public static TradingEventsSseClient tradingEventsSseClient(
+      markets.alpaca.client.openapi.trading.http.ApiClient tradingClient) {
+    return new TradingEventsSseClient(tradingClient);
+  }
+
+  /** Creates a Trading account-activity SSE client with explicit transport options. */
+  public static TradingEventsSseClient tradingEventsSseClient(
+      markets.alpaca.client.openapi.trading.http.ApiClient tradingClient,
+      AlpacaSseOptions options) {
+    return new TradingEventsSseClient(tradingClient, options);
+  }
+
+  /** Creates a resilient Trading SSE client with a callback executor. */
+  public static TradingEventsSseClient tradingEventsSseClient(
+      markets.alpaca.client.openapi.trading.http.ApiClient tradingClient,
+      Executor callbackExecutor) {
+    return new TradingEventsSseClient(tradingClient, callbackExecutor);
+  }
+
+  /** Creates a resilient paper Trading account-activity SSE client. */
+  public static TradingEventsSseClient tradingEventsSseClient(AlpacaCredentials credentials) {
+    return tradingEventsSseClient(tradingClient(credentials));
+  }
+
+  /** Creates a resilient paper Trading SSE client with a callback executor. */
+  public static TradingEventsSseClient tradingEventsSseClient(
+      AlpacaCredentials credentials, Executor callbackExecutor) {
+    return tradingEventsSseClient(tradingClient(credentials), callbackExecutor);
+  }
+
+  /** Creates a paper Trading account-activity SSE client with explicit transport options. */
+  public static TradingEventsSseClient tradingEventsSseClient(
+      AlpacaCredentials credentials, AlpacaSseOptions options) {
+    return tradingEventsSseClient(tradingClient(credentials), options);
+  }
+
+  /** Creates a resilient Trading account-activity SSE client for the requested environment. */
+  public static TradingEventsSseClient tradingEventsSseClient(
+      AlpacaCredentials credentials, TradingApiEnvironment environment) {
+    return tradingEventsSseClient(tradingClient(credentials, environment));
+  }
+
+  /** Creates a resilient Trading SSE client for an environment with a callback executor. */
+  public static TradingEventsSseClient tradingEventsSseClient(
+      AlpacaCredentials credentials, TradingApiEnvironment environment, Executor callbackExecutor) {
+    return tradingEventsSseClient(tradingClient(credentials, environment), callbackExecutor);
+  }
+
+  /** Creates a Trading account-activity SSE client with explicit environment and options. */
+  public static TradingEventsSseClient tradingEventsSseClient(
+      AlpacaCredentials credentials, TradingApiEnvironment environment, AlpacaSseOptions options) {
+    return tradingEventsSseClient(tradingClient(credentials, environment), options);
+  }
+
+  /** Creates a Trading SSE client with explicit environment, transport, and listener settings. */
+  public static TradingEventsSseClient tradingEventsSseClient(
+      AlpacaCredentials credentials,
+      TradingApiEnvironment environment,
+      AlpacaSseOptions options,
+      Executor callbackExecutor) {
+    return tradingEventsSseClient(
+        tradingClient(credentials, environment), options, callbackExecutor);
+  }
+
+  /** Creates a Trading account-activity SSE client with explicit transport settings. */
+  public static TradingEventsSseClient tradingEventsSseClient(
+      markets.alpaca.client.openapi.trading.http.ApiClient tradingClient,
+      AlpacaSseOptions options,
+      Executor callbackExecutor) {
+    return new TradingEventsSseClient(tradingClient, options, callbackExecutor);
+  }
+
   /** Creates a handwritten convenience facade for common Trading order workflows. */
   public static AlpacaOrders orders(
       markets.alpaca.client.openapi.trading.http.ApiClient tradingClient) {
@@ -298,6 +401,81 @@ public final class AlpacaClientFactory {
     var client = dataClient(credentials, httpClient);
     client.setBasePath(normalizeBaseUrl(baseUrl, "baseUrl"));
     return client;
+  }
+
+  /** Creates a resilient production corporate-actions SSE client. */
+  public static CorporateActionsSseClient corporateActionsSseClient(
+      markets.alpaca.client.openapi.data.http.ApiClient dataClient) {
+    return new CorporateActionsSseClient(dataClient);
+  }
+
+  /** Creates a resilient corporate-actions SSE client for an environment. */
+  public static CorporateActionsSseClient corporateActionsSseClient(
+      markets.alpaca.client.openapi.data.http.ApiClient dataClient,
+      MarketDataSseEnvironment environment) {
+    return new CorporateActionsSseClient(dataClient, environment);
+  }
+
+  /** Creates a corporate-actions SSE client with explicit transport options. */
+  public static CorporateActionsSseClient corporateActionsSseClient(
+      markets.alpaca.client.openapi.data.http.ApiClient dataClient,
+      MarketDataSseEnvironment environment,
+      AlpacaSseOptions options) {
+    return new CorporateActionsSseClient(dataClient, environment, options);
+  }
+
+  /** Creates a resilient corporate-actions SSE client with a callback executor. */
+  public static CorporateActionsSseClient corporateActionsSseClient(
+      markets.alpaca.client.openapi.data.http.ApiClient dataClient,
+      MarketDataSseEnvironment environment,
+      Executor callbackExecutor) {
+    return new CorporateActionsSseClient(dataClient, environment, callbackExecutor);
+  }
+
+  /** Creates a corporate-actions SSE client with explicit transport and callback settings. */
+  public static CorporateActionsSseClient corporateActionsSseClient(
+      markets.alpaca.client.openapi.data.http.ApiClient dataClient,
+      MarketDataSseEnvironment environment,
+      AlpacaSseOptions options,
+      Executor callbackExecutor) {
+    return new CorporateActionsSseClient(dataClient, environment, options, callbackExecutor);
+  }
+
+  /** Creates a resilient production corporate-actions SSE client from credentials. */
+  public static CorporateActionsSseClient corporateActionsSseClient(AlpacaCredentials credentials) {
+    return corporateActionsSseClient(dataClient(credentials));
+  }
+
+  /** Creates a resilient corporate-actions SSE client from credentials for an environment. */
+  public static CorporateActionsSseClient corporateActionsSseClient(
+      AlpacaCredentials credentials, MarketDataSseEnvironment environment) {
+    return corporateActionsSseClient(dataClient(credentials), environment);
+  }
+
+  /** Creates a corporate-actions SSE client from credentials with explicit transport options. */
+  public static CorporateActionsSseClient corporateActionsSseClient(
+      AlpacaCredentials credentials,
+      MarketDataSseEnvironment environment,
+      AlpacaSseOptions options) {
+    return corporateActionsSseClient(dataClient(credentials), environment, options);
+  }
+
+  /** Creates a resilient corporate-actions SSE client from credentials with a callback executor. */
+  public static CorporateActionsSseClient corporateActionsSseClient(
+      AlpacaCredentials credentials,
+      MarketDataSseEnvironment environment,
+      Executor callbackExecutor) {
+    return corporateActionsSseClient(dataClient(credentials), environment, callbackExecutor);
+  }
+
+  /** Creates a corporate-actions SSE client from credentials with explicit settings. */
+  public static CorporateActionsSseClient corporateActionsSseClient(
+      AlpacaCredentials credentials,
+      MarketDataSseEnvironment environment,
+      AlpacaSseOptions options,
+      Executor callbackExecutor) {
+    return corporateActionsSseClient(
+        dataClient(credentials), environment, options, callbackExecutor);
   }
 
   /** Creates a handwritten convenience facade for common Market Data stock workflows. */

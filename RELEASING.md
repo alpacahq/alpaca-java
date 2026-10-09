@@ -43,8 +43,69 @@ all NMCP snapshot tasks. Use these commands rather than lower-level publishing t
 
 After a successful current `main` push, the Build workflow publishes the version in
 `gradle.properties` when it ends in `-SNAPSHOT`. It freezes the committed OpenAPI pins under
-`specs/`, builds from read-only copies, rechecks `main`, then publishes those same copies. Pull
-requests, non-`main` pushes, failed builds, and stale commits never publish.
+`specs/`, builds from read-only copies, checks that exact JAR against the published compatibility
+baseline, rechecks `main`, then publishes those same copies. Pull-request CI also runs the
+compatibility task. Pull requests, non-`main` pushes, failed builds, incompatible JARs, and stale
+commits never publish.
+
+## Pre-tag verification
+
+Run the candidate from a clean tree so `checkGenerated` compares regenerated OpenAPI output with the
+candidate commit:
+
+```bash
+./gradlew build
+./gradlew checkApiCompatibility -PapiBaselineVersion=0.1.4
+```
+
+The API compatibility task compares the complete public JAR, including handwritten streaming
+surfaces, and fails on source or binary incompatibility. Update the baseline property only when the
+previous published release changes. The member-specific exclusions in
+`alpaca.quality.gradle` cover only reviewed OpenAPI corrections inherited before this gate existed;
+each is documented in [`MIGRATIONS.md`](MIGRATIONS.md). Do not broaden those exclusions or add
+another without equivalent migration guidance and review. The task still fails on every other
+incompatibility. It does not prove behavioral compatibility, and missing external dependency
+classes are ignored, so the migration review and SSE regression tests remain mandatory.
+
+SSE releases additionally require manual live validation with valid Trading paper/Market Data and
+Broker sandbox credentials. Supply bounded RFC 3339 Trading and corporate-actions replay windows
+known to contain at least one event. The release workflow cannot supply these account credentials
+or account-specific windows. Strict mode fails rather than skipping when any required input is
+absent:
+
+```bash
+./gradlew integrationTest -Palpaca.requireSseIntegration=true \
+  --tests 'markets.alpaca.client.integration.IntegrationIT.tradingActivitySse_decodesKnownReplayEvent' \
+  --tests 'markets.alpaca.client.integration.IntegrationIT.corporateActionsSse_decodesKnownReplayEvent' \
+  --tests 'markets.alpaca.client.integration.BrokerIntegrationIT.brokerSse_subscribeToTradeEvents_opensStream'
+```
+
+The Trading and Market Data tests must each decode at least one event from their bounded replay
+window; the Broker test must open its authenticated stream. All three named tests must execute and
+pass. A successful integration task containing skipped SSE tests does not satisfy this gate;
+protocol edge cases and reconnect behavior remain covered by deterministic unit tests. See
+[`TESTING.md`](TESTING.md) for the replay-window environment variables and `local.properties`
+names.
+
+The [public Activity SSE guide](https://docs.alpaca.markets/us/docs/activity-sse) defines
+`since_id` as the reconnect/replay cursor. Trading reconnects therefore send the committed event ID
+as `since_id` as well as `Last-Event-ID`; deterministic tests assert both wire values. The standard
+header aligns the Java and JS/TS v5 client model, but release notes must not claim that the Trading
+backend consumes that header unless separate public documentation, recorded API-owner
+confirmation, or a controlled live result establishes it. Replay correctness relies on the
+documented query cursor.
+Initial event IDs must be non-empty. Date-bounded Trading requests must reject an initial event ID
+rather than claiming header-only replay; Trading and Corporate Actions ID-bounded requests must
+reject an initial ID after `untilId`.
+
+SSE lifecycle futures use an elastic, direct-handoff SDK completion executor so one subscription's
+blocked synchronous continuation cannot queue another subscription's settlement or occupy the
+scheduler. Release documentation must keep the Java contract explicit: synchronous continuations
+remain short because concurrently blocked continuations consume additional daemon workers;
+documented waits for related lifecycle signals are supported, while unrelated or potentially
+unbounded work uses an async continuation with an application-owned executor. Deterministic tests
+cover callback ordering, more concurrent settlements than the callback-dispatch worker count,
+pre-open future dependencies, recursive closure, and shared callback executors.
 
 ## Release workflow
 
@@ -58,10 +119,11 @@ workflow from `main` with that tag. Do not queue release dispatches.
 The workflow verifies the tag and its reachability, requires curated changelog notes on the
 tagged commit (a non-empty `## [version]` section, or a non-empty `## [Unreleased]` fallback),
 rejects an existing release POM, tests release tools, archives the committed OpenAPI pins under
-`specs/`, builds and signs the release, publishes it, creates or publishes the GitHub Release, and
-opens a pull request that advances `gradle.properties` to the next patch `-SNAPSHOT` and, when
-needed, promotes `[Unreleased]` to the dated release section on `main`. Merge that PR through
-normal branch protection; its Build workflow publishes the next snapshot.
+`specs/`, builds the release, checks its public API against the previous reachable semantic release
+tag, signs and publishes it, creates or publishes the GitHub Release, and opens a pull request that
+advances `gradle.properties` to the next patch `-SNAPSHOT` and, when needed, promotes `[Unreleased]`
+to the dated release section on `main`. Merge that PR through normal branch protection; its Build
+workflow publishes the next snapshot.
 
 GitHub Release bodies are composed as the curated changelog section, then GitHub’s
 `**Full Changelog**` compare link for the tag range (not the auto-generated PR list).

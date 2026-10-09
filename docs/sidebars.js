@@ -16,6 +16,11 @@ const sidebars = {
           id: 'sdk/streaming',
           label: 'Streaming & Events',
         },
+        {
+          type: 'doc',
+          id: 'sdk/sse-migration',
+          label: 'SSE Migration (0.2.0)',
+        },
       ],
     },
   ],

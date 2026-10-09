@@ -233,7 +233,7 @@ jobs:
           retention-days: 90
           compression-level: 9
 
-      - name: Build tagged release from prepared specs
+      - name: Build and check tagged release from prepared specs
         if: steps.central-check.outputs.publish_required == 'true'
         shell: bash
         env:
@@ -241,8 +241,21 @@ jobs:
           SPEC_DIR: ${{ steps.specs.outputs.directory }}
         run: |
           set -euo pipefail
-          ./gradlew build \
+          baseline_version=''
+          while IFS= read -r candidate_tag; do
+            if [[ "$candidate_tag" != "v$RELEASE_VERSION" \
+              && "$candidate_tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              baseline_version="${candidate_tag#v}"
+              break
+            fi
+          done < <(git tag --merged "v$RELEASE_VERSION" --sort=-version:refname)
+          if [[ -z "$baseline_version" ]]; then
+            echo "::error::No previous semantic release tag found for API compatibility"
+            exit 1
+          fi
+          ./gradlew build checkApiCompatibility \
             -Pversion="$RELEASE_VERSION" \
+            -PapiBaselineVersion="$baseline_version" \
             -Palpaca.preprocessedSpecInputs=true \
             "-PbrokerSpec=$SPEC_DIR/broker/openapi.yaml" \
             "-PdataSpec=$SPEC_DIR/data/openapi.yaml" \

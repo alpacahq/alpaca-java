@@ -279,6 +279,17 @@ final class OpenApiSpecSupport {
             activityTypes.findAll { it != 'FILL' })
     }
 
+    /** Corrects the Broker NTA endpoint, which is SSE despite its upstream JSON media type. */
+    static void normalizeBrokerNtaSseMediaType(Map spec) {
+        def response = spec?.paths?.get('/v1/events/nta')?.get?.responses?.get('200')
+        def content = response?.content
+        if (!(content instanceof Map)) return
+        def json = content.remove('application/json')
+        if (json != null && !content.containsKey('text/event-stream')) {
+            content['text/event-stream'] = json
+        }
+    }
+
     /**
      * Sanitizers that apply to every API because they address OpenAPI 3.1 constructs the Java
      * generator renders into code that does not compile or that loses type information.
@@ -298,6 +309,7 @@ final class OpenApiSpecSupport {
         removeEmptyKeyProperties(spec)
         removeDiscriminatorEnums(spec)
         removeActivityV2DetailTrdRequired(spec)
+        normalizeBrokerNtaSseMediaType(spec)
         sanitizeSpec(spec)
     }
 
@@ -319,6 +331,583 @@ final class OpenApiSpecSupport {
         def spec = loadSpec(source) as Map
         sanitize.call(spec)
         outputFile.text = dumpYaml(spec)
+    }
+
+    /**
+     * Fails closed when a pinned SSE operation appears, disappears, or changes its identifying
+     * contract without a corresponding handwritten-support decision.
+     */
+    static void verifySseContracts(Map<String, File> specFiles) {
+        def expected = [
+            broker: [
+                contract('get-v1-events-nta', 'supported',
+                    'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
+                        '#subscribeToNonTradingActivities'),
+                contract('subscribeToAccountStatusSSE', 'supported',
+                    'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
+                        '#subscribeToAccountStatus'),
+                contract('subscribeToJournalStatusSSE', 'supported',
+                    'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
+                        '#subscribeToJournalStatusLegacy'),
+                contract('subscribeToTransferStatusSSE', 'deprecated'),
+                contract('getAccountActivityEvent', 'supported',
+                    'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
+                        '#getAccountActivityEventAsync'),
+                contract('subscribeToActivitiesSSE', 'supported',
+                    'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
+                        '#subscribeToActivities'),
+                contract('subscribeToAdminActionSSE', 'supported',
+                    'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
+                        '#subscribeToAdminActions'),
+                contract('subscribeToFundingStatusSSE', 'supported',
+                    'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
+                        '#subscribeToFundingStatus'),
+                contract('subscribeToIPOEventsSSE', 'supported',
+                    'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
+                        '#subscribeToIpoEvents'),
+                contract('subscribeToJournalStatusV2SSE', 'supported',
+                    'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
+                        '#subscribeToJournalStatus'),
+                contract('subscribeToSystemEventV2SSE', 'supported',
+                    'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
+                        '#subscribeToSystemEvents'),
+                contract('subscribeToTradeV2SSE', 'supported',
+                    'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
+                        '#subscribeToTradeEvents'),
+            ],
+            data: [
+                contract('SubscribeToCorporateActionsEventsSSE', 'supported',
+                    'markets.alpaca.client.data.sse.CorporateActionsSseClient' +
+                        '#subscribeToCorporateActions'),
+            ],
+            trading: [
+                contract('subscribeToActivitiesSSE', 'supported',
+                    'markets.alpaca.client.trading.sse.TradingEventsSseClient' +
+                        '#subscribeToActivities'),
+            ],
+        ]
+
+        def discoveredSseOperations = [:]
+        expected.each { api, expectedOperations ->
+            expectedOperations.each { validateSseSupportDecision(it, specFiles) }
+            def expectedIds = expectedOperations.collect { it.operationId }
+            if (expectedIds.toSet().size() != expectedIds.size()) {
+                throw new IllegalStateException(
+                    "${api} SSE support decisions contain duplicate operationIds")
+            }
+            def file = specFiles[api]
+            if (file == null || !file.isFile()) {
+                throw new IllegalStateException("Missing pinned ${api} OpenAPI document")
+            }
+            def spec = loadSpec(file.absolutePath) as Map
+            def actual = []
+            spec.paths.each { path, pathItem ->
+                if (!(pathItem instanceof Map)) return
+                OPERATION_METHODS.each { method ->
+                    def operation = pathItem[method]
+                    if (!(operation instanceof Map)) return
+                    def content = operation?.responses?.get('200')?.content
+                    boolean sseMedia = content instanceof Map &&
+                        content.containsKey('text/event-stream')
+                    if (!sseMedia) return
+                    if (!(content instanceof Map) || content.isEmpty()) {
+                        throw new IllegalStateException(
+                            "${api} ${method.toUpperCase()} ${path} has no success content")
+                    }
+                    def schema = content['text/event-stream']?.schema
+                    if (!(schema instanceof Map)) {
+                        throw new IllegalStateException(
+                            "${api} ${method.toUpperCase()} ${path} has no SSE schema")
+                    }
+                    def security = resolvedSecurityRequirements(spec, operation)
+                    if (security.isEmpty()) {
+                        throw new IllegalStateException(
+                            "${api} ${method.toUpperCase()} ${path} has no resolved security")
+                    }
+                    if (!(operation.operationId instanceof String) ||
+                        operation.operationId.isBlank()) {
+                        throw new IllegalStateException(
+                            "${api} ${method.toUpperCase()} ${path} has no operationId")
+                    }
+                    actual << [
+                        path: path,
+                        method: method,
+                        operationId: operation.operationId,
+                        pathItem: pathItem,
+                        operation: operation,
+                    ]
+                }
+            }
+
+            def actualByOperationId = actual.groupBy { it.operationId }
+            def duplicateIds = actualByOperationId
+                .findAll { operationId, operations -> operations.size() > 1 }
+                .keySet()
+            if (!duplicateIds.isEmpty()) {
+                throw new IllegalStateException(
+                    "${api} SSE operationIds are not unique: ${duplicateIds}")
+            }
+            def actualIds = actualByOperationId.keySet()
+            if (actualIds != expectedIds.toSet()) {
+                def actualInventory = actual.collect {
+                    "${it.operationId} (${it.method.toUpperCase()} ${it.path})"
+                }
+                throw new IllegalStateException(
+                    "${api} SSE inventory changed. Expected operationIds ${expectedIds}; " +
+                        "found ${actualInventory}")
+            }
+            discoveredSseOperations[api] = actualByOperationId.collectEntries {
+                operationId, operations -> [(operationId): operations.first()]
+            }
+            expectedOperations.each { expectedOperation ->
+                def discovered = discoveredSseOperations[api][expectedOperation.operationId]
+                if (discovered.method != expectedOperation.method) {
+                    throw new IllegalStateException(
+                        "${api} SSE ${expectedOperation.operationId} moved from " +
+                            "${expectedOperation.method.toUpperCase()} to " +
+                            "${discovered.method.toUpperCase()} ${discovered.path}")
+                }
+            }
+        }
+
+        def broker = loadSpec(specFiles.broker.absolutePath) as Map
+        def legacyDateRange = [
+            queryParameter('since', 'string', 'date'),
+            queryParameter('until', 'string', 'date'),
+            queryParameter('since_id', 'integer'),
+            queryParameter('until_id', 'integer'),
+        ]
+        def legacyUlidRange = [
+            queryParameter('since_ulid', 'string', 'ulid'),
+            queryParameter('until_ulid', 'string', 'ulid'),
+        ]
+        def activityRange = [
+            queryParameter('since', 'string', 'date-time'),
+            queryParameter('until', 'string', 'date-time'),
+            queryParameter('since_id', 'string', 'ulid'),
+            queryParameter('until_id', 'string', 'ulid'),
+        ]
+        def dateUlidRange = [
+            queryParameter('since', 'string', 'date'),
+            queryParameter('until', 'string', 'date'),
+            queryParameter('since_id', 'string', 'ulid'),
+            queryParameter('until_id', 'string', 'ulid'),
+        ]
+        def brokerShapes = [
+            brokerSseShape('get-v1-events-nta',
+                [queryParameter('id', 'string')] +
+                    legacyDateRange +
+                    legacyUlidRange +
+                    [queryParameter('include_preprocessing', 'boolean'),
+                        queryParameter('group_id', 'string', 'uuid')],
+                'ref:#/components/schemas/NonTradeActivityEvent'),
+            brokerSseShape('subscribeToAccountStatusSSE',
+                legacyDateRange + legacyUlidRange + [queryParameter('id', 'string')],
+                'array-ref:#/components/schemas/AccountStatusEvent'),
+            brokerSseShape('subscribeToJournalStatusSSE',
+                legacyDateRange + legacyUlidRange + [queryParameter('id', 'string')],
+                'array-ref:#/components/schemas/JournalStatusEvent'),
+            brokerSseShape('subscribeToTransferStatusSSE',
+                legacyDateRange + legacyUlidRange,
+                'array-ref:#/components/schemas/TransferStatusEvent'),
+            brokerSseShape('getAccountActivityEvent',
+                [pathParameter('account_id', 'string', 'uuid'),
+                    pathParameter('event_id', 'string', 'ulid')],
+                'ref:#/components/schemas/ActivityEventV2'),
+            brokerSseShape('subscribeToActivitiesSSE',
+                activityRange,
+                'array-ref:#/components/schemas/ActivityEventV2'),
+            brokerSseShape('subscribeToAdminActionSSE',
+                activityRange,
+                'array-oneOf:#/components/schemas/AdminActionLegacyNote|' +
+                    '#/components/schemas/AdminActionLiquidation|' +
+                    '#/components/schemas/AdminActionTransactionCancel'),
+            brokerSseShape('subscribeToFundingStatusSSE',
+                dateUlidRange,
+                'array-ref:#/components/schemas/StatusFundingEvent'),
+            brokerSseShape('subscribeToIPOEventsSSE',
+                activityRange,
+                'array-ref:#/components/schemas/IPOEvent'),
+            brokerSseShape('subscribeToJournalStatusV2SSE',
+                activityRange + [queryParameter('id', 'string')],
+                'array-ref:#/components/schemas/JournalStatusEventV2'),
+            brokerSseShape('subscribeToSystemEventV2SSE',
+                activityRange,
+                'array-ref:#/components/schemas/SystemEventV2'),
+            brokerSseShape('subscribeToTradeV2SSE',
+                dateUlidRange,
+                'array-ref:#/components/schemas/TradeUpdateEventV2'),
+        ]
+        brokerShapes.each { expectedShape ->
+            def discovered = discoveredSseOperations.broker[expectedShape.operationId]
+            def operation = discovered.operation
+            def label =
+                "${expectedShape.operationId} (${discovered.method.toUpperCase()} " +
+                "${discovered.path})"
+            def parameters =
+                resolvedParameterSignatures(broker, discovered.pathItem, operation)
+            if (parameters != expectedShape.parameters) {
+                throw new IllegalStateException(
+                    "Broker SSE parameters changed for ${label}: ${parameters}")
+            }
+            def schema = operation.responses['200']
+                .content['text/event-stream'].schema
+            def signature = sseSchemaSignature(schema)
+            if (signature != expectedShape.schema) {
+                throw new IllegalStateException(
+                    "Broker SSE response schema changed for ${label}: ${signature}")
+            }
+            def security = resolvedSecurityRequirements(broker, operation)
+            if (security != [['BasicAuth': []]].toSet()) {
+                throw new IllegalStateException(
+                    "Broker SSE security changed for ${label}: ${security}")
+            }
+        }
+        def basicAuth = broker.components?.securitySchemes?.BasicAuth
+        if (!(basicAuth instanceof Map) ||
+            basicAuth.type != 'http' ||
+            basicAuth.scheme != 'basic') {
+            throw new IllegalStateException(
+                "Broker BasicAuth definition changed: ${basicAuth}")
+        }
+
+        def trading = loadSpec(specFiles.trading.absolutePath) as Map
+        def tradingDiscovered = discoveredSseOperations.trading.subscribeToActivitiesSSE
+        def tradingOperation = tradingDiscovered.operation
+        def parameterSignatures = resolvedParameterSignatures(
+            trading, tradingDiscovered.pathItem, tradingOperation)
+        if (parameterSignatures != activityRange) {
+            throw new IllegalStateException(
+                "Trading activity SSE parameters changed: ${parameterSignatures}")
+        }
+        def itemRef = tradingOperation.responses['200']
+            .content['text/event-stream'].schema?.items?.get('$ref')
+        if (itemRef != '#/components/schemas/ActivityEventV2') {
+            throw new IllegalStateException(
+                "Trading activity SSE item schema changed: ${itemRef}")
+        }
+        def tradingSecurity = resolvedSecurityRequirements(trading, tradingOperation)
+        if (tradingSecurity != [['API_Key': [], 'API_Secret': []]].toSet()) {
+            throw new IllegalStateException(
+                "Trading activity SSE security changed: ${tradingSecurity}")
+        }
+        assertApiKeySecurityScheme(
+            trading, 'API_Key', 'APCA-API-KEY-ID', 'Trading')
+        assertApiKeySecurityScheme(
+            trading, 'API_Secret', 'APCA-API-SECRET-KEY', 'Trading')
+
+        def data = loadSpec(specFiles.data.absolutePath) as Map
+        def corporateActionsDiscovered =
+            discoveredSseOperations.data.SubscribeToCorporateActionsEventsSSE
+        def corporateActionsOperation = corporateActionsDiscovered.operation
+        def corporateActionsParameters = resolvedParameterSignatures(
+            data, corporateActionsDiscovered.pathItem, corporateActionsOperation)
+        def eventIdSchema = [
+            type: 'string',
+            format: 'ulid',
+            pattern: '^[0-7][0-9A-HJKMNP-TV-Z]{25}$',
+        ]
+        def corporateActionEventTypeSchema = [
+            type: 'string',
+            enum: [
+                'capital_gains_distribution_corporateaction_event',
+                'cash_dividend_corporateaction_event',
+                'cash_merger_corporateaction_event',
+                'equity_partial_call_corporateaction_event',
+                'forward_split_corporateaction_event',
+                'name_change_corporateaction_event',
+                'redemption_corporateaction_event',
+                'reorganization_corporateaction_event',
+                'reverse_split_corporateaction_event',
+                'rights_distribution_corporateaction_event',
+                'spin_off_corporateaction_event',
+                'stock_and_cash_merger_corporateaction_event',
+                'stock_dividend_corporateaction_event',
+                'stock_merger_corporateaction_event',
+                'unit_split_corporateaction_event',
+                'worthless_removal_corporateaction_event',
+            ],
+        ]
+        def expectedCorporateActionsParameters = [
+            queryArrayReferenceParameter(
+                'type',
+                '#/components/schemas/corporate_action_event_type',
+                corporateActionEventTypeSchema,
+                false),
+            querySchemaParameter(
+                'region', [type: 'string', enum: ['all', 'us', 'non_us'], default: 'all']),
+            queryParameter('since', 'string', 'date-time'),
+            queryParameter('until', 'string', 'date-time'),
+            queryReferenceParameter(
+                'since_id', '#/components/schemas/event_id', eventIdSchema),
+            queryReferenceParameter(
+                'until_id', '#/components/schemas/event_id', eventIdSchema),
+            headerReferenceParameter(
+                'Last-Event-Id', '#/components/schemas/event_id', eventIdSchema),
+        ]
+        if (corporateActionsParameters != expectedCorporateActionsParameters) {
+            throw new IllegalStateException(
+                "Market Data corporate-actions SSE parameters changed: " +
+                    "${corporateActionsParameters}")
+        }
+        def corporateActionsItemRef = corporateActionsOperation.responses['200']
+            .content['text/event-stream'].schema?.items?.get('$ref')
+        if (corporateActionsItemRef != '#/components/schemas/corporate_action_event') {
+            throw new IllegalStateException(
+                "Market Data corporate-actions SSE item schema changed: " +
+                    "${corporateActionsItemRef}")
+        }
+        def corporateActionsSecurity =
+            resolvedSecurityRequirements(data, corporateActionsOperation)
+        def expectedCorporateActionsSecurity = [
+            ['apiKey': [], 'apiSecret': []],
+            ['BasicAuth': []],
+        ].toSet()
+        if (corporateActionsSecurity != expectedCorporateActionsSecurity) {
+            throw new IllegalStateException(
+                "Market Data corporate-actions SSE security changed: " +
+                    "${corporateActionsSecurity}")
+        }
+        assertApiKeySecurityScheme(data, 'apiKey', 'APCA-API-KEY-ID', 'Market Data')
+        assertApiKeySecurityScheme(
+            data, 'apiSecret', 'APCA-API-SECRET-KEY', 'Market Data')
+        def dataBasicAuth = data.components?.securitySchemes?.BasicAuth
+        if (!(dataBasicAuth instanceof Map) ||
+            dataBasicAuth.type != 'http' ||
+            dataBasicAuth.scheme != 'basic') {
+            throw new IllegalStateException(
+                "Market Data BasicAuth definition changed: ${dataBasicAuth}")
+        }
+    }
+
+    private static Map contract(
+        String operationId, String status, String binding = null, String method = 'get') {
+        [operationId: operationId, status: status, binding: binding, method: method]
+    }
+
+    private static Map brokerSseShape(String operationId, List parameters, String schema) {
+        [operationId: operationId, parameters: parameters, schema: schema]
+    }
+
+    private static List resolvedParameterSignatures(Map spec, Object pathItem, Map operation) {
+        def parameters = []
+        if (pathItem instanceof Map && pathItem.parameters instanceof List) {
+            parameters.addAll(pathItem.parameters)
+        }
+        if (operation.parameters instanceof List) {
+            parameters.addAll(operation.parameters)
+        }
+        parameters.collect { parameter ->
+            def resolved = parameter instanceof Map && parameter['$ref']
+                ? spec.components?.parameters?.get(
+                    parameter['$ref'].toString().tokenize('/').last())
+                : parameter
+            resolved instanceof Map
+                ? parameterSignature(resolved, spec)
+                : "invalid:${parameter}"
+        }
+    }
+
+    private static String queryParameter(String name, String type, String format = null) {
+        def schema = [type: type]
+        if (format != null) schema.format = format
+        parameterSignature([name: name, in: 'query', schema: schema])
+    }
+
+    private static String pathParameter(String name, String type, String format = null) {
+        def schema = [type: type]
+        if (format != null) schema.format = format
+        parameterSignature([name: name, in: 'path', required: true, schema: schema])
+    }
+
+    private static String querySchemaParameter(String name, Map schema) {
+        parameterSignature([name: name, in: 'query', schema: schema])
+    }
+
+    private static String queryReferenceParameter(
+        String name, String reference, Map resolvedSchema) {
+        parameterSignature([
+            name: name,
+            in: 'query',
+            schema: ['$ref': reference, 'x-expected-resolved': resolvedSchema],
+        ])
+    }
+
+    private static String headerReferenceParameter(
+        String name, String reference, Map resolvedSchema) {
+        parameterSignature([
+            name: name,
+            in: 'header',
+            schema: ['$ref': reference, 'x-expected-resolved': resolvedSchema],
+        ])
+    }
+
+    private static String queryArrayReferenceParameter(
+        String name, String itemReference, Map resolvedItemSchema, boolean explode) {
+        parameterSignature([
+            name: name,
+            in: 'query',
+            style: 'form',
+            explode: explode,
+            schema: [
+                type: 'array',
+                items: [
+                    '$ref': itemReference,
+                    'x-expected-resolved': resolvedItemSchema,
+                ],
+            ],
+        ])
+    }
+
+    private static String parameterSignature(Map parameter, Map spec = null) {
+        def location = parameter['in']
+        def style = parameter.containsKey('style')
+            ? parameter.style
+            : defaultParameterStyle(location)
+        def explode = parameter.containsKey('explode')
+            ? parameter.explode
+            : style == 'form'
+        def required = parameter.containsKey('required')
+            ? parameter.required
+            : location == 'path'
+        def allowReserved = parameter.containsKey('allowReserved')
+            ? parameter.allowReserved
+            : false
+        "${parameter.name}|${location}|required=${required}|" +
+            "schema=${parameterSchemaSignature(spec, parameter.schema, [] as Set)}|" +
+            "style=${style}|explode=${explode}|allowReserved=${allowReserved}"
+    }
+
+    private static String defaultParameterStyle(Object location) {
+        switch (location) {
+            case 'query':
+            case 'cookie':
+                return 'form'
+            case 'path':
+            case 'header':
+                return 'simple'
+            default:
+                return 'missing'
+        }
+    }
+
+    private static String parameterSchemaSignature(
+        Map spec, Object schema, Set<String> resolvingReferences) {
+        if (!(schema instanceof Map)) return 'missing'
+        if (schema['$ref']) {
+            String reference = schema['$ref']
+            if (!resolvingReferences.add(reference)) return "ref:${reference}{recursive}"
+            def resolved = schema['x-expected-resolved']
+            if (resolved == null && reference.startsWith('#/components/schemas/')) {
+                resolved = spec?.components?.schemas?.get(reference.tokenize('/').last())
+            }
+            String resolvedSignature = parameterSchemaSignature(
+                spec, resolved, resolvingReferences)
+            resolvingReferences.remove(reference)
+            return "ref:${reference}{${resolvedSignature}}"
+        }
+        def signature = "${schema.type ?: 'missing'}:${schema.format ?: '-'}"
+        if (schema.type == 'array') {
+            signature += "[${parameterSchemaSignature(spec, schema.items, resolvingReferences)}]"
+        }
+        def constraintKeys = [
+            'enum', 'default', 'pattern', 'minLength', 'maxLength', 'minimum', 'maximum',
+            'exclusiveMinimum', 'exclusiveMaximum', 'minItems', 'maxItems', 'uniqueItems',
+        ]
+        def constraints = constraintKeys.findAll { schema.containsKey(it) }.collect { key ->
+            "${key}=${parameterConstraintValue(schema[key])}"
+        }
+        if (!constraints.isEmpty()) {
+            signature += "{${constraints.join(',')}}"
+        }
+        signature
+    }
+
+    private static String parameterConstraintValue(Object value) {
+        if (value instanceof List) {
+            return "[${value.collect { parameterConstraintValue(it) }.join('|')}]"
+        }
+        value == null ? 'null' : value.toString()
+    }
+
+    private static Set resolvedSecurityRequirements(Map spec, Map operation) {
+        def security = operation.containsKey('security')
+            ? operation.security
+            : spec.security
+        if (!(security instanceof List)) return [] as Set
+        security.collect { requirement ->
+            if (!(requirement instanceof Map)) {
+                return ['<invalid>': [requirement.toString()]]
+            }
+            requirement.collectEntries { name, scopes ->
+                def normalizedScopes = scopes instanceof List
+                    ? scopes.collect { it.toString() }.sort()
+                    : ['<invalid>']
+                [(name.toString()): normalizedScopes]
+            }
+        }.toSet()
+    }
+
+    private static void assertApiKeySecurityScheme(
+        Map spec, String schemeName, String headerName, String apiName) {
+        def scheme = spec.components?.securitySchemes?.get(schemeName)
+        if (!(scheme instanceof Map) ||
+            scheme.type != 'apiKey' ||
+            scheme.in != 'header' ||
+            scheme.name != headerName) {
+            throw new IllegalStateException(
+                "${apiName} ${schemeName} definition changed: ${scheme}")
+        }
+    }
+
+    private static String sseSchemaSignature(Object schema) {
+        if (!(schema instanceof Map)) return 'missing'
+        if (schema['$ref']) return "ref:${schema['$ref']}"
+        if (schema.type != 'array' || !(schema.items instanceof Map)) {
+            return "unsupported:${schema}"
+        }
+        def items = schema.items as Map
+        if (items['$ref']) return "array-ref:${items['$ref']}"
+        if (items.oneOf instanceof List) {
+            def references = items.oneOf.collect { it instanceof Map ? it['$ref'] : null }
+            if (references.every { it }) {
+                return "array-oneOf:${references.sort().join('|')}"
+            }
+        }
+        return "unsupported:${schema}"
+    }
+
+    private static void validateSseSupportDecision(
+        Map operation, Map<String, File> specFiles) {
+        def allowedStatuses = ['supported', 'deferred', 'deprecated'].toSet()
+        if (!(operation.status in allowedStatuses)) {
+            throw new IllegalStateException(
+                "Unknown SSE support status '${operation.status}' for ${operation.operationId}")
+        }
+        if (operation.status == 'supported' && !operation.binding) {
+            throw new IllegalStateException(
+                "Supported SSE operation ${operation.operationId} has no handwritten binding")
+        }
+        if (operation.status != 'supported' && operation.binding) {
+            throw new IllegalStateException(
+                "${operation.status} SSE operation ${operation.operationId} " +
+                    'must not declare a binding')
+        }
+        if (!operation.binding) return
+
+        def parts = operation.binding.toString().split('#', 2)
+        if (parts.length != 2 || !parts[0] || !parts[1]) {
+            throw new IllegalStateException(
+                "Invalid SSE binding '${operation.binding}' for ${operation.operationId}")
+        }
+        def projectDir = specFiles.values().first().parentFile.parentFile.parentFile
+        def source = new File(
+            projectDir, "src/main/java/${parts[0].replace('.', '/')}.java")
+        if (!source.isFile() ||
+            !(source.text =~ /\b${java.util.regex.Pattern.quote(parts[1])}\s*\(/).find()) {
+            throw new IllegalStateException(
+                "SSE binding ${operation.binding} for ${operation.operationId} was not found")
+        }
     }
 
     private static void traverseSchemas(Map spec, Closure visitor) {

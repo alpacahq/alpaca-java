@@ -2,6 +2,7 @@ package markets.alpaca.client.examples;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import markets.alpaca.client.AlpacaClientFactory;
 import markets.alpaca.client.broker.sse.BrokerSseDateOptions;
 import markets.alpaca.client.broker.sse.BrokerSseEventListener;
@@ -187,9 +188,15 @@ public final class BrokerApiExample {
             });
 
     try {
+      var connection = subscription.opened().get(10, TimeUnit.SECONDS);
+      System.out.printf(
+          "trade-events stream opened: %d %s%n", connection.statusCode(), connection.uri());
       Thread.sleep(15_000);
     } finally {
       subscription.close();
+      System.out.printf(
+          "trade-events stream closed: %s%n",
+          subscription.completion().get(10, TimeUnit.SECONDS).reason());
     }
   }
 

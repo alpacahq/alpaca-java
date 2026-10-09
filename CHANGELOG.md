@@ -11,17 +11,23 @@ the policy below applies strictly.
 
 | Change type                                                                                                   | Version bump |
 |---------------------------------------------------------------------------------------------------------------|--------------|
-| Breaking change to `AlpacaClientFactory`, `AlpacaCredentials`, HTTP helpers, REST helpers, or WebSocket public API | MAJOR        |
+| Breaking change to `AlpacaClientFactory`, `AlpacaCredentials`, HTTP helpers, REST helpers, or WebSocket/SSE public API | MAJOR        |
 | Breaking change to the generated API surface (renamed/removed class or method)                                | MAJOR        |
-| New endpoint or model coverage from a spec version update                                                     | MINOR        |
+| New backward-compatible public functionality, endpoint coverage, or model coverage                            | MINOR        |
 | Bug fix, dependency update, or preprocessing fix                                                              | PATCH        |
+
+`markets.alpaca.client.sse.internal` is implementation-only, is omitted from published Javadocs and
+API compatibility checks, and is not covered by this compatibility policy. Other public types
+remain covered regardless of an `.internal` package-name segment unless documented otherwise.
 
 ---
 
 ## [Unreleased]
 
 ### Breaking
+
 Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/alpaca-java/pull/90)):
+
 - Broker `EventsApi.suscribeToAccountStatusSSE` is now `subscribeToAccountStatusSSE`, including
   the `Call`, `WithHttpInfo`, and `Async` variants.
   `BrokerEventsSseClient.subscribeToAccountStatus` calls the corrected method; its own signature
@@ -34,8 +40,15 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Broker and Trading `OptionContract` JSON validation now requires `ppind`.
 - Broker and Trading `CommonFixedIncomeInterestActivityV2` JSON validation now requires
   `interest_type`.
+- Broker SSE keeps its public `eventSource()` method, but the returned object is now a
+  request/cancel compatibility facade rather than OkHttp's live implementation. Prefer
+  `BrokerSseSubscription.close()`.
+- Broker SSE callbacks are serialized and backpressured instead of fire-and-forget. Lifecycle
+  completion is independent from terminal listener delivery. Review callback-heavy applications
+  before upgrading.
 
 ### Added
+
 - Broker and Trading `FixedIncomeInterestType` (`coupon`, `accrued`), plus `interest_type`,
   `order_id`, and `parent_id` on fixed-income interest activities.
 - `ppind` on Broker and Trading `OptionContract`.
@@ -43,10 +56,31 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Broker `FundingWalletTransfer.getTotalAmount()`, and `fee_inclusive` on
   `CreateFundingWalletWithdrawalRequest`.
 - `TokenizationIssuer.ONDO` and `TokenizationNetwork.HYPERCORE` on Broker and Trading.
+- Typed, cancellable SSE clients for Trading account activities and Market Data corporate actions,
+  with filters, bounded replay, resume cursors, reconnect policies, and structured errors.
+- A shared Java SSE lifecycle API with awaitable opening, connection metadata, completion state,
+  resource limits, callback-executor configuration, and factory/top-level client access.
+- Additive Broker SSE capabilities including structured failure and closure callbacks, optional
+  reconnect, and asynchronous retrieval of one account-activity event.
+- A `0.1.4` to `0.2.0` SSE migration guide and conservative Broker cancellation codemod.
 
 ### Changed
+
 - Broker `FundingWalletTransfer.getOriginalAmount()` is deprecated. Use `getTotalAmount()` for the
   amount debited from the account.
+- Broker SSE now uses the shared bounded transport while preserving its existing method signatures,
+  one-connection default, and per-event malformed-payload handling. Applications can opt into
+  reconnect through `AlpacaSseOptions`.
+- `BrokerSseSubscription` implements the shared `AlpacaSseSubscription` interface while retaining
+  its Broker-specific compatibility methods.
+- Trading and Broker Activity V2 events use discriminant-aware decoding, preserve unknown envelope
+  fields, and fail closed when a detail payload cannot be identified safely.
+- The pinned Broker NTA operation now declares its actual `text/event-stream` media type, and
+  generation checks verify every pinned SSE operation has an explicit handwritten support decision.
+
+### Migration
+
+- See [`MIGRATIONS.md`](MIGRATIONS.md) for the `0.1.4` → `0.2.0` guide and conservative codemod.
 
 ## [0.1.4] - 2026-09-23
 
