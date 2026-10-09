@@ -25,7 +25,9 @@ remain covered regardless of an `.internal` package-name segment unless document
 ## [Unreleased]
 
 ### Breaking
+
 Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/alpaca-java/pull/90)):
+
 - Broker `EventsApi.suscribeToAccountStatusSSE` is now `subscribeToAccountStatusSSE`, including
   the `Call`, `WithHttpInfo`, and `Async` variants.
   `BrokerEventsSseClient.subscribeToAccountStatus` calls the corrected method; its own signature
@@ -39,12 +41,14 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Broker and Trading `CommonFixedIncomeInterestActivityV2` JSON validation now requires
   `interest_type`.
 - Broker SSE keeps its public `eventSource()` method, but the returned object is now a
-  request/cancel compatibility facade rather than OkHttp's live implementation.
-- Broker callbacks are serialized and backpressured instead of fire-and-forget. Terminal lifecycle
-  completion is independent from terminal listener delivery, and callback failure semantics are
-  defined below. See the migration guide before upgrading callback-heavy applications.
+  request/cancel compatibility facade rather than OkHttp's live implementation. Prefer
+  `BrokerSseSubscription.close()`.
+- Broker SSE callbacks are serialized and backpressured instead of fire-and-forget. Lifecycle
+  completion is independent from terminal listener delivery. Review callback-heavy applications
+  before upgrading.
 
 ### Added
+
 - Broker and Trading `FixedIncomeInterestType` (`coupon`, `accrued`), plus `interest_type`,
   `order_id`, and `parent_id` on fixed-income interest activities.
 - `ppind` on Broker and Trading `OptionContract`.
@@ -52,157 +56,31 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Broker `FundingWalletTransfer.getTotalAmount()`, and `fee_inclusive` on
   `CreateFundingWalletWithdrawalRequest`.
 - `TokenizationIssuer.ONDO` and `TokenizationNetwork.HYPERCORE` on Broker and Trading.
-- A typed, cancellable, reconnecting Trading account-activity SSE client with cursor filters,
-  bounded streams, resume IDs, resource limits, and structured lifecycle/error reporting.
-- A typed Market Data corporate-actions SSE client with production, sandbox, and custom endpoint
-  selection; event-type and region filters; validated history cursors; and fail-closed decoding for
-  every corporate-action discriminator in the pinned OpenAPI document.
-- Shared Java SSE transport types and explicit OpenAPI SSE contract verification.
-- Broker single-activity asynchronous retrieval through the endpoint's SSE framing.
-- Awaitable SSE opening, immutable current-connection metadata, options-only factories, top-level
-  client configuration, callback-executor factories, and named Trading and Market Data event-ID
-  cursor factories.
-- An optional elapsed-time budget for each initial-open or established reconnect cycle, separate
-  from the whole-subscription maximum duration.
+- Typed, cancellable SSE clients for Trading account activities and Market Data corporate actions,
+  with filters, bounded replay, resume cursors, reconnect policies, and structured errors.
+- A shared Java SSE lifecycle API with awaitable opening, connection metadata, completion state,
+  resource limits, callback-executor configuration, and factory/top-level client access.
+- Additive Broker SSE capabilities including structured failure and closure callbacks, optional
+  reconnect, and asynchronous retrieval of one account-activity event.
+- A `0.1.4` to `0.2.0` SSE migration guide and conservative Broker cancellation codemod.
 
 ### Changed
+
 - Broker `FundingWalletTransfer.getOriginalAmount()` is deprecated. Use `getTotalAmount()` for the
   amount debited from the account.
-- Broker SSE now uses the shared bounded parser and exposes SSE IDs/types, comments, reconnect
-  diagnostics, completion state, and optional resilient reconnect while preserving existing
-  one-connection defaults, per-event decode-failure behavior, and failure response bodies.
-- SSE listener callbacks are serialized per subscription, so terminal listener delivery follows an
-  active event callback and event handling provides transport backpressure; lifecycle completion
-  and timers do not wait for user callbacks. Because response parsing is backpressured, detection
-  of a remote end and its following reconnect can wait for the active event callback.
-- Activity V2 events use discriminant-aware decoders with a unique-most-specific structural
-  fallback instead of ambiguous generated `oneOf` matching; tied matches fail closed. Documented
-  `DIVROC` events resolve to `CDIVActivityV2`, and unknown envelope properties retain the generated
-  model's `additionalProperties` value shapes.
-- SSE resume state includes completed data-less `id:` blocks, and idle timers are scoped to active
-  response bodies rather than reconnect backoff.
-- Broker malformed events report failure, advance the transport cursor, and continue. Reconnect
-  attempt budgets are reset after a decoded event callback is invoked.
-- Broker listeners can distinguish malformed events, server retry changes, and structured normal
-  closure through additive default callbacks; deserialization failures include SSE ID/type.
-- The pinned Broker NTA operation now declares its actual `text/event-stream` response media type.
-- The public SSE subscription boundary is an interface; transport implementation classes under
-  `markets.alpaca.client.sse.internal` are excluded from Javadocs and compatibility guarantees.
-- `BrokerSseSubscription` implements the shared subscription interface while retaining its
-  Broker-specific compatibility surface. Reconnect delay caps apply to client backoff, server
-  `retry:`, and HTTP `Retry-After` values; `initialBackoff` floors server-directed delays to prevent
-  tight reconnect loops. Backoff durations require whole-millisecond precision and a value of at
-  least 1 ms, matching the transport scheduler's precision. Jitter cannot reduce a positive delay
-  to zero, and `Retry-After: 0` is handled by the SSE policy before OkHttp can follow it immediately.
-- Each SSE subscription uses and terminally shuts down a private, one-call daemon OkHttp dispatcher,
-  so long-lived streams do not consume the supplied client's REST dispatch slots, compete for a
-  process-wide SSE limit, or keep the JVM alive. The SDK's HTTP retry interceptor is removed from
-  the derived SSE client so application-level retries are not layered beneath the SSE reconnect
-  policy.
-- The migration codemod rewrites only a uniquely bound, bare `BrokerSseSubscription` parameter or
-  local variable in the call's lexical scope. Fields, qualified, shadowed, same-named local/nested
-  types, lambda-bound, commented, or otherwise uncertain chains are report-only. Missing inputs fail
-  closed.
-- Opening and terminal listener startup use separate bounded SDK dispatchers. Opening callbacks are
-  admitted before `opened()` continuations run, preventing a synchronous close-and-wait continuation
-  from blocking ordered `onOpen`/terminal delivery. Lifecycle futures remain authoritative;
-  terminal-dispatch saturation rejects pending terminal listener delivery with a warning instead of
-  creating unbounded threads.
-- Closing releases an HTTP response thread waiting for opening-dispatch capacity. Terminal listener
-  delivery is admitted before synchronous lifecycle-completion continuations run, while invocation
-  remains ordered after lifecycle completion and any previously admitted callback.
-- Markdown link checking includes the top-level migration index.
+- Broker SSE now uses the shared bounded transport while preserving its existing method signatures,
+  one-connection default, and per-event malformed-payload handling. Applications can opt into
+  reconnect through `AlpacaSseOptions`.
+- `BrokerSseSubscription` implements the shared `AlpacaSseSubscription` interface while retaining
+  its Broker-specific compatibility methods.
+- Trading and Broker Activity V2 events use discriminant-aware decoding, preserve unknown envelope
+  fields, and fail closed when a detail payload cannot be identified safely.
+- The pinned Broker NTA operation now declares its actual `text/event-stream` media type, and
+  generation checks verify every pinned SSE operation has an explicit handwritten support decision.
 
-### Fixed
-- Concurrent `close()` calls now return only after lifecycle completion settles, including when a
-  failure wins the terminal transition. Accepted initial and reconnect responses retain their
-  successful opening future and ordered open callback ahead of terminal listener delivery.
-- Broker admin-action SSE events now use their required `type` discriminator instead of the
-  ambiguous generated `oneOf` adapter, while retaining the generated public wrapper type.
-- Closing during initial connection or reconnect can no longer publish an uncancelled call after the
-  terminal transition, and closing from a listener while awaiting `completion()` no longer
-  deadlocks.
-- Lifecycle completion settlement no longer runs synchronous future continuations on an active
-  listener callback path, so a callback can close while a completion continuation awaits the
-  ordered terminal listener.
-- Terminal callbacks now verify lifecycle completion even when an existing callback drain consumes
-  them. Completion settlement uses isolated, direct-handoff workers so a blocked synchronous
-  continuation cannot queue another subscription's settlement or occupy the scheduler. Synchronous
-  lifecycle continuations must remain short because concurrently blocked continuations consume
-  additional daemon workers; unrelated or potentially unbounded work belongs on an
-  application-owned executor through an asynchronous continuation.
-- An empty Trading SSE `id:` clears `Last-Event-ID` but retains an unbounded request's original
-  `since`/`since_id` lower bound, including `initialLastEventId`, so reconnect cannot silently skip
-  activity emitted during backoff. This safe replay can redeliver earlier events. ID-bounded streams
-  and cursorless live streams fail closed when no replay-safe lower bound can be supplied.
-- Empty initial resume IDs are rejected. Trading rejects an initial ID combined with a date-bounded
-  request, and Trading and Corporate Actions reject one after an ID-bounded request's `untilId`,
-  instead of relying on undocumented header-only replay or sending an invalid cursor range.
-- Trading and Broker activity decoders preserve newly generated but not-yet-handled envelope fields
-  through `additionalProperties` instead of silently dropping them after regeneration.
-- Trading and Broker activity decoders preserve OAS-valid `DIVTXEX` events through the compatible
-  generated `CDIVActivityV2` detail model until the OAS supplies a dedicated schema.
-- Migration diagnostic `SSE006` covers generated SSE invocations and method references without
-  flagging a uniquely bound handwritten
-  `BrokerEventsSseClient.getAccountActivityEventAsync(...)` receiver. `this.receiver` is suppressed
-  only for a proven handwritten field declared on the current class; every generated use is
-  reported.
-- Terminal lifecycle state, timers, and cancellation no longer wait behind user callbacks or block
-  the shared scheduler. Terminal listener delivery remains serialized after callbacks already in
-  progress, and no new callbacks are admitted after termination.
-- Connection deadlines now cover bounded non-success response-body reads, timeout failures retain
-  their cancellation cause, and elapsed reconnect-budget expiry preserves the preceding transport
-  or HTTP failure instead of starting an immediately cancelled request.
-- Accepting response headers invalidates already-started connect-timeout work, preventing a stale
-  scheduler task from cancelling the accepted stream at the deadline boundary.
-- Established reconnect elapsed-time budgets remain active after accepted headers until event
-  delivery, including while the server sends only comments or remains silent.
-- Callback-executor rejection during reconnect and Broker single-activity timeout now always settle
-  their public futures; terminal completion settles before pre-open `opened()` continuations run.
-  Fatal listener throwables are logged even when terminal listener delivery is asynchronous.
-- Initial reconnect and open-stream idle budgets remain active while lifecycle callbacks execute.
-  SSE clients disable inherited OkHttp read and whole-call timeouts in favor of SDK SSE deadlines.
-- Delivered-event cursor commitment and reconnect-deadline reset are atomic, and Broker
-  single-activity timeout cannot be overwritten by a callback delivered after termination.
-- Canceled idle-timeout tasks are removed from the shared scheduler, and Unicode SSE IDs can be
-  replayed without stranding reconnects. HTTP-incompatible cursor controls and request/scheduler
-  construction failures now terminate with a protocol failure.
-- Pre-open user closure is preserved as cancellation on defensive `opened()` futures. Lifecycle
-  deadlines use saturating nanosecond scheduling so positive sub-millisecond and very large
-  `Duration` values do not truncate or fail asynchronously, and HTTP-failure header values are
-  deeply immutable.
-- The migration tool preserves CRLF line endings, scans checkouts beneath ancestor directories
-  named `build`, masks escaped delimiters in Java text blocks, and treats same-named type parameters
-  (including qualified type-use annotations) and Java Unicode escapes as report-only. It diagnoses
-  unqualified generated calls in indirect or anonymous subclasses plus chained `EventSource` casts
-  and identity checks.
-- Trading and Broker Activity V2 decoders preserve `CSD` events by temporarily representing their
-  details as `CSWActivityV2`. The activity type remains `CSD`, and undeclared detail fields remain
-  available through `getAdditionalProperties()`, pending a dedicated upstream CSD detail schema.
-- SSE contract verification pins each supported stream's ordered parameter wire signatures and
-  resolved schema constraints, response schema shapes, exact authentication alternatives, and
-  consumed API-key/HTTP-Basic definitions in addition to inventory and handwritten bindings.
-- Pull-request and frozen-snapshot CI enforce source and binary API compatibility before publication;
-  reviewed exclusions enumerate exact removed generated symbols.
+### Migration
 
-### Behavioral compatibility and migration
-- Existing Broker listener signatures remain available. Rich callbacks delegate to the legacy
-  shapes by default: malformed events pass their original deserialization cause, HTTP failures pass
-  a bounded response with no throwable, and user close passes `IOException("canceled")` with no
-  response. Overriding a rich callback suppresses its default legacy delegation.
-- `BrokerSseSubscription.eventSource()` is now a request/cancel compatibility facade rather than
-  the live OkHttp implementation. Prefer `close()`; casts, identity assumptions, and deep response
-  internals require manual review. Cancellation no longer carries OkHttp's stripped active
-  response, and protocol/resource failures use the SDK exception hierarchy.
-- Listener runtime exceptions are logged and a delivered event's resume cursor still advances.
-  Callback-executor rejection is terminal. Lifecycle `completion()` resolves before terminal
-  listener delivery and cannot be held up by a blocked callback.
-- Trading reconnect requests transmit the committed cursor through the documented `since_id` query
-  and `Last-Event-ID`. Replay relies on `since_id`; no backend consumption claim is made for the
-  standard header.
 - See [`MIGRATIONS.md`](MIGRATIONS.md) for the `0.1.4` → `0.2.0` guide and conservative codemod.
-  This substantial additive/behavioral release uses the repository's documented pre-1.0
-  compatibility policy.
 
 ## [0.1.4] - 2026-09-23
 
