@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Conservatively migrate Broker SSE usage from alpaca-java 0.1.4 to 0.1.5.
+"""Conservatively migrate Broker SSE usage from alpaca-java 0.1.4 to 0.2.0.
 
 The tool intentionally recognizes only a small, mechanically safe Java subset.
 Everything else is reported for manual review and left unchanged.
