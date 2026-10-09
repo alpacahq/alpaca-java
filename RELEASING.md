@@ -43,8 +43,28 @@ all NMCP snapshot tasks. Use these commands rather than lower-level publishing t
 
 After a successful current `main` push, the Build workflow publishes the version in
 `gradle.properties` when it ends in `-SNAPSHOT`. It freezes the committed OpenAPI pins under
-`specs/`, builds from read-only copies, rechecks `main`, then publishes those same copies. Pull
-requests, non-`main` pushes, failed builds, and stale commits never publish.
+`specs/`, builds from read-only copies, checks that exact JAR against the published compatibility
+baseline, rechecks `main`, then publishes those same copies. Pull-request CI also runs the
+compatibility task. Pull requests, non-`main` pushes, failed builds, incompatible JARs, and stale
+commits never publish.
+
+## Pre-tag verification
+
+Run the candidate from a clean tree so `checkGenerated` compares regenerated OpenAPI output with the
+candidate commit:
+
+```bash
+./gradlew build
+./gradlew checkApiCompatibility -PapiBaselineVersion=0.1.4
+```
+
+The API compatibility task compares the complete public JAR and fails on source or binary
+incompatibility. Set `apiBaselineVersion` to the previous published release. The member-specific
+exclusions in `alpaca.quality.gradle` cover only reviewed OpenAPI corrections inherited before this
+gate existed. Do not broaden those exclusions or add another without equivalent migration guidance
+and review. The task still fails on every other incompatibility. It does not prove behavioral
+compatibility, and missing external dependency classes are ignored, so release-specific migration
+review and regression tests remain mandatory.
 
 ## Release workflow
 
@@ -58,10 +78,11 @@ workflow from `main` with that tag. Do not queue release dispatches.
 The workflow verifies the tag and its reachability, requires curated changelog notes on the
 tagged commit (a non-empty `## [version]` section, or a non-empty `## [Unreleased]` fallback),
 rejects an existing release POM, tests release tools, archives the committed OpenAPI pins under
-`specs/`, builds and signs the release, publishes it, creates or publishes the GitHub Release, and
-opens a pull request that advances `gradle.properties` to the next patch `-SNAPSHOT` and, when
-needed, promotes `[Unreleased]` to the dated release section on `main`. Merge that PR through
-normal branch protection; its Build workflow publishes the next snapshot.
+`specs/`, builds the release, checks its public API against the previous reachable semantic release
+tag, signs and publishes it, creates or publishes the GitHub Release, and opens a pull request that
+advances `gradle.properties` to the next patch `-SNAPSHOT` and, when needed, promotes `[Unreleased]`
+to the dated release section on `main`. Merge that PR through normal branch protection; its Build
+workflow publishes the next snapshot.
 
 GitHub Release bodies are composed as the curated changelog section, then GitHub’s
 `**Full Changelog**` compare link for the tag range (not the auto-generated PR list).
