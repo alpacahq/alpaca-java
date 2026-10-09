@@ -1,9 +1,9 @@
 ---
 id: sse-migration
-title: Migrating SSE from 0.1.4 to 0.1.5
+title: Migrating SSE from 0.1.4 to 0.2.0
 ---
 
-Version `0.1.5` adds Trading account-activity and Market Data corporate-actions SSE, and moves
+Version `0.2.0` adds Trading account-activity and Market Data corporate-actions SSE, and moves
 Broker SSE onto the shared bounded, reconnecting transport. Existing Broker method signatures
 remain available, but applications should review cancellation, callback scheduling, failure
 handling, and uses of the exposed OkHttp `EventSource`.
@@ -23,7 +23,7 @@ live OkHttp implementation. Replace cancellation through that facade:
 // 0.1.4
 subscription.eventSource().cancel();
 
-// 0.1.5
+// 0.2.0
 subscription.close();
 ```
 
@@ -34,13 +34,13 @@ The repository includes a conservative scanner/codemod:
 
 ```bash
 # Report safe rewrites and manual-review findings.
-python3 scripts/migrate_sse_0_1_4_to_0_1_5.py src/main/java
+python3 scripts/migrate_sse_0_1_4_to_0_2_0.py src/main/java
 
 # Apply only proven BrokerSseSubscription rewrites.
-python3 scripts/migrate_sse_0_1_4_to_0_1_5.py --write src/main/java
+python3 scripts/migrate_sse_0_1_4_to_0_2_0.py --write src/main/java
 
 # CI/reporting modes.
-python3 scripts/migrate_sse_0_1_4_to_0_1_5.py --check --json src/main/java
+python3 scripts/migrate_sse_0_1_4_to_0_2_0.py --check --json src/main/java
 ```
 
 The tool rewrites only a bare identifier receiver with exactly one explicit
@@ -218,7 +218,7 @@ replay history without a lower bound. Existing Broker constructors keep the `0.1
 default; pass `AlpacaSseOptions` to opt into Broker reconnects.
 
 `AlpacaSseOptions.initialLastEventId` rejects an empty value. Do not combine an initial ID with a
-date-bounded Trading request; `0.1.5` rejects that ambiguous combination before opening a
+date-bounded Trading request; `0.2.0` rejects that ambiguous combination before opening a
 connection. Use an ID-bounded request instead, and keep the initial ID at or before its `untilId`.
 Corporate Actions also rejects an initial ID after an ID-bounded request's `untilId`.
 
@@ -258,7 +258,7 @@ endpoint-specific examples.
 
 ## Review generated validation changes
 
-The `0.1.5` generated models enforce two newly required payload fields:
+The `0.2.0` generated models enforce two newly required payload fields:
 
 - Broker and Trading `OptionContract` requires `ppind`;
 - Broker and Trading `CommonFixedIncomeInterestActivityV2` requires `interest_type`.
