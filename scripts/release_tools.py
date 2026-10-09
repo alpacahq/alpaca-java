@@ -23,6 +23,9 @@ _SNAPSHOT_PATTERN = re.compile(
     rf"^({_COMPONENT})\.({_COMPONENT})\.({_COMPONENT})-SNAPSHOT$"
 )
 _VERSION_PROPERTY_PATTERN = re.compile(r"^\s*version\s*=(.*)$")
+_API_BASELINE_PROPERTY_PATTERN = re.compile(
+    r"^\s*apiBaselineVersion\s*=(.*)$"
+)
 _DECIMAL_PATTERN = re.compile(rf"^{_COMPONENT}$")
 _FORBIDDEN_XML_DECLARATION_PATTERN = re.compile(
     r"<!\s*(?:DOCTYPE|ENTITY)\b", re.IGNORECASE
@@ -56,6 +59,8 @@ class VersionUpdate:
     version: str
     status: str
     changed: bool
+    baseline_version: str
+    baseline_status: str
 
 
 @dataclass(frozen=True)
@@ -124,6 +129,31 @@ def compare_semver_parts(
         if comparison != 0:
             return comparison
     return 0
+
+
+def select_previous_release_version(
+    release_version: str, candidate_tags: list[str]
+) -> str:
+    """Return the greatest canonical release tag strictly below the candidate."""
+    release_parts = parse_release_version(release_version)
+    selected_parts: tuple[str, str, str] | None = None
+    for candidate_tag in candidate_tags:
+        try:
+            candidate_version = parse_release_tag(candidate_tag.strip())
+        except ReleaseToolError:
+            continue
+        candidate_parts = parse_release_version(candidate_version)
+        if compare_semver_parts(candidate_parts, release_parts) >= 0:
+            continue
+        if selected_parts is None or compare_semver_parts(
+            candidate_parts, selected_parts
+        ) > 0:
+            selected_parts = candidate_parts
+    if selected_parts is None:
+        raise ReleaseToolError(
+            f"no semantic release tag exists below {release_version}"
+        )
+    return ".".join(selected_parts)
 
 
 def validate_recovery_pom(
@@ -470,7 +500,7 @@ def read_snapshot_version(properties_path: Path) -> str:
 
 
 def update_next_snapshot(properties_path: Path, release_version: str) -> VersionUpdate:
-    """Safely advance the effective final version property without downgrading."""
+    """Advance the development version and compatibility baseline without downgrading."""
     release_parts = parse_release_version(release_version)
     next_parts = (
         release_parts[0],
@@ -482,43 +512,86 @@ def update_next_snapshot(properties_path: Path, release_version: str) -> Version
     text, has_utf8_bom = _read_utf8_document(properties_path)
     lines = text.splitlines(keepends=True)
 
-    matches: list[tuple[int, str]] = []
-    for index, line in enumerate(lines):
-        match = _VERSION_PROPERTY_PATTERN.fullmatch(line.rstrip("\r\n"))
-        if match is not None:
-            matches.append((index, match.group(1).strip()))
-    if not matches:
-        raise ReleaseToolError("no version property was found")
+    def effective_property(
+        pattern: re.Pattern[str], label: str
+    ) -> tuple[int, str]:
+        matches: list[tuple[int, str]] = []
+        for index, line in enumerate(lines):
+            match = pattern.fullmatch(line.rstrip("\r\n"))
+            if match is not None:
+                matches.append((index, match.group(1).strip()))
+        if not matches:
+            raise ReleaseToolError(f"no {label} property was found")
+        return matches[-1]
 
-    version_index, current_version = matches[-1]
+    def replace_property(index: int, name: str, value: str) -> None:
+        original_line = lines[index]
+        if original_line.endswith("\r\n"):
+            newline = "\r\n"
+        elif original_line.endswith("\n"):
+            newline = "\n"
+        elif original_line.endswith("\r"):
+            newline = "\r"
+        else:
+            newline = ""
+        lines[index] = f"{name}={value}{newline}"
+
+    version_index, current_version = effective_property(
+        _VERSION_PROPERTY_PATTERN, "version"
+    )
     current_match = _SNAPSHOT_PATTERN.fullmatch(current_version)
     if current_match is None:
         raise ReleaseToolError(
             f"effective version on line {version_index + 1} is not a semantic SNAPSHOT"
         )
     current_parts = current_match.groups()
-    comparison = compare_semver_parts(current_parts, next_parts)
-
-    if comparison == 0:
-        return VersionUpdate(next_version, "equal", False)
-    if comparison > 0:
-        return VersionUpdate(next_version, "ahead", False)
-
-    original_line = lines[version_index]
-    if original_line.endswith("\r\n"):
-        newline = "\r\n"
-    elif original_line.endswith("\n"):
-        newline = "\n"
-    elif original_line.endswith("\r"):
-        newline = "\r"
+    version_comparison = compare_semver_parts(current_parts, next_parts)
+    if version_comparison < 0:
+        version_status = "behind"
+        replace_property(version_index, "version", next_version)
+    elif version_comparison == 0:
+        version_status = "equal"
     else:
-        newline = ""
-    lines[version_index] = f"version={next_version}{newline}"
+        version_status = "ahead"
+
+    baseline_index, current_baseline = effective_property(
+        _API_BASELINE_PROPERTY_PATTERN, "apiBaselineVersion"
+    )
+    current_baseline_parts = parse_release_version(current_baseline)
+    baseline_comparison = compare_semver_parts(
+        current_baseline_parts, release_parts
+    )
+    if baseline_comparison < 0:
+        baseline_status = "behind"
+        replace_property(
+            baseline_index, "apiBaselineVersion", release_version
+        )
+    elif baseline_comparison == 0:
+        baseline_status = "equal"
+    else:
+        baseline_status = "ahead"
+
+    changed = version_status == "behind" or baseline_status == "behind"
+    if not changed:
+        return VersionUpdate(
+            next_version,
+            version_status,
+            False,
+            release_version,
+            baseline_status,
+        )
+
     updated_text = "".join(lines)
     if has_utf8_bom:
         updated_text = "\ufeff" + updated_text
     _atomic_write_text(properties_path, updated_text)
-    return VersionUpdate(next_version, "behind", True)
+    return VersionUpdate(
+        next_version,
+        version_status,
+        True,
+        release_version,
+        baseline_status,
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -527,6 +600,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     parse_tag = subparsers.add_parser("parse-tag")
     parse_tag.add_argument("tag")
+
+    select_baseline = subparsers.add_parser("select-api-baseline")
+    select_baseline.add_argument("--release-version", required=True)
 
     validate_pom = subparsers.add_parser("validate-pom")
     validate_pom.add_argument("--pom", required=True)
@@ -578,6 +654,12 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if arguments.command == "parse-tag":
             print(parse_release_tag(arguments.tag))
+        elif arguments.command == "select-api-baseline":
+            print(
+                select_previous_release_version(
+                    arguments.release_version, list(sys.stdin)
+                )
+            )
         elif arguments.command == "validate-pom":
             validate_recovery_pom(
                 Path(arguments.pom),
@@ -593,6 +675,8 @@ def main(argv: list[str] | None = None) -> int:
                 f"version={update.version}\n"
                 f"should_push={str(update.changed).lower()}\n"
                 f"status={update.status}\n"
+                f"api_baseline_version={update.baseline_version}\n"
+                f"api_baseline_status={update.baseline_status}\n"
             )
             _write_github_output(
                 Path(arguments.github_output) if arguments.github_output else None,
