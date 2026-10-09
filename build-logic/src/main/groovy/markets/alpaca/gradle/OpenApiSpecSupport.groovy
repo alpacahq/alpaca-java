@@ -340,58 +340,61 @@ final class OpenApiSpecSupport {
     static void verifySseContracts(Map<String, File> specFiles) {
         def expected = [
             broker: [
-                contract('/v1/events/nta', 'get-v1-events-nta', 'supported',
+                contract('get-v1-events-nta', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#subscribeToNonTradingActivities'),
-                contract('/v1/events/accounts/status', 'subscribeToAccountStatusSSE', 'supported',
+                contract('subscribeToAccountStatusSSE', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#subscribeToAccountStatus'),
-                contract('/v1/events/journals/status', 'subscribeToJournalStatusSSE', 'supported',
+                contract('subscribeToJournalStatusSSE', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#subscribeToJournalStatusLegacy'),
-                contract('/v1/events/transfers/status', 'subscribeToTransferStatusSSE',
-                    'deprecated'),
-                contract('/v2beta1/accounts/{account_id}/events/activities/{event_id}',
-                    'getAccountActivityEvent', 'supported',
+                contract('subscribeToTransferStatusSSE', 'deprecated'),
+                contract('getAccountActivityEvent', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#getAccountActivityEventAsync'),
-                contract('/v2beta1/events/activities', 'subscribeToActivitiesSSE', 'supported',
+                contract('subscribeToActivitiesSSE', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#subscribeToActivities'),
-                contract('/v2/events/admin-actions', 'subscribeToAdminActionSSE', 'supported',
+                contract('subscribeToAdminActionSSE', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#subscribeToAdminActions'),
-                contract('/v2/events/funding/status', 'subscribeToFundingStatusSSE', 'supported',
+                contract('subscribeToFundingStatusSSE', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#subscribeToFundingStatus'),
-                contract('/v2/events/ipos', 'subscribeToIPOEventsSSE', 'supported',
+                contract('subscribeToIPOEventsSSE', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#subscribeToIpoEvents'),
-                contract('/v2/events/journals/status', 'subscribeToJournalStatusV2SSE', 'supported',
+                contract('subscribeToJournalStatusV2SSE', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#subscribeToJournalStatus'),
-                contract('/v2/events/system', 'subscribeToSystemEventV2SSE', 'supported',
+                contract('subscribeToSystemEventV2SSE', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#subscribeToSystemEvents'),
-                contract('/v2/events/trades', 'subscribeToTradeV2SSE', 'supported',
+                contract('subscribeToTradeV2SSE', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#subscribeToTradeEvents'),
             ],
             data: [
-                contract('/v1beta1/events/corporate-actions',
-                    'SubscribeToCorporateActionsEventsSSE', 'supported',
+                contract('SubscribeToCorporateActionsEventsSSE', 'supported',
                     'markets.alpaca.client.data.sse.CorporateActionsSseClient' +
                         '#subscribeToCorporateActions'),
             ],
             trading: [
-                contract('/v2beta1/events/activities', 'subscribeToActivitiesSSE', 'supported',
+                contract('subscribeToActivitiesSSE', 'supported',
                     'markets.alpaca.client.trading.sse.TradingEventsSseClient' +
                         '#subscribeToActivities'),
             ],
         ]
 
+        def discoveredSseOperations = [:]
         expected.each { api, expectedOperations ->
             expectedOperations.each { validateSseSupportDecision(it, specFiles) }
+            def expectedIds = expectedOperations.collect { it.operationId }
+            if (expectedIds.toSet().size() != expectedIds.size()) {
+                throw new IllegalStateException(
+                    "${api} SSE support decisions contain duplicate operationIds")
+            }
             def file = specFiles[api]
             if (file == null || !file.isFile()) {
                 throw new IllegalStateException("Missing pinned ${api} OpenAPI document")
@@ -421,17 +424,49 @@ final class OpenApiSpecSupport {
                         throw new IllegalStateException(
                             "${api} ${method.toUpperCase()} ${path} has no resolved security")
                     }
-                    actual << [path: path, operationId: operation.operationId]
+                    if (!(operation.operationId instanceof String) ||
+                        operation.operationId.isBlank()) {
+                        throw new IllegalStateException(
+                            "${api} ${method.toUpperCase()} ${path} has no operationId")
+                    }
+                    actual << [
+                        path: path,
+                        method: method,
+                        operationId: operation.operationId,
+                        pathItem: pathItem,
+                        operation: operation,
+                    ]
                 }
             }
 
-            def expectedIdentity =
-                expectedOperations.collect { [it.path, it.operationId] }.toSet()
-            def actualIdentity = actual.collect { [it.path, it.operationId] }.toSet()
-            if (actualIdentity != expectedIdentity) {
+            def actualByOperationId = actual.groupBy { it.operationId }
+            def duplicateIds = actualByOperationId
+                .findAll { operationId, operations -> operations.size() > 1 }
+                .keySet()
+            if (!duplicateIds.isEmpty()) {
                 throw new IllegalStateException(
-                    "${api} SSE inventory changed. Expected ${expectedIdentity}; " +
-                        "found ${actualIdentity}")
+                    "${api} SSE operationIds are not unique: ${duplicateIds}")
+            }
+            def actualIds = actualByOperationId.keySet()
+            if (actualIds != expectedIds.toSet()) {
+                def actualInventory = actual.collect {
+                    "${it.operationId} (${it.method.toUpperCase()} ${it.path})"
+                }
+                throw new IllegalStateException(
+                    "${api} SSE inventory changed. Expected operationIds ${expectedIds}; " +
+                        "found ${actualInventory}")
+            }
+            discoveredSseOperations[api] = actualByOperationId.collectEntries {
+                operationId, operations -> [(operationId): operations.first()]
+            }
+            expectedOperations.each { expectedOperation ->
+                def discovered = discoveredSseOperations[api][expectedOperation.operationId]
+                if (discovered.method != expectedOperation.method) {
+                    throw new IllegalStateException(
+                        "${api} SSE ${expectedOperation.operationId} moved from " +
+                            "${expectedOperation.method.toUpperCase()} to " +
+                            "${discovered.method.toUpperCase()} ${discovered.path}")
+                }
             }
         }
 
@@ -459,73 +494,73 @@ final class OpenApiSpecSupport {
             queryParameter('until_id', 'string', 'ulid'),
         ]
         def brokerShapes = [
-            brokerSseShape('/v1/events/nta',
+            brokerSseShape('get-v1-events-nta',
                 [queryParameter('id', 'string')] +
                     legacyDateRange +
                     legacyUlidRange +
                     [queryParameter('include_preprocessing', 'boolean'),
                         queryParameter('group_id', 'string', 'uuid')],
                 'ref:#/components/schemas/NonTradeActivityEvent'),
-            brokerSseShape('/v1/events/accounts/status',
+            brokerSseShape('subscribeToAccountStatusSSE',
                 legacyDateRange + legacyUlidRange + [queryParameter('id', 'string')],
                 'array-ref:#/components/schemas/AccountStatusEvent'),
-            brokerSseShape('/v1/events/journals/status',
+            brokerSseShape('subscribeToJournalStatusSSE',
                 legacyDateRange + legacyUlidRange + [queryParameter('id', 'string')],
                 'array-ref:#/components/schemas/JournalStatusEvent'),
-            brokerSseShape('/v1/events/transfers/status',
+            brokerSseShape('subscribeToTransferStatusSSE',
                 legacyDateRange + legacyUlidRange,
                 'array-ref:#/components/schemas/TransferStatusEvent'),
-            brokerSseShape('/v2beta1/accounts/{account_id}/events/activities/{event_id}',
+            brokerSseShape('getAccountActivityEvent',
                 [pathParameter('account_id', 'string', 'uuid'),
                     pathParameter('event_id', 'string', 'ulid')],
                 'ref:#/components/schemas/ActivityEventV2'),
-            brokerSseShape('/v2beta1/events/activities',
+            brokerSseShape('subscribeToActivitiesSSE',
                 activityRange,
                 'array-ref:#/components/schemas/ActivityEventV2'),
-            brokerSseShape('/v2/events/admin-actions',
+            brokerSseShape('subscribeToAdminActionSSE',
                 activityRange,
                 'array-oneOf:#/components/schemas/AdminActionLegacyNote|' +
                     '#/components/schemas/AdminActionLiquidation|' +
                     '#/components/schemas/AdminActionTransactionCancel'),
-            brokerSseShape('/v2/events/funding/status',
+            brokerSseShape('subscribeToFundingStatusSSE',
                 dateUlidRange,
                 'array-ref:#/components/schemas/StatusFundingEvent'),
-            brokerSseShape('/v2/events/ipos',
+            brokerSseShape('subscribeToIPOEventsSSE',
                 activityRange,
                 'array-ref:#/components/schemas/IPOEvent'),
-            brokerSseShape('/v2/events/journals/status',
+            brokerSseShape('subscribeToJournalStatusV2SSE',
                 activityRange + [queryParameter('id', 'string')],
                 'array-ref:#/components/schemas/JournalStatusEventV2'),
-            brokerSseShape('/v2/events/system',
+            brokerSseShape('subscribeToSystemEventV2SSE',
                 activityRange,
                 'array-ref:#/components/schemas/SystemEventV2'),
-            brokerSseShape('/v2/events/trades',
+            brokerSseShape('subscribeToTradeV2SSE',
                 dateUlidRange,
                 'array-ref:#/components/schemas/TradeUpdateEventV2'),
         ]
         brokerShapes.each { expectedShape ->
-            def operation = broker.paths[expectedShape.path]?.get
-            if (!(operation instanceof Map)) {
-                throw new IllegalStateException(
-                    "Broker SSE operation is no longer GET ${expectedShape.path}")
-            }
+            def discovered = discoveredSseOperations.broker[expectedShape.operationId]
+            def operation = discovered.operation
+            def label =
+                "${expectedShape.operationId} (${discovered.method.toUpperCase()} " +
+                "${discovered.path})"
             def parameters =
-                resolvedParameterSignatures(broker, broker.paths[expectedShape.path], operation)
+                resolvedParameterSignatures(broker, discovered.pathItem, operation)
             if (parameters != expectedShape.parameters) {
                 throw new IllegalStateException(
-                    "Broker SSE parameters changed for ${expectedShape.path}: ${parameters}")
+                    "Broker SSE parameters changed for ${label}: ${parameters}")
             }
             def schema = operation.responses['200']
                 .content['text/event-stream'].schema
             def signature = sseSchemaSignature(schema)
             if (signature != expectedShape.schema) {
                 throw new IllegalStateException(
-                    "Broker SSE response schema changed for ${expectedShape.path}: ${signature}")
+                    "Broker SSE response schema changed for ${label}: ${signature}")
             }
             def security = resolvedSecurityRequirements(broker, operation)
             if (security != [['BasicAuth': []]].toSet()) {
                 throw new IllegalStateException(
-                    "Broker SSE security changed for ${expectedShape.path}: ${security}")
+                    "Broker SSE security changed for ${label}: ${security}")
             }
         }
         def basicAuth = broker.components?.securitySchemes?.BasicAuth
@@ -537,10 +572,10 @@ final class OpenApiSpecSupport {
         }
 
         def trading = loadSpec(specFiles.trading.absolutePath) as Map
-        def tradingOperation =
-            trading.paths['/v2beta1/events/activities'].get
+        def tradingDiscovered = discoveredSseOperations.trading.subscribeToActivitiesSSE
+        def tradingOperation = tradingDiscovered.operation
         def parameterSignatures = resolvedParameterSignatures(
-            trading, trading.paths['/v2beta1/events/activities'], tradingOperation)
+            trading, tradingDiscovered.pathItem, tradingOperation)
         if (parameterSignatures != activityRange) {
             throw new IllegalStateException(
                 "Trading activity SSE parameters changed: ${parameterSignatures}")
@@ -562,10 +597,11 @@ final class OpenApiSpecSupport {
             trading, 'API_Secret', 'APCA-API-SECRET-KEY', 'Trading')
 
         def data = loadSpec(specFiles.data.absolutePath) as Map
-        def corporateActionsOperation =
-            data.paths['/v1beta1/events/corporate-actions'].get
+        def corporateActionsDiscovered =
+            discoveredSseOperations.data.SubscribeToCorporateActionsEventsSSE
+        def corporateActionsOperation = corporateActionsDiscovered.operation
         def corporateActionsParameters = resolvedParameterSignatures(
-            data, data.paths['/v1beta1/events/corporate-actions'], corporateActionsOperation)
+            data, corporateActionsDiscovered.pathItem, corporateActionsOperation)
         def eventIdSchema = [
             type: 'string',
             format: 'ulid',
@@ -645,12 +681,12 @@ final class OpenApiSpecSupport {
     }
 
     private static Map contract(
-        String path, String operationId, String status, String binding = null) {
-        [path: path, operationId: operationId, status: status, binding: binding]
+        String operationId, String status, String binding = null, String method = 'get') {
+        [operationId: operationId, status: status, binding: binding, method: method]
     }
 
-    private static Map brokerSseShape(String path, List parameters, String schema) {
-        [path: path, parameters: parameters, schema: schema]
+    private static Map brokerSseShape(String operationId, List parameters, String schema) {
+        [operationId: operationId, parameters: parameters, schema: schema]
     }
 
     private static List resolvedParameterSignatures(Map spec, Object pathItem, Map operation) {
@@ -846,22 +882,23 @@ final class OpenApiSpecSupport {
         def allowedStatuses = ['supported', 'deferred', 'deprecated'].toSet()
         if (!(operation.status in allowedStatuses)) {
             throw new IllegalStateException(
-                "Unknown SSE support status '${operation.status}' for ${operation.path}")
+                "Unknown SSE support status '${operation.status}' for ${operation.operationId}")
         }
         if (operation.status == 'supported' && !operation.binding) {
             throw new IllegalStateException(
-                "Supported SSE operation ${operation.path} has no handwritten binding")
+                "Supported SSE operation ${operation.operationId} has no handwritten binding")
         }
         if (operation.status != 'supported' && operation.binding) {
             throw new IllegalStateException(
-                "${operation.status} SSE operation ${operation.path} must not declare a binding")
+                "${operation.status} SSE operation ${operation.operationId} " +
+                    'must not declare a binding')
         }
         if (!operation.binding) return
 
         def parts = operation.binding.toString().split('#', 2)
         if (parts.length != 2 || !parts[0] || !parts[1]) {
             throw new IllegalStateException(
-                "Invalid SSE binding '${operation.binding}' for ${operation.path}")
+                "Invalid SSE binding '${operation.binding}' for ${operation.operationId}")
         }
         def projectDir = specFiles.values().first().parentFile.parentFile.parentFile
         def source = new File(
@@ -869,7 +906,7 @@ final class OpenApiSpecSupport {
         if (!source.isFile() ||
             !(source.text =~ /\b${java.util.regex.Pattern.quote(parts[1])}\s*\(/).find()) {
             throw new IllegalStateException(
-                "SSE binding ${operation.binding} for ${operation.path} was not found")
+                "SSE binding ${operation.binding} for ${operation.operationId} was not found")
         }
     }
 
