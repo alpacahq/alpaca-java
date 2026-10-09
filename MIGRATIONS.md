@@ -2,12 +2,12 @@
 
 Use the guide that matches the version you are adopting:
 
-- [`0.1.4` to `0.1.5`: Trading, Market Data, and Broker SSE](docs/content/sdk/sse-migration.md)
+- [`0.1.4` to `0.2.0`: Trading, Market Data, and Broker SSE](docs/content/sdk/sse-migration.md)
 
 The SSE guide includes a conservative scanner/codemod:
 
 ```bash
-python3 scripts/migrate_sse_0_1_4_to_0_1_5.py path/to/your/src
+python3 scripts/migrate_sse_0_1_4_to_0_2_0.py path/to/your/src
 ```
 
 The default mode only reports findings. Review its output, then add `--write` to apply the narrow
@@ -30,11 +30,11 @@ remain findings. Unqualified generated-method calls are reported conservatively,
 from indirect and anonymous generated API subclasses. Every generated SSE use in a file is
 reported.
 
-`BrokerSseSubscription` also implements `AlpacaSseSubscription` in `0.1.5`. This is additive and
+`BrokerSseSubscription` also implements `AlpacaSseSubscription` in `0.2.0`. This is additive and
 requires no source migration; it allows domain-neutral lifecycle code to accept existing Broker
 subscription values directly.
 
-## Generated REST corrections in 0.1.5
+## Generated REST corrections in 0.2.0
 
 OpenAPI corrections adopted before the compatibility gate was introduced changed these generated
 symbols from the published `0.1.4` artifact:

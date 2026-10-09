@@ -13,7 +13,7 @@ the policy below applies strictly.
 |---------------------------------------------------------------------------------------------------------------|--------------|
 | Breaking change to `AlpacaClientFactory`, `AlpacaCredentials`, HTTP helpers, REST helpers, or WebSocket/SSE public API | MAJOR        |
 | Breaking change to the generated API surface (renamed/removed class or method)                                | MAJOR        |
-| New endpoint or model coverage from a spec version update                                                     | MINOR        |
+| New backward-compatible public functionality, endpoint coverage, or model coverage                            | MINOR        |
 | Bug fix, dependency update, or preprocessing fix                                                              | PATCH        |
 
 `markets.alpaca.client.sse.internal` is implementation-only, is omitted from published Javadocs and
@@ -200,7 +200,7 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Trading reconnect requests transmit the committed cursor through the documented `since_id` query
   and `Last-Event-ID`. Replay relies on `since_id`; no backend consumption claim is made for the
   standard header.
-- See [`MIGRATIONS.md`](MIGRATIONS.md) for the `0.1.4` → `0.1.5` guide and conservative codemod.
+- See [`MIGRATIONS.md`](MIGRATIONS.md) for the `0.1.4` → `0.2.0` guide and conservative codemod.
   This substantial additive/behavioral release uses the repository's documented pre-1.0
   compatibility policy.
 

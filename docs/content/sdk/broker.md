@@ -334,7 +334,7 @@ override receives one callback without also invoking its legacy target.
 
 `subscription.eventSource()` is a compatibility facade supporting only `request()` and `cancel()`;
 it is not the live OkHttp implementation. Prefer `subscription.close()`. See
-[Migrating SSE from 0.1.4 to 0.1.5](./sse-migration) for callback, threading, and codemod guidance.
+[Migrating SSE from 0.1.4 to 0.2.0](./sse-migration) for callback, threading, and codemod guidance.
 
 Use `getAccountActivityEventAsync(accountId, eventId)` to re-fetch one previously observed
 Activity V2 event without invoking the generated SSE response decoder. The default timeout is 30

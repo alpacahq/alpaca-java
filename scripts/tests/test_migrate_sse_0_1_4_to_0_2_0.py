@@ -9,7 +9,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from scripts import migrate_sse_0_1_4_to_0_1_5 as migrate
+from scripts import migrate_sse_0_1_4_to_0_2_0 as migrate
 
 
 IMPORT = "import markets.alpaca.client.broker.sse.BrokerSseSubscription;\n"

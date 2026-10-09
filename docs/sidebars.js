@@ -19,7 +19,7 @@ const sidebars = {
         {
           type: 'doc',
           id: 'sdk/sse-migration',
-          label: 'SSE Migration (0.1.5)',
+          label: 'SSE Migration (0.2.0)',
         },
       ],
     },
