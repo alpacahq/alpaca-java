@@ -37,6 +37,58 @@ class ReleaseTagTest(unittest.TestCase):
                     release_tools.parse_release_tag(tag)
 
 
+class PreviousReleaseSelectionTest(unittest.TestCase):
+    def select(self, release, *tags):
+        return release_tools.select_previous_release_version(
+            release, list(tags)
+        )
+
+    def test_selects_greatest_version_below_release(self):
+        self.assertEqual(
+            self.select(
+                "1.2.0",
+                "v1.2.0",
+                "v1.1.9",
+                "v1.0.20",
+                "v1.1.10",
+            ),
+            "1.1.10",
+        )
+
+    def test_maintenance_release_ignores_reachable_newer_version(self):
+        self.assertEqual(
+            self.select("0.1.5", "v0.2.0", "v0.1.5", "v0.1.4"),
+            "0.1.4",
+        )
+
+    def test_invalid_equal_and_newer_tags_are_ignored(self):
+        self.assertEqual(
+            self.select(
+                "2.0.0",
+                "not-a-release",
+                "v2.0.0",
+                "v3.0.0",
+                "v1.9.9-SNAPSHOT",
+                "v1.9.9",
+            ),
+            "1.9.9",
+        )
+
+    def test_no_older_release_fails_closed(self):
+        with self.assertRaisesRegex(
+            release_tools.ReleaseToolError,
+            "no semantic release tag exists below 0.1.0",
+        ):
+            self.select("0.1.0", "v0.1.0", "v0.2.0", "invalid")
+
+    def test_huge_components_are_compared_without_integer_conversion(self):
+        huge = "9" * 5001
+        self.assertEqual(
+            self.select(f"1.0.{huge}", f"v1.0.{huge}", "v1.0.999"),
+            "1.0.999",
+        )
+
+
 class RecoveryPomTest(unittest.TestCase):
     def setUp(self):
         self.temporary_directory = tempfile.TemporaryDirectory()
@@ -245,18 +297,23 @@ class VersionUpdateTest(unittest.TestCase):
         return release_tools.update_next_snapshot(self.properties, release)
 
     def test_behind_updates_to_next_patch(self):
-        self.properties.write_text("version=1.2.3-SNAPSHOT\n", encoding="utf-8")
+        self.properties.write_text(
+            "version=1.2.3-SNAPSHOT\napiBaselineVersion=1.2.2\n",
+            encoding="utf-8",
+        )
         result = self.update()
         self.assertEqual(result.status, "behind")
+        self.assertEqual(result.baseline_status, "behind")
         self.assertTrue(result.changed)
         self.assertEqual(
             self.properties.read_text(encoding="utf-8"),
-            "version=1.2.4-SNAPSHOT\n",
+            "version=1.2.4-SNAPSHOT\napiBaselineVersion=1.2.3\n",
         )
 
     def test_utf8_bom_and_crlf_are_preserved(self):
         self.properties.write_bytes(
-            release_tools._UTF8_BOM + b"version=1.2.3-SNAPSHOT\r\n"
+            release_tools._UTF8_BOM
+            + b"version=1.2.3-SNAPSHOT\r\napiBaselineVersion=1.2.2\r\n"
         )
 
         result = self.update()
@@ -265,7 +322,8 @@ class VersionUpdateTest(unittest.TestCase):
         self.assertTrue(result.changed)
         self.assertEqual(
             self.properties.read_bytes(),
-            release_tools._UTF8_BOM + b"version=1.2.4-SNAPSHOT\r\n",
+            release_tools._UTF8_BOM
+            + b"version=1.2.4-SNAPSHOT\r\napiBaselineVersion=1.2.3\r\n",
         )
 
     def test_invalid_utf8_is_rejected_as_release_tool_error(self):
@@ -287,18 +345,47 @@ class VersionUpdateTest(unittest.TestCase):
         )
 
     def test_equal_is_noop(self):
-        original = "version=1.2.4-SNAPSHOT\n"
+        original = "version=1.2.4-SNAPSHOT\napiBaselineVersion=1.2.3\n"
         self.properties.write_text(original, encoding="utf-8")
         result = self.update()
         self.assertEqual(result.status, "equal")
+        self.assertEqual(result.baseline_status, "equal")
         self.assertFalse(result.changed)
         self.assertEqual(self.properties.read_text(encoding="utf-8"), original)
 
     def test_ahead_is_noop(self):
-        original = "version=2.0.0-SNAPSHOT\n"
+        original = "version=2.0.0-SNAPSHOT\napiBaselineVersion=1.2.3\n"
         self.properties.write_text(original, encoding="utf-8")
         result = self.update()
         self.assertEqual(result.status, "ahead")
+        self.assertEqual(result.baseline_status, "equal")
+        self.assertFalse(result.changed)
+        self.assertEqual(self.properties.read_text(encoding="utf-8"), original)
+
+    def test_equal_version_advances_api_baseline(self):
+        self.properties.write_text(
+            "version=1.2.4-SNAPSHOT\napiBaselineVersion=1.2.2\n",
+            encoding="utf-8",
+        )
+
+        result = self.update()
+
+        self.assertEqual(result.status, "equal")
+        self.assertEqual(result.baseline_status, "behind")
+        self.assertTrue(result.changed)
+        self.assertEqual(
+            self.properties.read_text(encoding="utf-8"),
+            "version=1.2.4-SNAPSHOT\napiBaselineVersion=1.2.3\n",
+        )
+
+    def test_ahead_api_baseline_is_not_downgraded(self):
+        original = "version=1.2.4-SNAPSHOT\napiBaselineVersion=2.0.0\n"
+        self.properties.write_text(original, encoding="utf-8")
+
+        result = self.update()
+
+        self.assertEqual(result.status, "equal")
+        self.assertEqual(result.baseline_status, "ahead")
         self.assertFalse(result.changed)
         self.assertEqual(self.properties.read_text(encoding="utf-8"), original)
 
@@ -307,22 +394,52 @@ class VersionUpdateTest(unittest.TestCase):
         with self.assertRaises(release_tools.ReleaseToolError):
             self.update()
 
+    def test_missing_api_baseline_is_rejected(self):
+        self.properties.write_text(
+            "version=1.2.4-SNAPSHOT\n", encoding="utf-8"
+        )
+        with self.assertRaisesRegex(
+            release_tools.ReleaseToolError,
+            "no apiBaselineVersion property was found",
+        ):
+            self.update()
+
+    def test_malformed_api_baseline_is_rejected(self):
+        self.properties.write_text(
+            "version=1.2.4-SNAPSHOT\napiBaselineVersion=not-semver\n",
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(
+            release_tools.ReleaseToolError,
+            "release version must exactly match",
+        ):
+            self.update()
+
     def test_effective_last_version_entry_is_updated_only(self):
         self.properties.write_text(
-            "version=9.9.9-SNAPSHOT\nother=value\n version = 1.2.3-SNAPSHOT \n",
+            "version=9.9.9-SNAPSHOT\n"
+            "other=value\n"
+            " version = 1.2.3-SNAPSHOT \n"
+            " apiBaselineVersion = 1.2.2 \n",
             encoding="utf-8",
         )
         result = self.update()
         self.assertTrue(result.changed)
         self.assertEqual(
             self.properties.read_text(encoding="utf-8"),
-            "version=9.9.9-SNAPSHOT\nother=value\nversion=1.2.4-SNAPSHOT\n",
+            "version=9.9.9-SNAPSHOT\n"
+            "other=value\n"
+            "version=1.2.4-SNAPSHOT\n"
+            "apiBaselineVersion=1.2.3\n",
         )
 
     def test_huge_patch_increment_carries_without_integer_conversion(self):
         huge = "9" * 5001
         incremented = "1" + ("0" * 5001)
-        self.properties.write_text("version=0.0.0-SNAPSHOT\n", encoding="utf-8")
+        self.properties.write_text(
+            "version=0.0.0-SNAPSHOT\napiBaselineVersion=0.0.0\n",
+            encoding="utf-8",
+        )
         result = self.update(f"1.2.{huge}")
         self.assertEqual(result.version, f"1.2.{incremented}-SNAPSHOT")
         self.assertEqual(result.status, "behind")
@@ -341,7 +458,8 @@ class VersionUpdateTest(unittest.TestCase):
         for current, expected_status, expected_changed in cases:
             with self.subTest(status=expected_status):
                 self.properties.write_text(
-                    f"version={current}\n", encoding="utf-8"
+                    f"version={current}\napiBaselineVersion={release}\n",
+                    encoding="utf-8",
                 )
                 result = self.update(release)
                 self.assertEqual(result.status, expected_status)
@@ -377,11 +495,12 @@ class ReleaseToolsCliTest(unittest.TestCase):
             "PYTHONDONTWRITEBYTECODE": "1",
         }
 
-    def run_cli(self, *arguments):
+    def run_cli(self, *arguments, input_text=None):
         return subprocess.run(
             [sys.executable, str(self.script), *arguments],
             cwd=self.root,
             env=self.environment,
+            input=input_text,
             capture_output=True,
             text=True,
             check=False,
@@ -397,6 +516,27 @@ class ReleaseToolsCliTest(unittest.TestCase):
         self.assertEqual(failure.returncode, 2)
         self.assertEqual(failure.stdout, "")
         self.assertIn("release tool error:", failure.stderr)
+
+    def test_select_api_baseline_uses_stdin_and_fails_closed(self):
+        success = self.run_cli(
+            "select-api-baseline",
+            "--release-version",
+            "0.1.5",
+            input_text="v0.2.0\nv0.1.5\nv0.1.4\n",
+        )
+        self.assertEqual(success.returncode, 0)
+        self.assertEqual(success.stdout, "0.1.4\n")
+        self.assertEqual(success.stderr, "")
+
+        failure = self.run_cli(
+            "select-api-baseline",
+            "--release-version",
+            "0.1.4",
+            input_text="v0.2.0\nv0.1.4\n",
+        )
+        self.assertEqual(failure.returncode, 2)
+        self.assertEqual(failure.stdout, "")
+        self.assertIn("no semantic release tag exists below", failure.stderr)
 
     def test_validate_pom_exit_codes_and_streams(self):
         pom = self.root / "release.pom"
@@ -431,7 +571,10 @@ class ReleaseToolsCliTest(unittest.TestCase):
     def test_update_version_github_output_and_failure(self):
         properties = self.root / "gradle.properties"
         github_output = self.root / "github-output"
-        properties.write_text("version=1.2.3-SNAPSHOT\n", encoding="utf-8")
+        properties.write_text(
+            "version=1.2.3-SNAPSHOT\napiBaselineVersion=1.2.2\n",
+            encoding="utf-8",
+        )
         arguments = (
             "update-version",
             "--properties",
@@ -447,11 +590,15 @@ class ReleaseToolsCliTest(unittest.TestCase):
         self.assertEqual(success.stderr, "")
         self.assertEqual(
             github_output.read_text(encoding="utf-8"),
-            "version=1.2.4-SNAPSHOT\nshould_push=true\nstatus=behind\n",
+            "version=1.2.4-SNAPSHOT\n"
+            "should_push=true\n"
+            "status=behind\n"
+            "api_baseline_version=1.2.3\n"
+            "api_baseline_status=behind\n",
         )
         self.assertEqual(
             properties.read_text(encoding="utf-8"),
-            "version=1.2.4-SNAPSHOT\n",
+            "version=1.2.4-SNAPSHOT\napiBaselineVersion=1.2.3\n",
         )
 
         properties.write_text("version=malformed\n", encoding="utf-8")

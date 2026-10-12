@@ -233,7 +233,7 @@ jobs:
           retention-days: 90
           compression-level: 9
 
-      - name: Build tagged release from prepared specs
+      - name: Build and check tagged release from prepared specs
         if: steps.central-check.outputs.publish_required == 'true'
         shell: bash
         env:
@@ -241,8 +241,17 @@ jobs:
           SPEC_DIR: ${{ steps.specs.outputs.directory }}
         run: |
           set -euo pipefail
-          ./gradlew build \
+          if ! baseline_version="$(
+            git tag --merged "v$RELEASE_VERSION" |
+              python3 scripts/release_tools.py select-api-baseline \
+                --release-version "$RELEASE_VERSION"
+          )"; then
+            echo "::error::Unable to select an older API compatibility baseline"
+            exit 1
+          fi
+          ./gradlew build checkApiCompatibility \
             -Pversion="$RELEASE_VERSION" \
+            -PapiBaselineVersion="$baseline_version" \
             -Palpaca.preprocessedSpecInputs=true \
             "-PbrokerSpec=$SPEC_DIR/broker/openapi.yaml" \
             "-PdataSpec=$SPEC_DIR/data/openapi.yaml" \
@@ -445,6 +454,9 @@ jobs:
           version_status="$(
             awk -F= '$1 == "status" { value = $2 } END { print value }' "$GITHUB_OUTPUT"
           )"
+          api_baseline_status="$(
+            awk -F= '$1 == "api_baseline_status" { value = $2 } END { print value }' "$GITHUB_OUTPUT"
+          )"
           case "$version_status" in
             equal)
               echo "::notice::Main already has the next development version"
@@ -457,6 +469,21 @@ jobs:
               ;;
             *)
               echo "::error::Version comparison did not produce a recognized status"
+              exit 1
+              ;;
+          esac
+          case "$api_baseline_status" in
+            equal)
+              echo "::notice::Main already uses the released API compatibility baseline"
+              ;;
+            ahead)
+              echo "::error::Main API compatibility baseline is ahead of the released version; refusing to downgrade it"
+              exit 1
+              ;;
+            behind)
+              ;;
+            *)
+              echo "::error::API baseline comparison did not produce a recognized status"
               exit 1
               ;;
           esac
@@ -521,12 +548,14 @@ jobs:
             echo "::error::CHANGELOG.md changed unexpectedly"
             exit 1
           fi
-          if [[ "$version_status" == "behind" && "$properties_changed" != "true" ]]; then
-            echo "::error::Version bump status is behind but gradle.properties is unmodified"
+          if [[ ( "$version_status" == "behind" || "$api_baseline_status" == "behind" ) \
+            && "$properties_changed" != "true" ]]; then
+            echo "::error::Version or API baseline status is behind but gradle.properties is unmodified"
             exit 1
           fi
-          if [[ "$version_status" == "equal" && "$properties_changed" == "true" ]]; then
-            echo "::error::Version status is equal but gradle.properties changed"
+          if [[ "$version_status" == "equal" && "$api_baseline_status" == "equal" \
+            && "$properties_changed" == "true" ]]; then
+            echo "::error::Version and API baseline are equal but gradle.properties changed"
             exit 1
           fi
 
@@ -536,7 +565,7 @@ jobs:
           else
             echo "should_push=false" >> "$GITHUB_OUTPUT"
             echo "changelog_changed=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Main already has the next development version and CHANGELOG.md; no bump PR is needed"
+            echo "::notice::Main already has the next development version, API baseline, and CHANGELOG.md; no bump PR is needed"
           fi
 
       - name: Create next development version pull request
@@ -614,7 +643,7 @@ jobs:
           if [[ "$CHANGELOG_CHANGED" == "true" ]]; then
             commit_message="chore: start $NEXT_VERSION development"
             pr_title="chore: start $NEXT_VERSION development"
-            pr_body="Automated post-release updates: next snapshot in \`gradle.properties\` and CHANGELOG promotion of \`$RELEASE_VERSION\`."
+            pr_body="Automated post-release updates: development version and API compatibility baseline in \`gradle.properties\`, plus CHANGELOG promotion of \`$RELEASE_VERSION\`."
             if ! printf '%s\n' "${staged_files[@]}" | grep -qx 'gradle.properties'; then
               commit_message="chore: promote CHANGELOG for $RELEASE_VERSION"
               pr_title="chore: promote CHANGELOG for $RELEASE_VERSION"
@@ -623,7 +652,7 @@ jobs:
           else
             commit_message="chore: start $NEXT_VERSION development"
             pr_title="chore: start $NEXT_VERSION development"
-            pr_body="Automated post-release version bump. This PR changes only \`gradle.properties\`."
+            pr_body="Automated post-release development-version and API-compatibility-baseline update. This PR changes only \`gradle.properties\`."
           fi
 
           git commit -m "$commit_message"
