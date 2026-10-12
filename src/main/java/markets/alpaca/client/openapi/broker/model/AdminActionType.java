@@ -34,7 +34,11 @@ public enum AdminActionType implements Serializable {
   
   LEGACY_NOTE_ADMIN_EVENT("legacy_note_admin_event"),
   
-  TRANSACTION_CANCEL_ADMIN_EVENT("transaction_cancel_admin_event");
+  NOTE_ADMIN_EVENT("note_admin_event"),
+  
+  TRANSACTION_CANCEL_ADMIN_EVENT("transaction_cancel_admin_event"),
+  
+  ACATS_STATUS_ADMIN_EVENT("acats_status_admin_event");
 
   private String value;
 

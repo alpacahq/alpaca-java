@@ -86,6 +86,20 @@ public class JSON {
                                 getDiscriminatorValue(readElement, "entry_type"));
                     }
           })
+                .registerTypeSelector(markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner.class, new TypeSelector<markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner>() {
+                    @Override
+                    public Class<? extends markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner> getClassForElement(JsonElement readElement) {
+                        Map<String, Class> classByDiscriminatorValue = new HashMap<String, Class>();
+                        classByDiscriminatorValue.put("acats_status_admin_event", markets.alpaca.client.openapi.broker.model.AdminActionAcatsStatus.class);
+                        classByDiscriminatorValue.put("legacy_note_admin_event", markets.alpaca.client.openapi.broker.model.AdminActionLegacyNote.class);
+                        classByDiscriminatorValue.put("liquidation_admin_event", markets.alpaca.client.openapi.broker.model.AdminActionLiquidation.class);
+                        classByDiscriminatorValue.put("note_admin_event", markets.alpaca.client.openapi.broker.model.AdminActionLegacyNote.class);
+                        classByDiscriminatorValue.put("transaction_cancel_admin_event", markets.alpaca.client.openapi.broker.model.AdminActionTransactionCancel.class);
+                        classByDiscriminatorValue.put("subscribeToAdminActionSSE_200_response_inner", markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner.class);
+                        return getClassByDiscriminator(classByDiscriminatorValue,
+                                getDiscriminatorValue(readElement, "type"));
+                    }
+          })
         ;
         GsonBuilder builder = fireBuilder.createGsonBuilder();
         return builder;
@@ -170,7 +184,10 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.ActivityEventV2CommonFields.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.ActivityV2DetailNTA.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.ActivityV2DetailTRD.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AdminActionAcatsStatus.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AdminActionAcatsStatusDetails.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AdminActionBelongsTo.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AdminActionContextAcatsStatusContext.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AdminActionContextLiquidationContext.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AdminActionContextTransactionCancelContext.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AdminActionCreatedBy.CustomTypeAdapterFactory());

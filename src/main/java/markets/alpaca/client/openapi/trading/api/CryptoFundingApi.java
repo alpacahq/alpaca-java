@@ -27,7 +27,6 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 
 
-import markets.alpaca.client.openapi.trading.model.CreateCryptoTransferRequest;
 import markets.alpaca.client.openapi.trading.model.CreateWhitelistedAddressRequest;
 import markets.alpaca.client.openapi.trading.model.CryptoChain;
 import markets.alpaca.client.openapi.trading.model.CryptoTransfer;
@@ -55,8 +54,6 @@ import java.util.Map;
  * <h2>Operations</h2>
  *
  * <ul>
- * 
- *   <li><b>{@code createCryptoTransferForAccount}</b>: Request a New Withdrawal</li>
  * 
  *   <li><b>{@code createWhitelistedAddress}</b>: Request a new whitelisted address</li>
  * 
@@ -115,146 +112,6 @@ public class CryptoFundingApi {
         this.localCustomBaseUrl = customBaseUrl;
     }
 
-    /**
-     * Build call for createCryptoTransferForAccount
-     * @param createCryptoTransferRequest  (required)
-     * @param _callback Callback for upload/download progress
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     * @http.response.details
-     <table border="1">
-       <caption>Response Details</caption>
-        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Successfully requested a transfer. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
-     </table>
-     * @deprecated
-     */
-    @Deprecated
-    public okhttp3.Call createCryptoTransferForAccountCall(@javax.annotation.Nonnull CreateCryptoTransferRequest createCryptoTransferRequest, final ApiCallback _callback) throws ApiException {
-        String basePath = null;
-        // Operation Servers
-        String[] localBasePaths = new String[] {  };
-
-        // Determine Base Path to Use
-        if (localCustomBaseUrl != null){
-            basePath = localCustomBaseUrl;
-        } else if ( localBasePaths.length > 0 ) {
-            basePath = localBasePaths[localHostIndex];
-        } else {
-            basePath = null;
-        }
-
-        Object localVarPostBody = createCryptoTransferRequest;
-
-        // create path and map variables
-        String localVarPath = "/v2/wallets/transfers";
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-        Map<String, String> localVarCookieParams = new HashMap<String, String>();
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json"
-        };
-        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) {
-            localVarHeaderParams.put("Accept", localVarAccept);
-        }
-
-        final String[] localVarContentTypes = {
-            "application/json"
-        };
-        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
-        if (localVarContentType != null) {
-            localVarHeaderParams.put("Content-Type", localVarContentType);
-        }
-
-        String[] localVarAuthNames = new String[] { "API_Key", "API_Secret" };
-        return localVarApiClient.buildCall(basePath, localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
-    }
-
-    @Deprecated
-    @SuppressWarnings("rawtypes")
-    private okhttp3.Call createCryptoTransferForAccountValidateBeforeCall(@javax.annotation.Nonnull CreateCryptoTransferRequest createCryptoTransferRequest, final ApiCallback _callback) throws ApiException {
-        // verify the required parameter 'createCryptoTransferRequest' is set
-        if (createCryptoTransferRequest == null) {
-            throw new ApiException("Missing the required parameter 'createCryptoTransferRequest' when calling createCryptoTransferForAccount(Async)");
-        }
-
-        return createCryptoTransferForAccountCall(createCryptoTransferRequest, _callback);
-
-    }
-
-    /**
-     * Request a New Withdrawal
-     * **Deprecation notice:** This endpoint is deprecated. Use the Alpaca web application to initiate withdrawals.  Since: 2026-07-09 Sunset: 2026-10-09  ---  Creates a withdrawal request. Note that outgoing withdrawals must be sent to a whitelisted address and you must whitelist addresses at least 24 hours in advance. If you attempt to withdraw funds to a non-whitelisted address then the transfer will be rejected.
-     * @param createCryptoTransferRequest  (required)
-     * @return CryptoTransfer
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
-     * @http.response.details
-     <table border="1">
-       <caption>Response Details</caption>
-        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Successfully requested a transfer. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
-     </table>
-     * @deprecated
-     */
-    @Deprecated
-    public CryptoTransfer createCryptoTransferForAccount(@javax.annotation.Nonnull CreateCryptoTransferRequest createCryptoTransferRequest) throws ApiException {
-        ApiResponse<CryptoTransfer> localVarResp = createCryptoTransferForAccountWithHttpInfo(createCryptoTransferRequest);
-        return localVarResp.getData();
-    }
-
-    /**
-     * Request a New Withdrawal
-     * **Deprecation notice:** This endpoint is deprecated. Use the Alpaca web application to initiate withdrawals.  Since: 2026-07-09 Sunset: 2026-10-09  ---  Creates a withdrawal request. Note that outgoing withdrawals must be sent to a whitelisted address and you must whitelist addresses at least 24 hours in advance. If you attempt to withdraw funds to a non-whitelisted address then the transfer will be rejected.
-     * @param createCryptoTransferRequest  (required)
-     * @return ApiResponse&lt;CryptoTransfer&gt;
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
-     * @http.response.details
-     <table border="1">
-       <caption>Response Details</caption>
-        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Successfully requested a transfer. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
-     </table>
-     * @deprecated
-     */
-    @Deprecated
-    public ApiResponse<CryptoTransfer> createCryptoTransferForAccountWithHttpInfo(@javax.annotation.Nonnull CreateCryptoTransferRequest createCryptoTransferRequest) throws ApiException {
-        okhttp3.Call localVarCall = createCryptoTransferForAccountValidateBeforeCall(createCryptoTransferRequest, null);
-        Type localVarReturnType = new TypeToken<CryptoTransfer>(){}.getType();
-        return localVarApiClient.execute(localVarCall, localVarReturnType);
-    }
-
-    /**
-     * Request a New Withdrawal (asynchronously)
-     * **Deprecation notice:** This endpoint is deprecated. Use the Alpaca web application to initiate withdrawals.  Since: 2026-07-09 Sunset: 2026-10-09  ---  Creates a withdrawal request. Note that outgoing withdrawals must be sent to a whitelisted address and you must whitelist addresses at least 24 hours in advance. If you attempt to withdraw funds to a non-whitelisted address then the transfer will be rejected.
-     * @param createCryptoTransferRequest  (required)
-     * @param _callback The callback to be executed when the API call finishes
-     * @return The request call
-     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
-     * @http.response.details
-     <table border="1">
-       <caption>Response Details</caption>
-        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Successfully requested a transfer. </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> The request or travel rule information is invalid. </td><td>  -  </td></tr>
-     </table>
-     * @deprecated
-     */
-    @Deprecated
-    public okhttp3.Call createCryptoTransferForAccountAsync(@javax.annotation.Nonnull CreateCryptoTransferRequest createCryptoTransferRequest, final ApiCallback<CryptoTransfer> _callback) throws ApiException {
-
-        okhttp3.Call localVarCall = createCryptoTransferForAccountValidateBeforeCall(createCryptoTransferRequest, _callback);
-        Type localVarReturnType = new TypeToken<CryptoTransfer>(){}.getType();
-        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
-        return localVarCall;
-    }
     /**
      * Build call for createWhitelistedAddress
      * @param createWhitelistedAddressRequest  (required)
@@ -1176,7 +1033,7 @@ public class CryptoFundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Successful request. Returns an array of VASPs or an empty list if no matches found. </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> Successful request. &#x60;vasps&#x60; lists each match and is an empty array when nothing matches. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call searchVASPsCall(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs, final ApiCallback _callback) throws ApiException {
@@ -1278,7 +1135,7 @@ public class CryptoFundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Successful request. Returns an array of VASPs or an empty list if no matches found. </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> Successful request. &#x60;vasps&#x60; lists each match and is an empty array when nothing matches. </td><td>  -  </td></tr>
      </table>
      */
     public SearchVASPsResponse searchVASPs(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs) throws ApiException {
@@ -1303,7 +1160,7 @@ public class CryptoFundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Successful request. Returns an array of VASPs or an empty list if no matches found. </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> Successful request. &#x60;vasps&#x60; lists each match and is an empty array when nothing matches. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<SearchVASPsResponse> searchVASPsWithHttpInfo(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs) throws ApiException {
@@ -1330,7 +1187,7 @@ public class CryptoFundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Successful request. Returns an array of VASPs or an empty list if no matches found. </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> Successful request. &#x60;vasps&#x60; lists each match and is an empty array when nothing matches. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call searchVASPsAsync(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs, final ApiCallback<SearchVASPsResponse> _callback) throws ApiException {

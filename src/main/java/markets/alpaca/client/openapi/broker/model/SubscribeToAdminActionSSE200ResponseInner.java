@@ -22,14 +22,16 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
+import markets.alpaca.client.openapi.broker.model.AdminActionAcatsStatus;
 import markets.alpaca.client.openapi.broker.model.AdminActionBelongsTo;
+import markets.alpaca.client.openapi.broker.model.AdminActionBelongsToKind;
 import markets.alpaca.client.openapi.broker.model.AdminActionCategory;
-import markets.alpaca.client.openapi.broker.model.AdminActionContextTransactionCancelContext;
+import markets.alpaca.client.openapi.broker.model.AdminActionContextAcatsStatusContext;
 import markets.alpaca.client.openapi.broker.model.AdminActionCreatedBy;
+import markets.alpaca.client.openapi.broker.model.AdminActionCreatedByKind;
 import markets.alpaca.client.openapi.broker.model.AdminActionLegacyNote;
 import markets.alpaca.client.openapi.broker.model.AdminActionLiquidation;
 import markets.alpaca.client.openapi.broker.model.AdminActionTransactionCancel;
-import markets.alpaca.client.openapi.broker.model.AdminActionType;
 import markets.alpaca.client.openapi.broker.model.AdminActionVisibility;
 import java.io.Serializable;
 
@@ -83,6 +85,7 @@ public class SubscribeToAdminActionSSE200ResponseInner extends AbstractOpenApiSc
             final TypeAdapter<AdminActionLegacyNote> adapterAdminActionLegacyNote = gson.getDelegateAdapter(this, TypeToken.get(AdminActionLegacyNote.class));
             final TypeAdapter<AdminActionLiquidation> adapterAdminActionLiquidation = gson.getDelegateAdapter(this, TypeToken.get(AdminActionLiquidation.class));
             final TypeAdapter<AdminActionTransactionCancel> adapterAdminActionTransactionCancel = gson.getDelegateAdapter(this, TypeToken.get(AdminActionTransactionCancel.class));
+            final TypeAdapter<AdminActionAcatsStatus> adapterAdminActionAcatsStatus = gson.getDelegateAdapter(this, TypeToken.get(AdminActionAcatsStatus.class));
 
             return (TypeAdapter<T>) new TypeAdapter<SubscribeToAdminActionSSE200ResponseInner>() {
                 @Override
@@ -110,7 +113,13 @@ public class SubscribeToAdminActionSSE200ResponseInner extends AbstractOpenApiSc
                         elementAdapter.write(out, element);
                         return;
                     }
-                    throw new IOException("Failed to serialize as the type doesn't match oneOf schemas: AdminActionLegacyNote, AdminActionLiquidation, AdminActionTransactionCancel");
+                    // check if the actual instance is of the type `AdminActionAcatsStatus`
+                    if (value.getActualInstance() instanceof AdminActionAcatsStatus) {
+                        JsonElement element = adapterAdminActionAcatsStatus.toJsonTree((AdminActionAcatsStatus)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
+                    throw new IOException("Failed to serialize as the type doesn't match oneOf schemas: AdminActionAcatsStatus, AdminActionLegacyNote, AdminActionLiquidation, AdminActionTransactionCancel");
                 }
 
                 @Override
@@ -158,6 +167,18 @@ public class SubscribeToAdminActionSSE200ResponseInner extends AbstractOpenApiSc
                         errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for AdminActionTransactionCancel failed with `%s`.", e.getMessage()));
                         log.log(Level.FINER, "Input data does not match schema 'AdminActionTransactionCancel'", e);
                     }
+                    // deserialize AdminActionAcatsStatus
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        AdminActionAcatsStatus.validateJsonElement(jsonElement);
+                        actualAdapter = adapterAdminActionAcatsStatus;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'AdminActionAcatsStatus'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for AdminActionAcatsStatus failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'AdminActionAcatsStatus'", e);
+                    }
 
                     if (match == 1) {
                         SubscribeToAdminActionSSE200ResponseInner ret = new SubscribeToAdminActionSSE200ResponseInner();
@@ -187,6 +208,7 @@ public class SubscribeToAdminActionSSE200ResponseInner extends AbstractOpenApiSc
         schemas.put("AdminActionLegacyNote", AdminActionLegacyNote.class);
         schemas.put("AdminActionLiquidation", AdminActionLiquidation.class);
         schemas.put("AdminActionTransactionCancel", AdminActionTransactionCancel.class);
+        schemas.put("AdminActionAcatsStatus", AdminActionAcatsStatus.class);
     }
 
     @Override
@@ -197,7 +219,7 @@ public class SubscribeToAdminActionSSE200ResponseInner extends AbstractOpenApiSc
     /**
      * Set the instance that matches the oneOf child schema, check
      * the instance parameter is valid against the oneOf child schemas:
-     * AdminActionLegacyNote, AdminActionLiquidation, AdminActionTransactionCancel
+     * AdminActionAcatsStatus, AdminActionLegacyNote, AdminActionLiquidation, AdminActionTransactionCancel
      *
      * It could be an instance of the 'oneOf' schemas.
      */
@@ -218,14 +240,19 @@ public class SubscribeToAdminActionSSE200ResponseInner extends AbstractOpenApiSc
             return;
         }
 
-        throw new RuntimeException("Invalid instance type. Must be AdminActionLegacyNote, AdminActionLiquidation, AdminActionTransactionCancel");
+        if (instance instanceof AdminActionAcatsStatus) {
+            super.setActualInstance(instance);
+            return;
+        }
+
+        throw new RuntimeException("Invalid instance type. Must be AdminActionAcatsStatus, AdminActionLegacyNote, AdminActionLiquidation, AdminActionTransactionCancel");
     }
 
     /**
      * Get the actual instance, which can be the following:
-     * AdminActionLegacyNote, AdminActionLiquidation, AdminActionTransactionCancel
+     * AdminActionAcatsStatus, AdminActionLegacyNote, AdminActionLiquidation, AdminActionTransactionCancel
      *
-     * @return The actual instance (AdminActionLegacyNote, AdminActionLiquidation, AdminActionTransactionCancel)
+     * @return The actual instance (AdminActionAcatsStatus, AdminActionLegacyNote, AdminActionLiquidation, AdminActionTransactionCancel)
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -270,6 +297,18 @@ public class SubscribeToAdminActionSSE200ResponseInner extends AbstractOpenApiSc
     }
 
     /**
+     * Get the actual instance of `AdminActionAcatsStatus`. If the actual instance is not `AdminActionAcatsStatus`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `AdminActionAcatsStatus`
+     * @throws ClassCastException if the instance is not `AdminActionAcatsStatus`
+     */
+    @SuppressWarnings("unchecked")
+    public AdminActionAcatsStatus getAdminActionAcatsStatus() throws ClassCastException {
+        return (AdminActionAcatsStatus)super.getActualInstance();
+    }
+
+    /**
      * Validates the JSON Element and throws an exception if issues found
      *
      * @param jsonElement JSON Element
@@ -303,8 +342,16 @@ public class SubscribeToAdminActionSSE200ResponseInner extends AbstractOpenApiSc
             errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for AdminActionTransactionCancel failed with `%s`.", e.getMessage()));
             // continue to the next one
         }
+        // validate the json string with AdminActionAcatsStatus
+        try {
+            AdminActionAcatsStatus.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for AdminActionAcatsStatus failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
         if (validCount != 1) {
-            throw new IOException(String.format(java.util.Locale.ROOT, "The JSON string is invalid for SubscribeToAdminActionSSE200ResponseInner with oneOf schemas: AdminActionLegacyNote, AdminActionLiquidation, AdminActionTransactionCancel. %d class(es) match the result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", validCount, errorMessages, jsonElement.toString()));
+            throw new IOException(String.format(java.util.Locale.ROOT, "The JSON string is invalid for SubscribeToAdminActionSSE200ResponseInner with oneOf schemas: AdminActionAcatsStatus, AdminActionLegacyNote, AdminActionLiquidation, AdminActionTransactionCancel. %d class(es) match the result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", validCount, errorMessages, jsonElement.toString()));
         }
     }
 
