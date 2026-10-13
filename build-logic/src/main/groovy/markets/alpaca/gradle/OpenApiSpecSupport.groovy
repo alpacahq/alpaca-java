@@ -279,17 +279,6 @@ final class OpenApiSpecSupport {
             activityTypes.findAll { it != 'FILL' })
     }
 
-    /** Corrects the Broker NTA endpoint, which is SSE despite its upstream JSON media type. */
-    static void normalizeBrokerNtaSseMediaType(Map spec) {
-        def response = spec?.paths?.get('/v1/events/nta')?.get?.responses?.get('200')
-        def content = response?.content
-        if (!(content instanceof Map)) return
-        def json = content.remove('application/json')
-        if (json != null && !content.containsKey('text/event-stream')) {
-            content['text/event-stream'] = json
-        }
-    }
-
     /**
      * Sanitizers that apply to every API because they address OpenAPI 3.1 constructs the Java
      * generator renders into code that does not compile or that loses type information.
@@ -309,7 +298,6 @@ final class OpenApiSpecSupport {
         removeEmptyKeyProperties(spec)
         removeDiscriminatorEnums(spec)
         removeActivityV2DetailTrdRequired(spec)
-        normalizeBrokerNtaSseMediaType(spec)
         sanitizeSpec(spec)
     }
 
