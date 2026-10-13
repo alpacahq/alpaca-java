@@ -488,6 +488,42 @@ class SseTransportTest {
   }
 
   @Test
+  void maximumErrorBodyLimitPreservesPermanentHttpFailureWithoutRetry() throws Exception {
+    server.enqueue(new MockResponse().setResponseCode(403).setBody("forbidden"));
+    server.enqueue(new MockResponse().setResponseCode(403).setBody("unexpected retry"));
+    var policy =
+        AlpacaSseReconnectPolicy.builder()
+            .initialAttempts(1)
+            .establishedAttempts(0)
+            .initialBackoff(Duration.ofMillis(1))
+            .maxBackoff(Duration.ofMillis(1))
+            .jitterRatio(0)
+            .build();
+    var options =
+        AlpacaSseOptions.builder()
+            .reconnectPolicy(policy)
+            .maxErrorBodyBytes(Long.MAX_VALUE)
+            .build();
+
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            options,
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {});
+
+    var failure =
+        assertThrows(
+            ExecutionException.class, () -> subscription.completion().get(2, TimeUnit.SECONDS));
+    var httpFailure = assertInstanceOf(AlpacaSseHttpException.class, failure.getCause());
+    assertEquals(403, httpFailure.statusCode());
+    assertEquals("forbidden", httpFailure.responseBody());
+    assertEquals(1, server.getRequestCount());
+  }
+
+  @Test
   void connectTimeoutBoundsStalledErrorBodyAndPreservesCancellationCause() throws Exception {
     server.enqueue(
         new MockResponse()

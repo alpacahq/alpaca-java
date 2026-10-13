@@ -1006,7 +1006,8 @@ public final class SseTransport {
       if (body != null) {
         BufferedSource source = body.source();
         long limit = options.maxErrorBodyBytes();
-        source.request(limit + 1);
+        long requestBytes = limit == Long.MAX_VALUE ? Long.MAX_VALUE : limit + 1;
+        source.request(requestBytes);
         long available = Math.min(source.getBuffer().size(), limit);
         text = source.getBuffer().readUtf8(available);
       }
