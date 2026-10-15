@@ -90,10 +90,68 @@ public class PortfolioHistory implements Serializable {
   @javax.annotation.Nonnull
   private List<BigDecimal> profitLossPct = new ArrayList<>();
 
+  /**
+   * An interval, duration, or window of time.
+   */
+  @JsonAdapter(TimeframeEnum.Adapter.class)
+  public enum TimeframeEnum {
+    _1_D("1D"),
+    
+    _1_H("1H"),
+    
+    _15_MIN("15Min"),
+    
+    _5_MIN("5Min"),
+    
+    _1_MIN("1Min");
+
+    private String value;
+
+    TimeframeEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static TimeframeEnum fromValue(String value) {
+      for (TimeframeEnum b : TimeframeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<TimeframeEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final TimeframeEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public TimeframeEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return TimeframeEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      TimeframeEnum.fromValue(value);
+    }
+  }
+
   public static final String SERIALIZED_NAME_TIMEFRAME = "timeframe";
   @SerializedName(SERIALIZED_NAME_TIMEFRAME)
   @javax.annotation.Nonnull
-  private String timeframe;
+  private TimeframeEnum timeframe;
 
   public static final String SERIALIZED_NAME_TIMESTAMP = "timestamp";
   @SerializedName(SERIALIZED_NAME_TIMESTAMP)
@@ -109,7 +167,7 @@ public class PortfolioHistory implements Serializable {
   }
 
   /**
-   * basis in dollar of the profit loss calculation
+   * Basis in dollar of the profit loss calculation.
    * @return baseValue
    */
   @javax.annotation.Nullable
@@ -155,7 +213,7 @@ public class PortfolioHistory implements Serializable {
   }
 
   /**
-   * accumulated value in dollar amount as of the end of each time window
+   * Accumulated value in dollar amount as of the end of each time window.
    * @return cashflow
    */
   @javax.annotation.Nullable
@@ -182,7 +240,7 @@ public class PortfolioHistory implements Serializable {
   }
 
   /**
-   * equity value of the account in dollar amount as of the end of each time window
+   * Equity value of the account in dollar amount as of the end of each time window.
    * @return equity
    */
   @javax.annotation.Nonnull
@@ -209,7 +267,7 @@ public class PortfolioHistory implements Serializable {
   }
 
   /**
-   * profit/loss in dollar from the base value
+   * Profit/loss in dollar from the base value.
    * @return profitLoss
    */
   @javax.annotation.Nonnull
@@ -236,7 +294,7 @@ public class PortfolioHistory implements Serializable {
   }
 
   /**
-   * profit/loss in percentage from the base value
+   * Profit/loss in percentage from the base value.
    * @return profitLossPct
    */
   @javax.annotation.Nonnull
@@ -249,21 +307,21 @@ public class PortfolioHistory implements Serializable {
   }
 
 
-  public PortfolioHistory timeframe(@javax.annotation.Nonnull String timeframe) {
+  public PortfolioHistory timeframe(@javax.annotation.Nonnull TimeframeEnum timeframe) {
     this.timeframe = timeframe;
     return this;
   }
 
   /**
-   * time window size of each data element
+   * An interval, duration, or window of time.
    * @return timeframe
    */
   @javax.annotation.Nonnull
-  public String getTimeframe() {
+  public TimeframeEnum getTimeframe() {
     return timeframe;
   }
 
-  public void setTimeframe(@javax.annotation.Nonnull String timeframe) {
+  public void setTimeframe(@javax.annotation.Nonnull TimeframeEnum timeframe) {
     this.timeframe = timeframe;
   }
 
@@ -443,6 +501,8 @@ public class PortfolioHistory implements Serializable {
       if (!jsonObj.get("timeframe").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `timeframe` to be a primitive type in the JSON string but got `%s`", jsonObj.get("timeframe").toString()));
       }
+      // validate the required field `timeframe`
+      TimeframeEnum.validateJsonElement(jsonObj.get("timeframe"));
       // ensure the required json array is present
       if (jsonObj.get("timestamp") == null) {
         throw new IllegalArgumentException("Expected the field `linkedContent` to be an array in the JSON string but got `null`");

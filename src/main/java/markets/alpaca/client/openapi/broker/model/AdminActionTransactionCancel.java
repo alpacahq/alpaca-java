@@ -23,10 +23,11 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import markets.alpaca.client.openapi.broker.model.AdminActionBelongsTo;
+import markets.alpaca.client.openapi.broker.model.AdminActionBelongsToKind;
 import markets.alpaca.client.openapi.broker.model.AdminActionCategory;
 import markets.alpaca.client.openapi.broker.model.AdminActionContextTransactionCancelContext;
 import markets.alpaca.client.openapi.broker.model.AdminActionCreatedBy;
-import markets.alpaca.client.openapi.broker.model.AdminActionType;
+import markets.alpaca.client.openapi.broker.model.AdminActionCreatedByKind;
 import markets.alpaca.client.openapi.broker.model.AdminActionVisibility;
 import java.io.Serializable;
 
@@ -67,9 +68,20 @@ public class AdminActionTransactionCancel implements Serializable {
   private OffsetDateTime at;
 
   public static final String SERIALIZED_NAME_BELONGS_TO = "belongs_to";
+  @Deprecated
   @SerializedName(SERIALIZED_NAME_BELONGS_TO)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private AdminActionBelongsTo belongsTo;
+
+  public static final String SERIALIZED_NAME_BELONGS_TO_ID_REFERENCE = "belongs_to_id_reference";
+  @SerializedName(SERIALIZED_NAME_BELONGS_TO_ID_REFERENCE)
+  @javax.annotation.Nonnull
+  private String belongsToIdReference;
+
+  public static final String SERIALIZED_NAME_BELONGS_TO_KIND = "belongs_to_kind";
+  @SerializedName(SERIALIZED_NAME_BELONGS_TO_KIND)
+  @javax.annotation.Nonnull
+  private AdminActionBelongsToKind belongsToKind;
 
   public static final String SERIALIZED_NAME_CATEGORY = "category";
   @SerializedName(SERIALIZED_NAME_CATEGORY)
@@ -82,9 +94,20 @@ public class AdminActionTransactionCancel implements Serializable {
   private String correspondent;
 
   public static final String SERIALIZED_NAME_CREATED_BY = "created_by";
+  @Deprecated
   @SerializedName(SERIALIZED_NAME_CREATED_BY)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private AdminActionCreatedBy createdBy;
+
+  public static final String SERIALIZED_NAME_CREATED_BY_ID_REFERENCE = "created_by_id_reference";
+  @SerializedName(SERIALIZED_NAME_CREATED_BY_ID_REFERENCE)
+  @javax.annotation.Nonnull
+  private String createdByIdReference;
+
+  public static final String SERIALIZED_NAME_CREATED_BY_KIND = "created_by_kind";
+  @SerializedName(SERIALIZED_NAME_CREATED_BY_KIND)
+  @javax.annotation.Nonnull
+  private AdminActionCreatedByKind createdByKind;
 
   public static final String SERIALIZED_NAME_EVENT_ID = "event_id";
   @SerializedName(SERIALIZED_NAME_EVENT_ID)
@@ -101,10 +124,60 @@ public class AdminActionTransactionCancel implements Serializable {
   @javax.annotation.Nullable
   private String replacesEventId;
 
+  /**
+   * Transaction cancel discriminator value.
+   */
+  @JsonAdapter(TypeEnum.Adapter.class)
+  public enum TypeEnum {
+    TRANSACTION_CANCEL_ADMIN_EVENT("transaction_cancel_admin_event");
+
+    private String value;
+
+    TypeEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static TypeEnum fromValue(String value) {
+      for (TypeEnum b : TypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<TypeEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final TypeEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public TypeEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return TypeEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      TypeEnum.fromValue(value);
+    }
+  }
+
   public static final String SERIALIZED_NAME_TYPE = "type";
   @SerializedName(SERIALIZED_NAME_TYPE)
   @javax.annotation.Nonnull
-  private AdminActionType type;
+  private TypeEnum type;
 
   public static final String SERIALIZED_NAME_VISIBILITY = "visibility";
   @SerializedName(SERIALIZED_NAME_VISIBILITY)
@@ -138,22 +211,64 @@ public class AdminActionTransactionCancel implements Serializable {
   }
 
 
-  public AdminActionTransactionCancel belongsTo(@javax.annotation.Nonnull AdminActionBelongsTo belongsTo) {
+  @Deprecated
+  public AdminActionTransactionCancel belongsTo(@javax.annotation.Nullable AdminActionBelongsTo belongsTo) {
     this.belongsTo = belongsTo;
     return this;
   }
 
   /**
-   * Get belongsTo
+   * **Deprecation notice:** Never sent by the stream. Use belongs_to_kind and belongs_to_id_reference instead.  Since: 2026-09-30 Sunset: 2027-01-13  ---  Deprecated. Not sent by the stream; use &#x60;belongs_to_kind&#x60; and &#x60;belongs_to_id_reference&#x60; instead.
    * @return belongsTo
+   * @deprecated
    */
-  @javax.annotation.Nonnull
+  @Deprecated
+  @javax.annotation.Nullable
   public AdminActionBelongsTo getBelongsTo() {
     return belongsTo;
   }
 
-  public void setBelongsTo(@javax.annotation.Nonnull AdminActionBelongsTo belongsTo) {
+  @Deprecated
+  public void setBelongsTo(@javax.annotation.Nullable AdminActionBelongsTo belongsTo) {
     this.belongsTo = belongsTo;
+  }
+
+
+  public AdminActionTransactionCancel belongsToIdReference(@javax.annotation.Nonnull String belongsToIdReference) {
+    this.belongsToIdReference = belongsToIdReference;
+    return this;
+  }
+
+  /**
+   * The ID of the entity that this event belongs to
+   * @return belongsToIdReference
+   */
+  @javax.annotation.Nonnull
+  public String getBelongsToIdReference() {
+    return belongsToIdReference;
+  }
+
+  public void setBelongsToIdReference(@javax.annotation.Nonnull String belongsToIdReference) {
+    this.belongsToIdReference = belongsToIdReference;
+  }
+
+
+  public AdminActionTransactionCancel belongsToKind(@javax.annotation.Nonnull AdminActionBelongsToKind belongsToKind) {
+    this.belongsToKind = belongsToKind;
+    return this;
+  }
+
+  /**
+   * Get belongsToKind
+   * @return belongsToKind
+   */
+  @javax.annotation.Nonnull
+  public AdminActionBelongsToKind getBelongsToKind() {
+    return belongsToKind;
+  }
+
+  public void setBelongsToKind(@javax.annotation.Nonnull AdminActionBelongsToKind belongsToKind) {
+    this.belongsToKind = belongsToKind;
   }
 
 
@@ -195,22 +310,64 @@ public class AdminActionTransactionCancel implements Serializable {
   }
 
 
-  public AdminActionTransactionCancel createdBy(@javax.annotation.Nonnull AdminActionCreatedBy createdBy) {
+  @Deprecated
+  public AdminActionTransactionCancel createdBy(@javax.annotation.Nullable AdminActionCreatedBy createdBy) {
     this.createdBy = createdBy;
     return this;
   }
 
   /**
-   * Get createdBy
+   * **Deprecation notice:** Never sent by the stream. Use created_by_kind and created_by_id_reference instead.  Since: 2026-09-30 Sunset: 2027-01-13  ---  Deprecated. Not sent by the stream; use &#x60;created_by_kind&#x60; and &#x60;created_by_id_reference&#x60; instead.
    * @return createdBy
+   * @deprecated
    */
-  @javax.annotation.Nonnull
+  @Deprecated
+  @javax.annotation.Nullable
   public AdminActionCreatedBy getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(@javax.annotation.Nonnull AdminActionCreatedBy createdBy) {
+  @Deprecated
+  public void setCreatedBy(@javax.annotation.Nullable AdminActionCreatedBy createdBy) {
     this.createdBy = createdBy;
+  }
+
+
+  public AdminActionTransactionCancel createdByIdReference(@javax.annotation.Nonnull String createdByIdReference) {
+    this.createdByIdReference = createdByIdReference;
+    return this;
+  }
+
+  /**
+   * The ID of the entity that created this event
+   * @return createdByIdReference
+   */
+  @javax.annotation.Nonnull
+  public String getCreatedByIdReference() {
+    return createdByIdReference;
+  }
+
+  public void setCreatedByIdReference(@javax.annotation.Nonnull String createdByIdReference) {
+    this.createdByIdReference = createdByIdReference;
+  }
+
+
+  public AdminActionTransactionCancel createdByKind(@javax.annotation.Nonnull AdminActionCreatedByKind createdByKind) {
+    this.createdByKind = createdByKind;
+    return this;
+  }
+
+  /**
+   * Get createdByKind
+   * @return createdByKind
+   */
+  @javax.annotation.Nonnull
+  public AdminActionCreatedByKind getCreatedByKind() {
+    return createdByKind;
+  }
+
+  public void setCreatedByKind(@javax.annotation.Nonnull AdminActionCreatedByKind createdByKind) {
+    this.createdByKind = createdByKind;
   }
 
 
@@ -271,21 +428,21 @@ public class AdminActionTransactionCancel implements Serializable {
   }
 
 
-  public AdminActionTransactionCancel type(@javax.annotation.Nonnull AdminActionType type) {
+  public AdminActionTransactionCancel type(@javax.annotation.Nonnull TypeEnum type) {
     this.type = type;
     return this;
   }
 
   /**
-   * Get type
+   * Transaction cancel discriminator value.
    * @return type
    */
   @javax.annotation.Nonnull
-  public AdminActionType getType() {
+  public TypeEnum getType() {
     return type;
   }
 
-  public void setType(@javax.annotation.Nonnull AdminActionType type) {
+  public void setType(@javax.annotation.Nonnull TypeEnum type) {
     this.type = type;
   }
 
@@ -384,9 +541,13 @@ public class AdminActionTransactionCancel implements Serializable {
     AdminActionTransactionCancel adminActionTransactionCancel = (AdminActionTransactionCancel) o;
     return Objects.equals(this.at, adminActionTransactionCancel.at) &&
         Objects.equals(this.belongsTo, adminActionTransactionCancel.belongsTo) &&
+        Objects.equals(this.belongsToIdReference, adminActionTransactionCancel.belongsToIdReference) &&
+        Objects.equals(this.belongsToKind, adminActionTransactionCancel.belongsToKind) &&
         Objects.equals(this.category, adminActionTransactionCancel.category) &&
         Objects.equals(this.correspondent, adminActionTransactionCancel.correspondent) &&
         Objects.equals(this.createdBy, adminActionTransactionCancel.createdBy) &&
+        Objects.equals(this.createdByIdReference, adminActionTransactionCancel.createdByIdReference) &&
+        Objects.equals(this.createdByKind, adminActionTransactionCancel.createdByKind) &&
         Objects.equals(this.eventId, adminActionTransactionCancel.eventId) &&
         Objects.equals(this.note, adminActionTransactionCancel.note) &&
         Objects.equals(this.replacesEventId, adminActionTransactionCancel.replacesEventId) &&
@@ -398,7 +559,7 @@ public class AdminActionTransactionCancel implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(at, belongsTo, category, correspondent, createdBy, eventId, note, replacesEventId, type, visibility, context, additionalProperties);
+    return Objects.hash(at, belongsTo, belongsToIdReference, belongsToKind, category, correspondent, createdBy, createdByIdReference, createdByKind, eventId, note, replacesEventId, type, visibility, context, additionalProperties);
   }
 
   @Override
@@ -407,9 +568,13 @@ public class AdminActionTransactionCancel implements Serializable {
     sb.append("class AdminActionTransactionCancel {\n");
     sb.append("    at: ").append(toIndentedString(at)).append("\n");
     sb.append("    belongsTo: ").append(toIndentedString(belongsTo)).append("\n");
+    sb.append("    belongsToIdReference: ").append(toIndentedString(belongsToIdReference)).append("\n");
+    sb.append("    belongsToKind: ").append(toIndentedString(belongsToKind)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    correspondent: ").append(toIndentedString(correspondent)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
+    sb.append("    createdByIdReference: ").append(toIndentedString(createdByIdReference)).append("\n");
+    sb.append("    createdByKind: ").append(toIndentedString(createdByKind)).append("\n");
     sb.append("    eventId: ").append(toIndentedString(eventId)).append("\n");
     sb.append("    note: ").append(toIndentedString(note)).append("\n");
     sb.append("    replacesEventId: ").append(toIndentedString(replacesEventId)).append("\n");
@@ -435,10 +600,10 @@ public class AdminActionTransactionCancel implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("at", "belongs_to", "category", "correspondent", "created_by", "event_id", "note", "replaces_event_id", "type", "visibility", "context"));
+    openapiFields = new HashSet<String>(Arrays.asList("at", "belongs_to", "belongs_to_id_reference", "belongs_to_kind", "category", "correspondent", "created_by", "created_by_id_reference", "created_by_kind", "event_id", "note", "replaces_event_id", "type", "visibility", "context"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("at", "belongs_to", "category", "correspondent", "created_by", "event_id", "note", "type", "visibility", "context"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("at", "belongs_to_id_reference", "belongs_to_kind", "category", "correspondent", "created_by_id_reference", "created_by_kind", "event_id", "note", "type", "visibility", "context"));
   }
 
   /**
@@ -461,15 +626,29 @@ public class AdminActionTransactionCancel implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      // validate the required field `belongs_to`
-      AdminActionBelongsTo.validateJsonElement(jsonObj.get("belongs_to"));
+      // validate the optional field `belongs_to`
+      if (jsonObj.get("belongs_to") != null && !jsonObj.get("belongs_to").isJsonNull()) {
+        AdminActionBelongsTo.validateJsonElement(jsonObj.get("belongs_to"));
+      }
+      if (!jsonObj.get("belongs_to_id_reference").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `belongs_to_id_reference` to be a primitive type in the JSON string but got `%s`", jsonObj.get("belongs_to_id_reference").toString()));
+      }
+      // validate the required field `belongs_to_kind`
+      AdminActionBelongsToKind.validateJsonElement(jsonObj.get("belongs_to_kind"));
       // validate the required field `category`
       AdminActionCategory.validateJsonElement(jsonObj.get("category"));
       if (!jsonObj.get("correspondent").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `correspondent` to be a primitive type in the JSON string but got `%s`", jsonObj.get("correspondent").toString()));
       }
-      // validate the required field `created_by`
-      AdminActionCreatedBy.validateJsonElement(jsonObj.get("created_by"));
+      // validate the optional field `created_by`
+      if (jsonObj.get("created_by") != null && !jsonObj.get("created_by").isJsonNull()) {
+        AdminActionCreatedBy.validateJsonElement(jsonObj.get("created_by"));
+      }
+      if (!jsonObj.get("created_by_id_reference").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `created_by_id_reference` to be a primitive type in the JSON string but got `%s`", jsonObj.get("created_by_id_reference").toString()));
+      }
+      // validate the required field `created_by_kind`
+      AdminActionCreatedByKind.validateJsonElement(jsonObj.get("created_by_kind"));
       if (!jsonObj.get("event_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `event_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("event_id").toString()));
       }
@@ -479,8 +658,11 @@ public class AdminActionTransactionCancel implements Serializable {
       if ((jsonObj.get("replaces_event_id") != null && !jsonObj.get("replaces_event_id").isJsonNull()) && !jsonObj.get("replaces_event_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `replaces_event_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("replaces_event_id").toString()));
       }
+      if (!jsonObj.get("type").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("type").toString()));
+      }
       // validate the required field `type`
-      AdminActionType.validateJsonElement(jsonObj.get("type"));
+      TypeEnum.validateJsonElement(jsonObj.get("type"));
       // validate the required field `visibility`
       AdminActionVisibility.validateJsonElement(jsonObj.get("visibility"));
       // validate the required field `context`
