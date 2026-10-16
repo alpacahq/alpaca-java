@@ -186,11 +186,14 @@ with opening. Its admitted `onOpen` callback starts independently before `opened
 run and remains ordered before the terminal listener callback. A synchronous continuation can
 therefore close the subscription and await `onClosed` without preventing callback delivery.
 
-The opening and terminal dispatchers have finite workers and queue capacity. Opening-dispatch
-rejection fails the subscription with `AlpacaSseCallbackException`. If the terminal dispatcher is
-saturated by blocked terminal callbacks, the SDK preserves the already-settled lifecycle result,
-rejects the pending listener delivery, and logs a warning. Keep callbacks non-blocking or supply an
-application-owned executor; lifecycle futures are the authoritative termination signal.
+The opening and terminal dispatchers have finite primary workers and queue capacity. Saturation from
+unrelated subscriptions hands an already-admitted callback to the transport lifecycle executor
+instead of failing the opening subscription or dropping terminal listener delivery. Blocking
+callbacks can therefore consume additional daemon workers during overload, so callbacks should
+remain non-blocking; an application-owned executor can isolate opening and event work. Rejection by
+that application-owned executor during opening or event delivery remains an
+`AlpacaSseCallbackException`; lifecycle futures remain the authoritative terminal signal if the
+application executor rejects terminal delivery.
 
 Each subscription derives an HTTP client with a private, one-call daemon dispatcher and shuts that
 dispatcher down at terminal completion. Close streams through `AlpacaSseSubscription`; the supplied

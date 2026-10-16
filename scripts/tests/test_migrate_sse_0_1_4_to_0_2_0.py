@@ -871,6 +871,52 @@ class CliTests(unittest.TestCase):
             self.assertEqual(1, exit_code)
             self.assertEqual(["SSE000"], [item["code"] for item in json.loads(output.getvalue())])
 
+    def test_scans_java_package_named_build(self):
+        source = (
+            IMPORT
+            + "class Example {\n"
+            + "  void close(BrokerSseSubscription subscription) {\n"
+            + "    subscription.eventSource().cancel();\n"
+            + "  }\n"
+            + "}\n"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            checkout = Path(directory) / "checkout"
+            path = checkout / "src" / "main" / "java" / "example" / "build" / "Example.java"
+            path.parent.mkdir(parents=True)
+            path.write_text(source, encoding="utf-8")
+
+            output = io.StringIO()
+            with redirect_stdout(output):
+                exit_code = migrate.main(["--check", "--json", str(checkout)])
+
+            self.assertEqual(1, exit_code)
+            self.assertEqual(["SSE000"], [item["code"] for item in json.loads(output.getvalue())])
+
+    def test_skips_gradle_build_output(self):
+        source = (
+            IMPORT
+            + "class Example {\n"
+            + "  void close(BrokerSseSubscription subscription) {\n"
+            + "    subscription.eventSource().cancel();\n"
+            + "  }\n"
+            + "}\n"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            checkout = Path(directory) / "checkout"
+            (checkout / "build.gradle.kts").parent.mkdir(parents=True)
+            (checkout / "build.gradle.kts").write_text("", encoding="utf-8")
+            path = checkout / "build" / "generated" / "Example.java"
+            path.parent.mkdir(parents=True)
+            path.write_text(source, encoding="utf-8")
+
+            output = io.StringIO()
+            with redirect_stdout(output):
+                exit_code = migrate.main(["--check", "--json", str(checkout)])
+
+            self.assertEqual(0, exit_code)
+            self.assertEqual([], json.loads(output.getvalue()))
+
     def test_missing_input_path_fails_closed(self):
         with redirect_stderr(io.StringIO()):
             exit_code = migrate.main(["--check", "/definitely/missing/source"])

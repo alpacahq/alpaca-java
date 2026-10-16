@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import markets.alpaca.client.AlpacaClientFactory;
 import markets.alpaca.client.AlpacaCredentials;
 import markets.alpaca.client.openapi.trading.model.ActivityEventV2;
+import markets.alpaca.client.sse.AlpacaSseDeserializationException;
 import markets.alpaca.client.sse.AlpacaSseEvent;
 import markets.alpaca.client.sse.AlpacaSseListener;
 import markets.alpaca.client.sse.AlpacaSseOptions;
@@ -75,6 +76,41 @@ class TradingEventsSseClientTest {
     assertEquals("trading-key", request.getHeader("APCA-API-KEY-ID"));
     assertEquals("trading-secret", request.getHeader("APCA-API-SECRET-KEY"));
     assertEquals("text/event-stream", request.getHeader("Accept"));
+  }
+
+  @Test
+  void malformedEventTerminatesWithoutReconnect() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("id: poison\ndata: {\n\n"));
+    var apiClient =
+        AlpacaClientFactory.tradingClient(
+            new AlpacaCredentials("trading-key", "trading-secret"), httpClient);
+    apiClient.setBasePath(baseUrl());
+    var policy =
+        AlpacaSseReconnectPolicy.builder()
+            .initialAttempts(0)
+            .establishedAttempts(1)
+            .initialBackoff(Duration.ofMillis(1))
+            .maxBackoff(Duration.ofMillis(1))
+            .jitterRatio(0)
+            .build();
+    var client =
+        new TradingEventsSseClient(
+            apiClient, AlpacaSseOptions.builder().reconnectPolicy(policy).build());
+
+    try (var subscription =
+        client.subscribeToActivities(
+            TradingActivitySseRequest.live(), new AlpacaSseListener<>() {})) {
+      var failure =
+          assertThrows(
+              ExecutionException.class, () -> subscription.completion().get(3, TimeUnit.SECONDS));
+
+      assertInstanceOf(AlpacaSseDeserializationException.class, failure.getCause());
+      assertTrue(subscription.lastEventId().isEmpty());
+      assertEquals(1, server.getRequestCount());
+    }
   }
 
   @Test

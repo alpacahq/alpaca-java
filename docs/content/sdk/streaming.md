@@ -55,8 +55,12 @@ listener callbacks remain ordered and may complete later. Lifecycle completion i
 the active callback path, so a callback may close the subscription even when a synchronous
 completion continuation waits for the ordered terminal listener.
 
-The SDK opening and terminal dispatchers have finite workers and queue capacity so blocked listeners
-cannot create unbounded threads. Lifecycle completion instead uses a separate elastic,
+The SDK opening and terminal dispatchers use finite primary worker pools and queues. If unrelated
+subscriptions saturate a primary dispatcher, its already-admitted callback falls back to the
+transport lifecycle executor instead of failing the subscription or dropping terminal delivery.
+That fallback can consume additional daemon workers when callbacks block, so callbacks should
+remain non-blocking; an application-owned executor can isolate opening and event work. Lifecycle
+completion uses a separate elastic,
 direct-handoff executor: a blocked synchronous continuation for one subscription cannot queue
 another subscription's settlement or occupy the scheduler. Synchronous lifecycle continuations
 must remain short because concurrently blocked continuations consume additional daemon workers. The
@@ -325,8 +329,11 @@ REST environment does not implicitly select the SSE environment.
 Use `CorporateActionsSseRequest.fromEventId(...)` or `throughEventId(...)` for replay and bounded
 history. Corporate-action event IDs are validated uppercase ULIDs. The endpoint defines inclusive
 resume semantics, so reconnects can redeliver the cursor event; deduplicate by event ID when
-effects must be exactly once. Unknown `event_type` values and payloads that do not validate against
-their generated concrete schema fail the subscription instead of being guessed.
+effects must be exactly once. After an empty SSE `id:`, requests with `since` or `sinceId` replay
+from that original lower bound, while cursorless requests fail closed instead of reconnecting with a
+possible gap. Unknown `event_type` values, malformed payloads, and payloads that do not validate
+against their generated concrete schema fail the subscription without reconnecting instead of being
+guessed or repeatedly replayed.
 
 ## Trading account-activity SSE
 
@@ -440,8 +447,10 @@ connection continues. Its SSE ID becomes the `Last-Event-ID` transport cursor af
 Admin-action streams retain the generated `SubscribeToAdminActionSSE200ResponseInner` listener
 type, while the required `type` field selects its concrete generated model without relying on the
 ambiguous generated `oneOf` adapter.
-Broker endpoints document endpoint-specific `since_id`/`since_ulid` query cursors, so applications
-that require gap replay should reconnect with the appropriate request option and deduplicate.
+Broker endpoints document endpoint-specific `since`/`since_id`/`since_ulid` query cursors. After an
+empty SSE `id:`, a configured initial ID or original lower-bound query keeps replay possible;
+cursorless subscriptions fail closed rather than reconnecting with a possible gap. Applications
+that require gap replay should configure the appropriate request option and deduplicate.
 Protocol and non-retryable HTTP failures are terminal;
 retryable HTTP and transport failures follow the configured reconnect policy.
 
