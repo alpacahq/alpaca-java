@@ -11,8 +11,7 @@ a template for each case that will ask you to fill out some information to bette
 (Note that not filling out the template or skipping questions is likely to delay resolution and may result in the issue
 being closed for missing information.)
 
-> **NOTE** that we can only solve issues with the SDK. If you are reporting an issue with the API itself, please open
-> an issue over [here](https://github.com/alpacahq/Alpaca-API) instead.
+> **NOTE** that we can only solve issues with the SDK. To report a bug in the Alpaca API itself, its OpenAPI specs, or its documentation, open an issue in [alpacahq/alpaca-api](https://github.com/alpacahq/alpaca-api/issues/new/choose) instead. For API feature requests and general questions, use the [Community Forum](https://forum.alpaca.markets/) or [Slack](https://alpaca.markets/slack).
 
 ## How do I contribute code?
 

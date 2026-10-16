@@ -66,8 +66,10 @@ For release consumption, use Maven Central as shown in the
 ## Support
 
 - **Library / SDK issues:** Bugs, feature requests, or questions specific to this Java library → [GitHub Issues](https://github.com/alpacahq/alpaca-java/issues/new/choose).
-- **General Alpaca support & API discussion:** Account questions, platform issues, or broader API topics → [Alpaca Community Forum](https://forum.alpaca.markets/).
-- **Slack community:** Chat with other developers and the Alpaca community on [Slack](https://alpaca.markets/slack).
+- **Alpaca API bugs:** Bugs in the Alpaca API itself, its OpenAPI specs, or its documentation → [alpacahq/alpaca-api](https://github.com/alpacahq/alpaca-api/issues/new/choose).
+- **Community:** API feature requests, general questions, and dashboard bugs → [Alpaca Community Forum](https://forum.alpaca.markets/) or [Slack](https://alpaca.markets/slack).
+- **Account help:** Questions about your account, funding, or orders → [Support request](https://alpaca.markets/support/request).
+- **Outages:** Service status and incident updates → [Status page](https://status.alpaca.markets/).
 
 ## Contributing
 
