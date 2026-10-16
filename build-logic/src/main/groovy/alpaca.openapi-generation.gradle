@@ -280,10 +280,27 @@ tasks.register('clearOpenApiPinBackup') {
     }
 }
 
+tasks.register('checkSseContracts') {
+    group = 'verification'
+    description = 'Verifies pinned SSE inventory, support decisions, and handwritten bindings'
+    inputs.files(
+        rootProject.file('specs/broker/openapi.yaml'),
+        rootProject.file('specs/data/openapi.yaml'),
+        rootProject.file('specs/trading/openapi.yaml'))
+
+    doLast {
+        OpenApiSpecSupport.verifySseContracts([
+            broker: rootProject.file('specs/broker/openapi.yaml'),
+            data: rootProject.file('specs/data/openapi.yaml'),
+            trading: rootProject.file('specs/trading/openapi.yaml'),
+        ])
+    }
+}
+
 tasks.register('checkGenerated') {
     group = 'verification'
     description = 'Regenerates from pinned specs and fails if specs/ or generated OpenAPI sources drift'
-    dependsOn 'generateApis'
+    dependsOn 'generateApis', 'checkSseContracts'
     doLast {
         // OpenAPI Generator updates this annotation's version on every generator upgrade.
         // -I ignores only hunks where every added/removed line matches, so real changes in

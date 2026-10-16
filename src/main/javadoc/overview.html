@@ -9,7 +9,7 @@
 
       <p>
         The Alpaca Java client provides generated REST clients and handwritten convenience layers
-        for Alpaca Broker, Market Data, Trading, WebSocket, and Broker Events SSE APIs.
+        for Alpaca Broker, Market Data, Trading, WebSocket, and Trading/Market Data/Broker SSE APIs.
       </p>
 
       <h2>Start Here</h2>
@@ -83,6 +83,19 @@
           OkHttp configuration, logging, and retry helpers.
         </li>
         <li>
+          <a href="markets/alpaca/client/sse/package-summary.html">sse</a> contains the shared
+          Server-Sent Events lifecycle and transport API, including awaitable opening, connection
+          metadata, cancellation, and completion.
+        </li>
+        <li>
+          <a href="markets/alpaca/client/trading/sse/package-summary.html">trading.sse</a> contains
+          the Trading activity Server-Sent Events client.
+        </li>
+        <li>
+          <a href="markets/alpaca/client/data/sse/package-summary.html">data.sse</a> contains the
+          Market Data corporate-actions Server-Sent Events client.
+        </li>
+        <li>
           <a href="markets/alpaca/client/broker/sse/package-summary.html">broker.sse</a> contains
           Broker Events Server-Sent Events clients.
         </li>
@@ -95,9 +108,11 @@
       <h2>Generated Sources</h2>
 
       <p>
-        Generated REST sources live under <code>build/generated</code> and are not committed. This
-        documentation is generated after <code>generateApis</code>, so it reflects whichever public
-        or local OpenAPI specs were configured for the build.
+        Generated REST sources are committed under
+        <code>src/main/java/markets/alpaca/client/openapi</code>. Generation renders through
+        <code>build/generated</code> and synchronizes the committed packages. This documentation is
+        generated after <code>generateApis</code>, so it reflects the configured pinned or local
+        OpenAPI specs.
       </p>
     </main>
   </body>

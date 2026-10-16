@@ -5,8 +5,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.lang.reflect.Field;
 import java.util.concurrent.Executor;
 import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
+import markets.alpaca.client.data.sse.CorporateActionsSseClient;
+import markets.alpaca.client.data.sse.MarketDataSseEnvironment;
 import markets.alpaca.client.http.AlpacaHttpConfig;
 import markets.alpaca.client.openapi.broker.api.EventsApi;
+import markets.alpaca.client.openapi.data.api.CorporateActionsApi;
+import markets.alpaca.client.sse.AlpacaSseOptions;
+import markets.alpaca.client.trading.sse.TradingEventsSseClient;
 import markets.alpaca.client.ws.AlpacaCryptoStream;
 import markets.alpaca.client.ws.AlpacaNewsStream;
 import markets.alpaca.client.ws.AlpacaStockStream;
@@ -189,6 +194,20 @@ class AlpacaClientFactoryTest {
     assertSame(callbackExecutor, field(sseClient, BrokerEventsSseClient.class, "callbackExecutor"));
   }
 
+  @Test
+  void brokerEventsSseClient_optionsOnlyOverloadsWireOptions() {
+    var options = AlpacaSseOptions.defaults();
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS);
+
+    var fromCredentials = AlpacaClientFactory.brokerEventsSseClient(CREDS, options);
+    var fromApiClient = AlpacaClientFactory.brokerEventsSseClient(brokerClient, options);
+    var fromEventsApi = new BrokerEventsSseClient(new EventsApi(brokerClient), options);
+
+    assertSame(options, field(fromCredentials, BrokerEventsSseClient.class, "sseOptions"));
+    assertSame(options, field(fromApiClient, BrokerEventsSseClient.class, "sseOptions"));
+    assertSame(options, field(fromEventsApi, BrokerEventsSseClient.class, "sseOptions"));
+  }
+
   // -------------------------------------------------------------------------
   // Trading API — header key pair
   // -------------------------------------------------------------------------
@@ -261,6 +280,26 @@ class AlpacaClientFactoryTest {
 
     assertEquals("https://trading-proxy.example", client.getBasePath());
     assertSame(httpClient, client.getHttpClient());
+  }
+
+  @Test
+  void tradingEventsSseClient_optionsOnlyOverloadsWireOptionsAndEnvironment() {
+    var options = AlpacaSseOptions.reconnectDisabled();
+    var tradingClient = AlpacaClientFactory.tradingClient(CREDS);
+
+    var fromApiClient = AlpacaClientFactory.tradingEventsSseClient(tradingClient, options);
+    var fromCredentials = AlpacaClientFactory.tradingEventsSseClient(CREDS, options);
+    var fromEnvironment =
+        AlpacaClientFactory.tradingEventsSseClient(
+            CREDS, TradingApiEnvironment.PRODUCTION, options);
+    var environmentEventsApi =
+        (markets.alpaca.client.openapi.trading.api.EventsApi)
+            field(fromEnvironment, TradingEventsSseClient.class, "eventsApi");
+
+    assertSame(options, field(fromApiClient, TradingEventsSseClient.class, "options"));
+    assertSame(options, field(fromCredentials, TradingEventsSseClient.class, "options"));
+    assertSame(options, field(fromEnvironment, TradingEventsSseClient.class, "options"));
+    assertEquals("https://api.alpaca.markets", environmentEventsApi.getApiClient().getBasePath());
   }
 
   @Test
@@ -343,6 +382,29 @@ class AlpacaClientFactoryTest {
 
     assertEquals("https://data-proxy.example", client.getBasePath());
     assertSame(httpClient, client.getHttpClient());
+  }
+
+  @Test
+  void corporateActionsSseClient_factoryOverloadsWireEnvironmentOptionsAndExecutor() {
+    var options = AlpacaSseOptions.reconnectDisabled();
+    Executor callbackExecutor = Runnable::run;
+    var dataClient = AlpacaClientFactory.dataClient(CREDS);
+
+    CorporateActionsSseClient fromApiClient =
+        AlpacaClientFactory.corporateActionsSseClient(
+            dataClient, MarketDataSseEnvironment.SANDBOX, options);
+    CorporateActionsSseClient fromCredentials =
+        AlpacaClientFactory.corporateActionsSseClient(
+            CREDS, MarketDataSseEnvironment.SANDBOX, callbackExecutor);
+
+    assertSame(options, field(fromApiClient, CorporateActionsSseClient.class, "options"));
+    assertSame(
+        callbackExecutor,
+        field(fromCredentials, CorporateActionsSseClient.class, "callbackExecutor"));
+    var generated =
+        (CorporateActionsApi)
+            field(fromApiClient, CorporateActionsSseClient.class, "corporateActionsApi");
+    assertEquals(MarketDataSseEnvironment.SANDBOX.baseUrl(), generated.getCustomBaseUrl());
   }
 
   @Test
