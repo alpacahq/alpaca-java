@@ -311,8 +311,10 @@ Protocol and non-retryable HTTP failures are terminal; retryable HTTP and transp
 the configured reconnect policy. When reconnect is enabled, the malformed event's SSE ID becomes
 the transport cursor sent in `Last-Event-ID` after invoking the failure callback—even if that
 callback throws. Broker endpoints document endpoint-specific query cursors rather than
-`Last-Event-ID`; applications that require gap replay should reconnect with the appropriate
-`since_id` or `since_ulid` option and deduplicate events. Activity V2
+`Last-Event-ID`; after an empty SSE `id:`, a configured initial ID or an original `since`,
+`since_id`, or `since_ulid` lower bound keeps replay possible. Cursorless subscriptions fail closed
+rather than reconnecting with a possible gap. Applications that require gap replay should configure
+the appropriate lower bound and deduplicate events. Activity V2
 details without OAS discriminants use a unique-most-specific field match and fail on ties. The
 activity type remains `CSD` for cash deposits, but because the pinned OAS lacks a dedicated CSD
 detail schema, those details are temporarily represented as `CSWActivityV2`; undeclared fields

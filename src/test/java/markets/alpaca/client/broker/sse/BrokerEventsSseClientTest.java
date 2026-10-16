@@ -29,6 +29,7 @@ import markets.alpaca.client.sse.AlpacaSseProtocolException;
 import markets.alpaca.client.sse.AlpacaSseReconnectPolicy;
 import markets.alpaca.client.sse.AlpacaSseState;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
@@ -99,6 +100,62 @@ class BrokerEventsSseClientTest {
     assertTrue(userAgent.startsWith("APCA-JAVA/"));
     assertNotNull(received.get());
     assertEquals("evt-1", received.get().getEventId());
+  }
+
+  @Test
+  void reconnectAfterEmptyEventIdFailsClosedWithoutAnyLowerBound() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("id:\ndata: {\"event_id\":\"evt-1\"}\n\n"));
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS, httpClient);
+    brokerClient.setBasePath(serverBasePath());
+    var policy =
+        AlpacaSseReconnectPolicy.builder()
+            .initialAttempts(0)
+            .establishedAttempts(1)
+            .initialBackoff(Duration.ofMillis(1))
+            .maxBackoff(Duration.ofMillis(1))
+            .jitterRatio(0)
+            .build();
+    var sse =
+        new BrokerEventsSseClient(
+            brokerClient, AlpacaSseOptions.builder().reconnectPolicy(policy).build());
+
+    try (var subscription =
+        sse.subscribeToTradeEvents(
+            BrokerSseDateOptions.builder().build(), new BrokerSseEventListener<>() {})) {
+      var failure =
+          assertThrows(
+              ExecutionException.class, () -> subscription.completion().get(3, TimeUnit.SECONDS));
+
+      var protocolFailure = assertInstanceOf(AlpacaSseProtocolException.class, failure.getCause());
+      var resumeFailure =
+          assertInstanceOf(AlpacaSseProtocolException.class, protocolFailure.getCause());
+      assertEquals(
+          "Cannot resume a cursorless Broker stream after an empty SSE id",
+          resumeFailure.getMessage());
+      assertEquals(1, server.getRequestCount());
+    }
+  }
+
+  @Test
+  void emptyEventIdRetainsOriginalLowerBound() {
+    var request =
+        new Request.Builder()
+            .url(
+                server
+                    .url("/v2/events/trades")
+                    .newBuilder()
+                    .addQueryParameter("since_id", "lower-bound")
+                    .build())
+            .header("Last-Event-ID", "replacement")
+            .build();
+
+    var resumed = BrokerEventsSseClient.withResumeCursor(request, "", null);
+
+    assertEquals("lower-bound", resumed.url().queryParameter("since_id"));
+    assertNull(resumed.header("Last-Event-ID"));
   }
 
   @Test

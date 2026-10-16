@@ -8,9 +8,11 @@ import markets.alpaca.client.openapi.data.http.ApiException;
 import markets.alpaca.client.openapi.data.model.CorporateActionEvent;
 import markets.alpaca.client.sse.AlpacaSseListener;
 import markets.alpaca.client.sse.AlpacaSseOptions;
+import markets.alpaca.client.sse.AlpacaSseProtocolException;
 import markets.alpaca.client.sse.AlpacaSseSubscription;
 import markets.alpaca.client.sse.internal.SseTransport;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 /** Streaming client for Market Data corporate-action Server-Sent Events. */
 public final class CorporateActionsSseClient {
@@ -109,6 +111,21 @@ public final class CorporateActionsSseClient {
         request.bounded(),
         decoder::decode,
         listener,
-        callbackExecutor);
+        callbackExecutor,
+        (baseRequest, eventId) -> withResumeCursor(baseRequest, eventId, initialEventId));
+  }
+
+  static Request withResumeCursor(Request request, String eventId, String fallbackEventId) {
+    Request resumedRequest = SseTransport.withLastEventIdHeader(request, eventId);
+    if (eventId == null || !eventId.isEmpty()) return resumedRequest;
+    if (fallbackEventId != null) {
+      return SseTransport.withLastEventIdHeader(request, fallbackEventId);
+    }
+    if (request.url().queryParameter("since") != null
+        || request.url().queryParameter("since_id") != null) {
+      return resumedRequest;
+    }
+    throw new AlpacaSseProtocolException(
+        "Cannot resume a cursorless Corporate Actions stream after an empty SSE id");
   }
 }

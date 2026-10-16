@@ -3,17 +3,23 @@ package markets.alpaca.client.data.sse;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import markets.alpaca.client.AlpacaClientFactory;
 import markets.alpaca.client.AlpacaCredentials;
 import markets.alpaca.client.openapi.data.model.CorporateActionEvent;
 import markets.alpaca.client.openapi.data.model.CorporateActionEventType;
+import markets.alpaca.client.sse.AlpacaSseDeserializationException;
 import markets.alpaca.client.sse.AlpacaSseEvent;
 import markets.alpaca.client.sse.AlpacaSseListener;
 import markets.alpaca.client.sse.AlpacaSseOptions;
+import markets.alpaca.client.sse.AlpacaSseProtocolException;
+import markets.alpaca.client.sse.AlpacaSseReconnectPolicy;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
@@ -86,6 +92,101 @@ class CorporateActionsSseClientTest {
     assertEquals("data-key", captured.getHeader("APCA-API-KEY-ID"));
     assertEquals("data-secret", captured.getHeader("APCA-API-SECRET-KEY"));
     assertEquals("text/event-stream", captured.getHeader("Accept"));
+  }
+
+  @Test
+  void reconnectAfterEmptyEventIdFailsClosedWithoutAnyLowerBound() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("id:\ndata: " + CorporateActionEventDecoderTest.cashDividendJson() + "\n\n"));
+    var dataClient =
+        AlpacaClientFactory.dataClient(
+            new AlpacaCredentials("data-key", "data-secret"), httpClient);
+    var policy =
+        AlpacaSseReconnectPolicy.builder()
+            .initialAttempts(0)
+            .establishedAttempts(1)
+            .initialBackoff(Duration.ofMillis(1))
+            .maxBackoff(Duration.ofMillis(1))
+            .jitterRatio(0)
+            .build();
+    var client =
+        new CorporateActionsSseClient(
+            dataClient,
+            MarketDataSseEnvironment.custom(baseUrl()),
+            AlpacaSseOptions.builder().reconnectPolicy(policy).build());
+
+    try (var subscription =
+        client.subscribeToCorporateActions(
+            CorporateActionsSseRequest.live(), new AlpacaSseListener<>() {})) {
+      var failure =
+          assertThrows(
+              ExecutionException.class, () -> subscription.completion().get(3, TimeUnit.SECONDS));
+
+      var protocolFailure = assertInstanceOf(AlpacaSseProtocolException.class, failure.getCause());
+      var resumeFailure =
+          assertInstanceOf(AlpacaSseProtocolException.class, protocolFailure.getCause());
+      assertEquals(
+          "Cannot resume a cursorless Corporate Actions stream after an empty SSE id",
+          resumeFailure.getMessage());
+      assertEquals(1, server.getRequestCount());
+    }
+  }
+
+  @Test
+  void emptyEventIdRetainsOriginalLowerBound() {
+    var request =
+        new Request.Builder()
+            .url(
+                server
+                    .url("/v1beta1/events/corporate-actions")
+                    .newBuilder()
+                    .addQueryParameter("since_id", SINCE_ID)
+                    .build())
+            .header("Last-Event-ID", "replacement")
+            .build();
+
+    var resumed = CorporateActionsSseClient.withResumeCursor(request, "", null);
+
+    assertEquals(SINCE_ID, resumed.url().queryParameter("since_id"));
+    assertNull(resumed.header("Last-Event-ID"));
+  }
+
+  @Test
+  void malformedEventTerminatesWithoutReconnect() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody("id: poison\ndata: {\n\n"));
+    var dataClient =
+        AlpacaClientFactory.dataClient(
+            new AlpacaCredentials("data-key", "data-secret"), httpClient);
+    var policy =
+        AlpacaSseReconnectPolicy.builder()
+            .initialAttempts(0)
+            .establishedAttempts(1)
+            .initialBackoff(Duration.ofMillis(1))
+            .maxBackoff(Duration.ofMillis(1))
+            .jitterRatio(0)
+            .build();
+    var client =
+        new CorporateActionsSseClient(
+            dataClient,
+            MarketDataSseEnvironment.custom(baseUrl()),
+            AlpacaSseOptions.builder().reconnectPolicy(policy).build());
+
+    try (var subscription =
+        client.subscribeToCorporateActions(
+            CorporateActionsSseRequest.live(), new AlpacaSseListener<>() {})) {
+      var failure =
+          assertThrows(
+              ExecutionException.class, () -> subscription.completion().get(3, TimeUnit.SECONDS));
+
+      assertInstanceOf(AlpacaSseDeserializationException.class, failure.getCause());
+      assertTrue(subscription.lastEventId().isEmpty());
+      assertEquals(1, server.getRequestCount());
+    }
   }
 
   @Test

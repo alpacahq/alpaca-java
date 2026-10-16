@@ -785,6 +785,23 @@ def analyze_text(text: str, path: str = "<memory>") -> Analysis:
     )
 
 
+def _is_gradle_build_output(search_root: Path, candidate: Path) -> bool:
+    gradle_project_markers = {
+        "build.gradle",
+        "build.gradle.kts",
+        "settings.gradle",
+        "settings.gradle.kts",
+    }
+    for directory in candidate.parents:
+        if directory == search_root.parent:
+            break
+        if directory.name == "build" and any(
+            (directory.parent / marker).is_file() for marker in gradle_project_markers
+        ):
+            return True
+    return False
+
+
 def _java_files(paths: Iterable[Path]) -> list[Path]:
     files: set[Path] = set()
     for path in paths:
@@ -794,9 +811,8 @@ def _java_files(paths: Iterable[Path]) -> list[Path]:
             files.update(
                 candidate
                 for candidate in path.rglob("*.java")
-                if not {".git", ".gradle", "build"}.intersection(
-                    candidate.relative_to(path).parts
-                )
+                if not {".git", ".gradle"}.intersection(candidate.relative_to(path).parts)
+                and not _is_gradle_build_output(path, candidate)
             )
     return sorted(files)
 

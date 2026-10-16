@@ -251,7 +251,7 @@ public final class SseTransport {
         resumeRequest);
   }
 
-  private static <T> AlpacaSseSubscription open(
+  public static <T> AlpacaSseSubscription open(
       OkHttpClient httpClient,
       Request request,
       AlpacaSseOptions options,
@@ -276,6 +276,7 @@ public final class SseTransport {
             OPENING_CALLBACK_EXECUTOR,
             TERMINAL_CALLBACK_EXECUTOR,
             COMPLETION_EXECUTOR,
+            LIFECYCLE_EXECUTOR,
             System::nanoTime);
     session.start();
     return session;
@@ -369,6 +370,7 @@ public final class SseTransport {
         openingCallbackExecutor,
         terminalCallbackExecutor,
         COMPLETION_EXECUTOR,
+        LIFECYCLE_EXECUTOR,
         nanoTime);
   }
 
@@ -383,6 +385,34 @@ public final class SseTransport {
       Executor openingCallbackExecutor,
       Executor terminalCallbackExecutor,
       Executor completionExecutor,
+      LongSupplier nanoTime) {
+    return openForTesting(
+        httpClient,
+        request,
+        options,
+        bounded,
+        decoder,
+        listener,
+        scheduler,
+        openingCallbackExecutor,
+        terminalCallbackExecutor,
+        completionExecutor,
+        LIFECYCLE_EXECUTOR,
+        nanoTime);
+  }
+
+  static <T> AlpacaSseSubscription openForTesting(
+      OkHttpClient httpClient,
+      Request request,
+      AlpacaSseOptions options,
+      boolean bounded,
+      SseDecoder<T> decoder,
+      AlpacaSseListener<T> listener,
+      ScheduledExecutorService scheduler,
+      Executor openingCallbackExecutor,
+      Executor terminalCallbackExecutor,
+      Executor completionExecutor,
+      Executor lifecycleExecutor,
       LongSupplier nanoTime) {
     var session =
         new Session<>(
@@ -399,6 +429,7 @@ public final class SseTransport {
             openingCallbackExecutor,
             terminalCallbackExecutor,
             completionExecutor,
+            lifecycleExecutor,
             nanoTime);
     session.start();
     return session;
@@ -449,6 +480,7 @@ public final class SseTransport {
     private final Executor openingCallbackExecutor;
     private final Executor terminalCallbackExecutor;
     private final Executor completionExecutor;
+    private final Executor lifecycleExecutor;
     private final LongSupplier nanoTime;
     private final Object lifecycleLock = new Object();
     private final SerialCallbackDispatcher callbackDispatcher = new SerialCallbackDispatcher();
@@ -497,6 +529,7 @@ public final class SseTransport {
         Executor openingCallbackExecutor,
         Executor terminalCallbackExecutor,
         Executor completionExecutor,
+        Executor lifecycleExecutor,
         LongSupplier nanoTime) {
       var httpClientBuilder =
           Objects.requireNonNull(httpClient, "httpClient must not be null").newBuilder();
@@ -533,6 +566,8 @@ public final class SseTransport {
               terminalCallbackExecutor, "terminalCallbackExecutor must not be null");
       this.completionExecutor =
           Objects.requireNonNull(completionExecutor, "completionExecutor must not be null");
+      this.lifecycleExecutor =
+          Objects.requireNonNull(lifecycleExecutor, "lifecycleExecutor must not be null");
       this.nanoTime = Objects.requireNonNull(nanoTime, "nanoTime must not be null");
       this.lastEventId = new AtomicReference<>(options.initialLastEventId());
     }
@@ -548,7 +583,7 @@ public final class SseTransport {
             durationTimeout =
                 scheduler.schedule(
                     () ->
-                        LIFECYCLE_EXECUTOR.execute(
+                        lifecycleExecutor.execute(
                             () -> fail(new SocketTimeoutException("SSE maximum duration elapsed"))),
                     durationToNanos(options.maxDuration()),
                     TimeUnit.NANOSECONDS);
@@ -926,7 +961,7 @@ public final class SseTransport {
         try {
           reconnectTask =
               scheduler.schedule(
-                  () -> connect(failure),
+                  () -> lifecycleExecutor.execute(() -> connect(failure)),
                   Math.max(0, callbackDelay.toMillis()),
                   TimeUnit.MILLISECONDS);
         } catch (RuntimeException rejected) {
@@ -951,7 +986,7 @@ public final class SseTransport {
       long generation = ++initialDeadlineGeneration;
       initialDeadline =
           scheduler.schedule(
-              () -> LIFECYCLE_EXECUTOR.execute(() -> failInitialDeadline(generation)),
+              () -> lifecycleExecutor.execute(() -> failInitialDeadline(generation)),
               durationToNanos(maximum),
               TimeUnit.NANOSECONDS);
     }
@@ -979,7 +1014,7 @@ public final class SseTransport {
       long generation = ++reconnectDeadlineGeneration;
       reconnectDeadline =
           scheduler.schedule(
-              () -> LIFECYCLE_EXECUTOR.execute(() -> failReconnectDeadline(generation)),
+              () -> lifecycleExecutor.execute(() -> failReconnectDeadline(generation)),
               durationToNanos(maximum),
               TimeUnit.NANOSECONDS);
     }
@@ -1030,7 +1065,7 @@ public final class SseTransport {
         idleTimeout =
             scheduler.schedule(
                 () ->
-                    LIFECYCLE_EXECUTOR.execute(
+                    lifecycleExecutor.execute(
                         () ->
                             failIdleTimeout(
                                 generation,
@@ -1061,26 +1096,36 @@ public final class SseTransport {
 
     private void startTerminal(EnqueuedCallback enqueued) {
       if (!enqueued.startDrain()) return;
+      Runnable dispatch =
+          () -> {
+            try {
+              start(enqueued);
+            } catch (AlpacaSseCallbackException failure) {
+              LOG.log(
+                  Level.WARNING,
+                  "SSE terminal callback executor failed: " + enqueued.task().name,
+                  failure);
+            }
+          };
       try {
-        terminalCallbackExecutor.execute(
-            () -> {
-              try {
-                start(enqueued);
-              } catch (AlpacaSseCallbackException failure) {
-                LOG.log(
-                    Level.WARNING,
-                    "SSE terminal callback executor failed: " + enqueued.task().name,
-                    failure);
-              }
-            });
-      } catch (RejectedExecutionException failure) {
-        callbackDispatcher.rejectPending(failure);
-        LOG.log(
-            Level.WARNING,
-            "SSE terminal callback dispatcher rejected "
-                + enqueued.task().name
-                + "; lifecycle completion is unaffected",
-            failure);
+        terminalCallbackExecutor.execute(dispatch);
+      } catch (RuntimeException primaryFailure) {
+        try {
+          lifecycleExecutor.execute(dispatch);
+        } catch (RuntimeException fallbackFailure) {
+          RejectedExecutionException rejection =
+              rejectedExecution(
+                  "SSE terminal callback dispatch failed " + enqueued.task().name,
+                  primaryFailure,
+                  fallbackFailure);
+          callbackDispatcher.rejectPending(rejection);
+          LOG.log(
+              Level.WARNING,
+              "SSE terminal callback dispatch failed "
+                  + enqueued.task().name
+                  + "; lifecycle completion is unaffected",
+              rejection);
+        }
       }
     }
 
@@ -1092,38 +1137,43 @@ public final class SseTransport {
     private boolean startIndependently(EnqueuedCallback enqueued) {
       if (!enqueued.startDrain()) return !terminal;
       var handoff = new CompletableFuture<Void>();
+      Runnable dispatch =
+          () -> {
+            try {
+              callbackExecutor.execute(
+                  () -> {
+                    handoff.complete(null);
+                    callbackDispatcher.drain();
+                  });
+              handoff.complete(null);
+            } catch (RuntimeException failure) {
+              var rejected =
+                  failure instanceof RejectedExecutionException rejection
+                      ? rejection
+                      : new RejectedExecutionException(
+                          "SSE callback executor failed " + enqueued.task().name, failure);
+              callbackDispatcher.rejectPending(rejected);
+              handoff.completeExceptionally(
+                  new AlpacaSseCallbackException(
+                      "SSE callback executor rejected " + enqueued.task().name, rejected));
+            }
+          };
       try {
-        openingCallbackExecutor.execute(
-            () -> {
-              try {
-                callbackExecutor.execute(
-                    () -> {
-                      handoff.complete(null);
-                      callbackDispatcher.drain();
-                    });
-                handoff.complete(null);
-              } catch (RuntimeException failure) {
-                var rejected =
-                    failure instanceof RejectedExecutionException rejection
-                        ? rejection
-                        : new RejectedExecutionException(
-                            "SSE callback executor failed " + enqueued.task().name, failure);
-                callbackDispatcher.rejectPending(rejected);
-                handoff.completeExceptionally(
-                    new AlpacaSseCallbackException(
-                        "SSE callback executor rejected " + enqueued.task().name, rejected));
-              }
-            });
-      } catch (RuntimeException failure) {
-        var rejected =
-            failure instanceof RejectedExecutionException rejection
-                ? rejection
-                : new RejectedExecutionException(
-                    "SSE opening callback dispatcher failed " + enqueued.task().name, failure);
-        callbackDispatcher.rejectPending(rejected);
-        handoff.completeExceptionally(
-            new AlpacaSseCallbackException(
-                "SSE opening callback dispatcher rejected " + enqueued.task().name, rejected));
+        openingCallbackExecutor.execute(dispatch);
+      } catch (RuntimeException primaryFailure) {
+        try {
+          lifecycleExecutor.execute(dispatch);
+        } catch (RuntimeException fallbackFailure) {
+          RejectedExecutionException rejection =
+              rejectedExecution(
+                  "SSE opening callback dispatch failed " + enqueued.task().name,
+                  primaryFailure,
+                  fallbackFailure);
+          callbackDispatcher.rejectPending(rejection);
+          handoff.completeExceptionally(
+              new AlpacaSseCallbackException(
+                  "SSE opening callback dispatch failed " + enqueued.task().name, rejection));
+        }
       }
       try {
         CompletableFuture.anyOf(handoff, completion).get();
@@ -1139,6 +1189,13 @@ public final class SseTransport {
         throw new AlpacaSseCallbackException(
             "Failed to start " + enqueued.task().name, failure.getCause());
       }
+    }
+
+    private static RejectedExecutionException rejectedExecution(
+        String message, RuntimeException primaryFailure, RuntimeException fallbackFailure) {
+      var rejection = new RejectedExecutionException(message, primaryFailure);
+      rejection.addSuppressed(fallbackFailure);
+      return rejection;
     }
 
     private boolean awaitOpening(EnqueuedCallback enqueued) {
