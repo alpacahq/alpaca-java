@@ -331,9 +331,10 @@ history. Corporate-action event IDs are validated uppercase ULIDs. The endpoint 
 resume semantics, so reconnects can redeliver the cursor event; deduplicate by event ID when
 effects must be exactly once. After an empty SSE `id:`, requests with `since` or `sinceId` replay
 from that original lower bound, while cursorless requests fail closed instead of reconnecting with a
-possible gap. Unknown `event_type` values, malformed payloads, and payloads that do not validate
-against their generated concrete schema fail the subscription without reconnecting instead of being
-guessed or repeatedly replayed.
+possible gap. Cursorless requests also fail closed if an established connection drops before
+supplying any event ID. Unknown `event_type` values, malformed payloads, and payloads that do not
+validate against their generated concrete schema fail the subscription without reconnecting instead
+of being guessed or repeatedly replayed.
 
 ## Trading account-activity SSE
 
@@ -384,11 +385,12 @@ events emitted during backoff. That safe replay can redeliver earlier events. Ma
 payloads do not advance the cursor. Date-bounded requests likewise retain their original date range
 on retry and can replay already processed events. Server replay can be inclusive, so applications
 requiring exactly-once effects must deduplicate persisted work by event ID. Because the Trading API
-returns no history without a lower bound, a cursorless live stream fails closed after an empty
-`id:` rather than reconnecting with a silent gap. An interrupted ID-bounded stream also fails closed
-because the API requires `since_id` with `until_id`. `until` or `untilId` makes a request bounded;
-normal EOF then completes the subscription instead of reconnecting. Configure retry budgets,
-initial resume ID, idle timeout, and resource limits with `AlpacaSseOptions` factory overloads.
+returns no history without a lower bound, a cursorless live stream fails closed after an empty `id:`
+or when an established connection drops before supplying any event ID, rather than reconnecting with
+a silent gap. An interrupted ID-bounded stream also fails closed because the API requires `since_id`
+with `until_id`. `until` or `untilId` makes a request bounded; normal EOF then completes the
+subscription instead of reconnecting. Configure retry budgets, initial resume ID, idle timeout, and
+resource limits with `AlpacaSseOptions` factory overloads.
 An initial resume ID must not be empty and cannot be combined with a date-bounded Trading request
 because backend consumption of `Last-Event-ID` is not documented and date/ID cursor families cannot
 be mixed safely. Use an ID-bounded request instead; its initial ID must not be after `untilId`.
@@ -449,8 +451,9 @@ type, while the required `type` field selects its concrete generated model witho
 ambiguous generated `oneOf` adapter.
 Broker endpoints document endpoint-specific `since`/`since_id`/`since_ulid` query cursors. After an
 empty SSE `id:`, a configured initial ID or original lower-bound query keeps replay possible;
-cursorless subscriptions fail closed rather than reconnecting with a possible gap. Applications
-that require gap replay should configure the appropriate request option and deduplicate.
+cursorless subscriptions fail closed rather than reconnecting with a possible gap, including when an
+established connection drops before supplying any event ID. Applications that require gap replay
+should configure the appropriate request option and deduplicate.
 Protocol and non-retryable HTTP failures are terminal;
 retryable HTTP and transport failures follow the configured reconnect policy.
 

@@ -112,12 +112,19 @@ public final class CorporateActionsSseClient {
         decoder::decode,
         listener,
         callbackExecutor,
-        (baseRequest, eventId) -> withResumeCursor(baseRequest, eventId, initialEventId));
+        (baseRequest, eventId, reconnect) ->
+            withResumeCursor(baseRequest, eventId, initialEventId, reconnect));
   }
 
   static Request withResumeCursor(Request request, String eventId, String fallbackEventId) {
+    return withResumeCursor(request, eventId, fallbackEventId, true);
+  }
+
+  private static Request withResumeCursor(
+      Request request, String eventId, String fallbackEventId, boolean reconnect) {
     Request resumedRequest = SseTransport.withLastEventIdHeader(request, eventId);
-    if (eventId == null || !eventId.isEmpty()) return resumedRequest;
+    if (eventId == null && !reconnect) return resumedRequest;
+    if (eventId != null && !eventId.isEmpty()) return resumedRequest;
     if (fallbackEventId != null) {
       return SseTransport.withLastEventIdHeader(request, fallbackEventId);
     }
@@ -126,6 +133,8 @@ public final class CorporateActionsSseClient {
       return resumedRequest;
     }
     throw new AlpacaSseProtocolException(
-        "Cannot resume a cursorless Corporate Actions stream after an empty SSE id");
+        eventId == null
+            ? "Cannot resume a cursorless Corporate Actions stream before receiving an SSE id"
+            : "Cannot resume a cursorless Corporate Actions stream after an empty SSE id");
   }
 }

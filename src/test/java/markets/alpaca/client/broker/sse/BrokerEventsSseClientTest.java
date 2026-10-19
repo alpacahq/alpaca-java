@@ -140,6 +140,41 @@ class BrokerEventsSseClientTest {
   }
 
   @Test
+  void reconnectBeforeAnyEventIdFailsClosedWithoutAnyLowerBound() throws Exception {
+    server.enqueue(
+        new MockResponse().setHeader("Content-Type", "text/event-stream").setBody(":\n\n"));
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS, httpClient);
+    brokerClient.setBasePath(serverBasePath());
+    var policy =
+        AlpacaSseReconnectPolicy.builder()
+            .initialAttempts(0)
+            .establishedAttempts(1)
+            .initialBackoff(Duration.ofMillis(1))
+            .maxBackoff(Duration.ofMillis(1))
+            .jitterRatio(0)
+            .build();
+    var sse =
+        new BrokerEventsSseClient(
+            brokerClient, AlpacaSseOptions.builder().reconnectPolicy(policy).build());
+
+    try (var subscription =
+        sse.subscribeToTradeEvents(
+            BrokerSseDateOptions.builder().build(), new BrokerSseEventListener<>() {})) {
+      var failure =
+          assertThrows(
+              ExecutionException.class, () -> subscription.completion().get(3, TimeUnit.SECONDS));
+
+      var protocolFailure = assertInstanceOf(AlpacaSseProtocolException.class, failure.getCause());
+      var resumeFailure =
+          assertInstanceOf(AlpacaSseProtocolException.class, protocolFailure.getCause());
+      assertEquals(
+          "Cannot resume a cursorless Broker stream before receiving an SSE id",
+          resumeFailure.getMessage());
+      assertEquals(1, server.getRequestCount());
+    }
+  }
+
+  @Test
   void emptyEventIdRetainsOriginalLowerBound() {
     var request =
         new Request.Builder()
@@ -153,9 +188,12 @@ class BrokerEventsSseClientTest {
             .build();
 
     var resumed = BrokerEventsSseClient.withResumeCursor(request, "", null);
+    var resumedBeforeAnyId = BrokerEventsSseClient.withResumeCursor(request, null, null);
 
     assertEquals("lower-bound", resumed.url().queryParameter("since_id"));
     assertNull(resumed.header("Last-Event-ID"));
+    assertEquals("lower-bound", resumedBeforeAnyId.url().queryParameter("since_id"));
+    assertNull(resumedBeforeAnyId.header("Last-Event-ID"));
   }
 
   @Test

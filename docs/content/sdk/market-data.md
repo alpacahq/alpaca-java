@@ -322,9 +322,10 @@ standard `Last-Event-ID` semantics and may redeliver the inclusive cursor event,
 event IDs when exactly-once effects matter. An `AlpacaSseOptions.initialLastEventId` must be
 non-empty and cannot be after an ID-bounded request's `untilId`. If an empty SSE `id:` clears the
 cursor, a request with `since` or `sinceId` replays from its original lower bound; a cursorless
-request fails closed instead of reconnecting with a possible gap. Malformed corporate-action
-payloads terminate the subscription without reconnecting, preventing a poison event from replaying
-indefinitely.
+request fails closed instead of reconnecting with a possible gap. The same fail-closed rule applies
+if an established cursorless connection drops before supplying any event ID. Malformed
+corporate-action payloads terminate the subscription without reconnecting, preventing a poison
+event from replaying indefinitely.
 
 Option live streaming is not currently exposed by this SDK. Use generated `OptionApi` for option
 REST data, and add a handwritten option stream client under `src/main/java/markets/alpaca/client/ws/`

@@ -95,16 +95,25 @@ public final class TradingEventsSseClient {
         decoder::decode,
         listener,
         callbackExecutor,
-        (baseRequest, eventId) -> withResumeCursor(baseRequest, eventId, initialEventId));
+        (baseRequest, eventId, reconnect) ->
+            withResumeCursor(baseRequest, eventId, initialEventId, reconnect));
   }
 
   static Request withResumeCursor(Request request, String eventId) {
-    return withResumeCursor(request, eventId, null);
+    return withResumeCursor(request, eventId, null, true);
   }
 
-  private static Request withResumeCursor(Request request, String eventId, String fallbackEventId) {
+  private static Request withResumeCursor(
+      Request request, String eventId, String fallbackEventId, boolean reconnect) {
     Request resumedRequest = SseTransport.withLastEventIdHeader(request, eventId);
     if (eventId == null) {
+      if (reconnect
+          && fallbackEventId == null
+          && request.url().queryParameter("since") == null
+          && request.url().queryParameter("since_id") == null) {
+        throw new AlpacaSseProtocolException(
+            "Cannot resume a cursorless Trading activity stream before receiving an SSE id");
+      }
       return resumedRequest;
     }
     boolean boundedByDate =

@@ -216,9 +216,10 @@ documented `since_id` query parameter and in `Last-Event-ID`. Date-bounded retri
 original date range and can replay events. If an empty SSE `id:` clears the committed cursor, an
 unbounded request retains its original `since` or `sinceId` lower bound on reconnect rather than
 risk a cursorless gap; deduplicate because this safe replay can redeliver earlier events. Existing
-cursorless live requests fail closed after an empty `id:` because the Trading endpoint does not
-replay history without a lower bound. Existing Broker constructors keep the `0.1.4` one-connection
-default; pass `AlpacaSseOptions` to opt into Broker reconnects.
+cursorless live requests fail closed after an empty `id:` or when an established connection drops
+before supplying any event ID, because the Trading endpoint does not replay history without a lower
+bound. Existing Broker constructors keep the `0.1.4` one-connection default; pass
+`AlpacaSseOptions` to opt into Broker reconnects.
 
 `AlpacaSseOptions.initialLastEventId` rejects an empty value. Do not combine an initial ID with a
 date-bounded Trading request; `0.2.0` rejects that ambiguous combination before opening a
