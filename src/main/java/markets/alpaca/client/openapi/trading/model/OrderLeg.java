@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 import markets.alpaca.client.openapi.trading.model.AssetClass;
 import markets.alpaca.client.openapi.trading.model.OrderClass;
+import markets.alpaca.client.openapi.trading.model.OrderGroupRole;
 import markets.alpaca.client.openapi.trading.model.OrderSide;
 import markets.alpaca.client.openapi.trading.model.OrderStatus;
 import markets.alpaca.client.openapi.trading.model.OrderType;
@@ -119,6 +120,16 @@ public class OrderLeg implements Serializable {
   @SerializedName(SERIALIZED_NAME_FILLED_QTY)
   @javax.annotation.Nullable
   private String filledQty;
+
+  public static final String SERIALIZED_NAME_GROUP_ID = "group_id";
+  @SerializedName(SERIALIZED_NAME_GROUP_ID)
+  @javax.annotation.Nullable
+  private UUID groupId;
+
+  public static final String SERIALIZED_NAME_GROUP_ROLE = "group_role";
+  @SerializedName(SERIALIZED_NAME_GROUP_ROLE)
+  @javax.annotation.Nullable
+  private OrderGroupRole groupRole;
 
   public static final String SERIALIZED_NAME_HWM = "hwm";
   @SerializedName(SERIALIZED_NAME_HWM)
@@ -440,6 +451,44 @@ public class OrderLeg implements Serializable {
 
   public void setFilledQty(@javax.annotation.Nullable String filledQty) {
     this.filledQty = filledQty;
+  }
+
+
+  public OrderLeg groupId(@javax.annotation.Nullable UUID groupId) {
+    this.groupId = groupId;
+    return this;
+  }
+
+  /**
+   * Opaque identifier shared by every order in the same &#x60;bracket&#x60;, &#x60;oto&#x60;, or &#x60;oco&#x60; order, including its legs and any replacement orders. Use it to associate related orders received from the &#x60;trade_updates&#x60; stream, where &#x60;legs&#x60; is not populated. Omitted for other orders.
+   * @return groupId
+   */
+  @javax.annotation.Nullable
+  public UUID getGroupId() {
+    return groupId;
+  }
+
+  public void setGroupId(@javax.annotation.Nullable UUID groupId) {
+    this.groupId = groupId;
+  }
+
+
+  public OrderLeg groupRole(@javax.annotation.Nullable OrderGroupRole groupRole) {
+    this.groupRole = groupRole;
+    return this;
+  }
+
+  /**
+   * Get groupRole
+   * @return groupRole
+   */
+  @javax.annotation.Nullable
+  public OrderGroupRole getGroupRole() {
+    return groupRole;
+  }
+
+  public void setGroupRole(@javax.annotation.Nullable OrderGroupRole groupRole) {
+    this.groupRole = groupRole;
   }
 
 
@@ -938,6 +987,8 @@ public class OrderLeg implements Serializable {
         Objects.equals(this.filledAt, orderLeg.filledAt) &&
         Objects.equals(this.filledAvgPrice, orderLeg.filledAvgPrice) &&
         Objects.equals(this.filledQty, orderLeg.filledQty) &&
+        Objects.equals(this.groupId, orderLeg.groupId) &&
+        Objects.equals(this.groupRole, orderLeg.groupRole) &&
         Objects.equals(this.hwm, orderLeg.hwm) &&
         Objects.equals(this.id, orderLeg.id) &&
         Objects.equals(this.legs, orderLeg.legs) &&
@@ -965,7 +1016,7 @@ public class OrderLeg implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(assetClass, assetId, canceledAt, clientOrderId, createdAt, expiredAt, extendedHours, failedAt, filledAt, filledAvgPrice, filledQty, hwm, id, legs, limitPrice, notional, orderClass, orderType, positionIntent, qty, replacedAt, replacedBy, replaces, side, status, stopPrice, submittedAt, symbol, timeInForce, trailPercent, trailPrice, type, updatedAt, additionalProperties);
+    return Objects.hash(assetClass, assetId, canceledAt, clientOrderId, createdAt, expiredAt, extendedHours, failedAt, filledAt, filledAvgPrice, filledQty, groupId, groupRole, hwm, id, legs, limitPrice, notional, orderClass, orderType, positionIntent, qty, replacedAt, replacedBy, replaces, side, status, stopPrice, submittedAt, symbol, timeInForce, trailPercent, trailPrice, type, updatedAt, additionalProperties);
   }
 
   @Override
@@ -983,6 +1034,8 @@ public class OrderLeg implements Serializable {
     sb.append("    filledAt: ").append(toIndentedString(filledAt)).append("\n");
     sb.append("    filledAvgPrice: ").append(toIndentedString(filledAvgPrice)).append("\n");
     sb.append("    filledQty: ").append(toIndentedString(filledQty)).append("\n");
+    sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
+    sb.append("    groupRole: ").append(toIndentedString(groupRole)).append("\n");
     sb.append("    hwm: ").append(toIndentedString(hwm)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    legs: ").append(toIndentedString(legs)).append("\n");
@@ -1024,7 +1077,7 @@ public class OrderLeg implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("asset_class", "asset_id", "canceled_at", "client_order_id", "created_at", "expired_at", "extended_hours", "failed_at", "filled_at", "filled_avg_price", "filled_qty", "hwm", "id", "legs", "limit_price", "notional", "order_class", "order_type", "position_intent", "qty", "replaced_at", "replaced_by", "replaces", "side", "status", "stop_price", "submitted_at", "symbol", "time_in_force", "trail_percent", "trail_price", "type", "updated_at"));
+    openapiFields = new HashSet<String>(Arrays.asList("asset_class", "asset_id", "canceled_at", "client_order_id", "created_at", "expired_at", "extended_hours", "failed_at", "filled_at", "filled_avg_price", "filled_qty", "group_id", "group_role", "hwm", "id", "legs", "limit_price", "notional", "order_class", "order_type", "position_intent", "qty", "replaced_at", "replaced_by", "replaces", "side", "status", "stop_price", "submitted_at", "symbol", "time_in_force", "trail_percent", "trail_price", "type", "updated_at"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("notional", "qty", "side", "symbol", "time_in_force", "type"));
@@ -1065,6 +1118,13 @@ public class OrderLeg implements Serializable {
       }
       if ((jsonObj.get("filled_qty") != null && !jsonObj.get("filled_qty").isJsonNull()) && !jsonObj.get("filled_qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `filled_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("filled_qty").toString()));
+      }
+      if ((jsonObj.get("group_id") != null && !jsonObj.get("group_id").isJsonNull()) && !jsonObj.get("group_id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `group_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("group_id").toString()));
+      }
+      // validate the optional field `group_role`
+      if (jsonObj.get("group_role") != null && !jsonObj.get("group_role").isJsonNull()) {
+        OrderGroupRole.validateJsonElement(jsonObj.get("group_role"));
       }
       if ((jsonObj.get("hwm") != null && !jsonObj.get("hwm").isJsonNull()) && !jsonObj.get("hwm").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `hwm` to be a primitive type in the JSON string but got `%s`", jsonObj.get("hwm").toString()));

@@ -262,20 +262,6 @@ components:
       schema:
         format: date-time
         type: string
-    forex_currency_pairs:
-      in: query
-      name: currency_pairs
-      required: true
-      schema:
-        allOf:
-          - type: string
-          - $ref: '#/components/schemas/forex_currency_pairs'
-    forex_timeframe:
-      in: query
-      name: timeframe
-      required: false
-      schema:
-        $ref: '#/components/schemas/forex_timeframe'
     isins:
       description: A comma-separated list of ISINs with a limit of 1000.
       example: US912797KJ59,US912797KS58,US912797LB15
@@ -2539,75 +2525,6 @@ components:
         - aytm
         - aytw
       type: object
-    forex_currency_pairs:
-      description: A comma-separated string with currency pairs.
-      examples:
-        - USDJPY
-        - USDMXN
-      type: string
-    forex_latest_rates_resp:
-      description: The response object of the latest forex rates.
-      properties:
-        rates:
-          additionalProperties:
-            $ref: '#/components/schemas/forex_rate'
-          type: object
-      required:
-        - rates
-      type: object
-    forex_rate:
-      description: A foreign exchange rate between two currencies at a given time.
-      examples:
-        - ap: 127.763
-          bp: 127.702
-          mp: 127.757
-          t: '2022-04-20T18:23:00Z'
-      properties:
-        ap:
-          description: The last ask price value of the currency at the end of the timeframe.
-          format: double
-          type: number
-        bp:
-          description: The last bid price value of the currency at the end of the timeframe.
-          format: double
-          type: number
-        mp:
-          description: The last mid price value of the currency at the end of the timeframe.
-          format: double
-          type: number
-        t:
-          description: Timestamp of the rate.
-          format: date-time
-          type: string
-      required:
-        - bp
-        - mp
-        - ap
-        - t
-      type: object
-    forex_rates_resp:
-      properties:
-        next_page_token:
-          $ref: '#/components/schemas/next_page_token'
-        rates:
-          additionalProperties:
-            items:
-              $ref: '#/components/schemas/forex_rate'
-            type: array
-          type: object
-      required:
-        - rates
-        - next_page_token
-      type: object
-    forex_timeframe:
-      default: 1Min
-      description: |
-        The sampling interval of the currency rates. For example, 5S returns forex rates sampled every five seconds.
-        You can use the following values:
-         - `5Sec` or `5S`
-         - `1Min` or `1T`
-         - `1Day` or `1D`
-      type: string
     forward_split:
       description: Forward split.
       examples:
@@ -4779,115 +4696,6 @@ paths:
       summary: Latest quotes
       tags:
         - Fixed income
-  /v1beta1/forex/latest/rates:
-    get:
-      description: |
-        Get the latest forex rates for the given currency pairs.
-      operationId: LatestRates
-      parameters:
-        - $ref: '#/components/parameters/forex_currency_pairs'
-      responses:
-        '200':
-          content:
-            application/json:
-              examples:
-                USDJPY:
-                  value:
-                    rates:
-                      USDJPY:
-                        ap: 128.112
-                        bp: 127.752
-                        mp: 127.779
-                        t: '2022-05-20T05:38:41.311530885Z'
-              schema:
-                $ref: '#/components/schemas/forex_latest_rates_resp'
-          description: OK
-          headers:
-            X-RateLimit-Limit:
-              $ref: '#/components/headers/ratelimit_limit'
-            X-RateLimit-Remaining:
-              $ref: '#/components/headers/ratelimit_remaining'
-            X-RateLimit-Reset:
-              $ref: '#/components/headers/ratelimit_reset'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '429':
-          $ref: '#/components/responses/429'
-        '500':
-          $ref: '#/components/responses/500'
-      security:
-        - BasicAuth: []
-        - apiKey: []
-          apiSecret: []
-      summary: Latest rates for currency pairs
-      tags:
-        - Forex
-  /v1beta1/forex/rates:
-    get:
-      description: |
-        Get historical forex rates for the given currency pairs in the given time interval and at the given timeframe (snapshot frequency).
-      operationId: Rates
-      parameters:
-        - $ref: '#/components/parameters/forex_currency_pairs'
-        - $ref: '#/components/parameters/forex_timeframe'
-        - $ref: '#/components/parameters/start'
-        - $ref: '#/components/parameters/end'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/sort'
-        - $ref: '#/components/parameters/page_token'
-      responses:
-        '200':
-          content:
-            application/json:
-              examples:
-                USDJPY:
-                  value:
-                    next_page_token: VVNESlBZfDIwMjItMDEtMDNUMDA6MDM6MDBa
-                    rates:
-                      USDJPY:
-                        - ap: 115.18
-                          bp: 114.192
-                          mp: 115.144
-                          t: '2022-01-03T00:01:00Z'
-                        - ap: 115.185
-                          bp: 114.189
-                          mp: 115.138
-                          t: '2022-01-03T00:02:00Z'
-                        - ap: 115.148
-                          bp: 115.122
-                          mp: 115.131
-                          t: '2022-01-03T00:03:00Z'
-              schema:
-                $ref: '#/components/schemas/forex_rates_resp'
-          description: OK
-          headers:
-            X-RateLimit-Limit:
-              $ref: '#/components/headers/ratelimit_limit'
-            X-RateLimit-Remaining:
-              $ref: '#/components/headers/ratelimit_remaining'
-            X-RateLimit-Reset:
-              $ref: '#/components/headers/ratelimit_reset'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '429':
-          $ref: '#/components/responses/429'
-        '500':
-          $ref: '#/components/responses/500'
-      security:
-        - BasicAuth: []
-        - apiKey: []
-          apiSecret: []
-      summary: Historical rates for currency pairs
-      tags:
-        - Forex
   /v1beta1/logos/{symbol}:
     get:
       description: Get the image of the company logo for the given symbol.
@@ -7478,14 +7286,10 @@ tags:
     name: Stock
   - description: Endpoints for option data.
     name: Option
-  - description: Endpoints for indices.
-    name: Index
   - description: Endpoints for cryptocurrencies.
     name: Crypto
   - description: Endpoints for fixed income data.
     name: Fixed income
-  - description: Endpoints for forex currency rates.
-    name: Forex
   - description: Endpoints for getting company logo images.
     name: Logos
   - description: Endpoints for most active stocks and top movers.
@@ -7494,5 +7298,3 @@ tags:
     name: News
   - description: Corporate actions (splits, dividends, etc.).
     name: Corporate actions
-  - description: Endpoints for event contract (prediction market) assets metadata.
-    name: Event contracts

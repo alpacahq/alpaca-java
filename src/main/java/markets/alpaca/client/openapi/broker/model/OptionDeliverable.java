@@ -290,7 +290,7 @@ public class OptionDeliverable implements Serializable {
   }
 
   /**
-   * The deliverable amount. For cash deliverables, this is the cash amount. For standard contract, this is always 100. This field can be null in case the deliverable settlement is delayed and the amount is yet to be determined. 
+   * The deliverable amount. For cash deliverables, this is the cash amount. For standard contract, this is always 100. When deliverable settlement is delayed and the amount is not yet determined, this value is \&quot;0\&quot; and delayed_settlement is true. 
    * @return amount
    */
   @javax.annotation.Nonnull

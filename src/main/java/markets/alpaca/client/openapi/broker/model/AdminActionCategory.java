@@ -34,7 +34,9 @@ public enum AdminActionCategory implements Serializable {
   
   ORDER("order"),
   
-  OTHER("other");
+  OTHER("other"),
+  
+  ACATS("acats");
 
   private String value;
 

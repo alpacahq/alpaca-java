@@ -66,12 +66,6 @@ public class TokenizationRedeemRequest implements Serializable {
   @javax.annotation.Nullable
   private String clientExternalAccountId;
 
-  public static final String SERIALIZED_NAME_CLIENT_ID = "client_id";
-  @Deprecated
-  @SerializedName(SERIALIZED_NAME_CLIENT_ID)
-  @javax.annotation.Nullable
-  private String clientId;
-
   public static final String SERIALIZED_NAME_ISSUER_REQUEST_ID = "issuer_request_id";
   @SerializedName(SERIALIZED_NAME_ISSUER_REQUEST_ID)
   @javax.annotation.Nonnull
@@ -145,29 +139,6 @@ public class TokenizationRedeemRequest implements Serializable {
 
   public void setClientExternalAccountId(@javax.annotation.Nullable String clientExternalAccountId) {
     this.clientExternalAccountId = clientExternalAccountId;
-  }
-
-
-  @Deprecated
-  public TokenizationRedeemRequest clientId(@javax.annotation.Nullable String clientId) {
-    this.clientId = clientId;
-    return this;
-  }
-
-  /**
-   * **Deprecation notice:** Use &#x60;client_external_account_id&#x60; instead.  Since: 2026-07-15 Sunset: 2026-10-15  ---  Customer&#39;s client identifier on the issuer&#39;s platform.
-   * @return clientId
-   * @deprecated
-   */
-  @Deprecated
-  @javax.annotation.Nullable
-  public String getClientId() {
-    return clientId;
-  }
-
-  @Deprecated
-  public void setClientId(@javax.annotation.Nullable String clientId) {
-    this.clientId = clientId;
   }
 
 
@@ -360,7 +331,6 @@ public class TokenizationRedeemRequest implements Serializable {
     TokenizationRedeemRequest tokenizationRedeemRequest = (TokenizationRedeemRequest) o;
     return Objects.equals(this.clientAccountId, tokenizationRedeemRequest.clientAccountId) &&
         Objects.equals(this.clientExternalAccountId, tokenizationRedeemRequest.clientExternalAccountId) &&
-        Objects.equals(this.clientId, tokenizationRedeemRequest.clientId) &&
         Objects.equals(this.issuerRequestId, tokenizationRedeemRequest.issuerRequestId) &&
         Objects.equals(this.network, tokenizationRedeemRequest.network) &&
         Objects.equals(this.qty, tokenizationRedeemRequest.qty) &&
@@ -373,7 +343,7 @@ public class TokenizationRedeemRequest implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(clientAccountId, clientExternalAccountId, clientId, issuerRequestId, network, qty, tokenSymbol, txHash, underlyingSymbol, walletAddress, additionalProperties);
+    return Objects.hash(clientAccountId, clientExternalAccountId, issuerRequestId, network, qty, tokenSymbol, txHash, underlyingSymbol, walletAddress, additionalProperties);
   }
 
   @Override
@@ -382,7 +352,6 @@ public class TokenizationRedeemRequest implements Serializable {
     sb.append("class TokenizationRedeemRequest {\n");
     sb.append("    clientAccountId: ").append(toIndentedString(clientAccountId)).append("\n");
     sb.append("    clientExternalAccountId: ").append(toIndentedString(clientExternalAccountId)).append("\n");
-    sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
     sb.append("    issuerRequestId: ").append(toIndentedString(issuerRequestId)).append("\n");
     sb.append("    network: ").append(toIndentedString(network)).append("\n");
     sb.append("    qty: ").append(toIndentedString(qty)).append("\n");
@@ -409,7 +378,7 @@ public class TokenizationRedeemRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("client_account_id", "client_external_account_id", "client_id", "issuer_request_id", "network", "qty", "token_symbol", "tx_hash", "underlying_symbol", "wallet_address"));
+    openapiFields = new HashSet<String>(Arrays.asList("client_account_id", "client_external_account_id", "issuer_request_id", "network", "qty", "token_symbol", "tx_hash", "underlying_symbol", "wallet_address"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("issuer_request_id", "network", "qty", "token_symbol", "tx_hash", "underlying_symbol", "wallet_address"));
@@ -440,9 +409,6 @@ public class TokenizationRedeemRequest implements Serializable {
       }
       if ((jsonObj.get("client_external_account_id") != null && !jsonObj.get("client_external_account_id").isJsonNull()) && !jsonObj.get("client_external_account_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `client_external_account_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("client_external_account_id").toString()));
-      }
-      if ((jsonObj.get("client_id") != null && !jsonObj.get("client_id").isJsonNull()) && !jsonObj.get("client_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `client_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("client_id").toString()));
       }
       if (!jsonObj.get("issuer_request_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `issuer_request_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("issuer_request_id").toString()));
