@@ -18,7 +18,7 @@ body:
       options:
         - label: I have searched the existing issues to ensure there is not already an open issue about this question.
           required: true
-        - label: My question is about the Java SDK and not a general question about the Alpaca API. (If it is, please open an issue [here](https://github.com/alpacahq/Alpaca-API) instead.)
+        - label: My question is about the Java SDK and not a general question about the Alpaca API. (General API questions go to the [Community Forum](https://forum.alpaca.markets/) or [Slack](https://alpaca.markets/slack), and API bugs go to [alpacahq/alpaca-api](https://github.com/alpacahq/alpaca-api/issues/new/choose).)
           required: true
         - label: My question is not about implementing a specific trading algorithm or requesting trade advice (these are outside the scope of this repo).
           required: true
