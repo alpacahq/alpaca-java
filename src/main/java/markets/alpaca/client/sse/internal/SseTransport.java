@@ -78,6 +78,13 @@ public final class SseTransport {
 
   private SseTransport() {}
 
+  /** Builds an initial or resumed request for an SSE connection attempt. */
+  @FunctionalInterface
+  public interface ResumeRequest {
+    /** Returns the request; reconnect is true only after an SSE response has been accepted. */
+    Request apply(Request originalRequest, String lastEventId, boolean reconnect);
+  }
+
   static Dispatcher createHttpDispatcher() {
     var executor =
         Executors.newSingleThreadExecutor(
@@ -227,7 +234,8 @@ public final class SseTransport {
         listener,
         callbackExecutor,
         decodeFailurePolicy,
-        SseTransport::withLastEventIdHeader);
+        (originalRequest, lastEventId, reconnect) ->
+            withLastEventIdHeader(originalRequest, lastEventId));
   }
 
   public static <T> AlpacaSseSubscription open(
@@ -239,6 +247,28 @@ public final class SseTransport {
       AlpacaSseListener<T> listener,
       Executor callbackExecutor,
       BiFunction<Request, String, Request> resumeRequest) {
+    return open(
+        httpClient,
+        request,
+        options,
+        bounded,
+        decoder,
+        listener,
+        callbackExecutor,
+        SseDecodeFailurePolicy.TERMINATE,
+        (originalRequest, lastEventId, reconnect) ->
+            resumeRequest.apply(originalRequest, lastEventId));
+  }
+
+  public static <T> AlpacaSseSubscription open(
+      OkHttpClient httpClient,
+      Request request,
+      AlpacaSseOptions options,
+      boolean bounded,
+      SseDecoder<T> decoder,
+      AlpacaSseListener<T> listener,
+      Executor callbackExecutor,
+      ResumeRequest resumeRequest) {
     return open(
         httpClient,
         request,
@@ -260,7 +290,7 @@ public final class SseTransport {
       AlpacaSseListener<T> listener,
       Executor callbackExecutor,
       SseDecodeFailurePolicy decodeFailurePolicy,
-      BiFunction<Request, String, Request> resumeRequest) {
+      ResumeRequest resumeRequest) {
     var session =
         new Session<>(
             httpClient,
@@ -424,7 +454,8 @@ public final class SseTransport {
             listener,
             DIRECT_EXECUTOR,
             SseDecodeFailurePolicy.TERMINATE,
-            SseTransport::withLastEventIdHeader,
+            (originalRequest, lastEventId, reconnect) ->
+                withLastEventIdHeader(originalRequest, lastEventId),
             scheduler,
             openingCallbackExecutor,
             terminalCallbackExecutor,
@@ -475,7 +506,7 @@ public final class SseTransport {
     private final AlpacaSseListener<T> listener;
     private final Executor callbackExecutor;
     private final SseDecodeFailurePolicy decodeFailurePolicy;
-    private final BiFunction<Request, String, Request> resumeRequest;
+    private final ResumeRequest resumeRequest;
     private final ScheduledExecutorService scheduler;
     private final Executor openingCallbackExecutor;
     private final Executor terminalCallbackExecutor;
@@ -524,7 +555,7 @@ public final class SseTransport {
         AlpacaSseListener<T> listener,
         Executor callbackExecutor,
         SseDecodeFailurePolicy decodeFailurePolicy,
-        BiFunction<Request, String, Request> resumeRequest,
+        ResumeRequest resumeRequest,
         ScheduledExecutorService scheduler,
         Executor openingCallbackExecutor,
         Executor terminalCallbackExecutor,
@@ -614,7 +645,7 @@ public final class SseTransport {
             String resumeId = lastEventId.get();
             Request resumedRequest =
                 Objects.requireNonNull(
-                    resumeRequest.apply(originalRequest, resumeId),
+                    resumeRequest.apply(originalRequest, resumeId, hasOpened),
                     "resumeRequest must not return null");
             Call preparedCall = httpClient.newCall(resumedRequest);
             Duration connectDeadline = remainingBudgetLocked(hasOpened, options.connectTimeout());

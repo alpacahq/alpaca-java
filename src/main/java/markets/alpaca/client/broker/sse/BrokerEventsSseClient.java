@@ -538,14 +538,20 @@ public final class BrokerEventsSseClient {
             adapt(listener, request),
             callbackExecutor,
             SseDecodeFailurePolicy.REPORT_AND_CONTINUE,
-            (baseRequest, eventId) ->
-                withResumeCursor(baseRequest, eventId, sseOptions.initialLastEventId()));
+            (baseRequest, eventId, reconnect) ->
+                withResumeCursor(baseRequest, eventId, sseOptions.initialLastEventId(), reconnect));
     return new BrokerSseSubscription(subscription);
   }
 
   static Request withResumeCursor(Request request, String eventId, String fallbackEventId) {
+    return withResumeCursor(request, eventId, fallbackEventId, true);
+  }
+
+  private static Request withResumeCursor(
+      Request request, String eventId, String fallbackEventId, boolean reconnect) {
     Request resumedRequest = SseTransport.withLastEventIdHeader(request, eventId);
-    if (eventId == null || !eventId.isEmpty()) return resumedRequest;
+    if (eventId == null && !reconnect) return resumedRequest;
+    if (eventId != null && !eventId.isEmpty()) return resumedRequest;
     if (fallbackEventId != null) {
       return SseTransport.withLastEventIdHeader(request, fallbackEventId);
     }
@@ -555,7 +561,9 @@ public final class BrokerEventsSseClient {
       return resumedRequest;
     }
     throw new AlpacaSseProtocolException(
-        "Cannot resume a cursorless Broker stream after an empty SSE id");
+        eventId == null
+            ? "Cannot resume a cursorless Broker stream before receiving an SSE id"
+            : "Cannot resume a cursorless Broker stream after an empty SSE id");
   }
 
   private static <T> AlpacaSseListener<T> adapt(

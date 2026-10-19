@@ -135,6 +135,44 @@ class CorporateActionsSseClientTest {
   }
 
   @Test
+  void reconnectBeforeAnyEventIdFailsClosedWithoutAnyLowerBound() throws Exception {
+    server.enqueue(
+        new MockResponse().setHeader("Content-Type", "text/event-stream").setBody(":\n\n"));
+    var dataClient =
+        AlpacaClientFactory.dataClient(
+            new AlpacaCredentials("data-key", "data-secret"), httpClient);
+    var policy =
+        AlpacaSseReconnectPolicy.builder()
+            .initialAttempts(0)
+            .establishedAttempts(1)
+            .initialBackoff(Duration.ofMillis(1))
+            .maxBackoff(Duration.ofMillis(1))
+            .jitterRatio(0)
+            .build();
+    var client =
+        new CorporateActionsSseClient(
+            dataClient,
+            MarketDataSseEnvironment.custom(baseUrl()),
+            AlpacaSseOptions.builder().reconnectPolicy(policy).build());
+
+    try (var subscription =
+        client.subscribeToCorporateActions(
+            CorporateActionsSseRequest.live(), new AlpacaSseListener<>() {})) {
+      var failure =
+          assertThrows(
+              ExecutionException.class, () -> subscription.completion().get(3, TimeUnit.SECONDS));
+
+      var protocolFailure = assertInstanceOf(AlpacaSseProtocolException.class, failure.getCause());
+      var resumeFailure =
+          assertInstanceOf(AlpacaSseProtocolException.class, protocolFailure.getCause());
+      assertEquals(
+          "Cannot resume a cursorless Corporate Actions stream before receiving an SSE id",
+          resumeFailure.getMessage());
+      assertEquals(1, server.getRequestCount());
+    }
+  }
+
+  @Test
   void emptyEventIdRetainsOriginalLowerBound() {
     var request =
         new Request.Builder()
@@ -148,9 +186,12 @@ class CorporateActionsSseClientTest {
             .build();
 
     var resumed = CorporateActionsSseClient.withResumeCursor(request, "", null);
+    var resumedBeforeAnyId = CorporateActionsSseClient.withResumeCursor(request, null, null);
 
     assertEquals(SINCE_ID, resumed.url().queryParameter("since_id"));
     assertNull(resumed.header("Last-Event-ID"));
+    assertEquals(SINCE_ID, resumedBeforeAnyId.url().queryParameter("since_id"));
+    assertNull(resumedBeforeAnyId.header("Last-Event-ID"));
   }
 
   @Test
