@@ -7,6 +7,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -496,6 +498,92 @@ public final class SseTransport {
     }
   }
 
+  private static final class LifecycleSignal<T> {
+    private final Executor observerExecutor;
+    private final CompletableFuture<T> settled = new CompletableFuture<>();
+    private final List<CompletableFuture<T>> observers = new ArrayList<>();
+    private LifecycleOutcome<T> outcome;
+
+    private LifecycleSignal(Executor observerExecutor) {
+      this.observerExecutor =
+          Objects.requireNonNull(observerExecutor, "observerExecutor must not be null");
+    }
+
+    private CompletableFuture<T> copy() {
+      var observer = new CompletableFuture<T>();
+      LifecycleOutcome<T> current;
+      synchronized (this) {
+        current = outcome;
+        if (current == null) observers.add(observer);
+      }
+      if (current != null) current.apply(observer);
+      return observer;
+    }
+
+    private CompletableFuture<T> internalFuture() {
+      return settled;
+    }
+
+    private boolean isDone() {
+      return settled.isDone();
+    }
+
+    private boolean complete(T value) {
+      return settle(new LifecycleOutcome<>(value, null, false));
+    }
+
+    private boolean completeExceptionally(Throwable failure) {
+      return settle(
+          new LifecycleOutcome<>(
+              null, Objects.requireNonNull(failure, "failure must not be null"), false));
+    }
+
+    private boolean cancel() {
+      return settle(new LifecycleOutcome<>(null, null, true));
+    }
+
+    private boolean settle(LifecycleOutcome<T> terminalOutcome) {
+      List<CompletableFuture<T>> pending;
+      synchronized (this) {
+        if (outcome != null) return false;
+        outcome = terminalOutcome;
+        pending = List.copyOf(observers);
+        observers.clear();
+      }
+      // A CompletableFuture is done before its synchronous continuations run. Settle each exposed
+      // copy independently, then wait only for that state transition so one blocking continuation
+      // cannot prevent another copy or the internal lifecycle signal from settling.
+      pending.forEach(observer -> observerExecutor.execute(() -> terminalOutcome.apply(observer)));
+      boolean interrupted = false;
+      while (!allDone(pending)) {
+        interrupted |= Thread.interrupted();
+        LockSupport.parkNanos(100_000L);
+      }
+      terminalOutcome.apply(settled);
+      if (interrupted) Thread.currentThread().interrupt();
+      return true;
+    }
+
+    private static boolean allDone(List<? extends CompletableFuture<?>> futures) {
+      for (CompletableFuture<?> future : futures) {
+        if (!future.isDone()) return false;
+      }
+      return true;
+    }
+  }
+
+  private record LifecycleOutcome<T>(T value, Throwable failure, boolean cancelled) {
+    private void apply(CompletableFuture<T> future) {
+      if (cancelled) {
+        future.cancel(false);
+      } else if (failure != null) {
+        future.completeExceptionally(failure);
+      } else {
+        future.complete(value);
+      }
+    }
+  }
+
   private static final class Session<T> implements AlpacaSseSubscription, Callback {
     private final OkHttpClient httpClient;
     private final Dispatcher httpDispatcher;
@@ -519,9 +607,10 @@ public final class SseTransport {
         new AtomicReference<>(AlpacaSseState.CONNECTING);
     private final AtomicReference<String> lastEventId;
     private final AtomicReference<AlpacaSseConnectionInfo> connection = new AtomicReference<>();
-    private final CompletableFuture<AlpacaSseConnectionInfo> openedFuture =
-        new CompletableFuture<>();
-    private final CompletableFuture<AlpacaSseCloseResult> completion = new CompletableFuture<>();
+    private final LifecycleSignal<AlpacaSseConnectionInfo> openedSignal =
+        new LifecycleSignal<>(COMPLETION_EXECUTOR);
+    private final LifecycleSignal<AlpacaSseCloseResult> completionSignal =
+        new LifecycleSignal<>(COMPLETION_EXECUTOR);
 
     // Guarded by lifecycleLock unless marked volatile for parser-loop visibility.
     private Call call;
@@ -788,7 +877,7 @@ public final class SseTransport {
                   reconnect ? listener::onReconnected : listener::onOpen);
         }
         if (!startIndependently(openCallback)) return;
-        if (!reconnect) openedFuture.complete(connectionInfo);
+        if (!reconnect) openedSignal.complete(connectionInfo);
         if (!awaitOpening(openCallback)) return;
         readBody(response.body());
         if (terminal) return;
@@ -1207,7 +1296,7 @@ public final class SseTransport {
         }
       }
       try {
-        CompletableFuture.anyOf(handoff, completion).get();
+        CompletableFuture.anyOf(handoff, completionSignal.internalFuture()).get();
         if (terminal) return false;
         handoff.get();
         return true;
@@ -1231,7 +1320,8 @@ public final class SseTransport {
 
     private boolean awaitOpening(EnqueuedCallback enqueued) {
       try {
-        CompletableFuture.anyOf(enqueued.task().completion, completion).get();
+        CompletableFuture.anyOf(enqueued.task().completion, completionSignal.internalFuture())
+            .get();
         if (terminal) return false;
         enqueued.task().completion.get();
         return true;
@@ -1297,15 +1387,15 @@ public final class SseTransport {
       EnqueuedCallback terminalCallback =
           admitTerminal("onClosed", () -> listener.onClosed(result));
       startTerminal(terminalCallback);
-      settleCompletion(() -> completion.complete(result));
+      settleCompletion(() -> completionSignal.complete(result));
       awaitTerminalSettlement();
       if (acceptedConnection != null) {
-        openedFuture.complete(acceptedConnection);
-      } else if (!openedFuture.isDone()) {
+        openedSignal.complete(acceptedConnection);
+      } else if (!openedSignal.isDone()) {
         if (result.reason() == AlpacaSseCloseResult.Reason.USER_CLOSED) {
-          openedFuture.cancel(false);
+          openedSignal.cancel();
         } else {
-          openedFuture.completeExceptionally(
+          openedSignal.completeExceptionally(
               new AlpacaSseException("SSE subscription closed before opening: " + result.reason()));
         }
       }
@@ -1345,12 +1435,12 @@ public final class SseTransport {
       EnqueuedCallback terminalCallback =
           admitTerminal("onFailure", () -> listener.onFailure(failure));
       startTerminal(terminalCallback);
-      settleCompletion(() -> completion.completeExceptionally(failure));
+      settleCompletion(() -> completionSignal.completeExceptionally(failure));
       awaitTerminalSettlement();
       if (acceptedConnection != null) {
-        openedFuture.complete(acceptedConnection);
+        openedSignal.complete(acceptedConnection);
       } else {
-        openedFuture.completeExceptionally(failure);
+        openedSignal.completeExceptionally(failure);
       }
     }
 
@@ -1360,7 +1450,7 @@ public final class SseTransport {
 
     private void awaitTerminalSettlement() {
       boolean interrupted = false;
-      while (!completion.isDone()) {
+      while (!completionSignal.isDone()) {
         interrupted |= Thread.interrupted();
         LockSupport.parkNanos(100_000L);
       }
@@ -1562,12 +1652,12 @@ public final class SseTransport {
 
     @Override
     public CompletableFuture<AlpacaSseConnectionInfo> opened() {
-      return defensiveCopy(openedFuture);
+      return openedSignal.copy();
     }
 
     @Override
     public CompletableFuture<AlpacaSseCloseResult> completion() {
-      return completion.copy();
+      return completionSignal.copy();
     }
 
     private static boolean isRetryable(int status) {
@@ -1599,21 +1689,6 @@ public final class SseTransport {
 
     private static void cancel(ScheduledFuture<?> future) {
       if (future != null) future.cancel(false);
-    }
-
-    private static <T> CompletableFuture<T> defensiveCopy(CompletableFuture<T> source) {
-      var copy = new CompletableFuture<T>();
-      source.whenComplete(
-          (value, failure) -> {
-            if (source.isCancelled()) {
-              copy.cancel(false);
-            } else if (failure != null) {
-              copy.completeExceptionally(failure);
-            } else {
-              copy.complete(value);
-            }
-          });
-      return copy;
     }
 
     private static long durationToNanos(Duration duration) {

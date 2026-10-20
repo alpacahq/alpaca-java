@@ -100,14 +100,15 @@ Initial event IDs must be non-empty. Date-bounded Trading requests must reject a
 rather than claiming header-only replay; Trading and Corporate Actions ID-bounded requests must
 reject an initial ID after `untilId`.
 
-SSE lifecycle futures use an elastic, direct-handoff SDK completion executor so one subscription's
-blocked synchronous continuation cannot queue another subscription's settlement or occupy the
-scheduler. Release documentation must keep the Java contract explicit: synchronous continuations
-remain short because concurrently blocked continuations consume additional daemon workers;
-documented waits for related lifecycle signals are supported, while unrelated or potentially
-unbounded work uses an async continuation with an application-owned executor. Deterministic tests
-cover callback ordering, more concurrent settlements than the callback-dispatch worker count,
-pre-open future dependencies, recursive closure, and shared callback executors.
+Each exposed SSE lifecycle future is settled independently on an elastic, direct-handoff SDK
+completion executor, so a blocked synchronous continuation cannot delay another saved future,
+queue another subscription's settlement, or occupy the scheduler. Release documentation must keep
+the Java contract explicit: synchronous continuations remain short because concurrently blocked
+continuations consume additional daemon workers; documented waits for related lifecycle signals
+are supported, while unrelated or potentially unbounded work uses an async continuation with an
+application-owned executor. Deterministic tests cover callback ordering, multiple saved lifecycle
+futures, more concurrent settlements than the callback-dispatch worker count, pre-open future
+dependencies, recursive closure, and shared callback executors.
 
 ## Release workflow
 

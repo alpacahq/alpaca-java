@@ -409,6 +409,70 @@ class SseTransportTest {
   }
 
   @Test
+  void savedOpenedCopiesSettleIndependently() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setHeadersDelay(100, TimeUnit.MILLISECONDS)
+            .setBodyDelay(5, TimeUnit.SECONDS)
+            .setBody(":\n\n"));
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {});
+    var first = subscription.opened();
+    var second = subscription.opened();
+    var dependent = second.thenApply(ignored -> first.join());
+
+    try {
+      assertEquals(first.get(2, TimeUnit.SECONDS), dependent.get(2, TimeUnit.SECONDS));
+    } finally {
+      subscription.close();
+    }
+  }
+
+  @Test
+  void lifecycleCopiesCannotMutateSubscriptionOrOtherCopies() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setHeadersDelay(100, TimeUnit.MILLISECONDS)
+            .setBodyDelay(5, TimeUnit.SECONDS)
+            .setBody(":\n\n"));
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {});
+    var cancelledOpening = subscription.opened();
+    var acceptedOpening = subscription.opened();
+    var forgedCompletion = subscription.completion();
+    var actualCompletion = subscription.completion();
+    var forgedResult =
+        new AlpacaSseCloseResult(AlpacaSseCloseResult.Reason.REMOTE_END, "forged result");
+
+    assertTrue(cancelledOpening.cancel(false));
+    assertTrue(forgedCompletion.complete(forgedResult));
+    assertNotNull(acceptedOpening.get(2, TimeUnit.SECONDS));
+    assertEquals(AlpacaSseState.OPEN, subscription.state());
+
+    subscription.close();
+
+    assertTrue(cancelledOpening.isCancelled());
+    assertEquals(forgedResult, forgedCompletion.join());
+    assertEquals(
+        AlpacaSseCloseResult.Reason.USER_CLOSED,
+        actualCompletion.get(1, TimeUnit.SECONDS).reason());
+  }
+
+  @Test
   void reconnectUpdatesCurrentConnectionWithoutReplacingOpenedResult() throws Exception {
     server.enqueue(
         new MockResponse()
@@ -2059,6 +2123,52 @@ class SseTransportTest {
     continuation.get(4, TimeUnit.SECONDS);
     close.get(1, TimeUnit.SECONDS);
     assertEquals(AlpacaSseState.CLOSED, subscription.state());
+  }
+
+  @Test
+  void savedCompletionCopiesSettleBeforeTerminalCallbackWithoutDeadlock() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBodyDelay(5, TimeUnit.SECONDS)
+            .setBody(":\n\n"));
+    var closed = new CountDownLatch(1);
+    var firstReference = new AtomicReference<CompletableFuture<AlpacaSseCloseResult>>();
+    var subscription =
+        SseTransport.open(
+            httpClient,
+            new Request.Builder().url(server.url("/events")).build(),
+            AlpacaSseOptions.reconnectDisabled(),
+            false,
+            data -> data,
+            new AlpacaSseListener<>() {
+              @Override
+              public void onClosed(AlpacaSseCloseResult result) {
+                firstReference.get().join();
+                closed.countDown();
+              }
+            });
+    subscription.opened().get(1, TimeUnit.SECONDS);
+    var first = subscription.completion();
+    firstReference.set(first);
+    var second = subscription.completion();
+    var secondContinuation =
+        second.thenRun(
+            () -> {
+              try {
+                assertTrue(closed.await(2, TimeUnit.SECONDS));
+              } catch (InterruptedException failure) {
+                Thread.currentThread().interrupt();
+                throw new AssertionError("interrupted while waiting for onClosed", failure);
+              }
+            });
+
+    CompletableFuture.runAsync(subscription::close).get(2, TimeUnit.SECONDS);
+
+    assertTrue(first.isDone());
+    assertTrue(second.isDone());
+    assertTrue(closed.await(1, TimeUnit.SECONDS));
+    secondContinuation.get(1, TimeUnit.SECONDS);
   }
 
   @Test

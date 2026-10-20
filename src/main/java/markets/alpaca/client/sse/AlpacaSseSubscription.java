@@ -40,7 +40,8 @@ public interface AlpacaSseSubscription extends AutoCloseable {
    * future is cancelled or completed exceptionally. A synchronous opening continuation may
    * therefore safely inspect terminal completion.
    *
-   * <p>Cancelling the returned defensive copy does not close this subscription.
+   * <p>Each call returns an independently settled defensive copy. Cancelling or manually completing
+   * one copy does not affect this subscription or another saved copy.
    */
   CompletableFuture<AlpacaSseConnectionInfo> opened();
 
@@ -53,9 +54,11 @@ public interface AlpacaSseSubscription extends AutoCloseable {
    * synchronous completion continuation may wait for the ordered terminal listener even when the
    * active callback initiated closure.
    *
-   * <p>Synchronous continuations run on isolated SDK lifecycle workers and must remain short. The
-   * ordered-terminal wait above is supported, and one subscription's blocked continuation does not
-   * queue another subscription's settlement. Use an asynchronous continuation such as {@code
+   * <p>Each call returns an independently settled defensive copy. Cancelling or manually completing
+   * one copy does not affect this subscription or another saved copy. Synchronous continuations run
+   * on isolated SDK lifecycle workers and must remain short. The ordered-terminal wait above is
+   * supported, and a blocked continuation does not delay another saved lifecycle copy or queue
+   * another subscription's settlement. Use an asynchronous continuation such as {@code
    * thenApplyAsync} with an application-owned executor for unrelated or potentially unbounded
    * blocking work.
    */

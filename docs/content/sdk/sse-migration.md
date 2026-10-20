@@ -174,9 +174,11 @@ then waits for lifecycle completion to settle before invoking the listener. Clos
 callback startup is queued also releases the HTTP response thread without violating callback order;
 the already-admitted callbacks may finish later. Completion settlement is handed off from an active
 callback, so a callback may close even when a synchronous completion continuation waits for the
-ordered terminal listener. Lifecycle completion uses isolated, direct-handoff SDK workers, so a
-blocked continuation for one subscription cannot queue another subscription's settlement or occupy
-the scheduler. Synchronous continuations must remain short because concurrently blocked
+ordered terminal listener. Each `opened()` or `completion()` call returns an independently settled
+defensive future; cancelling or manually completing one does not affect the subscription or another
+saved future. Lifecycle completion uses isolated, direct-handoff SDK workers, so a blocked
+continuation cannot delay another saved lifecycle future, queue another subscription's settlement,
+or occupy the scheduler. Synchronous continuations must remain short because concurrently blocked
 continuations consume additional daemon workers. The related lifecycle wait above is supported; use
 an async continuation with an application-owned executor for unrelated or potentially unbounded
 blocking work.

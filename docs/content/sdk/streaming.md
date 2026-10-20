@@ -59,14 +59,15 @@ The SDK opening and terminal dispatchers use finite primary worker pools and que
 subscriptions saturate a primary dispatcher, its already-admitted callback falls back to the
 transport lifecycle executor instead of failing the subscription or dropping terminal delivery.
 That fallback can consume additional daemon workers when callbacks block, so callbacks should
-remain non-blocking; an application-owned executor can isolate opening and event work. Lifecycle
-completion uses a separate elastic,
-direct-handoff executor: a blocked synchronous continuation for one subscription cannot queue
-another subscription's settlement or occupy the scheduler. Synchronous lifecycle continuations
-must remain short because concurrently blocked continuations consume additional daemon workers. The
-documented waits for related `opened()` or terminal-listener delivery are supported; use an async
-continuation with an application-owned executor for unrelated or potentially unbounded blocking
-work.
+remain non-blocking; an application-owned executor can isolate opening and event work. Each
+`opened()` or `completion()` call returns an independently settled defensive future; cancelling or
+manually completing one does not affect the subscription or another saved future. Lifecycle
+completion uses a separate elastic, direct-handoff executor: a blocked synchronous continuation
+cannot delay another saved lifecycle future, queue another subscription's settlement, or occupy the
+scheduler. Synchronous lifecycle continuations must remain short because concurrently blocked
+continuations consume additional daemon workers. The documented waits for related `opened()` or
+terminal-listener delivery are supported; use an async continuation with an application-owned
+executor for unrelated or potentially unbounded blocking work.
 Opening-dispatch rejection fails the subscription with an `AlpacaSseCallbackException`. Under
 terminal-dispatch saturation, lifecycle completion remains authoritative, the pending terminal
 listener callback is rejected, and the SDK logs a warning.
