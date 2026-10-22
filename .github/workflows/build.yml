@@ -37,6 +37,7 @@ jobs:
             RELEASING.md
             TESTING.md
             CHANGELOG.md
+            MIGRATIONS.md
             examples/README.md
             docs/README.md
 

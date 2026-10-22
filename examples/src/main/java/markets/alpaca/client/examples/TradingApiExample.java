@@ -1,6 +1,7 @@
 package markets.alpaca.client.examples;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import markets.alpaca.client.AlpacaClientFactory;
 import markets.alpaca.client.openapi.trading.api.AccountsApi;
 import markets.alpaca.client.openapi.trading.api.AssetsApi;
@@ -12,11 +13,12 @@ import markets.alpaca.client.openapi.trading.model.CreateOrderRequest;
 import markets.alpaca.client.openapi.trading.model.OrderSide;
 import markets.alpaca.client.openapi.trading.model.OrderType;
 import markets.alpaca.client.openapi.trading.model.TimeInForce;
+import markets.alpaca.client.sse.AlpacaSseListener;
 import markets.alpaca.client.trading.ListOrdersRequest;
 
 /**
  * Trading API workflow: authenticate, inspect account state, read assets/orders/positions, and
- * optionally submit an order.
+ * optionally start an activity SSE stream or submit an order.
  */
 public final class TradingApiExample {
   private TradingApiExample() {}
@@ -92,6 +94,27 @@ public final class TradingApiExample {
       ExampleSupport.printSection("Order Submission");
       System.out.println(
           "Skipped. Set APCA_EXAMPLE_PLACE_ORDER=true to submit a paper limit order.");
+    }
+
+    if (ExampleSupport.enabled("APCA_EXAMPLE_TRADING_SSE")) {
+      openActivityStream(tradingClient);
+    }
+  }
+
+  private static void openActivityStream(
+      markets.alpaca.client.openapi.trading.http.ApiClient tradingClient) throws Exception {
+    ExampleSupport.printSection("Trading Activity SSE");
+    var events = AlpacaClientFactory.tradingEventsSseClient(tradingClient);
+    var subscription = events.subscribeToActivities(new AlpacaSseListener<>() {});
+    try {
+      var connection = subscription.opened().get(10, TimeUnit.SECONDS);
+      System.out.printf(
+          "activity stream opened: %d %s%n", connection.statusCode(), connection.uri());
+    } finally {
+      subscription.close();
+      System.out.printf(
+          "activity stream closed: %s%n",
+          subscription.completion().get(10, TimeUnit.SECONDS).reason());
     }
   }
 
