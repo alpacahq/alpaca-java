@@ -178,11 +178,13 @@ while transmitting the committed cursor as the documented `since_id` query param
 standard `Last-Event-ID` header. If an empty SSE `id:` clears that cursor, an unbounded request
 retains its original `since` or `sinceId` lower bound rather than reconnecting without replay;
 deduplicate because this can redeliver earlier events. Date-bounded requests similarly retain their
-original date range on retry and can replay already processed events. Malformed payloads terminate
-the subscription. A cursorless live stream fails closed after an empty `id:` or if an established
-connection drops before supplying any event ID, because the endpoint does not replay history without
-a lower bound. Persisted workflows should inspect `completion()` and deduplicate by event ID after
-reconnect.
+original date range on retry and can replay already processed events. A malformed activity payload
+is logged and reported through `onEventFailure`, then skipped; its SSE ID becomes the committed
+resume cursor after the callback, and the healthy connection continues with the next event.
+Applications requiring complete activity accounting should persist or alert on this callback. A
+cursorless live stream fails closed after an empty `id:` or if an established connection drops
+before supplying any event ID, because the endpoint does not replay history without a lower bound.
+Persisted workflows should inspect `completion()` and deduplicate by event ID after reconnect.
 `AlpacaSseOptions.initialLastEventId` must be non-empty and cannot be combined with a date-bounded
 request; use an ID-bounded request and ensure the initial ID is not after `untilId`.
 Activity details normally use type/subtype dispatch; OAS schemas without discriminants use a

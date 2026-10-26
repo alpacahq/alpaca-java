@@ -1,6 +1,11 @@
 package markets.alpaca.client.sse;
 
-/** A complete SSE message could not be converted to its generated event model. */
+/**
+ * A complete SSE message could not be converted to its generated event model.
+ *
+ * <p>Domain SSE clients report this recoverable per-event failure through {@link
+ * AlpacaSseListener#onEventFailure(AlpacaSseDeserializationException)}.
+ */
 public final class AlpacaSseDeserializationException extends AlpacaSseException {
 
   private final String eventId;

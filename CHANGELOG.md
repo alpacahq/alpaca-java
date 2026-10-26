@@ -57,7 +57,8 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   `CreateFundingWalletWithdrawalRequest`.
 - `TokenizationIssuer.ONDO` and `TokenizationNetwork.HYPERCORE` on Broker and Trading.
 - Typed, cancellable SSE clients for Trading account activities and Market Data corporate actions,
-  with filters, bounded replay, resume cursors, reconnect policies, and structured errors.
+  with filters, bounded replay, resume cursors, reconnect policies, structured errors, and
+  recoverable malformed-event reporting.
 - A shared Java SSE lifecycle API with awaitable opening, connection metadata, completion state,
   resource limits, callback-executor configuration, and factory/top-level client access.
 - Additive Broker SSE capabilities including structured failure and closure callbacks, optional
@@ -71,6 +72,8 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Broker SSE now uses the shared bounded transport while preserving its existing method signatures,
   one-connection default, and per-event malformed-payload handling. Applications can opt into
   reconnect through `AlpacaSseOptions`.
+- Trading, Market Data, and Broker SSE report malformed events through `onEventFailure`, commit the
+  skipped event ID as the resume cursor, and continue an otherwise healthy connection.
 - `BrokerSseSubscription` implements the shared `AlpacaSseSubscription` interface while retaining
   its Broker-specific compatibility methods.
 - Trading and Broker Activity V2 events use discriminant-aware decoding, preserve unknown envelope

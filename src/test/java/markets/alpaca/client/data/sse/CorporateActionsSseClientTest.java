@@ -5,13 +5,17 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import markets.alpaca.client.AlpacaClientFactory;
 import markets.alpaca.client.AlpacaCredentials;
 import markets.alpaca.client.openapi.data.model.CorporateActionEvent;
 import markets.alpaca.client.openapi.data.model.CorporateActionEventType;
+import markets.alpaca.client.sse.AlpacaSseCloseResult;
 import markets.alpaca.client.sse.AlpacaSseDeserializationException;
 import markets.alpaca.client.sse.AlpacaSseEvent;
 import markets.alpaca.client.sse.AlpacaSseListener;
@@ -195,11 +199,19 @@ class CorporateActionsSseClientTest {
   }
 
   @Test
-  void malformedEventTerminatesWithoutReconnect() throws Exception {
+  void malformedEventIsReportedAndFollowingEventIsDeliveredWithoutReconnect() throws Exception {
     server.enqueue(
         new MockResponse()
             .setHeader("Content-Type", "text/event-stream")
-            .setBody("id: poison\ndata: {\n\n"));
+            .setBody(
+                "id: poison\n"
+                    + "event: corporate-action\n"
+                    + "data: {\n\n"
+                    + "id: good\n"
+                    + "event: corporate-action\n"
+                    + "data: "
+                    + CorporateActionEventDecoderTest.cashDividendJson()
+                    + "\n\n"));
     var dataClient =
         AlpacaClientFactory.dataClient(
             new AlpacaCredentials("data-key", "data-secret"), httpClient);
@@ -216,18 +228,49 @@ class CorporateActionsSseClientTest {
             dataClient,
             MarketDataSseEnvironment.custom(baseUrl()),
             AlpacaSseOptions.builder().reconnectPolicy(policy).build());
+    var callbacks = new CopyOnWriteArrayList<String>();
+    var decodingFailure = new AtomicReference<AlpacaSseDeserializationException>();
+    var terminalFailures = new AtomicInteger();
+    var callbacksDelivered = new CountDownLatch(2);
 
     try (var subscription =
         client.subscribeToCorporateActions(
-            CorporateActionsSseRequest.live(), new AlpacaSseListener<>() {})) {
-      var failure =
-          assertThrows(
-              ExecutionException.class, () -> subscription.completion().get(3, TimeUnit.SECONDS));
+            CorporateActionsSseRequest.builder()
+                .since(OffsetDateTime.parse("2026-10-01T00:00:00Z"))
+                .until(OffsetDateTime.parse("2026-10-02T00:00:00Z"))
+                .build(),
+            new AlpacaSseListener<>() {
+              @Override
+              public void onEventFailure(AlpacaSseDeserializationException failure) {
+                decodingFailure.set(failure);
+                callbacks.add("failure");
+                callbacksDelivered.countDown();
+              }
 
-      assertInstanceOf(AlpacaSseDeserializationException.class, failure.getCause());
-      assertTrue(subscription.lastEventId().isEmpty());
+              @Override
+              public void onEvent(AlpacaSseEvent<CorporateActionEvent> event) {
+                callbacks.add("event");
+                callbacksDelivered.countDown();
+              }
+
+              @Override
+              public void onFailure(Throwable failure) {
+                terminalFailures.incrementAndGet();
+              }
+            })) {
+      assertTrue(callbacksDelivered.await(3, TimeUnit.SECONDS));
+      assertEquals(
+          AlpacaSseCloseResult.Reason.BOUNDED_END,
+          subscription.completion().get(3, TimeUnit.SECONDS).reason());
+      assertEquals("good", subscription.lastEventId().orElseThrow());
       assertEquals(1, server.getRequestCount());
     }
+
+    assertEquals(java.util.List.of("failure", "event"), callbacks);
+    assertEquals("poison", decodingFailure.get().eventId());
+    assertEquals("corporate-action", decodingFailure.get().eventType());
+    assertNotNull(decodingFailure.get().getCause());
+    assertEquals(0, terminalFailures.get());
   }
 
   @Test

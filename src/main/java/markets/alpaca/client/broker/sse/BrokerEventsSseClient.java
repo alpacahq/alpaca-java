@@ -605,10 +605,13 @@ public final class BrokerEventsSseClient {
       }
 
       @Override
+      public void onEventFailure(AlpacaSseDeserializationException failure) {
+        listener.onEventFailure(failure);
+      }
+
+      @Override
       public void onFailure(Throwable failure) {
-        if (failure instanceof AlpacaSseDeserializationException decodingFailure) {
-          listener.onEventFailure(decodingFailure);
-        } else if (failure instanceof AlpacaSseHttpException httpFailure) {
+        if (failure instanceof AlpacaSseHttpException httpFailure) {
           listener.onHttpFailure(httpFailure, responseFor(httpFailure, request));
         } else {
           listener.onFailure(failure, null);

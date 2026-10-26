@@ -23,6 +23,16 @@ public interface AlpacaSseListener<T> {
 
   default void onReconnected() {}
 
+  /**
+   * One complete SSE event could not be converted to its generated model.
+   *
+   * <p>This callback is non-terminal: the malformed event is skipped, its event ID becomes the
+   * committed resume cursor after this callback is invoked, and delivery continues on the healthy
+   * connection. Override this method to alert or persist the data gap. The default does nothing;
+   * the SDK also logs the failure at warning level.
+   */
+  default void onEventFailure(AlpacaSseDeserializationException failure) {}
+
   default void onClosed(AlpacaSseCloseResult result) {}
 
   /** The subscription failed terminally. */

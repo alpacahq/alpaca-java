@@ -6,10 +6,12 @@ import markets.alpaca.client.http.AlpacaHttpConfig;
 import markets.alpaca.client.openapi.trading.api.EventsApi;
 import markets.alpaca.client.openapi.trading.http.ApiException;
 import markets.alpaca.client.openapi.trading.model.ActivityEventV2;
+import markets.alpaca.client.sse.AlpacaSseDeserializationException;
 import markets.alpaca.client.sse.AlpacaSseListener;
 import markets.alpaca.client.sse.AlpacaSseOptions;
 import markets.alpaca.client.sse.AlpacaSseProtocolException;
 import markets.alpaca.client.sse.AlpacaSseSubscription;
+import markets.alpaca.client.sse.internal.SseDecodeFailurePolicy;
 import markets.alpaca.client.sse.internal.SseTransport;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -65,6 +67,10 @@ public final class TradingEventsSseClient {
    *
    * <p>An initial event ID in the client options cannot be combined with a date-bounded request.
    * For an ID-bounded request, that initial ID must not be after the request's upper bound.
+   *
+   * <p>A malformed event is reported through {@link
+   * AlpacaSseListener#onEventFailure(AlpacaSseDeserializationException)}, skipped, and committed as
+   * the resume cursor; the healthy stream continues with the next event.
    */
   public AlpacaSseSubscription subscribeToActivities(
       TradingActivitySseRequest request, AlpacaSseListener<ActivityEventV2> listener)
@@ -95,6 +101,7 @@ public final class TradingEventsSseClient {
         decoder::decode,
         listener,
         callbackExecutor,
+        SseDecodeFailurePolicy.REPORT_AND_CONTINUE,
         (baseRequest, eventId, reconnect) ->
             withResumeCursor(baseRequest, eventId, initialEventId, reconnect));
   }

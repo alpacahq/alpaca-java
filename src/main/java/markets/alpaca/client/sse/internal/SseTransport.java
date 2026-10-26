@@ -950,12 +950,16 @@ public final class SseTransport {
                             type);
                     if (decodeFailurePolicy == SseDecodeFailurePolicy.REPORT_AND_CONTINUE) {
                       dispatchNonTerminal(
-                          "onFailure",
+                          "onEventFailure",
                           () -> {
+                            LOG.log(
+                                Level.WARNING,
+                                "SSE event decoding failed; skipping the event",
+                                decodingFailure);
                             try {
-                              listener.onFailure(decodingFailure);
+                              listener.onEventFailure(decodingFailure);
                             } finally {
-                              commitDecodedEventId(id);
+                              commitSkippedEventId(id);
                             }
                           });
                       return;
@@ -1503,7 +1507,7 @@ public final class SseTransport {
       }
     }
 
-    private void commitDecodedEventId(String id) {
+    private void commitSkippedEventId(String id) {
       synchronized (lifecycleLock) {
         lastEventId.set(id);
         if (!terminal) resetReconnectCycleLocked();

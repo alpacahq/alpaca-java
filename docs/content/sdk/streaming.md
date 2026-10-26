@@ -92,6 +92,14 @@ non-terminal dispatch fail; terminal lifecycle completion remains authoritative 
 listener fails. A callback-executor rejection is terminal. Applications should handle their own
 callback failures, persist work transactionally, and deduplicate by SSE event ID.
 
+A complete event that cannot be converted to its generated model is logged and delivered to
+`onEventFailure`. This callback is non-terminal: after it is invoked, the malformed event is skipped,
+its ID becomes the committed resume cursor, and parsing continues on the same healthy connection.
+`AlpacaSseListener.onEventFailure` defaults to no action, so applications requiring complete event
+accounting should override it and persist or alert on the reported gap.
+`AlpacaSseListener.onFailure(Throwable)` remains reserved for terminal subscription failures. The
+Broker-specific listener retains its legacy two-argument `onFailure` delegation described below.
+
 SSE subscriptions return immediately while the HTTP connection opens. Use `opened()` with a
 caller-chosen timeout instead of building a startup latch; it yields immutable response URI, status,
 and header metadata. `connection()` reports the most recently accepted connection and changes after
@@ -334,8 +342,8 @@ effects must be exactly once. After an empty SSE `id:`, requests with `since` or
 from that original lower bound, while cursorless requests fail closed instead of reconnecting with a
 possible gap. Cursorless requests also fail closed if an established connection drops before
 supplying any event ID. Unknown `event_type` values, malformed payloads, and payloads that do not
-validate against their generated concrete schema fail the subscription without reconnecting instead
-of being guessed or repeatedly replayed.
+validate against their generated concrete schema are not guessed: they are reported through
+`onEventFailure`, skipped, and committed as the resume cursor before delivery continues.
 
 ## Trading account-activity SSE
 
@@ -344,6 +352,7 @@ Create the handwritten client through the factory; generated `subscribeToActivit
 buffer the response and are not suitable for a live stream.
 
 ```java
+import markets.alpaca.client.sse.AlpacaSseDeserializationException;
 import markets.alpaca.client.sse.AlpacaSseEvent;
 import markets.alpaca.client.sse.AlpacaSseListener;
 import markets.alpaca.client.openapi.trading.model.ActivityEventV2;
@@ -357,6 +366,12 @@ var subscription = events.subscribeToActivities(
         @Override
         public void onEvent(AlpacaSseEvent<ActivityEventV2> event) {
             System.out.printf("%s %s%n", event.id(), event.data().getActivityType());
+        }
+
+        @Override
+        public void onEventFailure(AlpacaSseDeserializationException failure) {
+            System.err.printf("skipped event %s (%s)%n",
+                failure.eventId(), failure.eventType());
         }
     });
 
@@ -383,15 +398,16 @@ state advances after a payload is successfully decoded and dispatched, or when a
 data-less `id:` block is observed. An empty `id:` clears `Last-Event-ID`; an unbounded stream then
 retains its request's original `since` or `since_id` lower bound so a reconnect cannot silently skip
 events emitted during backoff. That safe replay can redeliver earlier events. Malformed Trading
-payloads do not advance the cursor. Date-bounded requests likewise retain their original date range
-on retry and can replay already processed events. Server replay can be inclusive, so applications
-requiring exactly-once effects must deduplicate persisted work by event ID. Because the Trading API
-returns no history without a lower bound, a cursorless live stream fails closed after an empty `id:`
-or when an established connection drops before supplying any event ID, rather than reconnecting with
-a silent gap. An interrupted ID-bounded stream also fails closed because the API requires `since_id`
-with `until_id`. `until` or `untilId` makes a request bounded; normal EOF then completes the
-subscription instead of reconnecting. Configure retry budgets, initial resume ID, idle timeout, and
-resource limits with `AlpacaSseOptions` factory overloads.
+payloads are reported and skipped, and their IDs advance the cursor after callback invocation.
+Date-bounded requests likewise retain their original date range on retry and can replay already
+processed events. Server replay can be inclusive, so applications requiring exactly-once effects
+must deduplicate persisted work by event ID. Because the Trading API returns no history without a
+lower bound, a cursorless live stream fails closed after an empty `id:` or when an established
+connection drops before supplying any event ID, rather than reconnecting with a silent gap. An
+interrupted ID-bounded stream also fails closed because the API requires `since_id` with `until_id`.
+`until` or `untilId` makes a request bounded; normal EOF then completes the subscription instead of
+reconnecting. Configure retry budgets, initial resume ID, idle timeout, and resource limits with
+`AlpacaSseOptions` factory overloads.
 An initial resume ID must not be empty and cannot be combined with a date-bounded Trading request
 because backend consumption of `Last-Event-ID` is not documented and date/ID cursor families cannot
 be mixed safely. Use an ID-bounded request instead; its initial ID must not be after `untilId`.
@@ -407,15 +423,15 @@ exponential backoff and server-provided delays. The connection timeout covers su
 response-header validation and bounded non-success response-body capture, so a server cannot keep a
 subscription opening indefinitely by stalling an error body.
 
-Malformed Trading activity payloads fail the subscription. Activity detail models are selected by
-the OAS type/subtype mapping. The two schemas whose OAS definitions currently lack discriminants
-(fixed-income redemption and rights distribution) use a unique-most-specific structural fallback;
-ties fail explicitly instead of being guessed. The same decoder behavior applies to Broker Activity
-V2 events. Until the upstream contract provides a dedicated CSD detail schema, `CSD` events retain
-their activity type but expose details through `CSWActivityV2`; additional payload fields remain
-available through `getAdditionalProperties()`. The OAS-valid `DIVTXEX` type likewise retains its
-activity type and uses the structurally compatible `CDIVActivityV2` detail model until a dedicated
-schema exists.
+Malformed Trading activity payloads invoke `onEventFailure` and are skipped without closing the
+healthy stream. Activity detail models are selected by the OAS type/subtype mapping. The two schemas
+whose OAS definitions currently lack discriminants (fixed-income redemption and rights distribution)
+use a unique-most-specific structural fallback; ties are reported as malformed instead of being
+guessed. The same decoder behavior applies to Broker Activity V2 events. Until the upstream contract
+provides a dedicated CSD detail schema, `CSD` events retain their activity type but expose details
+through `CSWActivityV2`; additional payload fields remain available through
+`getAdditionalProperties()`. The OAS-valid `DIVTXEX` type likewise retains its activity type and uses
+the structurally compatible `CDIVActivityV2` detail model until a dedicated schema exists.
 
 ## Broker Events SSE
 

@@ -1036,6 +1036,102 @@ class SseTransportTest {
   }
 
   @Test
+  void recoverableDecodeFailureIsLoggedCommittedAndDoesNotStopDelivery() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setHeadersDelay(100, TimeUnit.MILLISECONDS)
+            .setBody(
+                "id: poison\n"
+                    + "event: malformed\n"
+                    + "data: bad\n\n"
+                    + "id: good\n"
+                    + "event: valid\n"
+                    + "data: good\n\n"));
+    var subscriptionReference =
+        new AtomicReference<markets.alpaca.client.sse.AlpacaSseSubscription>();
+    var cursorDuringFailure = new AtomicReference<String>();
+    var cursorDuringEvent = new AtomicReference<String>();
+    var callbacks = new java.util.concurrent.CopyOnWriteArrayList<String>();
+    var callbacksDelivered = new CountDownLatch(2);
+    var decodeFailureLogged = new CountDownLatch(1);
+    var callbackFailureLogged = new CountDownLatch(1);
+    var terminalFailures = new AtomicInteger();
+    Logger logger = Logger.getLogger(SseTransport.class.getName());
+    Handler handler =
+        new Handler() {
+          @Override
+          public void publish(LogRecord record) {
+            if (record.getThrown() instanceof AlpacaSseDeserializationException) {
+              decodeFailureLogged.countDown();
+            }
+            if (record.getThrown() instanceof IllegalStateException) {
+              callbackFailureLogged.countDown();
+            }
+          }
+
+          @Override
+          public void flush() {}
+
+          @Override
+          public void close() {}
+        };
+    logger.addHandler(handler);
+
+    try {
+      var subscription =
+          SseTransport.open(
+              httpClient,
+              new Request.Builder().url(server.url("/events")).build(),
+              AlpacaSseOptions.reconnectDisabled(),
+              true,
+              data -> {
+                if ("bad".equals(data)) throw new IllegalArgumentException("bad payload");
+                return data;
+              },
+              new AlpacaSseListener<>() {
+                @Override
+                public void onEventFailure(AlpacaSseDeserializationException failure) {
+                  cursorDuringFailure.set(subscriptionReference.get().lastEventId().orElse(null));
+                  callbacks.add("failure");
+                  callbacksDelivered.countDown();
+                  throw new IllegalStateException("application event-failure callback failed");
+                }
+
+                @Override
+                public void onEvent(AlpacaSseEvent<String> event) {
+                  cursorDuringEvent.set(subscriptionReference.get().lastEventId().orElse(null));
+                  callbacks.add("event");
+                  callbacksDelivered.countDown();
+                }
+
+                @Override
+                public void onFailure(Throwable failure) {
+                  terminalFailures.incrementAndGet();
+                }
+              },
+              Runnable::run,
+              SseDecodeFailurePolicy.REPORT_AND_CONTINUE);
+      subscriptionReference.set(subscription);
+
+      assertTrue(callbacksDelivered.await(3, TimeUnit.SECONDS));
+      assertEquals(
+          AlpacaSseCloseResult.Reason.BOUNDED_END,
+          subscription.completion().get(3, TimeUnit.SECONDS).reason());
+      assertTrue(decodeFailureLogged.await(1, TimeUnit.SECONDS));
+      assertTrue(callbackFailureLogged.await(1, TimeUnit.SECONDS));
+      assertNull(cursorDuringFailure.get());
+      assertEquals("poison", cursorDuringEvent.get());
+      assertEquals("good", subscription.lastEventId().orElseThrow());
+      assertEquals(java.util.List.of("failure", "event"), callbacks);
+      assertEquals(0, terminalFailures.get());
+      assertEquals(1, server.getRequestCount());
+    } finally {
+      logger.removeHandler(handler);
+    }
+  }
+
+  @Test
   void terminalTimeoutCompletesLifecycleBeforeSerializedFailureCallback() throws Exception {
     server.enqueue(
         new MockResponse()

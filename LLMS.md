@@ -46,10 +46,11 @@ Use production Trading or Broker environments only when explicitly requested.
   buffered SSE methods. Trading and corporate-actions streams reconnect by default and transmit
   committed event IDs. Trading reconnects use the documented `since_id` query plus
   `Last-Event-ID`; corporate-actions use the OAS-documented standard header. Broker makes one
-  connection unless explicit `AlpacaSseOptions` enable reconnects. Malformed Trading and
-  corporate-action events are terminal. Broker reports a malformed event through `onFailure`,
-  advances its resume cursor, and continues. Close subscriptions when finished and deduplicate by
-  SSE event ID when exactly-once effects matter.
+  connection unless explicit `AlpacaSseOptions` enable reconnects. Malformed events are logged,
+  reported through `onEventFailure`, skipped, and committed as the resume cursor while the healthy
+  stream continues. Broker's legacy listener delegates that callback to `onFailure`. Applications
+  requiring complete event accounting should persist or alert on `onEventFailure`. Close
+  subscriptions when finished and deduplicate by SSE event ID when exactly-once effects matter.
   Await startup with `subscription.opened()` and a caller-controlled timeout; inspect
   `connection()` for the latest accepted response metadata. Prefer options-only factory overloads
   unless callbacks need an application-owned executor. SSE callbacks are serialized and

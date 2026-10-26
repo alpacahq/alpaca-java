@@ -228,9 +228,14 @@ date-bounded Trading request; `0.2.0` rejects that ambiguous combination before 
 connection. Use an ID-bounded request instead, and keep the initial ID at or before its `untilId`.
 Corporate Actions also rejects an initial ID after an ID-bounded request's `untilId`.
 
-Trading malformed payloads terminate the subscription without advancing the event cursor. Broker
-malformed payloads invoke `onEventFailure`, advance the cursor after callback invocation, and keep
-the healthy connection open. If that callback throws, the cursor still advances.
+Trading, Corporate Actions, and Broker malformed payloads invoke `onEventFailure`, advance the
+cursor after callback invocation, and keep the healthy connection open. The SDK logs each skipped
+event. `AlpacaSseListener.onEventFailure` defaults to no action; Broker's
+`BrokerSseEventListener.onEventFailure` instead delegates to its legacy two-argument `onFailure`.
+Override the rich callback to persist or alert on the data gap when complete event accounting
+matters. If it throws a `RuntimeException`, the cursor still advances and delivery continues.
+`AlpacaSseListener.onFailure(Throwable)` remains terminal; Broker's legacy
+`onFailure(Throwable, Response)` retains its documented non-terminal malformed-event delegation.
 Broker admin-action events retain `SubscribeToAdminActionSSE200ResponseInner` but now select its
 concrete generated model from the required `type` field; missing, unknown, or schema-invalid types
 follow that same malformed-event policy.
