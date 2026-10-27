@@ -1253,7 +1253,7 @@ public class CryptoFundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Successful request. Returns an array of VASPs or an empty list if no matches found. </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> Successful request. &#x60;vasps&#x60; lists each match and is an empty array when nothing matches. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call searchVASPsCall(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs, final ApiCallback _callback) throws ApiException {
@@ -1355,7 +1355,7 @@ public class CryptoFundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Successful request. Returns an array of VASPs or an empty list if no matches found. </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> Successful request. &#x60;vasps&#x60; lists each match and is an empty array when nothing matches. </td><td>  -  </td></tr>
      </table>
      */
     public SearchVASPsResponse searchVASPs(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs) throws ApiException {
@@ -1380,7 +1380,7 @@ public class CryptoFundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Successful request. Returns an array of VASPs or an empty list if no matches found. </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> Successful request. &#x60;vasps&#x60; lists each match and is an empty array when nothing matches. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<SearchVASPsResponse> searchVASPsWithHttpInfo(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs) throws ApiException {
@@ -1407,7 +1407,7 @@ public class CryptoFundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> Successful request. Returns an array of VASPs or an empty list if no matches found. </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> Successful request. &#x60;vasps&#x60; lists each match and is an empty array when nothing matches. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call searchVASPsAsync(@javax.annotation.Nullable String q, @javax.annotation.Nullable String emailDomain, @javax.annotation.Nullable String chainalysisName, @javax.annotation.Nullable String fields, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer perPage, @javax.annotation.Nullable String order, @javax.annotation.Nullable Boolean includeSubsidiaryVASPs, final ApiCallback<SearchVASPsResponse> _callback) throws ApiException {

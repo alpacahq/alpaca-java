@@ -389,7 +389,7 @@ public class ActivityEventV2CommonFields implements Serializable {
   }
 
   /**
-   * Currency conversion fee rate base-point in case of local currency activity
+   * Currency conversion fee in basis points charged to the customer on a trade activity. Sent when the order has a fee, including zero. Omitted on other activities.
    * @return swapFeeBps
    */
   @javax.annotation.Nullable
@@ -408,7 +408,7 @@ public class ActivityEventV2CommonFields implements Serializable {
   }
 
   /**
-   * Conversion rate for local currency activities
+   * Exchange rate from the execution on a trade activity. Sent when the execution has a rate, including zero. Omitted on other activities.
    * @return swapRate
    */
   @javax.annotation.Nullable

@@ -184,9 +184,6 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.FixedIncomeLatestQuotesResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.FixedIncomePrice.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.FixedIncomeQuote.CustomTypeAdapterFactory());
-        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.ForexLatestRatesResp.CustomTypeAdapterFactory());
-        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.ForexRate.CustomTypeAdapterFactory());
-        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.ForexRatesResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.ForwardSplit.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.MostActive.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.MostActivesResp.CustomTypeAdapterFactory());

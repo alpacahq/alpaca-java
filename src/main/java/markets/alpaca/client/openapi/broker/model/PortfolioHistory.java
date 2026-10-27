@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import markets.alpaca.client.openapi.broker.model.PortfolioHistoryTimeframe;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -93,12 +94,12 @@ public class PortfolioHistory implements Serializable {
   public static final String SERIALIZED_NAME_TIMEFRAME = "timeframe";
   @SerializedName(SERIALIZED_NAME_TIMEFRAME)
   @javax.annotation.Nonnull
-  private String timeframe;
+  private PortfolioHistoryTimeframe timeframe;
 
   public static final String SERIALIZED_NAME_TIMESTAMP = "timestamp";
   @SerializedName(SERIALIZED_NAME_TIMESTAMP)
   @javax.annotation.Nonnull
-  private List<Integer> timestamp = new ArrayList<>();
+  private List<Long> timestamp = new ArrayList<>();
 
   public PortfolioHistory() {
   }
@@ -109,7 +110,7 @@ public class PortfolioHistory implements Serializable {
   }
 
   /**
-   * basis in dollar of the profit loss calculation
+   * Basis in dollar of the profit loss calculation.
    * @return baseValue
    */
   @javax.annotation.Nullable
@@ -155,7 +156,7 @@ public class PortfolioHistory implements Serializable {
   }
 
   /**
-   * accumulated value in dollar amount as of the end of each time window
+   * Accumulated value in dollar amount as of the end of each time window.
    * @return cashflow
    */
   @javax.annotation.Nullable
@@ -182,7 +183,7 @@ public class PortfolioHistory implements Serializable {
   }
 
   /**
-   * equity value of the account in dollar amount as of the end of each time window
+   * Equity value of the account in dollar amount as of the end of each time window.
    * @return equity
    */
   @javax.annotation.Nonnull
@@ -209,7 +210,7 @@ public class PortfolioHistory implements Serializable {
   }
 
   /**
-   * profit/loss in dollar from the base value
+   * Profit/loss in dollar from the base value.
    * @return profitLoss
    */
   @javax.annotation.Nonnull
@@ -236,7 +237,7 @@ public class PortfolioHistory implements Serializable {
   }
 
   /**
-   * profit/loss in percentage from the base value
+   * Profit/loss in percentage from the base value.
    * @return profitLossPct
    */
   @javax.annotation.Nonnull
@@ -249,31 +250,31 @@ public class PortfolioHistory implements Serializable {
   }
 
 
-  public PortfolioHistory timeframe(@javax.annotation.Nonnull String timeframe) {
+  public PortfolioHistory timeframe(@javax.annotation.Nonnull PortfolioHistoryTimeframe timeframe) {
     this.timeframe = timeframe;
     return this;
   }
 
   /**
-   * time window size of each data element
+   * Get timeframe
    * @return timeframe
    */
   @javax.annotation.Nonnull
-  public String getTimeframe() {
+  public PortfolioHistoryTimeframe getTimeframe() {
     return timeframe;
   }
 
-  public void setTimeframe(@javax.annotation.Nonnull String timeframe) {
+  public void setTimeframe(@javax.annotation.Nonnull PortfolioHistoryTimeframe timeframe) {
     this.timeframe = timeframe;
   }
 
 
-  public PortfolioHistory timestamp(@javax.annotation.Nonnull List<Integer> timestamp) {
+  public PortfolioHistory timestamp(@javax.annotation.Nonnull List<Long> timestamp) {
     this.timestamp = timestamp;
     return this;
   }
 
-  public PortfolioHistory addTimestampItem(Integer timestampItem) {
+  public PortfolioHistory addTimestampItem(Long timestampItem) {
     if (this.timestamp == null) {
       this.timestamp = new ArrayList<>();
     }
@@ -286,11 +287,11 @@ public class PortfolioHistory implements Serializable {
    * @return timestamp
    */
   @javax.annotation.Nonnull
-  public List<Integer> getTimestamp() {
+  public List<Long> getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(@javax.annotation.Nonnull List<Integer> timestamp) {
+  public void setTimestamp(@javax.annotation.Nonnull List<Long> timestamp) {
     this.timestamp = timestamp;
   }
 
@@ -440,9 +441,8 @@ public class PortfolioHistory implements Serializable {
       } else if (!jsonObj.get("profit_loss_pct").isJsonArray()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `profit_loss_pct` to be an array in the JSON string but got `%s`", jsonObj.get("profit_loss_pct").toString()));
       }
-      if (!jsonObj.get("timeframe").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `timeframe` to be a primitive type in the JSON string but got `%s`", jsonObj.get("timeframe").toString()));
-      }
+      // validate the required field `timeframe`
+      PortfolioHistoryTimeframe.validateJsonElement(jsonObj.get("timeframe"));
       // ensure the required json array is present
       if (jsonObj.get("timestamp") == null) {
         throw new IllegalArgumentException("Expected the field `linkedContent` to be an array in the JSON string but got `null`");

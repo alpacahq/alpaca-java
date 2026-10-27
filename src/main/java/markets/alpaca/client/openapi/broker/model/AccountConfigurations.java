@@ -138,7 +138,7 @@ public class AccountConfigurations implements Serializable {
   public static final String SERIALIZED_NAME_PTP_NO_EXCEPTION_ENTRY = "ptp_no_exception_entry";
   @SerializedName(SERIALIZED_NAME_PTP_NO_EXCEPTION_ENTRY)
   @javax.annotation.Nullable
-  private String ptpNoExceptionEntry;
+  private Boolean ptpNoExceptionEntry;
 
   public static final String SERIALIZED_NAME_SUSPEND_TRADE = "suspend_trade";
   @SerializedName(SERIALIZED_NAME_SUSPEND_TRADE)
@@ -300,7 +300,7 @@ public class AccountConfigurations implements Serializable {
   }
 
 
-  public AccountConfigurations ptpNoExceptionEntry(@javax.annotation.Nullable String ptpNoExceptionEntry) {
+  public AccountConfigurations ptpNoExceptionEntry(@javax.annotation.Nullable Boolean ptpNoExceptionEntry) {
     this.ptpNoExceptionEntry = ptpNoExceptionEntry;
     return this;
   }
@@ -310,11 +310,11 @@ public class AccountConfigurations implements Serializable {
    * @return ptpNoExceptionEntry
    */
   @javax.annotation.Nullable
-  public String getPtpNoExceptionEntry() {
+  public Boolean getPtpNoExceptionEntry() {
     return ptpNoExceptionEntry;
   }
 
-  public void setPtpNoExceptionEntry(@javax.annotation.Nullable String ptpNoExceptionEntry) {
+  public void setPtpNoExceptionEntry(@javax.annotation.Nullable Boolean ptpNoExceptionEntry) {
     this.ptpNoExceptionEntry = ptpNoExceptionEntry;
   }
 
@@ -483,9 +483,6 @@ public class AccountConfigurations implements Serializable {
       // validate the optional field `max_options_trading_level`
       if (jsonObj.get("max_options_trading_level") != null && !jsonObj.get("max_options_trading_level").isJsonNull()) {
         MaxOptionsTradingLevelEnum.validateJsonElement(jsonObj.get("max_options_trading_level"));
-      }
-      if ((jsonObj.get("ptp_no_exception_entry") != null && !jsonObj.get("ptp_no_exception_entry").isJsonNull()) && !jsonObj.get("ptp_no_exception_entry").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `ptp_no_exception_entry` to be a primitive type in the JSON string but got `%s`", jsonObj.get("ptp_no_exception_entry").toString()));
       }
       if ((jsonObj.get("trade_confirm_email") != null && !jsonObj.get("trade_confirm_email").isJsonNull()) && !jsonObj.get("trade_confirm_email").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `trade_confirm_email` to be a primitive type in the JSON string but got `%s`", jsonObj.get("trade_confirm_email").toString()));

@@ -66,12 +66,6 @@ public class TokenizationMintCallback implements Serializable {
   @javax.annotation.Nullable
   private String clientExternalAccountId;
 
-  public static final String SERIALIZED_NAME_CLIENT_ID = "client_id";
-  @Deprecated
-  @SerializedName(SERIALIZED_NAME_CLIENT_ID)
-  @javax.annotation.Nullable
-  private String clientId;
-
   public static final String SERIALIZED_NAME_NETWORK = "network";
   @SerializedName(SERIALIZED_NAME_NETWORK)
   @javax.annotation.Nullable
@@ -130,29 +124,6 @@ public class TokenizationMintCallback implements Serializable {
 
   public void setClientExternalAccountId(@javax.annotation.Nullable String clientExternalAccountId) {
     this.clientExternalAccountId = clientExternalAccountId;
-  }
-
-
-  @Deprecated
-  public TokenizationMintCallback clientId(@javax.annotation.Nullable String clientId) {
-    this.clientId = clientId;
-    return this;
-  }
-
-  /**
-   * **Deprecation notice:** Use &#x60;client_external_account_id&#x60; instead.  Since: 2026-07-15 Sunset: 2026-10-15  ---  Customer&#39;s client identifier on the issuer&#39;s platform.
-   * @return clientId
-   * @deprecated
-   */
-  @Deprecated
-  @javax.annotation.Nullable
-  public String getClientId() {
-    return clientId;
-  }
-
-  @Deprecated
-  public void setClientId(@javax.annotation.Nullable String clientId) {
-    this.clientId = clientId;
   }
 
 
@@ -288,7 +259,6 @@ public class TokenizationMintCallback implements Serializable {
     TokenizationMintCallback tokenizationMintCallback = (TokenizationMintCallback) o;
     return Objects.equals(this.clientAccountId, tokenizationMintCallback.clientAccountId) &&
         Objects.equals(this.clientExternalAccountId, tokenizationMintCallback.clientExternalAccountId) &&
-        Objects.equals(this.clientId, tokenizationMintCallback.clientId) &&
         Objects.equals(this.network, tokenizationMintCallback.network) &&
         Objects.equals(this.tokenizationRequestId, tokenizationMintCallback.tokenizationRequestId) &&
         Objects.equals(this.txHash, tokenizationMintCallback.txHash) &&
@@ -298,7 +268,7 @@ public class TokenizationMintCallback implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(clientAccountId, clientExternalAccountId, clientId, network, tokenizationRequestId, txHash, walletAddress, additionalProperties);
+    return Objects.hash(clientAccountId, clientExternalAccountId, network, tokenizationRequestId, txHash, walletAddress, additionalProperties);
   }
 
   @Override
@@ -307,7 +277,6 @@ public class TokenizationMintCallback implements Serializable {
     sb.append("class TokenizationMintCallback {\n");
     sb.append("    clientAccountId: ").append(toIndentedString(clientAccountId)).append("\n");
     sb.append("    clientExternalAccountId: ").append(toIndentedString(clientExternalAccountId)).append("\n");
-    sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
     sb.append("    network: ").append(toIndentedString(network)).append("\n");
     sb.append("    tokenizationRequestId: ").append(toIndentedString(tokenizationRequestId)).append("\n");
     sb.append("    txHash: ").append(toIndentedString(txHash)).append("\n");
@@ -331,7 +300,7 @@ public class TokenizationMintCallback implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("client_account_id", "client_external_account_id", "client_id", "network", "tokenization_request_id", "tx_hash", "wallet_address"));
+    openapiFields = new HashSet<String>(Arrays.asList("client_account_id", "client_external_account_id", "network", "tokenization_request_id", "tx_hash", "wallet_address"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("tokenization_request_id", "tx_hash"));
@@ -362,9 +331,6 @@ public class TokenizationMintCallback implements Serializable {
       }
       if ((jsonObj.get("client_external_account_id") != null && !jsonObj.get("client_external_account_id").isJsonNull()) && !jsonObj.get("client_external_account_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `client_external_account_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("client_external_account_id").toString()));
-      }
-      if ((jsonObj.get("client_id") != null && !jsonObj.get("client_id").isJsonNull()) && !jsonObj.get("client_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `client_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("client_id").toString()));
       }
       // validate the optional field `network`
       if (jsonObj.get("network") != null && !jsonObj.get("network").isJsonNull()) {

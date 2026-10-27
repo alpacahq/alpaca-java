@@ -21,7 +21,6 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import markets.alpaca.client.openapi.trading.model.CryptoChain;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -49,108 +48,60 @@ import java.util.Set;
 import markets.alpaca.client.openapi.trading.http.JSON;
 
 /**
- * CreateCryptoTransferRequest
+ * PortfolioHistoryError
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
-public class CreateCryptoTransferRequest implements Serializable {
+public class PortfolioHistoryError implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  public static final String SERIALIZED_NAME_ADDRESS = "address";
-  @SerializedName(SERIALIZED_NAME_ADDRESS)
+  public static final String SERIALIZED_NAME_CODE = "code";
+  @SerializedName(SERIALIZED_NAME_CODE)
   @javax.annotation.Nonnull
-  private String address;
+  private Integer code;
 
-  public static final String SERIALIZED_NAME_AMOUNT = "amount";
-  @SerializedName(SERIALIZED_NAME_AMOUNT)
+  public static final String SERIALIZED_NAME_MESSAGE = "message";
+  @SerializedName(SERIALIZED_NAME_MESSAGE)
   @javax.annotation.Nonnull
-  private String amount;
+  private String message;
 
-  public static final String SERIALIZED_NAME_ASSET = "asset";
-  @SerializedName(SERIALIZED_NAME_ASSET)
-  @javax.annotation.Nonnull
-  private String asset;
-
-  public static final String SERIALIZED_NAME_CHAIN = "chain";
-  @SerializedName(SERIALIZED_NAME_CHAIN)
-  @javax.annotation.Nullable
-  private CryptoChain chain;
-
-  public CreateCryptoTransferRequest() {
+  public PortfolioHistoryError() {
   }
 
-  public CreateCryptoTransferRequest address(@javax.annotation.Nonnull String address) {
-    this.address = address;
+  public PortfolioHistoryError code(@javax.annotation.Nonnull Integer code) {
+    this.code = code;
     return this;
   }
 
   /**
-   * The destination wallet address
-   * @return address
+   * Get code
+   * @return code
    */
   @javax.annotation.Nonnull
-  public String getAddress() {
-    return address;
+  public Integer getCode() {
+    return code;
   }
 
-  public void setAddress(@javax.annotation.Nonnull String address) {
-    this.address = address;
+  public void setCode(@javax.annotation.Nonnull Integer code) {
+    this.code = code;
   }
 
 
-  public CreateCryptoTransferRequest amount(@javax.annotation.Nonnull String amount) {
-    this.amount = amount;
+  public PortfolioHistoryError message(@javax.annotation.Nonnull String message) {
+    this.message = message;
     return this;
   }
 
   /**
-   * The amount, denoted in the specified asset, to be withdrawn from the user&#39;s wallet
-   * @return amount
+   * Get message
+   * @return message
    */
   @javax.annotation.Nonnull
-  public String getAmount() {
-    return amount;
+  public String getMessage() {
+    return message;
   }
 
-  public void setAmount(@javax.annotation.Nonnull String amount) {
-    this.amount = amount;
-  }
-
-
-  public CreateCryptoTransferRequest asset(@javax.annotation.Nonnull String asset) {
-    this.asset = asset;
-    return this;
-  }
-
-  /**
-   * The crypto asset symbol, e.g. BTC, ETH, USDT.
-   * @return asset
-   */
-  @javax.annotation.Nonnull
-  public String getAsset() {
-    return asset;
-  }
-
-  public void setAsset(@javax.annotation.Nonnull String asset) {
-    this.asset = asset;
-  }
-
-
-  public CreateCryptoTransferRequest chain(@javax.annotation.Nullable CryptoChain chain) {
-    this.chain = chain;
-    return this;
-  }
-
-  /**
-   * Get chain
-   * @return chain
-   */
-  @javax.annotation.Nullable
-  public CryptoChain getChain() {
-    return chain;
-  }
-
-  public void setChain(@javax.annotation.Nullable CryptoChain chain) {
-    this.chain = chain;
+  public void setMessage(@javax.annotation.Nonnull String message) {
+    this.message = message;
   }
 
   /**
@@ -166,9 +117,9 @@ public class CreateCryptoTransferRequest implements Serializable {
    *
    * @param key name of the property
    * @param value value of the property
-   * @return the CreateCryptoTransferRequest instance itself
+   * @return the PortfolioHistoryError instance itself
    */
-  public CreateCryptoTransferRequest putAdditionalProperty(String key, Object value) {
+  public PortfolioHistoryError putAdditionalProperty(String key, Object value) {
     if (this.additionalProperties == null) {
         this.additionalProperties = new HashMap<String, Object>();
     }
@@ -207,27 +158,23 @@ public class CreateCryptoTransferRequest implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateCryptoTransferRequest createCryptoTransferRequest = (CreateCryptoTransferRequest) o;
-    return Objects.equals(this.address, createCryptoTransferRequest.address) &&
-        Objects.equals(this.amount, createCryptoTransferRequest.amount) &&
-        Objects.equals(this.asset, createCryptoTransferRequest.asset) &&
-        Objects.equals(this.chain, createCryptoTransferRequest.chain)&&
-        Objects.equals(this.additionalProperties, createCryptoTransferRequest.additionalProperties);
+    PortfolioHistoryError portfolioHistoryError = (PortfolioHistoryError) o;
+    return Objects.equals(this.code, portfolioHistoryError.code) &&
+        Objects.equals(this.message, portfolioHistoryError.message)&&
+        Objects.equals(this.additionalProperties, portfolioHistoryError.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(address, amount, asset, chain, additionalProperties);
+    return Objects.hash(code, message, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateCryptoTransferRequest {\n");
-    sb.append("    address: ").append(toIndentedString(address)).append("\n");
-    sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
-    sb.append("    asset: ").append(toIndentedString(asset)).append("\n");
-    sb.append("    chain: ").append(toIndentedString(chain)).append("\n");
+    sb.append("class PortfolioHistoryError {\n");
+    sb.append("    code: ").append(toIndentedString(code)).append("\n");
+    sb.append("    message: ").append(toIndentedString(message)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -247,44 +194,34 @@ public class CreateCryptoTransferRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("address", "amount", "asset", "chain"));
+    openapiFields = new HashSet<String>(Arrays.asList("code", "message"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("address", "amount", "asset"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("code", "message"));
   }
 
   /**
    * Validates the JSON Element and throws an exception if issues found
    *
    * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to CreateCryptoTransferRequest
+   * @throws IOException if the JSON Element is invalid with respect to PortfolioHistoryError
    */
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
       if (jsonElement == null) {
-        if (!CreateCryptoTransferRequest.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in CreateCryptoTransferRequest is not found in the empty JSON string", CreateCryptoTransferRequest.openapiRequiredFields.toString()));
+        if (!PortfolioHistoryError.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PortfolioHistoryError is not found in the empty JSON string", PortfolioHistoryError.openapiRequiredFields.toString()));
         }
       }
 
       // check to make sure all required properties/fields are present in the JSON string
-      for (String requiredField : CreateCryptoTransferRequest.openapiRequiredFields) {
+      for (String requiredField : PortfolioHistoryError.openapiRequiredFields) {
         if (jsonElement.getAsJsonObject().get(requiredField) == null) {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if (!jsonObj.get("address").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `address` to be a primitive type in the JSON string but got `%s`", jsonObj.get("address").toString()));
-      }
-      if (!jsonObj.get("amount").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `amount` to be a primitive type in the JSON string but got `%s`", jsonObj.get("amount").toString()));
-      }
-      if (!jsonObj.get("asset").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `asset` to be a primitive type in the JSON string but got `%s`", jsonObj.get("asset").toString()));
-      }
-      // validate the optional field `chain`
-      if (jsonObj.get("chain") != null && !jsonObj.get("chain").isJsonNull()) {
-        CryptoChain.validateJsonElement(jsonObj.get("chain"));
+      if (!jsonObj.get("message").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `message` to be a primitive type in the JSON string but got `%s`", jsonObj.get("message").toString()));
       }
   }
 
@@ -292,16 +229,16 @@ public class CreateCryptoTransferRequest implements Serializable {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!CreateCryptoTransferRequest.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'CreateCryptoTransferRequest' and its subtypes
+       if (!PortfolioHistoryError.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'PortfolioHistoryError' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<CreateCryptoTransferRequest> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(CreateCryptoTransferRequest.class));
+       final TypeAdapter<PortfolioHistoryError> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(PortfolioHistoryError.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<CreateCryptoTransferRequest>() {
+       return (TypeAdapter<T>) new TypeAdapter<PortfolioHistoryError>() {
            @Override
-           public void write(JsonWriter out, CreateCryptoTransferRequest value) throws IOException {
+           public void write(JsonWriter out, PortfolioHistoryError value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              obj.remove("additionalProperties");
              // serialize additional properties
@@ -331,12 +268,12 @@ public class CreateCryptoTransferRequest implements Serializable {
            }
 
            @Override
-           public CreateCryptoTransferRequest read(JsonReader in) throws IOException {
+           public PortfolioHistoryError read(JsonReader in) throws IOException {
              JsonElement jsonElement = elementAdapter.read(in);
              validateJsonElement(jsonElement);
              JsonObject jsonObj = jsonElement.getAsJsonObject();
              // store additional fields in the deserialized instance
-             CreateCryptoTransferRequest instance = thisAdapter.fromJsonTree(jsonObj);
+             PortfolioHistoryError instance = thisAdapter.fromJsonTree(jsonObj);
              for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
                if (!openapiFields.contains(entry.getKey())) {
                  if (entry.getValue().isJsonPrimitive()) { // primitive type
@@ -363,18 +300,18 @@ public class CreateCryptoTransferRequest implements Serializable {
   }
 
   /**
-   * Create an instance of CreateCryptoTransferRequest given an JSON string
+   * Create an instance of PortfolioHistoryError given an JSON string
    *
    * @param jsonString JSON string
-   * @return An instance of CreateCryptoTransferRequest
-   * @throws IOException if the JSON string is invalid with respect to CreateCryptoTransferRequest
+   * @return An instance of PortfolioHistoryError
+   * @throws IOException if the JSON string is invalid with respect to PortfolioHistoryError
    */
-  public static CreateCryptoTransferRequest fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, CreateCryptoTransferRequest.class);
+  public static PortfolioHistoryError fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, PortfolioHistoryError.class);
   }
 
   /**
-   * Convert an instance of CreateCryptoTransferRequest to an JSON string
+   * Convert an instance of PortfolioHistoryError to an JSON string
    *
    * @return JSON string
    */

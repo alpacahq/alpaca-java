@@ -29,6 +29,7 @@ import java.util.UUID;
 import markets.alpaca.client.openapi.broker.model.AssetClass;
 import markets.alpaca.client.openapi.broker.model.CommissionType;
 import markets.alpaca.client.openapi.broker.model.OrderClass;
+import markets.alpaca.client.openapi.broker.model.OrderGroupRole;
 import markets.alpaca.client.openapi.broker.model.OrderSide;
 import markets.alpaca.client.openapi.broker.model.OrderStatus;
 import markets.alpaca.client.openapi.broker.model.OrderType;
@@ -138,6 +139,16 @@ public class OrderLeg implements Serializable {
   @javax.annotation.Nullable
   private BigDecimal filledQty;
 
+  public static final String SERIALIZED_NAME_GROUP_ID = "group_id";
+  @SerializedName(SERIALIZED_NAME_GROUP_ID)
+  @javax.annotation.Nullable
+  private UUID groupId;
+
+  public static final String SERIALIZED_NAME_GROUP_ROLE = "group_role";
+  @SerializedName(SERIALIZED_NAME_GROUP_ROLE)
+  @javax.annotation.Nullable
+  private OrderGroupRole groupRole;
+
   public static final String SERIALIZED_NAME_HWM = "hwm";
   @SerializedName(SERIALIZED_NAME_HWM)
   @javax.annotation.Nullable
@@ -197,6 +208,11 @@ public class OrderLeg implements Serializable {
   @SerializedName(SERIALIZED_NAME_REPLACES)
   @javax.annotation.Nullable
   private UUID replaces;
+
+  public static final String SERIALIZED_NAME_SETTLEMENT_CURRENCY = "settlement_currency";
+  @SerializedName(SERIALIZED_NAME_SETTLEMENT_CURRENCY)
+  @javax.annotation.Nullable
+  private String settlementCurrency;
 
   public static final String SERIALIZED_NAME_SIDE = "side";
   @SerializedName(SERIALIZED_NAME_SIDE)
@@ -536,6 +552,44 @@ public class OrderLeg implements Serializable {
   }
 
 
+  public OrderLeg groupId(@javax.annotation.Nullable UUID groupId) {
+    this.groupId = groupId;
+    return this;
+  }
+
+  /**
+   * Opaque identifier shared by every order in the same &#x60;bracket&#x60;, &#x60;oto&#x60;, or &#x60;oco&#x60; order, including its legs and any replacement orders. Use it to associate related orders received from the &#x60;trade_updates&#x60; stream, where &#x60;legs&#x60; is not populated. Omitted for other orders.
+   * @return groupId
+   */
+  @javax.annotation.Nullable
+  public UUID getGroupId() {
+    return groupId;
+  }
+
+  public void setGroupId(@javax.annotation.Nullable UUID groupId) {
+    this.groupId = groupId;
+  }
+
+
+  public OrderLeg groupRole(@javax.annotation.Nullable OrderGroupRole groupRole) {
+    this.groupRole = groupRole;
+    return this;
+  }
+
+  /**
+   * Get groupRole
+   * @return groupRole
+   */
+  @javax.annotation.Nullable
+  public OrderGroupRole getGroupRole() {
+    return groupRole;
+  }
+
+  public void setGroupRole(@javax.annotation.Nullable OrderGroupRole groupRole) {
+    this.groupRole = groupRole;
+  }
+
+
   public OrderLeg hwm(@javax.annotation.Nullable BigDecimal hwm) {
     this.hwm = hwm;
     return this;
@@ -769,6 +823,25 @@ public class OrderLeg implements Serializable {
 
   public void setReplaces(@javax.annotation.Nullable UUID replaces) {
     this.replaces = replaces;
+  }
+
+
+  public OrderLeg settlementCurrency(@javax.annotation.Nullable String settlementCurrency) {
+    this.settlementCurrency = settlementCurrency;
+    return this;
+  }
+
+  /**
+   * Settlement currency of the order. Omitted when the order has none.
+   * @return settlementCurrency
+   */
+  @javax.annotation.Nullable
+  public String getSettlementCurrency() {
+    return settlementCurrency;
+  }
+
+  public void setSettlementCurrency(@javax.annotation.Nullable String settlementCurrency) {
+    this.settlementCurrency = settlementCurrency;
   }
 
 
@@ -1087,6 +1160,8 @@ public class OrderLeg implements Serializable {
         Objects.equals(this.filledAt, orderLeg.filledAt) &&
         Objects.equals(this.filledAvgPrice, orderLeg.filledAvgPrice) &&
         Objects.equals(this.filledQty, orderLeg.filledQty) &&
+        Objects.equals(this.groupId, orderLeg.groupId) &&
+        Objects.equals(this.groupRole, orderLeg.groupRole) &&
         Objects.equals(this.hwm, orderLeg.hwm) &&
         Objects.equals(this.id, orderLeg.id) &&
         Objects.equals(this.legs, orderLeg.legs) &&
@@ -1099,6 +1174,7 @@ public class OrderLeg implements Serializable {
         Objects.equals(this.replacedAt, orderLeg.replacedAt) &&
         Objects.equals(this.replacedBy, orderLeg.replacedBy) &&
         Objects.equals(this.replaces, orderLeg.replaces) &&
+        Objects.equals(this.settlementCurrency, orderLeg.settlementCurrency) &&
         Objects.equals(this.side, orderLeg.side) &&
         Objects.equals(this.status, orderLeg.status) &&
         Objects.equals(this.stopPrice, orderLeg.stopPrice) &&
@@ -1117,7 +1193,7 @@ public class OrderLeg implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(assetClass, assetId, canceledAt, clientOrderId, commission, commissionBps, commissionType, createdAt, expiredAt, extendedHours, failedAt, filledAt, filledAvgPrice, filledQty, hwm, id, legs, limitPrice, notional, orderClass, orderType, positionIntent, qty, replacedAt, replacedBy, replaces, side, status, stopPrice, submittedAt, swapFeeBps, swapRate, symbol, timeInForce, trailPercent, trailPrice, type, updatedAt, usd, additionalProperties);
+    return Objects.hash(assetClass, assetId, canceledAt, clientOrderId, commission, commissionBps, commissionType, createdAt, expiredAt, extendedHours, failedAt, filledAt, filledAvgPrice, filledQty, groupId, groupRole, hwm, id, legs, limitPrice, notional, orderClass, orderType, positionIntent, qty, replacedAt, replacedBy, replaces, settlementCurrency, side, status, stopPrice, submittedAt, swapFeeBps, swapRate, symbol, timeInForce, trailPercent, trailPrice, type, updatedAt, usd, additionalProperties);
   }
 
   @Override
@@ -1138,6 +1214,8 @@ public class OrderLeg implements Serializable {
     sb.append("    filledAt: ").append(toIndentedString(filledAt)).append("\n");
     sb.append("    filledAvgPrice: ").append(toIndentedString(filledAvgPrice)).append("\n");
     sb.append("    filledQty: ").append(toIndentedString(filledQty)).append("\n");
+    sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
+    sb.append("    groupRole: ").append(toIndentedString(groupRole)).append("\n");
     sb.append("    hwm: ").append(toIndentedString(hwm)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    legs: ").append(toIndentedString(legs)).append("\n");
@@ -1150,6 +1228,7 @@ public class OrderLeg implements Serializable {
     sb.append("    replacedAt: ").append(toIndentedString(replacedAt)).append("\n");
     sb.append("    replacedBy: ").append(toIndentedString(replacedBy)).append("\n");
     sb.append("    replaces: ").append(toIndentedString(replaces)).append("\n");
+    sb.append("    settlementCurrency: ").append(toIndentedString(settlementCurrency)).append("\n");
     sb.append("    side: ").append(toIndentedString(side)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    stopPrice: ").append(toIndentedString(stopPrice)).append("\n");
@@ -1182,7 +1261,7 @@ public class OrderLeg implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("asset_class", "asset_id", "canceled_at", "client_order_id", "commission", "commission_bps", "commission_type", "created_at", "expired_at", "extended_hours", "failed_at", "filled_at", "filled_avg_price", "filled_qty", "hwm", "id", "legs", "limit_price", "notional", "order_class", "order_type", "position_intent", "qty", "replaced_at", "replaced_by", "replaces", "side", "status", "stop_price", "submitted_at", "swap_fee_bps", "swap_rate", "symbol", "time_in_force", "trail_percent", "trail_price", "type", "updated_at", "usd"));
+    openapiFields = new HashSet<String>(Arrays.asList("asset_class", "asset_id", "canceled_at", "client_order_id", "commission", "commission_bps", "commission_type", "created_at", "expired_at", "extended_hours", "failed_at", "filled_at", "filled_avg_price", "filled_qty", "group_id", "group_role", "hwm", "id", "legs", "limit_price", "notional", "order_class", "order_type", "position_intent", "qty", "replaced_at", "replaced_by", "replaces", "settlement_currency", "side", "status", "stop_price", "submitted_at", "swap_fee_bps", "swap_rate", "symbol", "time_in_force", "trail_percent", "trail_price", "type", "updated_at", "usd"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "symbol"));
@@ -1234,6 +1313,13 @@ public class OrderLeg implements Serializable {
       if ((jsonObj.get("filled_qty") != null && !jsonObj.get("filled_qty").isJsonNull()) && !jsonObj.get("filled_qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `filled_qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("filled_qty").toString()));
       }
+      if ((jsonObj.get("group_id") != null && !jsonObj.get("group_id").isJsonNull()) && !jsonObj.get("group_id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `group_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("group_id").toString()));
+      }
+      // validate the optional field `group_role`
+      if (jsonObj.get("group_role") != null && !jsonObj.get("group_role").isJsonNull()) {
+        OrderGroupRole.validateJsonElement(jsonObj.get("group_role"));
+      }
       if ((jsonObj.get("hwm") != null && !jsonObj.get("hwm").isJsonNull()) && !jsonObj.get("hwm").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `hwm` to be a primitive type in the JSON string but got `%s`", jsonObj.get("hwm").toString()));
       }
@@ -1270,6 +1356,9 @@ public class OrderLeg implements Serializable {
       }
       if ((jsonObj.get("replaces") != null && !jsonObj.get("replaces").isJsonNull()) && !jsonObj.get("replaces").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `replaces` to be a primitive type in the JSON string but got `%s`", jsonObj.get("replaces").toString()));
+      }
+      if ((jsonObj.get("settlement_currency") != null && !jsonObj.get("settlement_currency").isJsonNull()) && !jsonObj.get("settlement_currency").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `settlement_currency` to be a primitive type in the JSON string but got `%s`", jsonObj.get("settlement_currency").toString()));
       }
       // validate the optional field `side`
       if (jsonObj.get("side") != null && !jsonObj.get("side").isJsonNull()) {

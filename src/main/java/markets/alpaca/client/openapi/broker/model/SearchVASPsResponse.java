@@ -74,7 +74,7 @@ public class SearchVASPsResponse implements Serializable {
 
   public static final String SERIALIZED_NAME_VASPS = "vasps";
   @SerializedName(SERIALIZED_NAME_VASPS)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private List<VASP> vasps = new ArrayList<>();
 
   public SearchVASPsResponse() {
@@ -137,7 +137,7 @@ public class SearchVASPsResponse implements Serializable {
   }
 
 
-  public SearchVASPsResponse vasps(@javax.annotation.Nullable List<VASP> vasps) {
+  public SearchVASPsResponse vasps(@javax.annotation.Nonnull List<VASP> vasps) {
     this.vasps = vasps;
     return this;
   }
@@ -154,12 +154,12 @@ public class SearchVASPsResponse implements Serializable {
    * Get vasps
    * @return vasps
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public List<VASP> getVasps() {
     return vasps;
   }
 
-  public void setVasps(@javax.annotation.Nullable List<VASP> vasps) {
+  public void setVasps(@javax.annotation.Nonnull List<VASP> vasps) {
     this.vasps = vasps;
   }
 
@@ -260,7 +260,7 @@ public class SearchVASPsResponse implements Serializable {
     openapiFields = new HashSet<String>(Arrays.asList("page", "pages", "total", "vasps"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("vasps"));
   }
 
   /**
@@ -275,19 +275,22 @@ public class SearchVASPsResponse implements Serializable {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in SearchVASPsResponse is not found in the empty JSON string", SearchVASPsResponse.openapiRequiredFields.toString()));
         }
       }
-        JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if (jsonObj.get("vasps") != null && !jsonObj.get("vasps").isJsonNull()) {
-        JsonArray jsonArrayvasps = jsonObj.getAsJsonArray("vasps");
-        if (jsonArrayvasps != null) {
-          // ensure the json data is an array
-          if (!jsonObj.get("vasps").isJsonArray()) {
-            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `vasps` to be an array in the JSON string but got `%s`", jsonObj.get("vasps").toString()));
-          }
 
-          // validate the optional field `vasps` (array)
-          for (int i = 0; i < jsonArrayvasps.size(); i++) {
-            VASP.validateJsonElement(jsonArrayvasps.get(i));
-          };
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : SearchVASPsResponse.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
+        JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if (jsonObj.get("vasps") != null) {
+        if (!jsonObj.get("vasps").isJsonArray()) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `vasps` to be an array in the JSON string but got `%s`", jsonObj.get("vasps").toString()));
+        }
+        JsonArray jsonArrayvasps = jsonObj.getAsJsonArray("vasps");
+        // validate the required field `vasps` (array)
+        for (int i = 0; i < jsonArrayvasps.size(); i++) {
+          VASP.validateJsonElement(jsonArrayvasps.get(i));
         }
       }
   }

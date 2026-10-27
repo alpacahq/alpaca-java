@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.UUID;
@@ -66,10 +67,25 @@ public class FEEActivityV2 implements Serializable {
   @javax.annotation.Nonnull
   private LocalDate systemDate;
 
+  public static final String SERIALIZED_NAME_EXECUTION_ID = "execution_id";
+  @SerializedName(SERIALIZED_NAME_EXECUTION_ID)
+  @javax.annotation.Nullable
+  private UUID executionId;
+
+  public static final String SERIALIZED_NAME_ORDER_ID = "order_id";
+  @SerializedName(SERIALIZED_NAME_ORDER_ID)
+  @javax.annotation.Nullable
+  private UUID orderId;
+
   public static final String SERIALIZED_NAME_PARENT_ID = "parent_id";
   @SerializedName(SERIALIZED_NAME_PARENT_ID)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private UUID parentId;
+
+  public static final String SERIALIZED_NAME_SWAP_RATE = "swap_rate";
+  @SerializedName(SERIALIZED_NAME_SWAP_RATE)
+  @javax.annotation.Nullable
+  private BigDecimal swapRate;
 
   public FEEActivityV2() {
   }
@@ -112,22 +128,79 @@ public class FEEActivityV2 implements Serializable {
   }
 
 
-  public FEEActivityV2 parentId(@javax.annotation.Nonnull UUID parentId) {
+  public FEEActivityV2 executionId(@javax.annotation.Nullable UUID executionId) {
+    this.executionId = executionId;
+    return this;
+  }
+
+  /**
+   * Execution ID. Present only for activity subtype FOT, and only when the fee has one.
+   * @return executionId
+   */
+  @javax.annotation.Nullable
+  public UUID getExecutionId() {
+    return executionId;
+  }
+
+  public void setExecutionId(@javax.annotation.Nullable UUID executionId) {
+    this.executionId = executionId;
+  }
+
+
+  public FEEActivityV2 orderId(@javax.annotation.Nullable UUID orderId) {
+    this.orderId = orderId;
+    return this;
+  }
+
+  /**
+   * Order ID. Present only for activity subtype FOT, and only when the fee has one.
+   * @return orderId
+   */
+  @javax.annotation.Nullable
+  public UUID getOrderId() {
+    return orderId;
+  }
+
+  public void setOrderId(@javax.annotation.Nullable UUID orderId) {
+    this.orderId = orderId;
+  }
+
+
+  public FEEActivityV2 parentId(@javax.annotation.Nullable UUID parentId) {
     this.parentId = parentId;
     return this;
   }
 
   /**
-   * The parent transaction&#39;s ID
+   * The parent transaction&#39;s ID. Present for fees with a one-to-one relationship to a parent trade (e.g. COM). Omitted for volume-based or bulk fees charged across multiple trades for a period (e.g. REG, TAF, CAT, ORF, NRV, NRC, BSWP) and for LOC fees that are not linked to a parent transaction.
    * @return parentId
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public UUID getParentId() {
     return parentId;
   }
 
-  public void setParentId(@javax.annotation.Nonnull UUID parentId) {
+  public void setParentId(@javax.annotation.Nullable UUID parentId) {
     this.parentId = parentId;
+  }
+
+
+  public FEEActivityV2 swapRate(@javax.annotation.Nullable BigDecimal swapRate) {
+    this.swapRate = swapRate;
+    return this;
+  }
+
+  /**
+   * Exchange rate on the fee. Sent when the fee has a non-zero rate.
+   * @return swapRate
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getSwapRate() {
+    return swapRate;
+  }
+
+  public void setSwapRate(@javax.annotation.Nullable BigDecimal swapRate) {
+    this.swapRate = swapRate;
   }
 
   /**
@@ -187,13 +260,16 @@ public class FEEActivityV2 implements Serializable {
     FEEActivityV2 feEActivityV2 = (FEEActivityV2) o;
     return Objects.equals(this.groupId, feEActivityV2.groupId) &&
         Objects.equals(this.systemDate, feEActivityV2.systemDate) &&
-        Objects.equals(this.parentId, feEActivityV2.parentId)&&
+        Objects.equals(this.executionId, feEActivityV2.executionId) &&
+        Objects.equals(this.orderId, feEActivityV2.orderId) &&
+        Objects.equals(this.parentId, feEActivityV2.parentId) &&
+        Objects.equals(this.swapRate, feEActivityV2.swapRate)&&
         Objects.equals(this.additionalProperties, feEActivityV2.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, systemDate, parentId, additionalProperties);
+    return Objects.hash(groupId, systemDate, executionId, orderId, parentId, swapRate, additionalProperties);
   }
 
   @Override
@@ -202,7 +278,10 @@ public class FEEActivityV2 implements Serializable {
     sb.append("class FEEActivityV2 {\n");
     sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
     sb.append("    systemDate: ").append(toIndentedString(systemDate)).append("\n");
+    sb.append("    executionId: ").append(toIndentedString(executionId)).append("\n");
+    sb.append("    orderId: ").append(toIndentedString(orderId)).append("\n");
     sb.append("    parentId: ").append(toIndentedString(parentId)).append("\n");
+    sb.append("    swapRate: ").append(toIndentedString(swapRate)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -222,10 +301,10 @@ public class FEEActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "parent_id"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "execution_id", "order_id", "parent_id", "swap_rate"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date", "parent_id"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date"));
   }
 
   /**
@@ -251,8 +330,17 @@ public class FEEActivityV2 implements Serializable {
       if ((jsonObj.get("group_id") != null && !jsonObj.get("group_id").isJsonNull()) && !jsonObj.get("group_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `group_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("group_id").toString()));
       }
-      if (!jsonObj.get("parent_id").isJsonPrimitive()) {
+      if ((jsonObj.get("execution_id") != null && !jsonObj.get("execution_id").isJsonNull()) && !jsonObj.get("execution_id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `execution_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("execution_id").toString()));
+      }
+      if ((jsonObj.get("order_id") != null && !jsonObj.get("order_id").isJsonNull()) && !jsonObj.get("order_id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `order_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("order_id").toString()));
+      }
+      if ((jsonObj.get("parent_id") != null && !jsonObj.get("parent_id").isJsonNull()) && !jsonObj.get("parent_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `parent_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("parent_id").toString()));
+      }
+      if ((jsonObj.get("swap_rate") != null && !jsonObj.get("swap_rate").isJsonNull()) && !jsonObj.get("swap_rate").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `swap_rate` to be a primitive type in the JSON string but got `%s`", jsonObj.get("swap_rate").toString()));
       }
   }
 

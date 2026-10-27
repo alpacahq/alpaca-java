@@ -87,22 +87,22 @@ public class BatchJournalResponseJNLS implements Serializable {
 
   public static final String SERIALIZED_NAME_NET_AMOUNT = "net_amount";
   @SerializedName(SERIALIZED_NAME_NET_AMOUNT)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private BigDecimal netAmount;
 
   public static final String SERIALIZED_NAME_PRICE = "price";
   @SerializedName(SERIALIZED_NAME_PRICE)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private BigDecimal price;
 
   public static final String SERIALIZED_NAME_QTY = "qty";
   @SerializedName(SERIALIZED_NAME_QTY)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private BigDecimal qty;
 
   public static final String SERIALIZED_NAME_SETTLE_DATE = "settle_date";
   @SerializedName(SERIALIZED_NAME_SETTLE_DATE)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private LocalDate settleDate;
 
   public static final String SERIALIZED_NAME_STATUS = "status";
@@ -112,12 +112,12 @@ public class BatchJournalResponseJNLS implements Serializable {
 
   public static final String SERIALIZED_NAME_SYMBOL = "symbol";
   @SerializedName(SERIALIZED_NAME_SYMBOL)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private String symbol;
 
   public static final String SERIALIZED_NAME_SYSTEM_DATE = "system_date";
   @SerializedName(SERIALIZED_NAME_SYSTEM_DATE)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private LocalDate systemDate;
 
   public static final String SERIALIZED_NAME_TO_ACCOUNT = "to_account";
@@ -288,7 +288,7 @@ public class BatchJournalResponseJNLS implements Serializable {
   }
 
 
-  public BatchJournalResponseJNLS netAmount(@javax.annotation.Nonnull BigDecimal netAmount) {
+  public BatchJournalResponseJNLS netAmount(@javax.annotation.Nullable BigDecimal netAmount) {
     this.netAmount = netAmount;
     return this;
   }
@@ -297,17 +297,17 @@ public class BatchJournalResponseJNLS implements Serializable {
    * The cash amount, or null when not applicable.
    * @return netAmount
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public BigDecimal getNetAmount() {
     return netAmount;
   }
 
-  public void setNetAmount(@javax.annotation.Nonnull BigDecimal netAmount) {
+  public void setNetAmount(@javax.annotation.Nullable BigDecimal netAmount) {
     this.netAmount = netAmount;
   }
 
 
-  public BatchJournalResponseJNLS price(@javax.annotation.Nonnull BigDecimal price) {
+  public BatchJournalResponseJNLS price(@javax.annotation.Nullable BigDecimal price) {
     this.price = price;
     return this;
   }
@@ -316,17 +316,17 @@ public class BatchJournalResponseJNLS implements Serializable {
    * The journaled security price, or null when not applicable.
    * @return price
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public BigDecimal getPrice() {
     return price;
   }
 
-  public void setPrice(@javax.annotation.Nonnull BigDecimal price) {
+  public void setPrice(@javax.annotation.Nullable BigDecimal price) {
     this.price = price;
   }
 
 
-  public BatchJournalResponseJNLS qty(@javax.annotation.Nonnull BigDecimal qty) {
+  public BatchJournalResponseJNLS qty(@javax.annotation.Nullable BigDecimal qty) {
     this.qty = qty;
     return this;
   }
@@ -335,17 +335,17 @@ public class BatchJournalResponseJNLS implements Serializable {
    * The journaled security quantity, or null when not applicable.
    * @return qty
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public BigDecimal getQty() {
     return qty;
   }
 
-  public void setQty(@javax.annotation.Nonnull BigDecimal qty) {
+  public void setQty(@javax.annotation.Nullable BigDecimal qty) {
     this.qty = qty;
   }
 
 
-  public BatchJournalResponseJNLS settleDate(@javax.annotation.Nonnull LocalDate settleDate) {
+  public BatchJournalResponseJNLS settleDate(@javax.annotation.Nullable LocalDate settleDate) {
     this.settleDate = settleDate;
     return this;
   }
@@ -354,12 +354,12 @@ public class BatchJournalResponseJNLS implements Serializable {
    * The settlement date, or null until one is assigned.
    * @return settleDate
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public LocalDate getSettleDate() {
     return settleDate;
   }
 
-  public void setSettleDate(@javax.annotation.Nonnull LocalDate settleDate) {
+  public void setSettleDate(@javax.annotation.Nullable LocalDate settleDate) {
     this.settleDate = settleDate;
   }
 
@@ -383,7 +383,7 @@ public class BatchJournalResponseJNLS implements Serializable {
   }
 
 
-  public BatchJournalResponseJNLS symbol(@javax.annotation.Nonnull String symbol) {
+  public BatchJournalResponseJNLS symbol(@javax.annotation.Nullable String symbol) {
     this.symbol = symbol;
     return this;
   }
@@ -392,17 +392,17 @@ public class BatchJournalResponseJNLS implements Serializable {
    * The journaled security symbol, or null for a cash journal.
    * @return symbol
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public String getSymbol() {
     return symbol;
   }
 
-  public void setSymbol(@javax.annotation.Nonnull String symbol) {
+  public void setSymbol(@javax.annotation.Nullable String symbol) {
     this.symbol = symbol;
   }
 
 
-  public BatchJournalResponseJNLS systemDate(@javax.annotation.Nonnull LocalDate systemDate) {
+  public BatchJournalResponseJNLS systemDate(@javax.annotation.Nullable LocalDate systemDate) {
     this.systemDate = systemDate;
     return this;
   }
@@ -411,12 +411,12 @@ public class BatchJournalResponseJNLS implements Serializable {
    * The booking-system date, or null until one is assigned.
    * @return systemDate
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public LocalDate getSystemDate() {
     return systemDate;
   }
 
-  public void setSystemDate(@javax.annotation.Nonnull LocalDate systemDate) {
+  public void setSystemDate(@javax.annotation.Nullable LocalDate systemDate) {
     this.systemDate = systemDate;
   }
 
@@ -652,18 +652,18 @@ public class BatchJournalResponseJNLS implements Serializable {
       if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if (!jsonObj.get("net_amount").isJsonPrimitive()) {
+      if ((jsonObj.get("net_amount") != null && !jsonObj.get("net_amount").isJsonNull()) && !jsonObj.get("net_amount").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `net_amount` to be a primitive type in the JSON string but got `%s`", jsonObj.get("net_amount").toString()));
       }
-      if (!jsonObj.get("price").isJsonPrimitive()) {
+      if ((jsonObj.get("price") != null && !jsonObj.get("price").isJsonNull()) && !jsonObj.get("price").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `price` to be a primitive type in the JSON string but got `%s`", jsonObj.get("price").toString()));
       }
-      if (!jsonObj.get("qty").isJsonPrimitive()) {
+      if ((jsonObj.get("qty") != null && !jsonObj.get("qty").isJsonNull()) && !jsonObj.get("qty").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `qty` to be a primitive type in the JSON string but got `%s`", jsonObj.get("qty").toString()));
       }
       // validate the required field `status`
       JournalStatus.validateJsonElement(jsonObj.get("status"));
-      if (!jsonObj.get("symbol").isJsonPrimitive()) {
+      if ((jsonObj.get("symbol") != null && !jsonObj.get("symbol").isJsonNull()) && !jsonObj.get("symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
       }
       if (!jsonObj.get("to_account").isJsonPrimitive()) {
