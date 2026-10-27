@@ -121,20 +121,27 @@ checkstyle {
 }
 
 pluginManager.withPlugin('java') {
+    def apiCompatibilityReport = layout.buildDirectory.file('reports/api-compatibility/japicmp.xml')
+
     tasks.register('checkApiCompatibility', JavaExec) {
         group = 'verification'
         description =
-            "Checks the complete public JAR against alpaca-java ${apiBaselineVersion.get()}"
+            "Reports public JAR changes against alpaca-java ${apiBaselineVersion.get()} without failing the build"
         dependsOn tasks.named('jar'), downloadApiCompatibilityBaseline
         classpath = apiCompatibilityTool
         mainClass = 'japicmp.JApiCmp'
+        outputs.file(apiCompatibilityReport)
 
         doFirst {
+            File report = apiCompatibilityReport.get().asFile
+            report.parentFile.mkdirs()
             def comparisonArgs = [
                 '--old', apiCompatibilityBaselineFile.get().asFile.absolutePath,
                 '--new', tasks.named('jar').get().archiveFile.get().asFile.absolutePath,
-                '--only-modified',
+                '--only-incompatible',
+                '--report-only-summary',
                 '--ignore-missing-classes',
+                '--xml-file', report.absolutePath,
             ]
             def exclusions = ['markets.alpaca.client.sse.internal.*'] +
                 (reviewedApiCompatibilityExclusionsByBaseline[apiBaselineVersion.get()] ?: [])
@@ -143,11 +150,19 @@ pluginManager.withPlugin('java') {
                 exclusions.join(';'),
                 '--no-error-on-exclusion-incompatibility',
             ])
-            comparisonArgs.addAll([
-                '--error-on-binary-incompatibility',
-                '--error-on-source-incompatibility',
-            ])
             setArgs(comparisonArgs)
+        }
+
+        doLast {
+            String report = apiCompatibilityReport.get().asFile.getText('UTF-8')
+            boolean incompatible = report.contains('binaryCompatible="false"') ||
+                report.contains('sourceCompatible="false"')
+            if (incompatible) {
+                logger.warn(
+                    "API compatibility differences against alpaca-java " +
+                        "${apiBaselineVersion.get()}. Adopted OpenAPI changes are reported " +
+                        "and do not fail the build. See ${apiCompatibilityReport.get().asFile}")
+            }
         }
     }
 

@@ -30,7 +30,9 @@ import com.google.gson.stream.JsonWriter;
 @JsonAdapter(AdminActionCreatedByKind.Adapter.class)
 public enum AdminActionCreatedByKind implements Serializable {
   
-  ADMIN("admin");
+  ADMIN("admin"),
+  
+  SERVICE("service");
 
   private String value;
 

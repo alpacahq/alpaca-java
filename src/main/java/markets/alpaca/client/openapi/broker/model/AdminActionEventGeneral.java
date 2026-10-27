@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import markets.alpaca.client.openapi.broker.model.AdminActionBelongsTo;
+import markets.alpaca.client.openapi.broker.model.AdminActionBelongsToKind;
 import markets.alpaca.client.openapi.broker.model.AdminActionCategory;
 import markets.alpaca.client.openapi.broker.model.AdminActionCreatedBy;
+import markets.alpaca.client.openapi.broker.model.AdminActionCreatedByKind;
 import markets.alpaca.client.openapi.broker.model.AdminActionType;
 import markets.alpaca.client.openapi.broker.model.AdminActionVisibility;
 import java.io.Serializable;
@@ -66,9 +68,20 @@ public class AdminActionEventGeneral implements Serializable {
   private OffsetDateTime at;
 
   public static final String SERIALIZED_NAME_BELONGS_TO = "belongs_to";
+  @Deprecated
   @SerializedName(SERIALIZED_NAME_BELONGS_TO)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private AdminActionBelongsTo belongsTo;
+
+  public static final String SERIALIZED_NAME_BELONGS_TO_ID_REFERENCE = "belongs_to_id_reference";
+  @SerializedName(SERIALIZED_NAME_BELONGS_TO_ID_REFERENCE)
+  @javax.annotation.Nonnull
+  private String belongsToIdReference;
+
+  public static final String SERIALIZED_NAME_BELONGS_TO_KIND = "belongs_to_kind";
+  @SerializedName(SERIALIZED_NAME_BELONGS_TO_KIND)
+  @javax.annotation.Nonnull
+  private AdminActionBelongsToKind belongsToKind;
 
   public static final String SERIALIZED_NAME_CATEGORY = "category";
   @SerializedName(SERIALIZED_NAME_CATEGORY)
@@ -81,9 +94,20 @@ public class AdminActionEventGeneral implements Serializable {
   private String correspondent;
 
   public static final String SERIALIZED_NAME_CREATED_BY = "created_by";
+  @Deprecated
   @SerializedName(SERIALIZED_NAME_CREATED_BY)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private AdminActionCreatedBy createdBy;
+
+  public static final String SERIALIZED_NAME_CREATED_BY_ID_REFERENCE = "created_by_id_reference";
+  @SerializedName(SERIALIZED_NAME_CREATED_BY_ID_REFERENCE)
+  @javax.annotation.Nonnull
+  private String createdByIdReference;
+
+  public static final String SERIALIZED_NAME_CREATED_BY_KIND = "created_by_kind";
+  @SerializedName(SERIALIZED_NAME_CREATED_BY_KIND)
+  @javax.annotation.Nonnull
+  private AdminActionCreatedByKind createdByKind;
 
   public static final String SERIALIZED_NAME_EVENT_ID = "event_id";
   @SerializedName(SERIALIZED_NAME_EVENT_ID)
@@ -132,22 +156,64 @@ public class AdminActionEventGeneral implements Serializable {
   }
 
 
-  public AdminActionEventGeneral belongsTo(@javax.annotation.Nonnull AdminActionBelongsTo belongsTo) {
+  @Deprecated
+  public AdminActionEventGeneral belongsTo(@javax.annotation.Nullable AdminActionBelongsTo belongsTo) {
     this.belongsTo = belongsTo;
     return this;
   }
 
   /**
-   * Get belongsTo
+   * **Deprecation notice:** Never sent by the stream. Use belongs_to_kind and belongs_to_id_reference instead.  Since: 2026-09-30 Sunset: 2027-01-13  ---  Deprecated. Not sent by the stream; use &#x60;belongs_to_kind&#x60; and &#x60;belongs_to_id_reference&#x60; instead.
    * @return belongsTo
+   * @deprecated
    */
-  @javax.annotation.Nonnull
+  @Deprecated
+  @javax.annotation.Nullable
   public AdminActionBelongsTo getBelongsTo() {
     return belongsTo;
   }
 
-  public void setBelongsTo(@javax.annotation.Nonnull AdminActionBelongsTo belongsTo) {
+  @Deprecated
+  public void setBelongsTo(@javax.annotation.Nullable AdminActionBelongsTo belongsTo) {
     this.belongsTo = belongsTo;
+  }
+
+
+  public AdminActionEventGeneral belongsToIdReference(@javax.annotation.Nonnull String belongsToIdReference) {
+    this.belongsToIdReference = belongsToIdReference;
+    return this;
+  }
+
+  /**
+   * The ID of the entity that this event belongs to
+   * @return belongsToIdReference
+   */
+  @javax.annotation.Nonnull
+  public String getBelongsToIdReference() {
+    return belongsToIdReference;
+  }
+
+  public void setBelongsToIdReference(@javax.annotation.Nonnull String belongsToIdReference) {
+    this.belongsToIdReference = belongsToIdReference;
+  }
+
+
+  public AdminActionEventGeneral belongsToKind(@javax.annotation.Nonnull AdminActionBelongsToKind belongsToKind) {
+    this.belongsToKind = belongsToKind;
+    return this;
+  }
+
+  /**
+   * Get belongsToKind
+   * @return belongsToKind
+   */
+  @javax.annotation.Nonnull
+  public AdminActionBelongsToKind getBelongsToKind() {
+    return belongsToKind;
+  }
+
+  public void setBelongsToKind(@javax.annotation.Nonnull AdminActionBelongsToKind belongsToKind) {
+    this.belongsToKind = belongsToKind;
   }
 
 
@@ -189,22 +255,64 @@ public class AdminActionEventGeneral implements Serializable {
   }
 
 
-  public AdminActionEventGeneral createdBy(@javax.annotation.Nonnull AdminActionCreatedBy createdBy) {
+  @Deprecated
+  public AdminActionEventGeneral createdBy(@javax.annotation.Nullable AdminActionCreatedBy createdBy) {
     this.createdBy = createdBy;
     return this;
   }
 
   /**
-   * Get createdBy
+   * **Deprecation notice:** Never sent by the stream. Use created_by_kind and created_by_id_reference instead.  Since: 2026-09-30 Sunset: 2027-01-13  ---  Deprecated. Not sent by the stream; use &#x60;created_by_kind&#x60; and &#x60;created_by_id_reference&#x60; instead.
    * @return createdBy
+   * @deprecated
    */
-  @javax.annotation.Nonnull
+  @Deprecated
+  @javax.annotation.Nullable
   public AdminActionCreatedBy getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(@javax.annotation.Nonnull AdminActionCreatedBy createdBy) {
+  @Deprecated
+  public void setCreatedBy(@javax.annotation.Nullable AdminActionCreatedBy createdBy) {
     this.createdBy = createdBy;
+  }
+
+
+  public AdminActionEventGeneral createdByIdReference(@javax.annotation.Nonnull String createdByIdReference) {
+    this.createdByIdReference = createdByIdReference;
+    return this;
+  }
+
+  /**
+   * The ID of the entity that created this event
+   * @return createdByIdReference
+   */
+  @javax.annotation.Nonnull
+  public String getCreatedByIdReference() {
+    return createdByIdReference;
+  }
+
+  public void setCreatedByIdReference(@javax.annotation.Nonnull String createdByIdReference) {
+    this.createdByIdReference = createdByIdReference;
+  }
+
+
+  public AdminActionEventGeneral createdByKind(@javax.annotation.Nonnull AdminActionCreatedByKind createdByKind) {
+    this.createdByKind = createdByKind;
+    return this;
+  }
+
+  /**
+   * Get createdByKind
+   * @return createdByKind
+   */
+  @javax.annotation.Nonnull
+  public AdminActionCreatedByKind getCreatedByKind() {
+    return createdByKind;
+  }
+
+  public void setCreatedByKind(@javax.annotation.Nonnull AdminActionCreatedByKind createdByKind) {
+    this.createdByKind = createdByKind;
   }
 
 
@@ -359,9 +467,13 @@ public class AdminActionEventGeneral implements Serializable {
     AdminActionEventGeneral adminActionEventGeneral = (AdminActionEventGeneral) o;
     return Objects.equals(this.at, adminActionEventGeneral.at) &&
         Objects.equals(this.belongsTo, adminActionEventGeneral.belongsTo) &&
+        Objects.equals(this.belongsToIdReference, adminActionEventGeneral.belongsToIdReference) &&
+        Objects.equals(this.belongsToKind, adminActionEventGeneral.belongsToKind) &&
         Objects.equals(this.category, adminActionEventGeneral.category) &&
         Objects.equals(this.correspondent, adminActionEventGeneral.correspondent) &&
         Objects.equals(this.createdBy, adminActionEventGeneral.createdBy) &&
+        Objects.equals(this.createdByIdReference, adminActionEventGeneral.createdByIdReference) &&
+        Objects.equals(this.createdByKind, adminActionEventGeneral.createdByKind) &&
         Objects.equals(this.eventId, adminActionEventGeneral.eventId) &&
         Objects.equals(this.note, adminActionEventGeneral.note) &&
         Objects.equals(this.replacesEventId, adminActionEventGeneral.replacesEventId) &&
@@ -372,7 +484,7 @@ public class AdminActionEventGeneral implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(at, belongsTo, category, correspondent, createdBy, eventId, note, replacesEventId, type, visibility, additionalProperties);
+    return Objects.hash(at, belongsTo, belongsToIdReference, belongsToKind, category, correspondent, createdBy, createdByIdReference, createdByKind, eventId, note, replacesEventId, type, visibility, additionalProperties);
   }
 
   @Override
@@ -381,9 +493,13 @@ public class AdminActionEventGeneral implements Serializable {
     sb.append("class AdminActionEventGeneral {\n");
     sb.append("    at: ").append(toIndentedString(at)).append("\n");
     sb.append("    belongsTo: ").append(toIndentedString(belongsTo)).append("\n");
+    sb.append("    belongsToIdReference: ").append(toIndentedString(belongsToIdReference)).append("\n");
+    sb.append("    belongsToKind: ").append(toIndentedString(belongsToKind)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    correspondent: ").append(toIndentedString(correspondent)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
+    sb.append("    createdByIdReference: ").append(toIndentedString(createdByIdReference)).append("\n");
+    sb.append("    createdByKind: ").append(toIndentedString(createdByKind)).append("\n");
     sb.append("    eventId: ").append(toIndentedString(eventId)).append("\n");
     sb.append("    note: ").append(toIndentedString(note)).append("\n");
     sb.append("    replacesEventId: ").append(toIndentedString(replacesEventId)).append("\n");
@@ -408,10 +524,10 @@ public class AdminActionEventGeneral implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("at", "belongs_to", "category", "correspondent", "created_by", "event_id", "note", "replaces_event_id", "type", "visibility"));
+    openapiFields = new HashSet<String>(Arrays.asList("at", "belongs_to", "belongs_to_id_reference", "belongs_to_kind", "category", "correspondent", "created_by", "created_by_id_reference", "created_by_kind", "event_id", "note", "replaces_event_id", "type", "visibility"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("at", "belongs_to", "category", "correspondent", "created_by", "event_id", "note", "type", "visibility"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("at", "belongs_to_id_reference", "belongs_to_kind", "category", "correspondent", "created_by_id_reference", "created_by_kind", "event_id", "note", "type", "visibility"));
   }
 
   /**
@@ -434,15 +550,29 @@ public class AdminActionEventGeneral implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      // validate the required field `belongs_to`
-      AdminActionBelongsTo.validateJsonElement(jsonObj.get("belongs_to"));
+      // validate the optional field `belongs_to`
+      if (jsonObj.get("belongs_to") != null && !jsonObj.get("belongs_to").isJsonNull()) {
+        AdminActionBelongsTo.validateJsonElement(jsonObj.get("belongs_to"));
+      }
+      if (!jsonObj.get("belongs_to_id_reference").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `belongs_to_id_reference` to be a primitive type in the JSON string but got `%s`", jsonObj.get("belongs_to_id_reference").toString()));
+      }
+      // validate the required field `belongs_to_kind`
+      AdminActionBelongsToKind.validateJsonElement(jsonObj.get("belongs_to_kind"));
       // validate the required field `category`
       AdminActionCategory.validateJsonElement(jsonObj.get("category"));
       if (!jsonObj.get("correspondent").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `correspondent` to be a primitive type in the JSON string but got `%s`", jsonObj.get("correspondent").toString()));
       }
-      // validate the required field `created_by`
-      AdminActionCreatedBy.validateJsonElement(jsonObj.get("created_by"));
+      // validate the optional field `created_by`
+      if (jsonObj.get("created_by") != null && !jsonObj.get("created_by").isJsonNull()) {
+        AdminActionCreatedBy.validateJsonElement(jsonObj.get("created_by"));
+      }
+      if (!jsonObj.get("created_by_id_reference").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `created_by_id_reference` to be a primitive type in the JSON string but got `%s`", jsonObj.get("created_by_id_reference").toString()));
+      }
+      // validate the required field `created_by_kind`
+      AdminActionCreatedByKind.validateJsonElement(jsonObj.get("created_by_kind"));
       if (!jsonObj.get("event_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `event_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("event_id").toString()));
       }

@@ -155,6 +155,11 @@ public class ActivityV2DetailTRD implements Serializable {
   @javax.annotation.Nullable
   private String orderStatus;
 
+  public static final String SERIALIZED_NAME_SETTLEMENT_CURRENCY = "settlement_currency";
+  @SerializedName(SERIALIZED_NAME_SETTLEMENT_CURRENCY)
+  @javax.annotation.Nullable
+  private String settlementCurrency;
+
   /**
    * Represents what side of the transaction an order was on
    */
@@ -391,6 +396,25 @@ public class ActivityV2DetailTRD implements Serializable {
   }
 
 
+  public ActivityV2DetailTRD settlementCurrency(@javax.annotation.Nullable String settlementCurrency) {
+    this.settlementCurrency = settlementCurrency;
+    return this;
+  }
+
+  /**
+   * Settlement currency of the order. Omitted when the order has none.
+   * @return settlementCurrency
+   */
+  @javax.annotation.Nullable
+  public String getSettlementCurrency() {
+    return settlementCurrency;
+  }
+
+  public void setSettlementCurrency(@javax.annotation.Nullable String settlementCurrency) {
+    this.settlementCurrency = settlementCurrency;
+  }
+
+
   public ActivityV2DetailTRD side(@javax.annotation.Nullable SideEnum side) {
     this.side = side;
     return this;
@@ -492,6 +516,7 @@ public class ActivityV2DetailTRD implements Serializable {
         Objects.equals(this.leavesQty, activityV2DetailTRD.leavesQty) &&
         Objects.equals(this.orderId, activityV2DetailTRD.orderId) &&
         Objects.equals(this.orderStatus, activityV2DetailTRD.orderStatus) &&
+        Objects.equals(this.settlementCurrency, activityV2DetailTRD.settlementCurrency) &&
         Objects.equals(this.side, activityV2DetailTRD.side) &&
         Objects.equals(this.symbol, activityV2DetailTRD.symbol)&&
         Objects.equals(this.additionalProperties, activityV2DetailTRD.additionalProperties);
@@ -499,7 +524,7 @@ public class ActivityV2DetailTRD implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(assetId, clientOrderId, commission, cumQty, cusip, executionType, leavesQty, orderId, orderStatus, side, symbol, additionalProperties);
+    return Objects.hash(assetId, clientOrderId, commission, cumQty, cusip, executionType, leavesQty, orderId, orderStatus, settlementCurrency, side, symbol, additionalProperties);
   }
 
   @Override
@@ -515,6 +540,7 @@ public class ActivityV2DetailTRD implements Serializable {
     sb.append("    leavesQty: ").append(toIndentedString(leavesQty)).append("\n");
     sb.append("    orderId: ").append(toIndentedString(orderId)).append("\n");
     sb.append("    orderStatus: ").append(toIndentedString(orderStatus)).append("\n");
+    sb.append("    settlementCurrency: ").append(toIndentedString(settlementCurrency)).append("\n");
     sb.append("    side: ").append(toIndentedString(side)).append("\n");
     sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
@@ -536,7 +562,7 @@ public class ActivityV2DetailTRD implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("asset_id", "client_order_id", "commission", "cum_qty", "cusip", "execution_type", "leaves_qty", "order_id", "order_status", "side", "symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("asset_id", "client_order_id", "commission", "cum_qty", "cusip", "execution_type", "leaves_qty", "order_id", "order_status", "settlement_currency", "side", "symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -585,6 +611,9 @@ public class ActivityV2DetailTRD implements Serializable {
       }
       if ((jsonObj.get("order_status") != null && !jsonObj.get("order_status").isJsonNull()) && !jsonObj.get("order_status").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `order_status` to be a primitive type in the JSON string but got `%s`", jsonObj.get("order_status").toString()));
+      }
+      if ((jsonObj.get("settlement_currency") != null && !jsonObj.get("settlement_currency").isJsonNull()) && !jsonObj.get("settlement_currency").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `settlement_currency` to be a primitive type in the JSON string but got `%s`", jsonObj.get("settlement_currency").toString()));
       }
       if ((jsonObj.get("side") != null && !jsonObj.get("side").isJsonNull()) && !jsonObj.get("side").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `side` to be a primitive type in the JSON string but got `%s`", jsonObj.get("side").toString()));

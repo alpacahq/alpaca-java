@@ -24,6 +24,7 @@ import markets.alpaca.client.openapi.trading.api.OrdersApi;
 import markets.alpaca.client.openapi.trading.api.PortfolioHistoryApi;
 import markets.alpaca.client.openapi.trading.api.PositionsApi;
 import markets.alpaca.client.openapi.trading.model.ActivityEventV2;
+import markets.alpaca.client.openapi.trading.model.PortfolioHistoryTimeframe;
 import markets.alpaca.client.sse.AlpacaSseCloseResult;
 import markets.alpaca.client.sse.AlpacaSseListener;
 import markets.alpaca.client.sse.AlpacaSseOptions;
@@ -325,7 +326,9 @@ class IntegrationIT {
   @Test
   void tradingApi_getPortfolioHistory_returnsHistory() throws Exception {
     var api = new PortfolioHistoryApi(tradingClient);
-    var history = api.getAccountPortfolioHistory("1M", "1D", null, null, null, null, null, null);
+    var history =
+        api.getAccountPortfolioHistory(
+            "1M", PortfolioHistoryTimeframe._1_D, null, null, null, null, null, null);
 
     assertNotNull(history, "portfolio history must not be null");
     assertNotNull(history.getEquity(), "portfolio history equity series must not be null");

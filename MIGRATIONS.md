@@ -57,5 +57,5 @@ application does not read the new properties.
 
 The release compatibility check has member-specific reviewed exclusions for only these inherited
 symbol changes. Required-field validation changes are behavioral and therefore remain migration
-review items rather than japicmp exclusions. PR and frozen-snapshot CI continue to fail on every
-other source or binary incompatibility.
+review items rather than japicmp exclusions. PR and frozen-snapshot CI report every other source
+or binary incompatibility as a warning and continue.

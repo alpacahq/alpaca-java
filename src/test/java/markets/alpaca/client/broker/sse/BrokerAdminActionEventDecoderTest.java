@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+import markets.alpaca.client.openapi.broker.model.AdminActionAcatsStatus;
 import markets.alpaca.client.openapi.broker.model.AdminActionLegacyNote;
 import markets.alpaca.client.openapi.broker.model.AdminActionLiquidation;
 import markets.alpaca.client.openapi.broker.model.AdminActionTransactionCancel;
@@ -30,6 +31,27 @@ class BrokerAdminActionEventDecoderTest {
     assertInstanceOf(
         AdminActionLegacyNote.class,
         decoder.decode(adminActionJson("legacy_note_admin_event", "{}")).getActualInstance());
+    assertInstanceOf(
+        AdminActionLegacyNote.class,
+        decoder.decode(adminActionJson("note_admin_event", "{}")).getActualInstance());
+    assertInstanceOf(
+        AdminActionAcatsStatus.class,
+        decoder
+            .decode(
+                adminActionJson(
+                    "acats_status_admin_event",
+                    """
+                    {
+                      "acats_id":"fdf18af2-142b-409e-8aad-d1731e276af0",
+                      "status_details":{
+                        "transfer_direction":"INCOMING",
+                        "transfer_status":"SETTLED",
+                        "transfer_type":"FULL"
+                      },
+                      "transfer_identifier":"transfer-1"
+                    }
+                    """))
+            .getActualInstance());
     assertInstanceOf(
         AdminActionLiquidation.class,
         decoder
@@ -93,10 +115,14 @@ class BrokerAdminActionEventDecoderTest {
         {
           "at":"2026-10-01T12:00:00Z",
           "belongs_to":{"kind":"account","id_reference":"account-1"},
+          "belongs_to_id_reference":"account-1",
+          "belongs_to_kind":"account",
           "category":"other",
           "context":%s,
           "correspondent":"LPCA",
           "created_by":{"kind":"admin","id_reference":"admin-1"},
+          "created_by_id_reference":"admin-1",
+          "created_by_kind":"admin",
           "event_id":"01K6G000000000000000000000",
           "note":"reviewed action",
           "type":"%s",

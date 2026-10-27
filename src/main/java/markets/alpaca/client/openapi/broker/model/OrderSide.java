@@ -32,21 +32,7 @@ public enum OrderSide implements Serializable {
   
   BUY("buy"),
   
-  SELL("sell"),
-  
-  BUY_MINUS("buy_minus"),
-  
-  SELL_PLUS("sell_plus"),
-  
-  SELL_SHORT("sell_short"),
-  
-  SELL_SHORT_EXEMPT("sell_short_exempt"),
-  
-  UNDISCLOSED("undisclosed"),
-  
-  CROSS("cross"),
-  
-  CROSS_SHORT("cross_short");
+  SELL("sell");
 
   private String value;
 

@@ -26,8 +26,8 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.UUID;
 import markets.alpaca.client.openapi.broker.model.ActivityType;
-import markets.alpaca.client.openapi.broker.model.OrderSide;
 import markets.alpaca.client.openapi.broker.model.OrderStatus;
+import markets.alpaca.client.openapi.broker.model.TradeActivitySide;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -109,7 +109,7 @@ public class Activity implements Serializable {
   public static final String SERIALIZED_NAME_SIDE = "side";
   @SerializedName(SERIALIZED_NAME_SIDE)
   @javax.annotation.Nullable
-  private OrderSide side;
+  private TradeActivitySide side;
 
   public static final String SERIALIZED_NAME_SYMBOL = "symbol";
   @SerializedName(SERIALIZED_NAME_SYMBOL)
@@ -461,7 +461,7 @@ public class Activity implements Serializable {
   }
 
 
-  public Activity side(@javax.annotation.Nullable OrderSide side) {
+  public Activity side(@javax.annotation.Nullable TradeActivitySide side) {
     this.side = side;
     return this;
   }
@@ -471,11 +471,11 @@ public class Activity implements Serializable {
    * @return side
    */
   @javax.annotation.Nullable
-  public OrderSide getSide() {
+  public TradeActivitySide getSide() {
     return side;
   }
 
-  public void setSide(@javax.annotation.Nullable OrderSide side) {
+  public void setSide(@javax.annotation.Nullable TradeActivitySide side) {
     this.side = side;
   }
 
@@ -934,7 +934,7 @@ public class Activity implements Serializable {
       }
       // validate the optional field `side`
       if (jsonObj.get("side") != null && !jsonObj.get("side").isJsonNull()) {
-        OrderSide.validateJsonElement(jsonObj.get("side"));
+        TradeActivitySide.validateJsonElement(jsonObj.get("side"));
       }
       if ((jsonObj.get("symbol") != null && !jsonObj.get("symbol").isJsonNull()) && !jsonObj.get("symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));

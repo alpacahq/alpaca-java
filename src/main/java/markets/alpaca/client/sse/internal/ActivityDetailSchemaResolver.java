@@ -34,6 +34,7 @@ public final class ActivityDetailSchemaResolver {
               ? "FEEActivityV2"
               : null;
       case "FOPT" -> "FOPTActivityV2";
+      case "FXTRD" -> "FXTRDActivityV2";
       case "INT" -> "FI".equals(detail) ? "FixedIncomeInterestActivityV2" : null;
       case "JNLC" -> "JNLCActivityV2";
       case "JNLS" -> "JNLSActivityV2";

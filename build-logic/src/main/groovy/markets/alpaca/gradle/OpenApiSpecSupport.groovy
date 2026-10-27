@@ -507,7 +507,8 @@ final class OpenApiSpecSupport {
                 'array-ref:#/components/schemas/ActivityEventV2'),
             brokerSseShape('subscribeToAdminActionSSE',
                 activityRange,
-                'array-oneOf:#/components/schemas/AdminActionLegacyNote|' +
+                'array-oneOf:#/components/schemas/AdminActionAcatsStatus|' +
+                    '#/components/schemas/AdminActionLegacyNote|' +
                     '#/components/schemas/AdminActionLiquidation|' +
                     '#/components/schemas/AdminActionTransactionCancel'),
             brokerSseShape('subscribeToFundingStatusSSE',

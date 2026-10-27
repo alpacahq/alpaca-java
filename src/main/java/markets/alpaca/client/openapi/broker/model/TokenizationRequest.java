@@ -60,12 +60,6 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 public class TokenizationRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  public static final String SERIALIZED_NAME_ACCOUNT = "account";
-  @Deprecated
-  @SerializedName(SERIALIZED_NAME_ACCOUNT)
-  @javax.annotation.Nullable
-  private String account;
-
   public static final String SERIALIZED_NAME_CLIENT_ACCOUNT_ID = "client_account_id";
   @SerializedName(SERIALIZED_NAME_CLIENT_ACCOUNT_ID)
   @javax.annotation.Nullable
@@ -95,12 +89,6 @@ public class TokenizationRequest implements Serializable {
   @SerializedName(SERIALIZED_NAME_ISSUER)
   @javax.annotation.Nonnull
   private TokenizationIssuer issuer;
-
-  public static final String SERIALIZED_NAME_ISSUER_ACCOUNT = "issuer_account";
-  @Deprecated
-  @SerializedName(SERIALIZED_NAME_ISSUER_ACCOUNT)
-  @javax.annotation.Nullable
-  private String issuerAccount;
 
   public static final String SERIALIZED_NAME_ISSUER_REQUEST_ID = "issuer_request_id";
   @SerializedName(SERIALIZED_NAME_ISSUER_REQUEST_ID)
@@ -159,29 +147,6 @@ public class TokenizationRequest implements Serializable {
 
   public TokenizationRequest() {
   }
-
-  @Deprecated
-  public TokenizationRequest account(@javax.annotation.Nullable String account) {
-    this.account = account;
-    return this;
-  }
-
-  /**
-   * **Deprecation notice:** Use client_account_id instead.  Since: 2026-07-15 Sunset: 2026-10-15  ---  Alpaca account ID associated with this tokenization request.
-   * @return account
-   * @deprecated
-   */
-  @Deprecated
-  @javax.annotation.Nullable
-  public String getAccount() {
-    return account;
-  }
-
-  @Deprecated
-  public void setAccount(@javax.annotation.Nullable String account) {
-    this.account = account;
-  }
-
 
   public TokenizationRequest clientAccountId(@javax.annotation.Nullable UUID clientAccountId) {
     this.clientAccountId = clientAccountId;
@@ -294,29 +259,6 @@ public class TokenizationRequest implements Serializable {
 
   public void setIssuer(@javax.annotation.Nonnull TokenizationIssuer issuer) {
     this.issuer = issuer;
-  }
-
-
-  @Deprecated
-  public TokenizationRequest issuerAccount(@javax.annotation.Nullable String issuerAccount) {
-    this.issuerAccount = issuerAccount;
-    return this;
-  }
-
-  /**
-   * **Deprecation notice:** Use client_external_account_id instead.  Since: 2026-07-15 Sunset: 2026-10-15  ---  Issuer&#39;s account ID associated with this tokenization request.
-   * @return issuerAccount
-   * @deprecated
-   */
-  @Deprecated
-  @javax.annotation.Nullable
-  public String getIssuerAccount() {
-    return issuerAccount;
-  }
-
-  @Deprecated
-  public void setIssuerAccount(@javax.annotation.Nullable String issuerAccount) {
-    this.issuerAccount = issuerAccount;
   }
 
 
@@ -583,14 +525,12 @@ public class TokenizationRequest implements Serializable {
       return false;
     }
     TokenizationRequest tokenizationRequest = (TokenizationRequest) o;
-    return Objects.equals(this.account, tokenizationRequest.account) &&
-        Objects.equals(this.clientAccountId, tokenizationRequest.clientAccountId) &&
+    return Objects.equals(this.clientAccountId, tokenizationRequest.clientAccountId) &&
         Objects.equals(this.clientExternalAccountId, tokenizationRequest.clientExternalAccountId) &&
         Objects.equals(this.clientRequestId, tokenizationRequest.clientRequestId) &&
         Objects.equals(this.createdAt, tokenizationRequest.createdAt) &&
         Objects.equals(this.fees, tokenizationRequest.fees) &&
         Objects.equals(this.issuer, tokenizationRequest.issuer) &&
-        Objects.equals(this.issuerAccount, tokenizationRequest.issuerAccount) &&
         Objects.equals(this.issuerRequestId, tokenizationRequest.issuerRequestId) &&
         Objects.equals(this.network, tokenizationRequest.network) &&
         Objects.equals(this.qty, tokenizationRequest.qty) &&
@@ -607,21 +547,19 @@ public class TokenizationRequest implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(account, clientAccountId, clientExternalAccountId, clientRequestId, createdAt, fees, issuer, issuerAccount, issuerRequestId, network, qty, status, tokenSymbol, tokenizationRequestId, txHash, type, underlyingSymbol, updatedAt, walletAddress, additionalProperties);
+    return Objects.hash(clientAccountId, clientExternalAccountId, clientRequestId, createdAt, fees, issuer, issuerRequestId, network, qty, status, tokenSymbol, tokenizationRequestId, txHash, type, underlyingSymbol, updatedAt, walletAddress, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TokenizationRequest {\n");
-    sb.append("    account: ").append(toIndentedString(account)).append("\n");
     sb.append("    clientAccountId: ").append(toIndentedString(clientAccountId)).append("\n");
     sb.append("    clientExternalAccountId: ").append(toIndentedString(clientExternalAccountId)).append("\n");
     sb.append("    clientRequestId: ").append(toIndentedString(clientRequestId)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    fees: ").append(toIndentedString(fees)).append("\n");
     sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
-    sb.append("    issuerAccount: ").append(toIndentedString(issuerAccount)).append("\n");
     sb.append("    issuerRequestId: ").append(toIndentedString(issuerRequestId)).append("\n");
     sb.append("    network: ").append(toIndentedString(network)).append("\n");
     sb.append("    qty: ").append(toIndentedString(qty)).append("\n");
@@ -652,7 +590,7 @@ public class TokenizationRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("account", "client_account_id", "client_external_account_id", "client_request_id", "created_at", "fees", "issuer", "issuer_account", "issuer_request_id", "network", "qty", "status", "token_symbol", "tokenization_request_id", "tx_hash", "type", "underlying_symbol", "updated_at", "wallet_address"));
+    openapiFields = new HashSet<String>(Arrays.asList("client_account_id", "client_external_account_id", "client_request_id", "created_at", "fees", "issuer", "issuer_request_id", "network", "qty", "status", "token_symbol", "tokenization_request_id", "tx_hash", "type", "underlying_symbol", "updated_at", "wallet_address"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("created_at", "issuer", "network", "qty", "status", "token_symbol", "tokenization_request_id", "type", "underlying_symbol", "wallet_address"));
@@ -678,9 +616,6 @@ public class TokenizationRequest implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("account") != null && !jsonObj.get("account").isJsonNull()) && !jsonObj.get("account").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `account` to be a primitive type in the JSON string but got `%s`", jsonObj.get("account").toString()));
-      }
       if ((jsonObj.get("client_account_id") != null && !jsonObj.get("client_account_id").isJsonNull()) && !jsonObj.get("client_account_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `client_account_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("client_account_id").toString()));
       }
@@ -695,9 +630,6 @@ public class TokenizationRequest implements Serializable {
       }
       // validate the required field `issuer`
       TokenizationIssuer.validateJsonElement(jsonObj.get("issuer"));
-      if ((jsonObj.get("issuer_account") != null && !jsonObj.get("issuer_account").isJsonNull()) && !jsonObj.get("issuer_account").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `issuer_account` to be a primitive type in the JSON string but got `%s`", jsonObj.get("issuer_account").toString()));
-      }
       if ((jsonObj.get("issuer_request_id") != null && !jsonObj.get("issuer_request_id").isJsonNull()) && !jsonObj.get("issuer_request_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `issuer_request_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("issuer_request_id").toString()));
       }

@@ -12,6 +12,7 @@ import markets.alpaca.client.openapi.trading.model.AssetClass;
 import markets.alpaca.client.openapi.trading.model.CreateOrderRequest;
 import markets.alpaca.client.openapi.trading.model.OrderSide;
 import markets.alpaca.client.openapi.trading.model.OrderType;
+import markets.alpaca.client.openapi.trading.model.PortfolioHistoryTimeframe;
 import markets.alpaca.client.openapi.trading.model.TimeInForce;
 import markets.alpaca.client.sse.AlpacaSseListener;
 import markets.alpaca.client.trading.ListOrdersRequest;
@@ -84,7 +85,8 @@ public final class TradingApiExample {
 
     ExampleSupport.printSection("Portfolio History");
     var history =
-        portfolio.getAccountPortfolioHistory("1M", "1D", null, null, null, null, null, null);
+        portfolio.getAccountPortfolioHistory(
+            "1M", PortfolioHistoryTimeframe._1_D, null, null, null, null, null, null);
     System.out.printf(
         "equity points=%d%n", history.getEquity() == null ? 0 : history.getEquity().size());
 

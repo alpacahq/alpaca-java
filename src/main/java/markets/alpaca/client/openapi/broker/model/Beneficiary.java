@@ -20,6 +20,8 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.io.Serializable;
 
@@ -48,7 +50,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * Beneficiary of an account
+ * Beneficiary of an IRA account. The same shape is used on account create, account update, and account responses. 
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
 public class Beneficiary implements Serializable {
@@ -57,7 +59,7 @@ public class Beneficiary implements Serializable {
   public static final String SERIALIZED_NAME_DATE_OF_BIRTH = "date_of_birth";
   @SerializedName(SERIALIZED_NAME_DATE_OF_BIRTH)
   @javax.annotation.Nonnull
-  private String dateOfBirth;
+  private LocalDate dateOfBirth;
 
   public static final String SERIALIZED_NAME_FAMILY_NAME = "family_name";
   @SerializedName(SERIALIZED_NAME_FAMILY_NAME)
@@ -71,52 +73,206 @@ public class Beneficiary implements Serializable {
 
   public static final String SERIALIZED_NAME_MIDDLE_NAME = "middle_name";
   @SerializedName(SERIALIZED_NAME_MIDDLE_NAME)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private String middleName;
+
+  /**
+   * Relationship of the beneficiary to the account holder.
+   */
+  @JsonAdapter(RelationshipEnum.Adapter.class)
+  public enum RelationshipEnum {
+    SPOUSE("spouse"),
+    
+    OTHER("other");
+
+    private String value;
+
+    RelationshipEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static RelationshipEnum fromValue(String value) {
+      for (RelationshipEnum b : RelationshipEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<RelationshipEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final RelationshipEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public RelationshipEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return RelationshipEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      RelationshipEnum.fromValue(value);
+    }
+  }
 
   public static final String SERIALIZED_NAME_RELATIONSHIP = "relationship";
   @SerializedName(SERIALIZED_NAME_RELATIONSHIP)
   @javax.annotation.Nonnull
-  private String relationship;
+  private RelationshipEnum relationship;
 
   public static final String SERIALIZED_NAME_SHARE_PCT = "share_pct";
   @SerializedName(SERIALIZED_NAME_SHARE_PCT)
   @javax.annotation.Nonnull
-  private String sharePct;
+  private BigDecimal sharePct;
 
   public static final String SERIALIZED_NAME_TAX_ID = "tax_id";
   @SerializedName(SERIALIZED_NAME_TAX_ID)
   @javax.annotation.Nonnull
   private String taxId;
 
+  /**
+   * Tax identifier type.
+   */
+  @JsonAdapter(TaxIdTypeEnum.Adapter.class)
+  public enum TaxIdTypeEnum {
+    USA_SSN("USA_SSN");
+
+    private String value;
+
+    TaxIdTypeEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static TaxIdTypeEnum fromValue(String value) {
+      for (TaxIdTypeEnum b : TaxIdTypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<TaxIdTypeEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final TaxIdTypeEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public TaxIdTypeEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return TaxIdTypeEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      TaxIdTypeEnum.fromValue(value);
+    }
+  }
+
   public static final String SERIALIZED_NAME_TAX_ID_TYPE = "tax_id_type";
   @SerializedName(SERIALIZED_NAME_TAX_ID_TYPE)
   @javax.annotation.Nonnull
-  private String taxIdType;
+  private TaxIdTypeEnum taxIdType;
+
+  /**
+   * Whether this beneficiary is primary or contingent. An account with beneficiaries needs at least one primary beneficiary. The &#x60;share_pct&#x60; values of all primary beneficiaries must add up to 100, and the &#x60;share_pct&#x60; values of all contingent beneficiaries, if any, must also add up to 100. 
+   */
+  @JsonAdapter(TypeEnum.Adapter.class)
+  public enum TypeEnum {
+    PRIMARY("primary"),
+    
+    CONTINGENT("contingent");
+
+    private String value;
+
+    TypeEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static TypeEnum fromValue(String value) {
+      for (TypeEnum b : TypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<TypeEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final TypeEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public TypeEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return TypeEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      TypeEnum.fromValue(value);
+    }
+  }
 
   public static final String SERIALIZED_NAME_TYPE = "type";
   @SerializedName(SERIALIZED_NAME_TYPE)
   @javax.annotation.Nonnull
-  private String type;
+  private TypeEnum type;
 
   public Beneficiary() {
   }
 
-  public Beneficiary dateOfBirth(@javax.annotation.Nonnull String dateOfBirth) {
+  public Beneficiary dateOfBirth(@javax.annotation.Nonnull LocalDate dateOfBirth) {
     this.dateOfBirth = dateOfBirth;
     return this;
   }
 
   /**
-   * Get dateOfBirth
+   * Date of birth in YYYY-MM-DD format. It cannot be in the future.
    * @return dateOfBirth
    */
   @javax.annotation.Nonnull
-  public String getDateOfBirth() {
+  public LocalDate getDateOfBirth() {
     return dateOfBirth;
   }
 
-  public void setDateOfBirth(@javax.annotation.Nonnull String dateOfBirth) {
+  public void setDateOfBirth(@javax.annotation.Nonnull LocalDate dateOfBirth) {
     this.dateOfBirth = dateOfBirth;
   }
 
@@ -127,7 +283,7 @@ public class Beneficiary implements Serializable {
   }
 
   /**
-   * Get familyName
+   * Beneficiary family name.
    * @return familyName
    */
   @javax.annotation.Nonnull
@@ -146,7 +302,7 @@ public class Beneficiary implements Serializable {
   }
 
   /**
-   * Get givenName
+   * Beneficiary given name.
    * @return givenName
    */
   @javax.annotation.Nonnull
@@ -159,59 +315,59 @@ public class Beneficiary implements Serializable {
   }
 
 
-  public Beneficiary middleName(@javax.annotation.Nonnull String middleName) {
+  public Beneficiary middleName(@javax.annotation.Nullable String middleName) {
     this.middleName = middleName;
     return this;
   }
 
   /**
-   * Get middleName
+   * Beneficiary middle name. Omit this field or send null when the beneficiary has no middle name. An empty string is rejected. Account responses always include the field and use null when it is unset. 
    * @return middleName
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public String getMiddleName() {
     return middleName;
   }
 
-  public void setMiddleName(@javax.annotation.Nonnull String middleName) {
+  public void setMiddleName(@javax.annotation.Nullable String middleName) {
     this.middleName = middleName;
   }
 
 
-  public Beneficiary relationship(@javax.annotation.Nonnull String relationship) {
+  public Beneficiary relationship(@javax.annotation.Nonnull RelationshipEnum relationship) {
     this.relationship = relationship;
     return this;
   }
 
   /**
-   * Get relationship
+   * Relationship of the beneficiary to the account holder.
    * @return relationship
    */
   @javax.annotation.Nonnull
-  public String getRelationship() {
+  public RelationshipEnum getRelationship() {
     return relationship;
   }
 
-  public void setRelationship(@javax.annotation.Nonnull String relationship) {
+  public void setRelationship(@javax.annotation.Nonnull RelationshipEnum relationship) {
     this.relationship = relationship;
   }
 
 
-  public Beneficiary sharePct(@javax.annotation.Nonnull String sharePct) {
+  public Beneficiary sharePct(@javax.annotation.Nonnull BigDecimal sharePct) {
     this.sharePct = sharePct;
     return this;
   }
 
   /**
-   * Get sharePct
+   * Share of the account allocated to this beneficiary, as a decimal string. The value must be greater than 0 and at most 100, with at most two decimal places. 
    * @return sharePct
    */
   @javax.annotation.Nonnull
-  public String getSharePct() {
+  public BigDecimal getSharePct() {
     return sharePct;
   }
 
-  public void setSharePct(@javax.annotation.Nonnull String sharePct) {
+  public void setSharePct(@javax.annotation.Nonnull BigDecimal sharePct) {
     this.sharePct = sharePct;
   }
 
@@ -222,7 +378,7 @@ public class Beneficiary implements Serializable {
   }
 
   /**
-   * Get taxId
+   * Beneficiary tax identifier. Create and update requests require a USA SSN. Account responses always return the masked value &#x60;xxx-xx-xxxx&#x60;. 
    * @return taxId
    */
   @javax.annotation.Nonnull
@@ -235,40 +391,40 @@ public class Beneficiary implements Serializable {
   }
 
 
-  public Beneficiary taxIdType(@javax.annotation.Nonnull String taxIdType) {
+  public Beneficiary taxIdType(@javax.annotation.Nonnull TaxIdTypeEnum taxIdType) {
     this.taxIdType = taxIdType;
     return this;
   }
 
   /**
-   * Get taxIdType
+   * Tax identifier type.
    * @return taxIdType
    */
   @javax.annotation.Nonnull
-  public String getTaxIdType() {
+  public TaxIdTypeEnum getTaxIdType() {
     return taxIdType;
   }
 
-  public void setTaxIdType(@javax.annotation.Nonnull String taxIdType) {
+  public void setTaxIdType(@javax.annotation.Nonnull TaxIdTypeEnum taxIdType) {
     this.taxIdType = taxIdType;
   }
 
 
-  public Beneficiary type(@javax.annotation.Nonnull String type) {
+  public Beneficiary type(@javax.annotation.Nonnull TypeEnum type) {
     this.type = type;
     return this;
   }
 
   /**
-   * Get type
+   * Whether this beneficiary is primary or contingent. An account with beneficiaries needs at least one primary beneficiary. The &#x60;share_pct&#x60; values of all primary beneficiaries must add up to 100, and the &#x60;share_pct&#x60; values of all contingent beneficiaries, if any, must also add up to 100. 
    * @return type
    */
   @javax.annotation.Nonnull
-  public String getType() {
+  public TypeEnum getType() {
     return type;
   }
 
-  public void setType(@javax.annotation.Nonnull String type) {
+  public void setType(@javax.annotation.Nonnull TypeEnum type) {
     this.type = type;
   }
 
@@ -379,7 +535,7 @@ public class Beneficiary implements Serializable {
     openapiFields = new HashSet<String>(Arrays.asList("date_of_birth", "family_name", "given_name", "middle_name", "relationship", "share_pct", "tax_id", "tax_id_type", "type"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("date_of_birth", "family_name", "given_name", "middle_name", "relationship", "share_pct", "tax_id", "tax_id_type", "type"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("date_of_birth", "family_name", "given_name", "relationship", "share_pct", "tax_id", "tax_id_type", "type"));
   }
 
   /**
@@ -402,21 +558,20 @@ public class Beneficiary implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if (!jsonObj.get("date_of_birth").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `date_of_birth` to be a primitive type in the JSON string but got `%s`", jsonObj.get("date_of_birth").toString()));
-      }
       if (!jsonObj.get("family_name").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `family_name` to be a primitive type in the JSON string but got `%s`", jsonObj.get("family_name").toString()));
       }
       if (!jsonObj.get("given_name").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `given_name` to be a primitive type in the JSON string but got `%s`", jsonObj.get("given_name").toString()));
       }
-      if (!jsonObj.get("middle_name").isJsonPrimitive()) {
+      if ((jsonObj.get("middle_name") != null && !jsonObj.get("middle_name").isJsonNull()) && !jsonObj.get("middle_name").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `middle_name` to be a primitive type in the JSON string but got `%s`", jsonObj.get("middle_name").toString()));
       }
       if (!jsonObj.get("relationship").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `relationship` to be a primitive type in the JSON string but got `%s`", jsonObj.get("relationship").toString()));
       }
+      // validate the required field `relationship`
+      RelationshipEnum.validateJsonElement(jsonObj.get("relationship"));
       if (!jsonObj.get("share_pct").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `share_pct` to be a primitive type in the JSON string but got `%s`", jsonObj.get("share_pct").toString()));
       }
@@ -426,9 +581,13 @@ public class Beneficiary implements Serializable {
       if (!jsonObj.get("tax_id_type").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `tax_id_type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("tax_id_type").toString()));
       }
+      // validate the required field `tax_id_type`
+      TaxIdTypeEnum.validateJsonElement(jsonObj.get("tax_id_type"));
       if (!jsonObj.get("type").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("type").toString()));
       }
+      // validate the required field `type`
+      TypeEnum.validateJsonElement(jsonObj.get("type"));
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
