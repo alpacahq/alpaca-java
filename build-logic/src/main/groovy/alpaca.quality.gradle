@@ -136,15 +136,13 @@ pluginManager.withPlugin('java') {
                 '--only-modified',
                 '--ignore-missing-classes',
             ]
-            def reviewedExclusions =
-                reviewedApiCompatibilityExclusionsByBaseline[apiBaselineVersion.get()] ?: []
-            if (!reviewedExclusions.isEmpty()) {
-                comparisonArgs.addAll([
-                    '--exclude',
-                    reviewedExclusions.join(';'),
-                    '--no-error-on-exclusion-incompatibility',
-                ])
-            }
+            def exclusions = ['markets.alpaca.client.sse.internal.*'] +
+                (reviewedApiCompatibilityExclusionsByBaseline[apiBaselineVersion.get()] ?: [])
+            comparisonArgs.addAll([
+                '--exclude',
+                exclusions.join(';'),
+                '--no-error-on-exclusion-incompatibility',
+            ])
             comparisonArgs.addAll([
                 '--error-on-binary-incompatibility',
                 '--error-on-source-incompatibility',

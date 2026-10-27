@@ -2,9 +2,9 @@
 
 Runnable examples for the same workflows covered by the Alpaca Python SDK guides:
 
-- Trading API: account, assets, orders, positions, portfolio history, and trading stream concepts.
+- Trading API: account, assets, orders, positions, portfolio history, and activity SSE.
 - Broker API: account management, sub-account trading, funding, and Broker Events SSE.
-- Market Data API: stock bars/quotes, crypto bars, news, and live stock data streaming.
+- Market Data API: stock bars/quotes, crypto bars, news, live stock data, and corporate-actions SSE.
 
 The examples use `AlpacaClientFactory` instead of instantiating generated `ApiClient` classes directly. This keeps authentication and base URLs consistent with the rest of this Java client.
 
@@ -58,7 +58,8 @@ export APCA_BROKER_ENVIRONMENT=sandbox
 
 ## Safe Defaults
 
-By default, examples perform read-only calls. State-changing operations require explicit opt-in:
+By default, examples perform read-only calls. Longer-lived streams and state-changing operations
+require explicit opt-in:
 
 ```bash
 export APCA_EXAMPLE_PLACE_ORDER=true                 # TradingApiExample paper limit order
@@ -66,6 +67,8 @@ export APCA_EXAMPLE_CREATE_BROKER_ACCOUNT=true      # BrokerApiExample sandbox a
 export APCA_EXAMPLE_BROKER_PLACE_ORDER=true         # BrokerApiExample sub-account order
 export APCA_EXAMPLE_BROKER_FUNDING=true             # BrokerApiExample sandbox ACH + deposit
 export APCA_EXAMPLE_STREAM=true                     # MarketDataExample stock quote stream
+export APCA_EXAMPLE_CORPORATE_ACTIONS_SSE=true      # MarketDataExample corporate-actions SSE
+export APCA_EXAMPLE_TRADING_SSE=true                # TradingApiExample activity SSE connection
 export APCA_EXAMPLE_BROKER_SSE=true                 # BrokerApiExample trade-events SSE stream
 ```
 
@@ -81,7 +84,8 @@ export APCA_BROKER_ACCOUNT_ID=<sandbox-account-uuid>
 
 ## Files
 
-- `TradingApiExample.java` creates a paper Trading client, reads account/assets/orders/positions/portfolio history, and can submit then cancel a far-away limit order.
+- `TradingApiExample.java` creates a paper Trading client, reads account/assets/orders/positions/portfolio history, and can start an activity SSE stream or submit then cancel a far-away limit order.
 - `BrokerApiExample.java` creates a Broker client, lists accounts, loads a trading account, and can create sandbox accounts, orders, ACH relationships, deposits, and SSE subscriptions.
-- `MarketDataExample.java` creates a Market Data client, requests stock/crypto/news data, and can subscribe to live IEX stock quotes.
+- `MarketDataExample.java` creates a Market Data client, requests stock/crypto/news data, and can
+  subscribe to live IEX stock quotes or corporate-action events.
 - `PaginationExample.java` uses `AlpacaPagination.collectDataItems` with `NewsApi.newsWithHttpInfo(...)` and `NewsResp::getNextPageToken`.

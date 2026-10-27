@@ -51,6 +51,7 @@ tasks.named('jar').configure {
 tasks.named('javadoc').configure {
     description =
         'Generates Javadoc API documentation for handwritten helpers and generated REST clients'
+    exclude 'markets/alpaca/client/sse/internal/**'
     inputs.file(layout.projectDirectory.file('src/main/javadoc/overview.html'))
     options.overview = layout.projectDirectory.file('src/main/javadoc/overview.html').asFile
     options.addBooleanOption('Xdoclint:all,-missing', true)
