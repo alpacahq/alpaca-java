@@ -18,10 +18,14 @@ final class BrokerAdminActionEventDecoder {
       Map.of(
           AdminActionType.LEGACY_NOTE_ADMIN_EVENT,
           "AdminActionLegacyNote",
+          AdminActionType.NOTE_ADMIN_EVENT,
+          "AdminActionLegacyNote",
           AdminActionType.LIQUIDATION_ADMIN_EVENT,
           "AdminActionLiquidation",
           AdminActionType.TRANSACTION_CANCEL_ADMIN_EVENT,
-          "AdminActionTransactionCancel");
+          "AdminActionTransactionCancel",
+          AdminActionType.ACATS_STATUS_ADMIN_EVENT,
+          "AdminActionAcatsStatus");
 
   static {
     if (!SCHEMAS.keySet().equals(Set.of(AdminActionType.values()))) {

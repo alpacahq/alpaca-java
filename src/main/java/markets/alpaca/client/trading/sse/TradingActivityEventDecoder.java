@@ -28,6 +28,7 @@ import markets.alpaca.client.openapi.trading.model.DIVWHActivityV2;
 import markets.alpaca.client.openapi.trading.model.ExchangeOfferActivityV2;
 import markets.alpaca.client.openapi.trading.model.FEEActivityV2;
 import markets.alpaca.client.openapi.trading.model.FOPTActivityV2;
+import markets.alpaca.client.openapi.trading.model.FXTRDActivityV2;
 import markets.alpaca.client.openapi.trading.model.FixedIncomeInterestActivityV2;
 import markets.alpaca.client.openapi.trading.model.FixedIncomeRedemptionActivityV2;
 import markets.alpaca.client.openapi.trading.model.ForwardSplitActivityV2;
@@ -187,7 +188,9 @@ final class TradingActivityEventDecoder {
           candidate("CSWActivityV2", CSWActivityV2.class, CSWActivityV2::validateJsonElement),
           candidate("FEEActivityV2", FEEActivityV2.class, FEEActivityV2::validateJsonElement),
           candidate("MEMActivityV2", MEMActivityV2.class, MEMActivityV2::validateJsonElement),
-          candidate("OCTActivityV2", OCTActivityV2.class, OCTActivityV2::validateJsonElement));
+          candidate("OCTActivityV2", OCTActivityV2.class, OCTActivityV2::validateJsonElement),
+          candidate(
+              "FXTRDActivityV2", FXTRDActivityV2.class, FXTRDActivityV2::validateJsonElement));
   private static final Map<String, Candidate> CANDIDATES_BY_NAME =
       CANDIDATES.stream()
           .collect(Collectors.toUnmodifiableMap(Candidate::schemaName, value -> value));
