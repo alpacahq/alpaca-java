@@ -53,6 +53,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          check-latest: true
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
@@ -60,7 +61,8 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '22'
+          node-version: '>=22.23.4 <23'
+          check-latest: true
           cache: npm
           cache-dependency-path: docs/package-lock.json
 
@@ -102,6 +104,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          check-latest: true
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
@@ -185,6 +188,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          check-latest: true
 
       - name: Set up Gradle
         if: steps.freshness.outputs.should_publish == 'true'

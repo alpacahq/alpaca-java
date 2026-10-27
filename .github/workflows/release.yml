@@ -202,6 +202,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          check-latest: true
 
       - name: Set up Gradle
         if: steps.central-check.outputs.publish_required == 'true'
