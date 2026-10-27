@@ -43,10 +43,10 @@ all NMCP snapshot tasks. Use these commands rather than lower-level publishing t
 
 After a successful current `main` push, the Build workflow publishes the version in
 `gradle.properties` when it ends in `-SNAPSHOT`. It freezes the committed OpenAPI pins under
-`specs/`, builds from read-only copies, checks that exact JAR against the published compatibility
-baseline, rechecks `main`, then publishes those same copies. Pull-request CI also runs the
-compatibility task. Pull requests, non-`main` pushes, failed builds, incompatible JARs, and stale
-commits never publish.
+`specs/`, builds from read-only copies, reports that exact JAR against the published
+compatibility baseline, rechecks `main`, then publishes those same copies. Pull-request CI also
+runs the compatibility task. Pull requests, non-`main` pushes, failed builds, and stale commits
+never publish. API incompatibilities are warnings and do not block publication.
 
 ## Pre-tag verification
 
@@ -59,15 +59,14 @@ candidate commit:
 ```
 
 The API compatibility task compares the complete public JAR, including handwritten streaming
-surfaces, and fails on source or binary incompatibility. `apiBaselineVersion` in
-`gradle.properties` is the previous published release and the post-release bump workflow advances
-it alongside the next development version. The tagged release check independently derives the
-greatest reachable semantic version below the candidate. The baseline-specific, member-level
-exclusions in `alpaca.quality.gradle` cover only reviewed OpenAPI corrections inherited before this
-gate existed; each is documented in [`MIGRATIONS.md`](MIGRATIONS.md). Do not broaden those
-exclusions or add another without equivalent migration guidance and review. The task still fails on
-every other incompatibility. It does not prove behavioral compatibility, and missing external
-dependency classes are ignored, so the migration review and SSE regression tests remain mandatory.
+surfaces, and prints source or binary incompatibilities as a warning. It does not fail the build.
+`apiBaselineVersion` in `gradle.properties` is the previous published release and the post-release
+bump workflow advances it alongside the next development version. The tagged release check
+independently derives the greatest reachable semantic version below the candidate. The
+baseline-specific, member-level exclusions in `alpaca.quality.gradle` cover only reviewed OpenAPI
+corrections inherited before this gate existed; each is documented in [`MIGRATIONS.md`](MIGRATIONS.md).
+The task does not prove behavioral compatibility, and missing external dependency classes are
+ignored, so the migration review and SSE regression tests remain mandatory.
 
 SSE releases additionally require manual live validation with valid Trading paper/Market Data and
 Broker sandbox credentials. Supply bounded RFC 3339 Trading and corporate-actions replay windows
