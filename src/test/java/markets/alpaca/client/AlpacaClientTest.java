@@ -2,20 +2,28 @@ package markets.alpaca.client;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import markets.alpaca.client.broker.sse.BrokerEventsSseClient;
 import markets.alpaca.client.data.AlpacaStocks;
 import markets.alpaca.client.data.StockTradesRequest;
+import markets.alpaca.client.data.sse.CorporateActionsSseClient;
+import markets.alpaca.client.data.sse.MarketDataSseEnvironment;
+import markets.alpaca.client.openapi.data.api.CorporateActionsApi;
 import markets.alpaca.client.openapi.data.api.StockApi;
 import markets.alpaca.client.openapi.data.model.StockHistoricalFeed;
 import markets.alpaca.client.openapi.data.model.StockTradesResp;
 import markets.alpaca.client.openapi.data.model.StockTradesRespSingle;
 import markets.alpaca.client.openapi.trading.api.OrdersApi;
 import markets.alpaca.client.openapi.trading.model.Order;
+import markets.alpaca.client.sse.AlpacaSseOptions;
 import markets.alpaca.client.trading.AlpacaOrders;
 import markets.alpaca.client.trading.ListOrdersRequest;
+import markets.alpaca.client.trading.sse.TradingEventsSseClient;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +31,17 @@ class AlpacaClientTest {
 
   private static final AlpacaCredentials CREDS =
       new AlpacaCredentials("test-key-id", "test-secret-key");
+
+  private static Object field(Object target, Class<?> declaringClass, String name) {
+    try {
+      Field field = declaringClass.getDeclaredField(name);
+      field.setAccessible(true);
+      return field.get(target);
+    } catch (ReflectiveOperationException failure) {
+      throw new AssertionError(
+          "Unable to read " + declaringClass.getSimpleName() + "." + name, failure);
+    }
+  }
 
   @Test
   void builder_rejectsMissingCredentials() {
@@ -46,6 +65,22 @@ class AlpacaClientTest {
     assertEquals("test-key-id", brokerUsername(broker));
     assertEquals("test-secret-key", brokerPassword(broker));
     assertNotNull(client.brokerEventsSseClient());
+    assertNotNull(client.corporateActionsSseClient());
+    var tradingSseOptions =
+        (AlpacaSseOptions)
+            field(client.tradingEventsSseClient(), TradingEventsSseClient.class, "options");
+    var dataSseOptions =
+        (AlpacaSseOptions)
+            field(client.corporateActionsSseClient(), CorporateActionsSseClient.class, "options");
+    var brokerSseOptions =
+        (AlpacaSseOptions)
+            field(client.brokerEventsSseClient(), BrokerEventsSseClient.class, "sseOptions");
+    assertEquals(2, tradingSseOptions.reconnectPolicy().initialAttempts());
+    assertEquals(-1, tradingSseOptions.reconnectPolicy().establishedAttempts());
+    assertEquals(2, dataSseOptions.reconnectPolicy().initialAttempts());
+    assertEquals(-1, dataSseOptions.reconnectPolicy().establishedAttempts());
+    assertEquals(0, brokerSseOptions.reconnectPolicy().initialAttempts());
+    assertEquals(0, brokerSseOptions.reconnectPolicy().establishedAttempts());
   }
 
   @Test
@@ -80,6 +115,70 @@ class AlpacaClientTest {
     assertThrows(NullPointerException.class, () -> builder.tradingCredentials(null));
     assertThrows(NullPointerException.class, () -> builder.dataCredentials(null));
     assertThrows(NullPointerException.class, () -> builder.brokerCredentials(null));
+  }
+
+  @Test
+  void builder_wiresIndependentSseOptionsAndCallbackExecutors() {
+    var tradingOptions = AlpacaSseOptions.reconnectDisabled();
+    var dataOptions = AlpacaSseOptions.reconnectDisabled();
+    var brokerOptions = AlpacaSseOptions.defaults();
+    Executor tradingExecutor = runnable -> {};
+    Executor dataExecutor = runnable -> {};
+    Executor brokerExecutor = runnable -> {};
+
+    var client =
+        AlpacaClient.builder(CREDS)
+            .tradingSseOptions(tradingOptions)
+            .tradingSseCallbackExecutor(tradingExecutor)
+            .marketDataSseEnvironment(MarketDataSseEnvironment.SANDBOX)
+            .dataSseOptions(dataOptions)
+            .dataSseCallbackExecutor(dataExecutor)
+            .brokerSseOptions(brokerOptions)
+            .brokerSseCallbackExecutor(brokerExecutor)
+            .build();
+
+    assertSame(
+        tradingOptions,
+        field(client.tradingEventsSseClient(), TradingEventsSseClient.class, "options"));
+    assertSame(
+        tradingExecutor,
+        field(client.tradingEventsSseClient(), TradingEventsSseClient.class, "callbackExecutor"));
+    assertSame(
+        dataOptions,
+        field(client.corporateActionsSseClient(), CorporateActionsSseClient.class, "options"));
+    assertSame(
+        dataExecutor,
+        field(
+            client.corporateActionsSseClient(),
+            CorporateActionsSseClient.class,
+            "callbackExecutor"));
+    var corporateActionsApi =
+        (CorporateActionsApi)
+            field(
+                client.corporateActionsSseClient(),
+                CorporateActionsSseClient.class,
+                "corporateActionsApi");
+    assertEquals(
+        MarketDataSseEnvironment.SANDBOX.baseUrl(), corporateActionsApi.getCustomBaseUrl());
+    assertSame(
+        brokerOptions,
+        field(client.brokerEventsSseClient(), BrokerEventsSseClient.class, "sseOptions"));
+    assertSame(
+        brokerExecutor,
+        field(client.brokerEventsSseClient(), BrokerEventsSseClient.class, "callbackExecutor"));
+  }
+
+  @Test
+  void builder_sseConfigurationRejectsNullValues() {
+    var builder = AlpacaClient.builder(CREDS);
+
+    assertThrows(NullPointerException.class, () -> builder.tradingSseOptions(null));
+    assertThrows(NullPointerException.class, () -> builder.tradingSseCallbackExecutor(null));
+    assertThrows(NullPointerException.class, () -> builder.marketDataSseEnvironment(null));
+    assertThrows(NullPointerException.class, () -> builder.dataSseOptions(null));
+    assertThrows(NullPointerException.class, () -> builder.dataSseCallbackExecutor(null));
+    assertThrows(NullPointerException.class, () -> builder.brokerSseOptions(null));
+    assertThrows(NullPointerException.class, () -> builder.brokerSseCallbackExecutor(null));
   }
 
   @Test

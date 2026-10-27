@@ -11,9 +11,10 @@ title: Getting Started
 
 ## About
 
-`alpaca-java` provides Java clients for Alpaca's Trading, Market Data, Broker, WebSocket,
-and Broker Events SSE APIs. Use it when you want to build trading applications, read historical or
-live market data, or build broker-backed investing experiences from a Java application.
+`alpaca-java` provides Java clients for Alpaca's Trading, Market Data, Broker, WebSocket, and
+Trading/Market Data/Broker SSE APIs. Use it when you want to build trading applications, read
+historical or live market data, or build broker-backed investing experiences from a Java
+application.
 
 The SDK includes a top-level `AlpacaClient` facade for common workflows, factory methods for
 pre-configured generated REST clients, and handwritten streaming clients for live data.
@@ -220,7 +221,7 @@ var trades = client.stocks().tradesForSymbol(StockTradesRequest.builder()
 
 ## Request identification
 
-The SDK identifies all REST requests, WebSocket upgrade requests, and Broker Events SSE requests
+The SDK identifies all REST requests, WebSocket upgrade requests, and SSE requests
 with a `User-Agent` header:
 
 ```text
@@ -236,12 +237,14 @@ custom OkHttp client.
 
 - Use `AlpacaClient` for common Trading and Market Data workflows.
 - Use `AlpacaClientFactory` when you need a specific generated REST client, WebSocket stream, or
-  Broker Events SSE client.
+  Trading/Market Data/Broker SSE client.
 - Use `client.newTradingClient()`, `client.newDataClient()`, or `client.newBrokerClient()` as an
   escape hatch for generated REST endpoints that do not yet have handwritten helpers.
 
 Next, see the focused guides for [Trading](./sdk/trading), [Market Data](./sdk/market-data),
 [Broker](./sdk/broker), and [Streaming & Events](./sdk/streaming).
+Applications upgrading Broker SSE from `0.1.4` should also read the
+[SSE migration guide](./sdk/sse-migration).
 
 ## Support
 

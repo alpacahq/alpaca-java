@@ -5,7 +5,7 @@ title: Alpaca Java Client
 ---
 
 `alpaca-java` is a Java 17+ SDK for Alpaca Broker, Market Data, Trading, WebSocket, and
-Broker Events SSE APIs.
+Trading/Market Data/Broker SSE APIs.
 
 This wiki is the narrative documentation layer for the SDK. It should explain workflows, safe
 defaults, examples, and SDK conventions. The generated class and method reference lives separately
