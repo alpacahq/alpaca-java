@@ -1,6 +1,6 @@
 [versions]
-okhttp               = "5.5.0"
-gson                 = "2.14.0"
+okhttp               = "5.5.1"
+gson                 = "2.15.0"
 gson-fire            = "1.9.0"
 swagger-annotations  = "2.2.55"
 jsr305               = "3.0.2"
