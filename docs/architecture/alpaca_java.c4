@@ -1,0 +1,205 @@
+// generated_by: claude-fable-5 / layered-docs 2026-09
+// source_commit: 9a1a58e4da6da89c86a46c5dbc23dd6b21e3b1f0   source_branch: docs/layered-2026-09   generated_at: 2026-10-29T08:30:00Z
+// confidence: medium   review_status: draft-needs-review
+model {
+
+  alpaca_java = system 'Alpaca Java SDK' {
+    #generated
+    description '
+      Java 17+ client library for the Alpaca Trading, Market Data and Broker APIs, published to Maven Central as markets.alpaca:alpaca-java. REST clients are generated at build time from OpenAPI documents pinned under specs/; WebSocket stream clients and the Trading, Broker and Market Data corporate-actions SSE clients are handwritten. Evidence: README.md, GENERATION.md, settings.gradle, gradle.properties
+    '
+    technology 'Java 17 / Gradle 9 / OkHttp 5 / Gson / OpenAPI Generator 7.25 (okhttp-gson)'
+    link https://github.com/alpacahq/alpaca-java 'Repository'
+    metadata {
+      okf 'docs/okf/system.md'
+      allium 'none: no accepted spec'
+      evidence 'README.md, GENERATION.md, AGENTS.md, CONTRIBUTING.md, build.gradle, settings.gradle, gradle.properties, gradle/libs.versions.toml, .github/workflows/build.yml, .github/workflows/release.yml'
+      note 'The containers below are Java packages and sibling builds of one published artifact (rootProject alpaca-java in settings.gradle), grouped by the handwritten-package boundaries stated in CONTRIBUTING.md; they are not independently deployed units. No Dockerfile, compose, k8s or terraform file exists in the tree (git ls-files), so no deployment model is published.'
+    }
+
+    client_facade = container 'Client facade and HTTP layer' {
+      #generated #entrypoint
+      description '
+        Handwritten entry points: the AlpacaClient facade (orders, stocks, trading/corporate-actions/broker SSE clients) with its builder, AlpacaClientFactory, AlpacaCredentials, trading and broker environment enums, REST pagination/futures/rate-limit helpers, and the shared OkHttp configuration with a User-Agent interceptor and a retry interceptor (default retryable statuses 408, 425, 429, 500, 502, 503, 504). Evidence: src/main/java/markets/alpaca/client/AlpacaClient.java, src/main/java/markets/alpaca/client/AlpacaClientFactory.java, src/main/java/markets/alpaca/client/http/AlpacaRetryPolicy.java, src/main/java/markets/alpaca/client/rest/
+      '
+      technology 'Java / OkHttp'
+      link https://github.com/alpacahq/alpaca-java/tree/main/src/main/java/markets/alpaca/client 'Repository'
+      metadata {
+        okf 'docs/okf/system.md'
+        allium 'none: no accepted spec'
+        evidence 'src/main/java/markets/alpaca/client/AlpacaClient.java, src/main/java/markets/alpaca/client/AlpacaClientFactory.java, src/main/java/markets/alpaca/client/AlpacaCredentials.java, src/main/java/markets/alpaca/client/TradingApiEnvironment.java, src/main/java/markets/alpaca/client/BrokerApiEnvironment.java, src/main/java/markets/alpaca/client/http/, src/main/java/markets/alpaca/client/rest/, src/main/java/markets/alpaca/client/trading/AlpacaOrders.java, src/main/java/markets/alpaca/client/data/AlpacaStocks.java, CONTRIBUTING.md'
+      }
+    }
+
+    generated_rest = container 'Generated REST clients' {
+      #generated
+      description '
+        OpenAPI-generated Java clients (api, model and http packages) for the Broker, Market Data and Trading APIs. Committed under markets.alpaca.client.openapi.*, regenerated from specs/ on every build (compileJava depends on generateApis) and never hand-edited. Evidence: GENERATION.md, AGENTS.md, src/main/java/markets/alpaca/client/openapi/
+      '
+      technology 'Java / OpenAPI Generator okhttp-gson / Gson'
+      link https://github.com/alpacahq/alpaca-java/tree/main/src/main/java/markets/alpaca/client/openapi 'Repository'
+      metadata {
+        okf 'docs/okf/system.md'
+        allium 'none: no accepted spec'
+        evidence 'GENERATION.md, src/main/java/markets/alpaca/client/openapi/broker/api/, src/main/java/markets/alpaca/client/openapi/data/api/, src/main/java/markets/alpaca/client/openapi/trading/api/, src/main/java/markets/alpaca/client/openapi/data/http/ApiClient.java, src/main/openapi-templates/'
+      }
+    }
+
+    ws_streams = container 'WebSocket stream clients' {
+      #generated #entrypoint
+      description '
+        Handwritten WebSocket clients for stock, crypto and news market data streams and the trading order-update stream, with listeners, subscription validation, authentication result handling, a reconnect policy and BigDecimal-based stream models. Evidence: src/main/java/markets/alpaca/client/ws/AlpacaStockStream.java, src/main/java/markets/alpaca/client/ws/AlpacaCryptoStream.java, src/main/java/markets/alpaca/client/ws/AlpacaNewsStream.java, src/main/java/markets/alpaca/client/ws/AlpacaTradingStream.java, src/main/java/markets/alpaca/client/ws/AlpacaStreamReconnectPolicy.java, AGENTS.md
+      '
+      technology 'Java / OkHttp WebSocket / Gson'
+      link https://github.com/alpacahq/alpaca-java/tree/main/src/main/java/markets/alpaca/client/ws 'Repository'
+      metadata {
+        okf 'docs/okf/system.md'
+        allium 'none: no accepted spec'
+        evidence 'src/main/java/markets/alpaca/client/ws/, src/main/java/markets/alpaca/client/ws/AlpacaStreamEnvironment.java, src/main/java/markets/alpaca/client/ws/TradingEnvironment.java, src/main/java/markets/alpaca/client/ws/model/'
+      }
+    }
+
+    sse_clients = container 'Server-Sent Events clients' {
+      #generated #entrypoint
+      description '
+        Handwritten SSE layer: a shared bounded, reconnecting transport with lifecycle, callback and subscription types (markets.alpaca.client.sse, internal transport under sse.internal), and API-specific wrappers for Trading account activities, Market Data corporate actions and Broker events. Evidence: src/main/java/markets/alpaca/client/sse/package-info.java, src/main/java/markets/alpaca/client/trading/sse/TradingEventsSseClient.java, src/main/java/markets/alpaca/client/data/sse/CorporateActionsSseClient.java, src/main/java/markets/alpaca/client/broker/sse/BrokerEventsSseClient.java
+      '
+      technology 'Java / OkHttp SSE'
+      link https://github.com/alpacahq/alpaca-java/tree/main/src/main/java/markets/alpaca/client/sse 'Repository'
+      metadata {
+        okf 'docs/okf/system.md'
+        allium 'none: no accepted spec'
+        evidence 'src/main/java/markets/alpaca/client/sse/, src/main/java/markets/alpaca/client/sse/internal/SseTransport.java, src/main/java/markets/alpaca/client/trading/sse/, src/main/java/markets/alpaca/client/data/sse/MarketDataSseEnvironment.java, src/main/java/markets/alpaca/client/broker/sse/, docs/content/sdk/sse-migration.md, CONTRIBUTING.md'
+      }
+    }
+
+    codegen = container 'OpenAPI pin and generation tooling' {
+      #generated
+      description '
+        Build-time tooling, not shipped: Gradle convention plugins (build-logic) that preprocess the pinned specs with SnakeYAML and run OpenAPI Generator, plus Python helpers that diff upstream specs against the pins, classify generated Java surface changes, migrate SSE call sites and support releases. Evidence: build-logic/src/main/groovy/alpaca.openapi-generation.gradle, build-logic/src/main/groovy/markets/alpaca/gradle/OpenApiSpecSupport.groovy, scripts/adopt_openapi.py, scripts/sdk_api_diff.py, specs/
+      '
+      technology 'Gradle (Groovy) / SnakeYAML / Python 3'
+      link https://github.com/alpacahq/alpaca-java/tree/main/build-logic 'Repository'
+      metadata {
+        okf 'docs/okf/system.md'
+        allium 'none: no accepted spec'
+        evidence 'build-logic/, specs/broker/openapi.yaml, specs/data/openapi.yaml, specs/trading/openapi.yaml, scripts/upstream_openapi_urls.json, scripts/adopt_openapi.py, scripts/openapi_tools.py, scripts/sdk_api_diff.py, scripts/release_tools.py, scripts/migrate_sse_0_1_4_to_0_2_0.py, scripts/requirements.txt, GENERATION.md'
+      }
+    }
+
+    docs_site = container 'Documentation site' {
+      #generated
+      description '
+        Docusaurus site with getting-started and per-API guides (trading, market data, broker, streaming, SSE migration) plus Javadocs synced from the Gradle build, deployed to GitHub Pages. Evidence: docs/README.md, docs/docusaurus.config.js, docs/scripts/sync-javadocs.mjs, .github/workflows/deploy-docs.yml
+      '
+      technology 'Docusaurus / Node 22'
+      link https://github.com/alpacahq/alpaca-java/tree/main/docs 'Repository'
+      metadata {
+        okf 'docs/okf/system.md'
+        allium 'none: no accepted spec'
+        evidence 'docs/package.json, docs/docusaurus.config.js, docs/sidebars.js, docs/content/, .github/workflows/deploy-docs.yml'
+      }
+    }
+
+    examples = container 'Runnable examples' {
+      #generated
+      description '
+        Separate Gradle build with Trading, Market Data, Broker and pagination example programs that consume the SDK through AlpacaClientFactory. Not part of the published artifact. Evidence: examples/README.md, examples/build.gradle, examples/settings.gradle, examples/src/main/java/markets/alpaca/client/examples/
+      '
+      technology 'Java / Gradle'
+      link https://github.com/alpacahq/alpaca-java/tree/main/examples 'Repository'
+      metadata {
+        okf 'docs/okf/system.md'
+        allium 'none: no accepted spec'
+        evidence 'examples/README.md, examples/build.gradle, examples/src/main/java/markets/alpaca/client/examples/TradingApiExample.java, examples/src/main/java/markets/alpaca/client/examples/BrokerApiExample.java, examples/src/main/java/markets/alpaca/client/examples/MarketDataExample.java'
+      }
+    }
+
+    client_facade -[uses]-> generated_rest 'configures and wraps the generated ApiClient instances (AlpacaClientFactory)'
+    client_facade -[uses]-> sse_clients 'exposes tradingEventsSseClient(), corporateActionsSseClient(), brokerEventsSseClient()'
+    client_facade -[uses]-> ws_streams 'factory methods for stock, crypto, news and trading streams'
+    sse_clients -[uses]-> generated_rest 'decodes events into generated models; Broker SSE builds on the generated EventsApi'
+    codegen -[writes]-> generated_rest 'regenerates sources from specs/ before compileJava'
+    examples -[uses]-> client_facade 'builds clients from credentials'
+    docs_site -[reads]-> generated_rest 'publishes generated Javadocs'
+  }
+
+  ext_alpaca_trading_api = external 'Alpaca Trading API' {
+    #generated #external
+    description '
+      Trading REST hosts https://api.alpaca.markets and https://paper-api.alpaca.markets; the trade-update WebSocket stream and the account-activity SSE stream run on the same hosts. Evidence: src/main/java/markets/alpaca/client/TradingApiEnvironment.java, src/main/java/markets/alpaca/client/ws/TradingEnvironment.java, src/main/java/markets/alpaca/client/trading/sse/TradingEventsSseClient.java
+    '
+  }
+
+  ext_alpaca_market_data_api = external 'Alpaca Market Data API' {
+    #generated #external
+    description '
+      Historical data hosts https://data.alpaca.markets and https://data.sandbox.alpaca.markets; streaming hosts stream.data.alpaca.markets and stream.data.sandbox.alpaca.markets (WebSocket and corporate-actions SSE). Evidence: src/main/java/markets/alpaca/client/openapi/data/http/ApiClient.java, src/main/java/markets/alpaca/client/ws/AlpacaStreamEnvironment.java, src/main/java/markets/alpaca/client/data/sse/MarketDataSseEnvironment.java
+    '
+  }
+
+  ext_alpaca_broker_api = external 'Alpaca Broker API' {
+    #generated #external
+    description '
+      Broker REST and events hosts https://broker-api.alpaca.markets and https://broker-api.sandbox.alpaca.markets, authenticated with HTTP Basic credentials. Evidence: src/main/java/markets/alpaca/client/BrokerApiEnvironment.java, LLMS.md
+    '
+  }
+
+  ext_alpaca_openapi_specs = external 'Alpaca public OpenAPI documents' {
+    #generated #external
+    description '
+      Public OpenAPI documents at docs.alpaca.markets (broker-api.json, market-data-api.json, trading-api.json), fetched only by the adopt and drift flows, never by normal builds. Evidence: scripts/upstream_openapi_urls.json, GENERATION.md
+    '
+  }
+
+  ext_maven_central = external 'Maven Central' {
+    #generated #external
+    description '
+      Distribution channel for markets.alpaca:alpaca-java: snapshots to Central Snapshots on every current push to main, immutable releases through the Central Portal (NMCP plugin). Evidence: settings.gradle, .github/workflows/build.yml, .github/workflows/release.yml, RELEASING.md, README.md
+    '
+  }
+
+  ext_github = external 'GitHub' {
+    #generated #external
+    description '
+      Hosts the repository, Actions workflows (build, release, docs deploy, weekly OpenAPI drift adopt pull requests), Dependabot updates and the GitHub Pages documentation site. Evidence: .github/workflows/, .github/dependabot.yml, docs/docusaurus.config.js
+    '
+  }
+
+  sdk_developer = person 'Java application developer' {
+    #generated
+    description '
+      Builds Java applications against Alpaca APIs using the SDK with trading API keys or Broker HTTP Basic credentials. Evidence: README.md, docs/content/getting-started.md, LLMS.md, examples/README.md
+    '
+  }
+
+  sdk_developer -[uses]-> alpaca_java.client_facade 'builds AlpacaClient and generated clients'
+  sdk_developer -[uses]-> alpaca_java.ws_streams 'subscribes to market data and trade updates'
+  sdk_developer -[uses]-> alpaca_java.sse_clients 'subscribes to trading, corporate-actions and broker events'
+  sdk_developer -[reads]-> alpaca_java.docs_site 'reads guides and API reference'
+
+  alpaca_java.generated_rest -[calls]-> ext_alpaca_trading_api 'HTTPS REST calls for accounts, orders, positions, assets and clock'
+  alpaca_java.generated_rest -[calls]-> ext_alpaca_market_data_api 'HTTPS REST calls for historical stock, crypto, option, news and screener data'
+  alpaca_java.generated_rest -[calls]-> ext_alpaca_broker_api 'HTTPS REST calls for broker accounts, funding, journals, documents and events'
+  alpaca_java.ws_streams -[consumes]-> ext_alpaca_market_data_api 'WebSocket stock, crypto and news streams'
+  alpaca_java.ws_streams -[consumes]-> ext_alpaca_trading_api 'WebSocket trade-update stream'
+  alpaca_java.sse_clients -[consumes]-> ext_alpaca_trading_api 'account-activity SSE'
+  alpaca_java.sse_clients -[consumes]-> ext_alpaca_market_data_api 'corporate-actions SSE'
+  alpaca_java.sse_clients -[consumes]-> ext_alpaca_broker_api 'broker events SSE'
+  alpaca_java.codegen -[reads]-> ext_alpaca_openapi_specs 'downloads upstream specs for semantic diff and pin adoption'
+  alpaca_java -[publishes]-> ext_maven_central 'snapshots on main pushes, releases from dispatched tagged runs'
+  alpaca_java -[uses]-> ext_github 'CI, release, drift adoption and Pages deployment'
+}
+
+views {
+  view alpaca_java_context {
+    title 'Alpaca Java SDK — context'
+    include alpaca_java, sdk_developer, ext_alpaca_trading_api, ext_alpaca_market_data_api, ext_alpaca_broker_api, ext_alpaca_openapi_specs, ext_maven_central, ext_github
+    autoLayout TopBottom
+  }
+  view alpaca_java_containers of alpaca_java {
+    title 'Alpaca Java SDK — containers'
+    include *
+    autoLayout LeftRight
+  }
+}
