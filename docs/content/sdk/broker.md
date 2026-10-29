@@ -191,7 +191,7 @@ routing and account numbers or with a Plaid processor token for Alpaca.
 
 Transfers use `CreateTransferRequest`: ACH transfers set `transferType(TransferType.ACH)` and a
 `relationshipId`, while wire withdrawals set `transferType(TransferType.WIRE)` and a `bankId` from a
-recipient bank. The generated `timing` field is deprecated and ignored by the API.
+recipient bank.
 
 These calls create real Broker resources in the selected environment, so keep sandbox and production
 credentials visibly separate.
