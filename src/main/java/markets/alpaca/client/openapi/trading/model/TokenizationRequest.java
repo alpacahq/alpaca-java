@@ -27,6 +27,7 @@ import markets.alpaca.client.openapi.trading.model.TokenizationIssuer;
 import markets.alpaca.client.openapi.trading.model.TokenizationNetwork;
 import markets.alpaca.client.openapi.trading.model.TokenizationRequestStatus;
 import markets.alpaca.client.openapi.trading.model.TokenizationRequestType;
+import markets.alpaca.client.openapi.trading.model.TokenizationTransferStatus;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -119,6 +120,11 @@ public class TokenizationRequest implements Serializable {
   @SerializedName(SERIALIZED_NAME_TOKENIZATION_REQUEST_ID)
   @javax.annotation.Nonnull
   private String tokenizationRequestId;
+
+  public static final String SERIALIZED_NAME_TRANSFER_STATUS = "transfer_status";
+  @SerializedName(SERIALIZED_NAME_TRANSFER_STATUS)
+  @javax.annotation.Nullable
+  private TokenizationTransferStatus transferStatus;
 
   public static final String SERIALIZED_NAME_TX_HASH = "tx_hash";
   @SerializedName(SERIALIZED_NAME_TX_HASH)
@@ -376,6 +382,25 @@ public class TokenizationRequest implements Serializable {
   }
 
 
+  public TokenizationRequest transferStatus(@javax.annotation.Nullable TokenizationTransferStatus transferStatus) {
+    this.transferStatus = transferStatus;
+    return this;
+  }
+
+  /**
+   * Get transferStatus
+   * @return transferStatus
+   */
+  @javax.annotation.Nullable
+  public TokenizationTransferStatus getTransferStatus() {
+    return transferStatus;
+  }
+
+  public void setTransferStatus(@javax.annotation.Nullable TokenizationTransferStatus transferStatus) {
+    this.transferStatus = transferStatus;
+  }
+
+
   public TokenizationRequest txHash(@javax.annotation.Nullable String txHash) {
     this.txHash = txHash;
     return this;
@@ -537,6 +562,7 @@ public class TokenizationRequest implements Serializable {
         Objects.equals(this.status, tokenizationRequest.status) &&
         Objects.equals(this.tokenSymbol, tokenizationRequest.tokenSymbol) &&
         Objects.equals(this.tokenizationRequestId, tokenizationRequest.tokenizationRequestId) &&
+        Objects.equals(this.transferStatus, tokenizationRequest.transferStatus) &&
         Objects.equals(this.txHash, tokenizationRequest.txHash) &&
         Objects.equals(this.type, tokenizationRequest.type) &&
         Objects.equals(this.underlyingSymbol, tokenizationRequest.underlyingSymbol) &&
@@ -547,7 +573,7 @@ public class TokenizationRequest implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(clientAccountId, clientExternalAccountId, clientRequestId, createdAt, fees, issuer, issuerRequestId, network, qty, status, tokenSymbol, tokenizationRequestId, txHash, type, underlyingSymbol, updatedAt, walletAddress, additionalProperties);
+    return Objects.hash(clientAccountId, clientExternalAccountId, clientRequestId, createdAt, fees, issuer, issuerRequestId, network, qty, status, tokenSymbol, tokenizationRequestId, transferStatus, txHash, type, underlyingSymbol, updatedAt, walletAddress, additionalProperties);
   }
 
   @Override
@@ -566,6 +592,7 @@ public class TokenizationRequest implements Serializable {
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    tokenSymbol: ").append(toIndentedString(tokenSymbol)).append("\n");
     sb.append("    tokenizationRequestId: ").append(toIndentedString(tokenizationRequestId)).append("\n");
+    sb.append("    transferStatus: ").append(toIndentedString(transferStatus)).append("\n");
     sb.append("    txHash: ").append(toIndentedString(txHash)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    underlyingSymbol: ").append(toIndentedString(underlyingSymbol)).append("\n");
@@ -590,7 +617,7 @@ public class TokenizationRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("client_account_id", "client_external_account_id", "client_request_id", "created_at", "fees", "issuer", "issuer_request_id", "network", "qty", "status", "token_symbol", "tokenization_request_id", "tx_hash", "type", "underlying_symbol", "updated_at", "wallet_address"));
+    openapiFields = new HashSet<String>(Arrays.asList("client_account_id", "client_external_account_id", "client_request_id", "created_at", "fees", "issuer", "issuer_request_id", "network", "qty", "status", "token_symbol", "tokenization_request_id", "transfer_status", "tx_hash", "type", "underlying_symbol", "updated_at", "wallet_address"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("created_at", "issuer", "network", "qty", "status", "token_symbol", "tokenization_request_id", "type", "underlying_symbol", "wallet_address"));
@@ -645,6 +672,10 @@ public class TokenizationRequest implements Serializable {
       }
       if (!jsonObj.get("tokenization_request_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `tokenization_request_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("tokenization_request_id").toString()));
+      }
+      // validate the optional field `transfer_status`
+      if (jsonObj.get("transfer_status") != null && !jsonObj.get("transfer_status").isJsonNull()) {
+        TokenizationTransferStatus.validateJsonElement(jsonObj.get("transfer_status"));
       }
       if ((jsonObj.get("tx_hash") != null && !jsonObj.get("tx_hash").isJsonNull()) && !jsonObj.get("tx_hash").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `tx_hash` to be a primitive type in the JSON string but got `%s`", jsonObj.get("tx_hash").toString()));

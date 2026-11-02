@@ -21,7 +21,6 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import markets.alpaca.client.openapi.broker.model.PartialTransferAnyOf1Securities;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -49,36 +48,60 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * PartialTransferAnyOf1
+ * Returned when request handling stops unexpectedly. This body has no numeric code.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
-public class PartialTransferAnyOf1 implements Serializable {
+public class UnexpectedError implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  public static final String SERIALIZED_NAME_SECURITIES = "securities";
-  @SerializedName(SERIALIZED_NAME_SECURITIES)
+  public static final String SERIALIZED_NAME_ERROR = "error";
+  @SerializedName(SERIALIZED_NAME_ERROR)
   @javax.annotation.Nonnull
-  private PartialTransferAnyOf1Securities securities;
+  private String error;
 
-  public PartialTransferAnyOf1() {
+  public static final String SERIALIZED_NAME_MESSAGE = "message";
+  @SerializedName(SERIALIZED_NAME_MESSAGE)
+  @javax.annotation.Nonnull
+  private String message;
+
+  public UnexpectedError() {
   }
 
-  public PartialTransferAnyOf1 securities(@javax.annotation.Nonnull PartialTransferAnyOf1Securities securities) {
-    this.securities = securities;
+  public UnexpectedError error(@javax.annotation.Nonnull String error) {
+    this.error = error;
     return this;
   }
 
   /**
-   * Get securities
-   * @return securities
+   * Get error
+   * @return error
    */
   @javax.annotation.Nonnull
-  public PartialTransferAnyOf1Securities getSecurities() {
-    return securities;
+  public String getError() {
+    return error;
   }
 
-  public void setSecurities(@javax.annotation.Nonnull PartialTransferAnyOf1Securities securities) {
-    this.securities = securities;
+  public void setError(@javax.annotation.Nonnull String error) {
+    this.error = error;
+  }
+
+
+  public UnexpectedError message(@javax.annotation.Nonnull String message) {
+    this.message = message;
+    return this;
+  }
+
+  /**
+   * Get message
+   * @return message
+   */
+  @javax.annotation.Nonnull
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(@javax.annotation.Nonnull String message) {
+    this.message = message;
   }
 
   /**
@@ -94,9 +117,9 @@ public class PartialTransferAnyOf1 implements Serializable {
    *
    * @param key name of the property
    * @param value value of the property
-   * @return the PartialTransferAnyOf1 instance itself
+   * @return the UnexpectedError instance itself
    */
-  public PartialTransferAnyOf1 putAdditionalProperty(String key, Object value) {
+  public UnexpectedError putAdditionalProperty(String key, Object value) {
     if (this.additionalProperties == null) {
         this.additionalProperties = new HashMap<String, Object>();
     }
@@ -135,21 +158,23 @@ public class PartialTransferAnyOf1 implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PartialTransferAnyOf1 partialTransferAnyOf1 = (PartialTransferAnyOf1) o;
-    return Objects.equals(this.securities, partialTransferAnyOf1.securities)&&
-        Objects.equals(this.additionalProperties, partialTransferAnyOf1.additionalProperties);
+    UnexpectedError unexpectedError = (UnexpectedError) o;
+    return Objects.equals(this.error, unexpectedError.error) &&
+        Objects.equals(this.message, unexpectedError.message)&&
+        Objects.equals(this.additionalProperties, unexpectedError.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(securities, additionalProperties);
+    return Objects.hash(error, message, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PartialTransferAnyOf1 {\n");
-    sb.append("    securities: ").append(toIndentedString(securities)).append("\n");
+    sb.append("class UnexpectedError {\n");
+    sb.append("    error: ").append(toIndentedString(error)).append("\n");
+    sb.append("    message: ").append(toIndentedString(message)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -169,50 +194,54 @@ public class PartialTransferAnyOf1 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("securities"));
+    openapiFields = new HashSet<String>(Arrays.asList("error", "message"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("securities"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("error", "message"));
   }
 
   /**
    * Validates the JSON Element and throws an exception if issues found
    *
    * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to PartialTransferAnyOf1
+   * @throws IOException if the JSON Element is invalid with respect to UnexpectedError
    */
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
       if (jsonElement == null) {
-        if (!PartialTransferAnyOf1.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PartialTransferAnyOf1 is not found in the empty JSON string", PartialTransferAnyOf1.openapiRequiredFields.toString()));
+        if (!UnexpectedError.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in UnexpectedError is not found in the empty JSON string", UnexpectedError.openapiRequiredFields.toString()));
         }
       }
 
       // check to make sure all required properties/fields are present in the JSON string
-      for (String requiredField : PartialTransferAnyOf1.openapiRequiredFields) {
+      for (String requiredField : UnexpectedError.openapiRequiredFields) {
         if (jsonElement.getAsJsonObject().get(requiredField) == null) {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      // validate the required field `securities`
-      PartialTransferAnyOf1Securities.validateJsonElement(jsonObj.get("securities"));
+      if (!jsonObj.get("error").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `error` to be a primitive type in the JSON string but got `%s`", jsonObj.get("error").toString()));
+      }
+      if (!jsonObj.get("message").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `message` to be a primitive type in the JSON string but got `%s`", jsonObj.get("message").toString()));
+      }
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!PartialTransferAnyOf1.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'PartialTransferAnyOf1' and its subtypes
+       if (!UnexpectedError.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'UnexpectedError' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<PartialTransferAnyOf1> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(PartialTransferAnyOf1.class));
+       final TypeAdapter<UnexpectedError> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(UnexpectedError.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<PartialTransferAnyOf1>() {
+       return (TypeAdapter<T>) new TypeAdapter<UnexpectedError>() {
            @Override
-           public void write(JsonWriter out, PartialTransferAnyOf1 value) throws IOException {
+           public void write(JsonWriter out, UnexpectedError value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              obj.remove("additionalProperties");
              // serialize additional properties
@@ -242,12 +271,12 @@ public class PartialTransferAnyOf1 implements Serializable {
            }
 
            @Override
-           public PartialTransferAnyOf1 read(JsonReader in) throws IOException {
+           public UnexpectedError read(JsonReader in) throws IOException {
              JsonElement jsonElement = elementAdapter.read(in);
              validateJsonElement(jsonElement);
              JsonObject jsonObj = jsonElement.getAsJsonObject();
              // store additional fields in the deserialized instance
-             PartialTransferAnyOf1 instance = thisAdapter.fromJsonTree(jsonObj);
+             UnexpectedError instance = thisAdapter.fromJsonTree(jsonObj);
              for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
                if (!openapiFields.contains(entry.getKey())) {
                  if (entry.getValue().isJsonPrimitive()) { // primitive type
@@ -274,18 +303,18 @@ public class PartialTransferAnyOf1 implements Serializable {
   }
 
   /**
-   * Create an instance of PartialTransferAnyOf1 given an JSON string
+   * Create an instance of UnexpectedError given an JSON string
    *
    * @param jsonString JSON string
-   * @return An instance of PartialTransferAnyOf1
-   * @throws IOException if the JSON string is invalid with respect to PartialTransferAnyOf1
+   * @return An instance of UnexpectedError
+   * @throws IOException if the JSON string is invalid with respect to UnexpectedError
    */
-  public static PartialTransferAnyOf1 fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, PartialTransferAnyOf1.class);
+  public static UnexpectedError fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, UnexpectedError.class);
   }
 
   /**
-   * Convert an instance of PartialTransferAnyOf1 to an JSON string
+   * Convert an instance of UnexpectedError to an JSON string
    *
    * @return JSON string
    */

@@ -97,7 +97,7 @@ public class CorporateActionsApi {
      * @param until The end (inclusive) of the date range when searching corporate action announcements. This should follow the YYYY-MM-DD format. The date range is limited to 90 days. (required)
      * @param symbol The symbol of the company initiating the announcement. (optional)
      * @param cusip The CUSIP of the company initiating the announcement. (optional)
-     * @param dateType declaration_date, ex_date, record_date, or payable_date (optional)
+     * @param dateType Which announcement date &#x60;since&#x60; and &#x60;until&#x60; apply to. When omitted, the range applies to payable_date.  - **declaration_date**: The date of the preliminary announcement details or the date that any subsequent term updates took place. - **ex_date**: The date on which any security purchasing activity will not result in a corporate action entitlement. Any selling activity that takes place on or after this date will result in a corporate action entitlement. - **record_date**: The date the company checks its records to determine who is shareholder in order to allocate entitlements. - **payable_date**: The date that the stock and cash positions will update according to the account positions as of the record date. (optional, default to payable_date)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -208,7 +208,7 @@ public class CorporateActionsApi {
      * @param until The end (inclusive) of the date range when searching corporate action announcements. This should follow the YYYY-MM-DD format. The date range is limited to 90 days. (required)
      * @param symbol The symbol of the company initiating the announcement. (optional)
      * @param cusip The CUSIP of the company initiating the announcement. (optional)
-     * @param dateType declaration_date, ex_date, record_date, or payable_date (optional)
+     * @param dateType Which announcement date &#x60;since&#x60; and &#x60;until&#x60; apply to. When omitted, the range applies to payable_date.  - **declaration_date**: The date of the preliminary announcement details or the date that any subsequent term updates took place. - **ex_date**: The date on which any security purchasing activity will not result in a corporate action entitlement. Any selling activity that takes place on or after this date will result in a corporate action entitlement. - **record_date**: The date the company checks its records to determine who is shareholder in order to allocate entitlements. - **payable_date**: The date that the stock and cash positions will update according to the account positions as of the record date. (optional, default to payable_date)
      * @return List&lt;CorporateAnnouncement&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -233,7 +233,7 @@ public class CorporateActionsApi {
      * @param until The end (inclusive) of the date range when searching corporate action announcements. This should follow the YYYY-MM-DD format. The date range is limited to 90 days. (required)
      * @param symbol The symbol of the company initiating the announcement. (optional)
      * @param cusip The CUSIP of the company initiating the announcement. (optional)
-     * @param dateType declaration_date, ex_date, record_date, or payable_date (optional)
+     * @param dateType Which announcement date &#x60;since&#x60; and &#x60;until&#x60; apply to. When omitted, the range applies to payable_date.  - **declaration_date**: The date of the preliminary announcement details or the date that any subsequent term updates took place. - **ex_date**: The date on which any security purchasing activity will not result in a corporate action entitlement. Any selling activity that takes place on or after this date will result in a corporate action entitlement. - **record_date**: The date the company checks its records to determine who is shareholder in order to allocate entitlements. - **payable_date**: The date that the stock and cash positions will update according to the account positions as of the record date. (optional, default to payable_date)
      * @return ApiResponse&lt;List&lt;CorporateAnnouncement&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -259,7 +259,7 @@ public class CorporateActionsApi {
      * @param until The end (inclusive) of the date range when searching corporate action announcements. This should follow the YYYY-MM-DD format. The date range is limited to 90 days. (required)
      * @param symbol The symbol of the company initiating the announcement. (optional)
      * @param cusip The CUSIP of the company initiating the announcement. (optional)
-     * @param dateType declaration_date, ex_date, record_date, or payable_date (optional)
+     * @param dateType Which announcement date &#x60;since&#x60; and &#x60;until&#x60; apply to. When omitted, the range applies to payable_date.  - **declaration_date**: The date of the preliminary announcement details or the date that any subsequent term updates took place. - **ex_date**: The date on which any security purchasing activity will not result in a corporate action entitlement. Any selling activity that takes place on or after this date will result in a corporate action entitlement. - **record_date**: The date the company checks its records to determine who is shareholder in order to allocate entitlements. - **payable_date**: The date that the stock and cash positions will update according to the account positions as of the record date. (optional, default to payable_date)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object

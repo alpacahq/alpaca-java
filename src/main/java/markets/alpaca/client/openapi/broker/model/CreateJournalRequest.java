@@ -150,7 +150,7 @@ public class CreateJournalRequest implements Serializable {
   }
 
   /**
-   * Get currency
+   * The currency of the journal. Defaults to the system currency (for example, USD in the US or EUR in the EU) when omitted. Correspondents with local currency trading enabled must send this field, and the value must be the system currency or one of the correspondent&#39;s enabled currencies
    * @return currency
    */
   @javax.annotation.Nullable

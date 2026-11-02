@@ -34,7 +34,11 @@ public enum AssetClass implements Serializable {
   
   US_OPTION("us_option"),
   
+  US_INDEX("us_index"),
+  
   CRYPTO("crypto"),
+  
+  CRYPTO_PERP("crypto_perp"),
   
   IPO("ipo");
 

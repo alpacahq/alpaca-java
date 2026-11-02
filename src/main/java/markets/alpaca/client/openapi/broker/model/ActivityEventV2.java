@@ -26,6 +26,7 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.UUID;
 import markets.alpaca.client.openapi.broker.model.ActivityEventV2AllOfDetails;
+import markets.alpaca.client.openapi.broker.model.ActivityEventV2Asset;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -73,6 +74,11 @@ public class ActivityEventV2 implements Serializable {
   @SerializedName(SERIALIZED_NAME_ACTIVITY_TYPE)
   @javax.annotation.Nonnull
   private String activityType;
+
+  public static final String SERIALIZED_NAME_ASSET = "asset";
+  @SerializedName(SERIALIZED_NAME_ASSET)
+  @javax.annotation.Nullable
+  private ActivityEventV2Asset asset;
 
   public static final String SERIALIZED_NAME_AT = "at";
   @SerializedName(SERIALIZED_NAME_AT)
@@ -201,6 +207,25 @@ public class ActivityEventV2 implements Serializable {
 
   public void setActivityType(@javax.annotation.Nonnull String activityType) {
     this.activityType = activityType;
+  }
+
+
+  public ActivityEventV2 asset(@javax.annotation.Nullable ActivityEventV2Asset asset) {
+    this.asset = asset;
+    return this;
+  }
+
+  /**
+   * Get asset
+   * @return asset
+   */
+  @javax.annotation.Nullable
+  public ActivityEventV2Asset getAsset() {
+    return asset;
+  }
+
+  public void setAsset(@javax.annotation.Nullable ActivityEventV2Asset asset) {
+    this.asset = asset;
   }
 
 
@@ -527,6 +552,7 @@ public class ActivityEventV2 implements Serializable {
     return Objects.equals(this.accountId, activityEventV2.accountId) &&
         Objects.equals(this.activitySubtype, activityEventV2.activitySubtype) &&
         Objects.equals(this.activityType, activityEventV2.activityType) &&
+        Objects.equals(this.asset, activityEventV2.asset) &&
         Objects.equals(this.at, activityEventV2.at) &&
         Objects.equals(this.currency, activityEventV2.currency) &&
         Objects.equals(this.eventId, activityEventV2.eventId) &&
@@ -546,7 +572,7 @@ public class ActivityEventV2 implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(accountId, activitySubtype, activityType, at, currency, eventId, executedAt, netAmount, previousId, price, qty, refId, settleDate, status, swapFeeBps, swapRate, details, additionalProperties);
+    return Objects.hash(accountId, activitySubtype, activityType, asset, at, currency, eventId, executedAt, netAmount, previousId, price, qty, refId, settleDate, status, swapFeeBps, swapRate, details, additionalProperties);
   }
 
   @Override
@@ -556,6 +582,7 @@ public class ActivityEventV2 implements Serializable {
     sb.append("    accountId: ").append(toIndentedString(accountId)).append("\n");
     sb.append("    activitySubtype: ").append(toIndentedString(activitySubtype)).append("\n");
     sb.append("    activityType: ").append(toIndentedString(activityType)).append("\n");
+    sb.append("    asset: ").append(toIndentedString(asset)).append("\n");
     sb.append("    at: ").append(toIndentedString(at)).append("\n");
     sb.append("    currency: ").append(toIndentedString(currency)).append("\n");
     sb.append("    eventId: ").append(toIndentedString(eventId)).append("\n");
@@ -589,7 +616,7 @@ public class ActivityEventV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("account_id", "activity_subtype", "activity_type", "at", "currency", "event_id", "executed_at", "net_amount", "previous_id", "price", "qty", "ref_id", "settle_date", "status", "swap_fee_bps", "swap_rate", "details"));
+    openapiFields = new HashSet<String>(Arrays.asList("account_id", "activity_subtype", "activity_type", "asset", "at", "currency", "event_id", "executed_at", "net_amount", "previous_id", "price", "qty", "ref_id", "settle_date", "status", "swap_fee_bps", "swap_rate", "details"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("account_id", "activity_type", "at", "currency", "event_id", "executed_at", "ref_id", "settle_date", "status", "details"));
@@ -623,6 +650,10 @@ public class ActivityEventV2 implements Serializable {
       }
       if (!jsonObj.get("activity_type").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `activity_type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("activity_type").toString()));
+      }
+      // validate the optional field `asset`
+      if (jsonObj.get("asset") != null && !jsonObj.get("asset").isJsonNull()) {
+        ActivityEventV2Asset.validateJsonElement(jsonObj.get("asset"));
       }
       if (!jsonObj.get("currency").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `currency` to be a primitive type in the JSON string but got `%s`", jsonObj.get("currency").toString()));

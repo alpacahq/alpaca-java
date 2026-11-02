@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.io.Serializable;
 
@@ -48,11 +49,16 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * PortfolioWeightRequestOneOf1
+ * An asset weight. &#x60;symbol&#x60; is required.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
-public class PortfolioWeightRequestOneOf1 implements Serializable {
+public class PortfolioWeightAssetEntry implements Serializable {
   private static final long serialVersionUID = 1L;
+
+  public static final String SERIALIZED_NAME_PERCENT = "percent";
+  @SerializedName(SERIALIZED_NAME_PERCENT)
+  @javax.annotation.Nonnull
+  private BigDecimal percent;
 
   public static final String SERIALIZED_NAME_SYMBOL = "symbol";
   @SerializedName(SERIALIZED_NAME_SYMBOL)
@@ -111,13 +117,32 @@ public class PortfolioWeightRequestOneOf1 implements Serializable {
 
   public static final String SERIALIZED_NAME_TYPE = "type";
   @SerializedName(SERIALIZED_NAME_TYPE)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private TypeEnum type;
 
-  public PortfolioWeightRequestOneOf1() {
+  public PortfolioWeightAssetEntry() {
   }
 
-  public PortfolioWeightRequestOneOf1 symbol(@javax.annotation.Nonnull String symbol) {
+  public PortfolioWeightAssetEntry percent(@javax.annotation.Nonnull BigDecimal percent) {
+    this.percent = percent;
+    return this;
+  }
+
+  /**
+   * Percentage allocated to this weight. Values must be greater than zero, and all supplied weights must total exactly 100.
+   * @return percent
+   */
+  @javax.annotation.Nonnull
+  public BigDecimal getPercent() {
+    return percent;
+  }
+
+  public void setPercent(@javax.annotation.Nonnull BigDecimal percent) {
+    this.percent = percent;
+  }
+
+
+  public PortfolioWeightAssetEntry symbol(@javax.annotation.Nonnull String symbol) {
     this.symbol = symbol;
     return this;
   }
@@ -136,7 +161,7 @@ public class PortfolioWeightRequestOneOf1 implements Serializable {
   }
 
 
-  public PortfolioWeightRequestOneOf1 type(@javax.annotation.Nullable TypeEnum type) {
+  public PortfolioWeightAssetEntry type(@javax.annotation.Nonnull TypeEnum type) {
     this.type = type;
     return this;
   }
@@ -145,12 +170,12 @@ public class PortfolioWeightRequestOneOf1 implements Serializable {
    * Get type
    * @return type
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public TypeEnum getType() {
     return type;
   }
 
-  public void setType(@javax.annotation.Nullable TypeEnum type) {
+  public void setType(@javax.annotation.Nonnull TypeEnum type) {
     this.type = type;
   }
 
@@ -167,9 +192,9 @@ public class PortfolioWeightRequestOneOf1 implements Serializable {
    *
    * @param key name of the property
    * @param value value of the property
-   * @return the PortfolioWeightRequestOneOf1 instance itself
+   * @return the PortfolioWeightAssetEntry instance itself
    */
-  public PortfolioWeightRequestOneOf1 putAdditionalProperty(String key, Object value) {
+  public PortfolioWeightAssetEntry putAdditionalProperty(String key, Object value) {
     if (this.additionalProperties == null) {
         this.additionalProperties = new HashMap<String, Object>();
     }
@@ -208,21 +233,23 @@ public class PortfolioWeightRequestOneOf1 implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PortfolioWeightRequestOneOf1 portfolioWeightRequestOneOf1 = (PortfolioWeightRequestOneOf1) o;
-    return Objects.equals(this.symbol, portfolioWeightRequestOneOf1.symbol) &&
-        Objects.equals(this.type, portfolioWeightRequestOneOf1.type)&&
-        Objects.equals(this.additionalProperties, portfolioWeightRequestOneOf1.additionalProperties);
+    PortfolioWeightAssetEntry portfolioWeightAssetEntry = (PortfolioWeightAssetEntry) o;
+    return Objects.equals(this.percent, portfolioWeightAssetEntry.percent) &&
+        Objects.equals(this.symbol, portfolioWeightAssetEntry.symbol) &&
+        Objects.equals(this.type, portfolioWeightAssetEntry.type)&&
+        Objects.equals(this.additionalProperties, portfolioWeightAssetEntry.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(symbol, type, additionalProperties);
+    return Objects.hash(percent, symbol, type, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PortfolioWeightRequestOneOf1 {\n");
+    sb.append("class PortfolioWeightAssetEntry {\n");
+    sb.append("    percent: ").append(toIndentedString(percent)).append("\n");
     sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
@@ -244,58 +271,59 @@ public class PortfolioWeightRequestOneOf1 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("symbol", "type"));
+    openapiFields = new HashSet<String>(Arrays.asList("percent", "symbol", "type"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("symbol"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("percent", "symbol", "type"));
   }
 
   /**
    * Validates the JSON Element and throws an exception if issues found
    *
    * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to PortfolioWeightRequestOneOf1
+   * @throws IOException if the JSON Element is invalid with respect to PortfolioWeightAssetEntry
    */
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
       if (jsonElement == null) {
-        if (!PortfolioWeightRequestOneOf1.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PortfolioWeightRequestOneOf1 is not found in the empty JSON string", PortfolioWeightRequestOneOf1.openapiRequiredFields.toString()));
+        if (!PortfolioWeightAssetEntry.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PortfolioWeightAssetEntry is not found in the empty JSON string", PortfolioWeightAssetEntry.openapiRequiredFields.toString()));
         }
       }
 
       // check to make sure all required properties/fields are present in the JSON string
-      for (String requiredField : PortfolioWeightRequestOneOf1.openapiRequiredFields) {
+      for (String requiredField : PortfolioWeightAssetEntry.openapiRequiredFields) {
         if (jsonElement.getAsJsonObject().get(requiredField) == null) {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if (!jsonObj.get("percent").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `percent` to be a primitive type in the JSON string but got `%s`", jsonObj.get("percent").toString()));
+      }
       if (!jsonObj.get("symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
       }
-      if ((jsonObj.get("type") != null && !jsonObj.get("type").isJsonNull()) && !jsonObj.get("type").isJsonPrimitive()) {
+      if (!jsonObj.get("type").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("type").toString()));
       }
-      // validate the optional field `type`
-      if (jsonObj.get("type") != null && !jsonObj.get("type").isJsonNull()) {
-        TypeEnum.validateJsonElement(jsonObj.get("type"));
-      }
+      // validate the required field `type`
+      TypeEnum.validateJsonElement(jsonObj.get("type"));
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!PortfolioWeightRequestOneOf1.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'PortfolioWeightRequestOneOf1' and its subtypes
+       if (!PortfolioWeightAssetEntry.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'PortfolioWeightAssetEntry' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<PortfolioWeightRequestOneOf1> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(PortfolioWeightRequestOneOf1.class));
+       final TypeAdapter<PortfolioWeightAssetEntry> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(PortfolioWeightAssetEntry.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<PortfolioWeightRequestOneOf1>() {
+       return (TypeAdapter<T>) new TypeAdapter<PortfolioWeightAssetEntry>() {
            @Override
-           public void write(JsonWriter out, PortfolioWeightRequestOneOf1 value) throws IOException {
+           public void write(JsonWriter out, PortfolioWeightAssetEntry value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              obj.remove("additionalProperties");
              // serialize additional properties
@@ -325,12 +353,12 @@ public class PortfolioWeightRequestOneOf1 implements Serializable {
            }
 
            @Override
-           public PortfolioWeightRequestOneOf1 read(JsonReader in) throws IOException {
+           public PortfolioWeightAssetEntry read(JsonReader in) throws IOException {
              JsonElement jsonElement = elementAdapter.read(in);
              validateJsonElement(jsonElement);
              JsonObject jsonObj = jsonElement.getAsJsonObject();
              // store additional fields in the deserialized instance
-             PortfolioWeightRequestOneOf1 instance = thisAdapter.fromJsonTree(jsonObj);
+             PortfolioWeightAssetEntry instance = thisAdapter.fromJsonTree(jsonObj);
              for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
                if (!openapiFields.contains(entry.getKey())) {
                  if (entry.getValue().isJsonPrimitive()) { // primitive type
@@ -357,18 +385,18 @@ public class PortfolioWeightRequestOneOf1 implements Serializable {
   }
 
   /**
-   * Create an instance of PortfolioWeightRequestOneOf1 given an JSON string
+   * Create an instance of PortfolioWeightAssetEntry given an JSON string
    *
    * @param jsonString JSON string
-   * @return An instance of PortfolioWeightRequestOneOf1
-   * @throws IOException if the JSON string is invalid with respect to PortfolioWeightRequestOneOf1
+   * @return An instance of PortfolioWeightAssetEntry
+   * @throws IOException if the JSON string is invalid with respect to PortfolioWeightAssetEntry
    */
-  public static PortfolioWeightRequestOneOf1 fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, PortfolioWeightRequestOneOf1.class);
+  public static PortfolioWeightAssetEntry fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, PortfolioWeightAssetEntry.class);
   }
 
   /**
-   * Convert an instance of PortfolioWeightRequestOneOf1 to an JSON string
+   * Convert an instance of PortfolioWeightAssetEntry to an JSON string
    *
    * @return JSON string
    */

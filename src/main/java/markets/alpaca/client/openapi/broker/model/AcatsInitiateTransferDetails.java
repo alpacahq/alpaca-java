@@ -28,7 +28,6 @@ import markets.alpaca.client.openapi.broker.model.AcatsInitiateTransferType;
 import markets.alpaca.client.openapi.broker.model.AcatsSecurities;
 import markets.alpaca.client.openapi.broker.model.FullTransfer;
 import markets.alpaca.client.openapi.broker.model.PartialTransfer;
-import markets.alpaca.client.openapi.broker.model.PartialTransferAnyOf1Securities;
 import java.io.Serializable;
 
 

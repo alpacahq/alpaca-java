@@ -25,7 +25,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * Represents the current exchanges Alpaca supports. List is currently:  - AMEX - ARCA - BATS - NYSE - NASDAQ - NYSEARCA - OTC - CRYPTO  Can be empty if not applicable (e.g., for options contracts)
+ * Represents the current exchanges Alpaca supports. List is currently:  US equities: - AMEX - ARCA - BATS - NYSE - NASDAQ - NYSEARCA - OTC - TXSE  Crypto: - CRYPTO - ERSX - CRXL  Crypto perpetuals: - ASCX  Index symbols: - INDEX  INDEX is the artificial exchange for index symbols such as SPX.  Can be empty if not applicable (e.g., for options contracts)
  */
 @JsonAdapter(ExchangeForPosition.Adapter.class)
 public enum ExchangeForPosition implements Serializable {
@@ -45,6 +45,16 @@ public enum ExchangeForPosition implements Serializable {
   OTC("OTC"),
   
   CRYPTO("CRYPTO"),
+  
+  TXSE("TXSE"),
+  
+  ERSX("ERSX"),
+  
+  CRXL("CRXL"),
+  
+  ASCX("ASCX"),
+  
+  INDEX("INDEX"),
   
   EMPTY("");
 

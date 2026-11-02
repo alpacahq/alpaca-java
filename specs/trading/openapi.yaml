@@ -919,6 +919,34 @@ components:
       description: Represents an account activity, sent over the Event Streaming API.
       title: ActivityEventV2
       type: object
+    ActivityEventV2Asset:
+      description: Instrument for `qty`. For options, the contract. Omitted when `qty` is missing or zero, when no identifier is known, and on activities recorded before this field was introduced.
+      examples:
+        - cusip: '037833100'
+          id: 790f3f26-4e7c-4f46-93f4-0425a28873da
+          symbol: AAPL
+        - id: 5b4ec3b4-6a1f-4a47-9b8e-2f6c1d0a9e31
+          isin: HK0000069689
+          symbol: 1299:XHKG
+      properties:
+        cusip:
+          description: CUSIP. Only present for US assets when permitted by licensing.
+          example: '037833100'
+          type: string
+        id:
+          description: Asset ID. For options, the contract ID. Only present when `activity_type` is `TRD`.
+          example: 790f3f26-4e7c-4f46-93f4-0425a28873da
+          format: uuid
+          type: string
+        isin:
+          description: ISIN. Only present when `activity_type` is `TRD`, and when permitted by licensing.
+          example: US0378331005
+          type: string
+        symbol:
+          description: Symbol. For options, the contract symbol.
+          example: AAPL
+          type: string
+      type: object
     ActivityEventV2CommonFields:
       description: Represents the common fields for all Activity V2 Events
       properties:
@@ -928,6 +956,8 @@ components:
         activity_type:
           description: The type of the activity, which can be trade or any of the non trade activities
           type: string
+        asset:
+          $ref: '#/components/schemas/ActivityEventV2Asset'
         at:
           description: Timestamp of event
           format: date-time
@@ -2635,6 +2665,7 @@ components:
       description: |-
         Represents the current exchanges Alpaca supports. List is currently:
 
+        US equities:
         - AMEX
         - ARCA
         - BATS
@@ -2642,7 +2673,20 @@ components:
         - NASDAQ
         - NYSEARCA
         - OTC
+        - TXSE
+
+        Crypto:
         - CRYPTO
+        - ERSX
+        - CRXL
+
+        Crypto perpetuals:
+        - ASCX
+
+        Index symbols:
+        - INDEX
+
+        INDEX is the artificial exchange for index symbols such as SPX.
       enum:
         - AMEX
         - ARCA
@@ -2652,6 +2696,11 @@ components:
         - NYSEARCA
         - OTC
         - CRYPTO
+        - TXSE
+        - ERSX
+        - CRXL
+        - ASCX
+        - INDEX
       example: NYSE
       title: Exchange
       type: string
@@ -2659,6 +2708,7 @@ components:
       description: |-
         Represents the current exchanges Alpaca supports. List is currently:
 
+        US equities:
         - AMEX
         - ARCA
         - BATS
@@ -2666,7 +2716,20 @@ components:
         - NASDAQ
         - NYSEARCA
         - OTC
+        - TXSE
+
+        Crypto:
         - CRYPTO
+        - ERSX
+        - CRXL
+
+        Crypto perpetuals:
+        - ASCX
+
+        Index symbols:
+        - INDEX
+
+        INDEX is the artificial exchange for index symbols such as SPX.
 
         Can be empty if not applicable (e.g., for options contracts)
       enum:
@@ -2678,6 +2741,11 @@ components:
         - NYSEARCA
         - OTC
         - CRYPTO
+        - TXSE
+        - ERSX
+        - CRXL
+        - ASCX
+        - INDEX
         - ''
       example: NYSE
       title: Exchange
@@ -2828,6 +2896,11 @@ components:
       allOf:
         - $ref: '#/components/schemas/CommonJournalActivityV2'
         - properties:
+            issuer:
+              description: Issuer of the tokenized asset, on tokenization mint and redeem journals (`activity_subtype` `ITNJ`). Same value as `issuer` on the related tokenization request. Omitted for other
+                journals and for journals booked before this field was added.
+              example: xstocks
+              type: string
             symbol:
               description: The symbol of the security involved with the activity
               type: string
@@ -4788,6 +4861,8 @@ components:
           description: Unique identifier of the tokenization request set by Alpaca
           example: 5b1d6a3e-7f0a-4d2c-b8e1-9e6f1c0d2c4a
           type: string
+        transfer_status:
+          $ref: '#/components/schemas/TokenizationTransferStatus'
         tx_hash:
           description: Transaction hash of the completed request on the blockchain
           example: null
@@ -4839,6 +4914,22 @@ components:
         - redeem
       example: mint
       title: TokenizationRequestType
+      type: string
+    TokenizationTransferStatus:
+      description: |-
+        Whether Alpaca has moved the underlying shares for this tokenization request. Independent of `status`: `status` can stay `pending` until the issuer completes the on-chain mint or redeem, while `transfer_status` becomes `completed` as soon as the shares move.
+
+        - `pending`: the shares have not moved yet.
+        - `completed`: the shares have moved. Account activities can lag until after end-of-day posting.
+        - `rejected`: the share transfer failed.
+
+        Returned by the list and get tokenization request endpoints. Omitted when Alpaca has no share transfer for the request, for example when the request was rejected during validation.
+      enum:
+        - pending
+        - completed
+        - rejected
+      example: completed
+      title: TokenizationTransferStatus
       type: string
     TradingActivities:
       examples:
@@ -6853,7 +6944,9 @@ paths:
           name: asset_class
           schema:
             type: string
-        - description: Optional AMEX, ARCA, BATS, NYSE, NASDAQ, NYSEARCA, OTC or CRYPTO
+        - description: |-
+            Optional comma-separated exchanges to filter `us_equity` and `us_index` assets by: AMEX, ARCA, BATS, NYSE, NASDAQ, NYSEARCA, OTC, TXSE, or INDEX. `INDEX` requires `asset_class=us_index`.
+            Crypto and crypto perpetual assets are not filtered by exchange; set `asset_class` to exclude them.
           in: query
           name: exchange
           schema:
@@ -7017,10 +7110,22 @@ paths:
           name: cusip
           schema:
             type: string
-        - description: declaration_date, ex_date, record_date, or payable_date
+        - description: |-
+            Which announcement date `since` and `until` apply to. When omitted, the range applies to payable_date.
+
+            - **declaration_date**: The date of the preliminary announcement details or the date that any subsequent term updates took place.
+            - **ex_date**: The date on which any security purchasing activity will not result in a corporate action entitlement. Any selling activity that takes place on or after this date will result in a corporate action entitlement.
+            - **record_date**: The date the company checks its records to determine who is shareholder in order to allocate entitlements.
+            - **payable_date**: The date that the stock and cash positions will update according to the account positions as of the record date.
           in: query
           name: date_type
           schema:
+            default: payable_date
+            enum:
+              - declaration_date
+              - ex_date
+              - record_date
+              - payable_date
             type: string
       responses:
         '200':
@@ -7996,6 +8101,7 @@ paths:
                 status: completed
                 token_symbol: TSLAx
                 tokenization_request_id: 5b1d6a3e-7f0a-4d2c-b8e1-9e6f1c0d2c4a
+                transfer_status: completed
                 tx_hash: 5J7ZxK4QwR3vH2pY1aB6sN8cM9tD0fA2eXyVwUjL3kPqR4mZcF7nB1tA8sH6dG2pE
                 type: mint
                 underlying_symbol: TSLA
@@ -8069,6 +8175,7 @@ paths:
                 status: completed
                 token_symbol: TSLAx
                 tokenization_request_id: 5b1d6a3e-7f0a-4d2c-b8e1-9e6f1c0d2c4a
+                transfer_status: completed
                 tx_hash: 5J7ZxK4QwR3vH2pY1aB6sN8cM9tD0fA2eXyVwUjL3kPqR4mZcF7nB1tA8sH6dG2pE
                 type: mint
                 underlying_symbol: TSLA
