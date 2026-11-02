@@ -225,7 +225,7 @@ public class APRTier implements Serializable {
   }
 
   /**
-   * True if this is the default APR tier. Only one APR tier can be default per currency. 
+   * Whether this is the default APR tier for its currency. Each currency has at most one default tier. When true, an account that signs the required Alpaca Customer Agreement revision without providing cash_interest may be automatically enrolled in this tier. Do not rely on a default tier for enrollment; always set apr_tier_name explicitly via Create Account or Update Account. 
    * @return isDefault
    */
   @javax.annotation.Nullable

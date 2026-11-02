@@ -23,249 +23,408 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import markets.alpaca.client.openapi.broker.model.PartialTransferAnyOf;
-import markets.alpaca.client.openapi.broker.model.PartialTransferAnyOf1;
-import markets.alpaca.client.openapi.broker.model.PartialTransferAnyOf1Securities;
+import markets.alpaca.client.openapi.broker.model.AcatsCashBalance;
+import markets.alpaca.client.openapi.broker.model.AcatsSecurities;
 import java.io.Serializable;
-
-
-
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.annotations.JsonAdapter;
-import com.google.gson.annotations.SerializedName;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonArray;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import markets.alpaca.client.openapi.broker.http.JSON;
 
+/**
+ * Transfers selected assets. Must carry a non-empty &#x60;cash&#x60; array, a non-empty &#x60;securities.equities&#x60; array, or both.
+ */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
-public class PartialTransfer extends AbstractOpenApiSchema implements Serializable {
-    private static final Logger log = Logger.getLogger(PartialTransfer.class.getName());
+public class PartialTransfer implements Serializable {
+  private static final long serialVersionUID = 1L;
 
-    public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
-        @SuppressWarnings("unchecked")
-        @Override
-        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-            if (!PartialTransfer.class.isAssignableFrom(type.getRawType())) {
-                return null; // this class only serializes 'PartialTransfer' and its subtypes
-            }
-            final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-            final TypeAdapter<PartialTransferAnyOf> adapterPartialTransferAnyOf = gson.getDelegateAdapter(this, TypeToken.get(PartialTransferAnyOf.class));
-            final TypeAdapter<PartialTransferAnyOf1> adapterPartialTransferAnyOf1 = gson.getDelegateAdapter(this, TypeToken.get(PartialTransferAnyOf1.class));
+  public static final String SERIALIZED_NAME_CASH = "cash";
+  @SerializedName(SERIALIZED_NAME_CASH)
+  @javax.annotation.Nullable
+  private List<AcatsCashBalance> cash = new ArrayList<>();
 
-            return (TypeAdapter<T>) new TypeAdapter<PartialTransfer>() {
-                @Override
-                public void write(JsonWriter out, PartialTransfer value) throws IOException {
-                    if (value == null || value.getActualInstance() == null) {
-                        elementAdapter.write(out, null);
-                        return;
-                    }
+  public static final String SERIALIZED_NAME_SECURITIES = "securities";
+  @SerializedName(SERIALIZED_NAME_SECURITIES)
+  @javax.annotation.Nullable
+  private AcatsSecurities securities;
 
-                    // check if the actual instance is of the type `PartialTransferAnyOf`
-                    if (value.getActualInstance() instanceof PartialTransferAnyOf) {
-                        JsonElement element = adapterPartialTransferAnyOf.toJsonTree((PartialTransferAnyOf)value.getActualInstance());
-                        elementAdapter.write(out, element);
-                        return;
-                    }
-                    // check if the actual instance is of the type `PartialTransferAnyOf1`
-                    if (value.getActualInstance() instanceof PartialTransferAnyOf1) {
-                        JsonElement element = adapterPartialTransferAnyOf1.toJsonTree((PartialTransferAnyOf1)value.getActualInstance());
-                        elementAdapter.write(out, element);
-                        return;
-                    }
-                    throw new IOException("Failed to serialize as the type doesn't match anyOf schemas: PartialTransferAnyOf, PartialTransferAnyOf1");
-                }
+  /**
+   * Gets or Sets type
+   */
+  @JsonAdapter(TypeEnum.Adapter.class)
+  public enum TypeEnum {
+    PARTIAL("PARTIAL");
 
-                @Override
-                public PartialTransfer read(JsonReader in) throws IOException {
-                    Object deserialized = null;
-                    JsonElement jsonElement = elementAdapter.read(in);
+    private String value;
 
-                    ArrayList<String> errorMessages = new ArrayList<>();
-                    TypeAdapter actualAdapter = elementAdapter;
-
-                    // deserialize PartialTransferAnyOf
-                    try {
-                        // validate the JSON object to see if any exception is thrown
-                        PartialTransferAnyOf.validateJsonElement(jsonElement);
-                        actualAdapter = adapterPartialTransferAnyOf;
-                        PartialTransfer ret = new PartialTransfer();
-                        ret.setActualInstance(actualAdapter.fromJsonTree(jsonElement));
-                        return ret;
-                    } catch (Exception e) {
-                        // deserialization failed, continue
-                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for PartialTransferAnyOf failed with `%s`.", e.getMessage()));
-                        log.log(Level.FINER, "Input data does not match schema 'PartialTransferAnyOf'", e);
-                    }
-                    // deserialize PartialTransferAnyOf1
-                    try {
-                        // validate the JSON object to see if any exception is thrown
-                        PartialTransferAnyOf1.validateJsonElement(jsonElement);
-                        actualAdapter = adapterPartialTransferAnyOf1;
-                        PartialTransfer ret = new PartialTransfer();
-                        ret.setActualInstance(actualAdapter.fromJsonTree(jsonElement));
-                        return ret;
-                    } catch (Exception e) {
-                        // deserialization failed, continue
-                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for PartialTransferAnyOf1 failed with `%s`.", e.getMessage()));
-                        log.log(Level.FINER, "Input data does not match schema 'PartialTransferAnyOf1'", e);
-                    }
-
-                    throw new IOException(String.format(java.util.Locale.ROOT, "Failed deserialization for PartialTransfer: no class matches result, expected at least 1. Detailed failure message for anyOf schemas: %s. JSON: %s", errorMessages, jsonElement.toString()));
-                }
-            }.nullSafe();
-        }
+    TypeEnum(String value) {
+      this.value = value;
     }
 
-    // store a list of schema names defined in anyOf
-    public static final Map<String, Class<?>> schemas = new HashMap<String, Class<?>>();
-
-    public PartialTransfer() {
-        super("anyOf", Boolean.FALSE);
-    }
-
-    public PartialTransfer(Object o) {
-        super("anyOf", Boolean.FALSE);
-        setActualInstance(o);
-    }
-
-    static {
-        schemas.put("PartialTransferAnyOf", PartialTransferAnyOf.class);
-        schemas.put("PartialTransferAnyOf1", PartialTransferAnyOf1.class);
+    public String getValue() {
+      return value;
     }
 
     @Override
-    public Map<String, Class<?>> getSchemas() {
-        return PartialTransfer.schemas;
+    public String toString() {
+      return String.valueOf(value);
     }
 
-    /**
-     * Set the instance that matches the anyOf child schema, check
-     * the instance parameter is valid against the anyOf child schemas:
-     * PartialTransferAnyOf, PartialTransferAnyOf1
-     *
-     * It could be an instance of the 'anyOf' schemas.
-     */
-    @Override
-    public void setActualInstance(Object instance) {
-        if (instance instanceof PartialTransferAnyOf) {
-            super.setActualInstance(instance);
-            return;
+    public static TypeEnum fromValue(String value) {
+      for (TypeEnum b : TypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
         }
-
-        if (instance instanceof PartialTransferAnyOf1) {
-            super.setActualInstance(instance);
-            return;
-        }
-
-        throw new RuntimeException("Invalid instance type. Must be PartialTransferAnyOf, PartialTransferAnyOf1");
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
     }
 
-    /**
-     * Get the actual instance, which can be the following:
-     * PartialTransferAnyOf, PartialTransferAnyOf1
-     *
-     * @return The actual instance (PartialTransferAnyOf, PartialTransferAnyOf1)
-     */
+    public static class Adapter extends TypeAdapter<TypeEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final TypeEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public TypeEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return TypeEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      TypeEnum.fromValue(value);
+    }
+  }
+
+  public static final String SERIALIZED_NAME_TYPE = "type";
+  @SerializedName(SERIALIZED_NAME_TYPE)
+  @javax.annotation.Nonnull
+  private TypeEnum type;
+
+  public PartialTransfer() {
+  }
+
+  public PartialTransfer cash(@javax.annotation.Nullable List<AcatsCashBalance> cash) {
+    this.cash = cash;
+    return this;
+  }
+
+  public PartialTransfer addCashItem(AcatsCashBalance cashItem) {
+    if (this.cash == null) {
+      this.cash = new ArrayList<>();
+    }
+    this.cash.add(cashItem);
+    return this;
+  }
+
+  /**
+   * Cash amounts to transfer.
+   * @return cash
+   */
+  @javax.annotation.Nullable
+  public List<AcatsCashBalance> getCash() {
+    return cash;
+  }
+
+  public void setCash(@javax.annotation.Nullable List<AcatsCashBalance> cash) {
+    this.cash = cash;
+  }
+
+
+  public PartialTransfer securities(@javax.annotation.Nullable AcatsSecurities securities) {
+    this.securities = securities;
+    return this;
+  }
+
+  /**
+   * Get securities
+   * @return securities
+   */
+  @javax.annotation.Nullable
+  public AcatsSecurities getSecurities() {
+    return securities;
+  }
+
+  public void setSecurities(@javax.annotation.Nullable AcatsSecurities securities) {
+    this.securities = securities;
+  }
+
+
+  public PartialTransfer type(@javax.annotation.Nonnull TypeEnum type) {
+    this.type = type;
+    return this;
+  }
+
+  /**
+   * Get type
+   * @return type
+   */
+  @javax.annotation.Nonnull
+  public TypeEnum getType() {
+    return type;
+  }
+
+  public void setType(@javax.annotation.Nonnull TypeEnum type) {
+    this.type = type;
+  }
+
+  /**
+   * A container for additional, undeclared properties.
+   * This is a holder for any undeclared properties as specified with
+   * the 'additionalProperties' keyword in the OAS document.
+   */
+  private Map<String, Object> additionalProperties;
+
+  /**
+   * Set the additional (undeclared) property with the specified name and value.
+   * If the property does not already exist, create it otherwise replace it.
+   *
+   * @param key name of the property
+   * @param value value of the property
+   * @return the PartialTransfer instance itself
+   */
+  public PartialTransfer putAdditionalProperty(String key, Object value) {
+    if (this.additionalProperties == null) {
+        this.additionalProperties = new HashMap<String, Object>();
+    }
+    this.additionalProperties.put(key, value);
+    return this;
+  }
+
+  /**
+   * Return the additional (undeclared) property.
+   *
+   * @return a map of objects
+   */
+  public Map<String, Object> getAdditionalProperties() {
+    return additionalProperties;
+  }
+
+  /**
+   * Return the additional (undeclared) property with the specified name.
+   *
+   * @param key name of the property
+   * @return an object
+   */
+  public Object getAdditionalProperty(String key) {
+    if (this.additionalProperties == null) {
+        return null;
+    }
+    return this.additionalProperties.get(key);
+  }
+
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    PartialTransfer partialTransfer = (PartialTransfer) o;
+    return Objects.equals(this.cash, partialTransfer.cash) &&
+        Objects.equals(this.securities, partialTransfer.securities) &&
+        Objects.equals(this.type, partialTransfer.type)&&
+        Objects.equals(this.additionalProperties, partialTransfer.additionalProperties);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(cash, securities, type, additionalProperties);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class PartialTransfer {\n");
+    sb.append("    cash: ").append(toIndentedString(cash)).append("\n");
+    sb.append("    securities: ").append(toIndentedString(securities)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
+    sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
+  }
+
+
+  public static HashSet<String> openapiFields;
+  public static HashSet<String> openapiRequiredFields;
+
+  static {
+    // a set of all properties/fields (JSON key names)
+    openapiFields = new HashSet<String>(Arrays.asList("cash", "securities", "type"));
+
+    // a set of required properties/fields (JSON key names)
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("type"));
+  }
+
+  /**
+   * Validates the JSON Element and throws an exception if issues found
+   *
+   * @param jsonElement JSON Element
+   * @throws IOException if the JSON Element is invalid with respect to PartialTransfer
+   */
+  public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      if (jsonElement == null) {
+        if (!PartialTransfer.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PartialTransfer is not found in the empty JSON string", PartialTransfer.openapiRequiredFields.toString()));
+        }
+      }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : PartialTransfer.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
+        JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if (jsonObj.get("cash") != null && !jsonObj.get("cash").isJsonNull()) {
+        JsonArray jsonArraycash = jsonObj.getAsJsonArray("cash");
+        if (jsonArraycash != null) {
+          // ensure the json data is an array
+          if (!jsonObj.get("cash").isJsonArray()) {
+            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cash` to be an array in the JSON string but got `%s`", jsonObj.get("cash").toString()));
+          }
+
+          // validate the optional field `cash` (array)
+          for (int i = 0; i < jsonArraycash.size(); i++) {
+            AcatsCashBalance.validateJsonElement(jsonArraycash.get(i));
+          };
+        }
+      }
+      // validate the optional field `securities`
+      if (jsonObj.get("securities") != null && !jsonObj.get("securities").isJsonNull()) {
+        AcatsSecurities.validateJsonElement(jsonObj.get("securities"));
+      }
+      if (!jsonObj.get("type").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("type").toString()));
+      }
+      // validate the required field `type`
+      TypeEnum.validateJsonElement(jsonObj.get("type"));
+  }
+
+  public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
     @SuppressWarnings("unchecked")
     @Override
-    public Object getActualInstance() {
-        return super.getActualInstance();
-    }
+    public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+       if (!PartialTransfer.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'PartialTransfer' and its subtypes
+       }
+       final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
+       final TypeAdapter<PartialTransfer> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(PartialTransfer.class));
 
-    /**
-     * Get the actual instance of `PartialTransferAnyOf`. If the actual instance is not `PartialTransferAnyOf`,
-     * the ClassCastException will be thrown.
-     *
-     * @return The actual instance of `PartialTransferAnyOf`
-     * @throws ClassCastException if the instance is not `PartialTransferAnyOf`
-     */
-    public PartialTransferAnyOf getPartialTransferAnyOf() throws ClassCastException {
-        return (PartialTransferAnyOf)super.getActualInstance();
-    }
+       return (TypeAdapter<T>) new TypeAdapter<PartialTransfer>() {
+           @Override
+           public void write(JsonWriter out, PartialTransfer value) throws IOException {
+             JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
+             obj.remove("additionalProperties");
+             // serialize additional properties
+             if (value.getAdditionalProperties() != null) {
+               for (Map.Entry<String, Object> entry : value.getAdditionalProperties().entrySet()) {
+                 if (entry.getValue() instanceof String)
+                   obj.addProperty(entry.getKey(), (String) entry.getValue());
+                 else if (entry.getValue() instanceof Number)
+                   obj.addProperty(entry.getKey(), (Number) entry.getValue());
+                 else if (entry.getValue() instanceof Boolean)
+                   obj.addProperty(entry.getKey(), (Boolean) entry.getValue());
+                 else if (entry.getValue() instanceof Character)
+                   obj.addProperty(entry.getKey(), (Character) entry.getValue());
+                 else {
+                   JsonElement jsonElement = gson.toJsonTree(entry.getValue());
+                   if (jsonElement.isJsonNull()) {
+                     obj.add(entry.getKey(), JsonNull.INSTANCE);
+                   } else if (jsonElement.isJsonArray()) {
+                     obj.add(entry.getKey(), jsonElement.getAsJsonArray());
+                   } else {
+                     obj.add(entry.getKey(), jsonElement.getAsJsonObject());
+                   }
+                 }
+               }
+             }
+             elementAdapter.write(out, obj);
+           }
 
-    /**
-     * Get the actual instance of `PartialTransferAnyOf1`. If the actual instance is not `PartialTransferAnyOf1`,
-     * the ClassCastException will be thrown.
-     *
-     * @return The actual instance of `PartialTransferAnyOf1`
-     * @throws ClassCastException if the instance is not `PartialTransferAnyOf1`
-     */
-    public PartialTransferAnyOf1 getPartialTransferAnyOf1() throws ClassCastException {
-        return (PartialTransferAnyOf1)super.getActualInstance();
-    }
+           @Override
+           public PartialTransfer read(JsonReader in) throws IOException {
+             JsonElement jsonElement = elementAdapter.read(in);
+             validateJsonElement(jsonElement);
+             JsonObject jsonObj = jsonElement.getAsJsonObject();
+             // store additional fields in the deserialized instance
+             PartialTransfer instance = thisAdapter.fromJsonTree(jsonObj);
+             for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
+               if (!openapiFields.contains(entry.getKey())) {
+                 if (entry.getValue().isJsonPrimitive()) { // primitive type
+                   if (entry.getValue().getAsJsonPrimitive().isString())
+                     instance.putAdditionalProperty(entry.getKey(), entry.getValue().getAsString());
+                   else if (entry.getValue().getAsJsonPrimitive().isNumber())
+                     instance.putAdditionalProperty(entry.getKey(), entry.getValue().getAsNumber());
+                   else if (entry.getValue().getAsJsonPrimitive().isBoolean())
+                     instance.putAdditionalProperty(entry.getKey(), entry.getValue().getAsBoolean());
+                   else
+                     throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The field `%s` has unknown primitive type. Value: %s", entry.getKey(), entry.getValue().toString()));
+                 } else if (entry.getValue().isJsonArray()) {
+                     instance.putAdditionalProperty(entry.getKey(), gson.fromJson(entry.getValue(), List.class));
+                 } else { // JSON object
+                     instance.putAdditionalProperty(entry.getKey(), gson.fromJson(entry.getValue(), HashMap.class));
+                 }
+               }
+             }
+             return instance;
+           }
 
-    /**
-     * Validates the JSON Element and throws an exception if issues found
-     *
-     * @param jsonElement JSON Element
-     * @throws IOException if the JSON Element is invalid with respect to PartialTransfer
-     */
-    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
-        // validate anyOf schemas one by one
-        ArrayList<String> errorMessages = new ArrayList<>();
-        // validate the json string with PartialTransferAnyOf
-        try {
-            PartialTransferAnyOf.validateJsonElement(jsonElement);
-            return;
-        } catch (Exception e) {
-            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for PartialTransferAnyOf failed with `%s`.", e.getMessage()));
-            // continue to the next one
-        }
-        // validate the json string with PartialTransferAnyOf1
-        try {
-            PartialTransferAnyOf1.validateJsonElement(jsonElement);
-            return;
-        } catch (Exception e) {
-            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for PartialTransferAnyOf1 failed with `%s`.", e.getMessage()));
-            // continue to the next one
-        }
-        throw new IOException(String.format(java.util.Locale.ROOT, "The JSON string is invalid for PartialTransfer with anyOf schemas: PartialTransferAnyOf, PartialTransferAnyOf1. no class match the result, expected at least 1. Detailed failure message for anyOf schemas: %s. JSON: %s", errorMessages, jsonElement.toString()));
+       }.nullSafe();
     }
+  }
 
-    /**
-     * Create an instance of PartialTransfer given an JSON string
-     *
-     * @param jsonString JSON string
-     * @return An instance of PartialTransfer
-     * @throws IOException if the JSON string is invalid with respect to PartialTransfer
-     */
-    public static PartialTransfer fromJson(String jsonString) throws IOException {
-        return JSON.getGson().fromJson(jsonString, PartialTransfer.class);
-    }
+  /**
+   * Create an instance of PartialTransfer given an JSON string
+   *
+   * @param jsonString JSON string
+   * @return An instance of PartialTransfer
+   * @throws IOException if the JSON string is invalid with respect to PartialTransfer
+   */
+  public static PartialTransfer fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, PartialTransfer.class);
+  }
 
-    /**
-     * Convert an instance of PartialTransfer to an JSON string
-     *
-     * @return JSON string
-     */
-    public String toJson() {
-        return JSON.getGson().toJson(this);
-    }
+  /**
+   * Convert an instance of PartialTransfer to an JSON string
+   *
+   * @return JSON string
+   */
+  public String toJson() {
+    return JSON.getGson().toJson(this);
+  }
 }
 

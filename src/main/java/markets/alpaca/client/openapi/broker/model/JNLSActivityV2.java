@@ -71,6 +71,11 @@ public class JNLSActivityV2 implements Serializable {
   @javax.annotation.Nullable
   private UUID journalId;
 
+  public static final String SERIALIZED_NAME_ISSUER = "issuer";
+  @SerializedName(SERIALIZED_NAME_ISSUER)
+  @javax.annotation.Nullable
+  private String issuer;
+
   public static final String SERIALIZED_NAME_SYMBOL = "symbol";
   @SerializedName(SERIALIZED_NAME_SYMBOL)
   @javax.annotation.Nonnull
@@ -133,6 +138,25 @@ public class JNLSActivityV2 implements Serializable {
 
   public void setJournalId(@javax.annotation.Nullable UUID journalId) {
     this.journalId = journalId;
+  }
+
+
+  public JNLSActivityV2 issuer(@javax.annotation.Nullable String issuer) {
+    this.issuer = issuer;
+    return this;
+  }
+
+  /**
+   * Issuer of the tokenized asset, on tokenization mint and redeem journals (&#x60;activity_subtype&#x60; &#x60;ITNJ&#x60;). Same value as &#x60;issuer&#x60; on the related tokenization request. Omitted for other journals and for journals booked before this field was added.
+   * @return issuer
+   */
+  @javax.annotation.Nullable
+  public String getIssuer() {
+    return issuer;
+  }
+
+  public void setIssuer(@javax.annotation.Nullable String issuer) {
+    this.issuer = issuer;
   }
 
 
@@ -212,13 +236,14 @@ public class JNLSActivityV2 implements Serializable {
     return Objects.equals(this.groupId, jnLSActivityV2.groupId) &&
         Objects.equals(this.systemDate, jnLSActivityV2.systemDate) &&
         Objects.equals(this.journalId, jnLSActivityV2.journalId) &&
+        Objects.equals(this.issuer, jnLSActivityV2.issuer) &&
         Objects.equals(this.symbol, jnLSActivityV2.symbol)&&
         Objects.equals(this.additionalProperties, jnLSActivityV2.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, systemDate, journalId, symbol, additionalProperties);
+    return Objects.hash(groupId, systemDate, journalId, issuer, symbol, additionalProperties);
   }
 
   @Override
@@ -228,6 +253,7 @@ public class JNLSActivityV2 implements Serializable {
     sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
     sb.append("    systemDate: ").append(toIndentedString(systemDate)).append("\n");
     sb.append("    journalId: ").append(toIndentedString(journalId)).append("\n");
+    sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
     sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
@@ -248,7 +274,7 @@ public class JNLSActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "journal_id", "symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "journal_id", "issuer", "symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date", "symbol"));
@@ -279,6 +305,9 @@ public class JNLSActivityV2 implements Serializable {
       }
       if ((jsonObj.get("journal_id") != null && !jsonObj.get("journal_id").isJsonNull()) && !jsonObj.get("journal_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `journal_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("journal_id").toString()));
+      }
+      if ((jsonObj.get("issuer") != null && !jsonObj.get("issuer").isJsonNull()) && !jsonObj.get("issuer").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `issuer` to be a primitive type in the JSON string but got `%s`", jsonObj.get("issuer").toString()));
       }
       if (!jsonObj.get("symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));

@@ -60,7 +60,7 @@ public class GetV1RebalancingSubscriptions200Response implements Serializable {
   public static final String SERIALIZED_NAME_NEXT_PAGE_TOKEN = "next_page_token";
   @SerializedName(SERIALIZED_NAME_NEXT_PAGE_TOKEN)
   @javax.annotation.Nullable
-  private String nextPageToken;
+  private Integer nextPageToken;
 
   public static final String SERIALIZED_NAME_SUBSCRIPTIONS = "subscriptions";
   @SerializedName(SERIALIZED_NAME_SUBSCRIPTIONS)
@@ -70,21 +70,21 @@ public class GetV1RebalancingSubscriptions200Response implements Serializable {
   public GetV1RebalancingSubscriptions200Response() {
   }
 
-  public GetV1RebalancingSubscriptions200Response nextPageToken(@javax.annotation.Nullable String nextPageToken) {
+  public GetV1RebalancingSubscriptions200Response nextPageToken(@javax.annotation.Nullable Integer nextPageToken) {
     this.nextPageToken = nextPageToken;
     return this;
   }
 
   /**
-   * Use this token in your next API call to paginate through the dataset and retrieve the next page of results. A null token indicates there are no more data to fetch. 
+   * Offset to use as the next page_token, or null when there are no more subscriptions. Set only when the page is full (result count equals the requested limit). 
    * @return nextPageToken
    */
   @javax.annotation.Nullable
-  public String getNextPageToken() {
+  public Integer getNextPageToken() {
     return nextPageToken;
   }
 
-  public void setNextPageToken(@javax.annotation.Nullable String nextPageToken) {
+  public void setNextPageToken(@javax.annotation.Nullable Integer nextPageToken) {
     this.nextPageToken = nextPageToken;
   }
 
@@ -231,9 +231,6 @@ public class GetV1RebalancingSubscriptions200Response implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("next_page_token") != null && !jsonObj.get("next_page_token").isJsonNull()) && !jsonObj.get("next_page_token").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `next_page_token` to be a primitive type in the JSON string but got `%s`", jsonObj.get("next_page_token").toString()));
-      }
       if (jsonObj.get("subscriptions") != null) {
         if (!jsonObj.get("subscriptions").isJsonArray()) {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `subscriptions` to be an array in the JSON string but got `%s`", jsonObj.get("subscriptions").toString()));

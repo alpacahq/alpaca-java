@@ -59,6 +59,11 @@ public class ReverseBatchJournalRequestEntriesInner implements Serializable {
   @javax.annotation.Nullable
   private String amount;
 
+  public static final String SERIALIZED_NAME_CURRENCY = "currency";
+  @SerializedName(SERIALIZED_NAME_CURRENCY)
+  @javax.annotation.Nullable
+  private String currency;
+
   public static final String SERIALIZED_NAME_DESCRIPTION = "description";
   @SerializedName(SERIALIZED_NAME_DESCRIPTION)
   @javax.annotation.Nullable
@@ -78,7 +83,7 @@ public class ReverseBatchJournalRequestEntriesInner implements Serializable {
   }
 
   /**
-   * Journal amount in USD
+   * Journal amount in the entry&#39;s &#x60;currency&#x60;
    * @return amount
    */
   @javax.annotation.Nullable
@@ -88,6 +93,25 @@ public class ReverseBatchJournalRequestEntriesInner implements Serializable {
 
   public void setAmount(@javax.annotation.Nullable String amount) {
     this.amount = amount;
+  }
+
+
+  public ReverseBatchJournalRequestEntriesInner currency(@javax.annotation.Nullable String currency) {
+    this.currency = currency;
+    return this;
+  }
+
+  /**
+   * The currency of the journal. Defaults to the system currency (for example, USD in the US or EUR in the EU) when omitted. Correspondents with local currency trading enabled must send this field, and the value must be the system currency or one of the correspondent&#39;s enabled currencies
+   * @return currency
+   */
+  @javax.annotation.Nullable
+  public String getCurrency() {
+    return currency;
+  }
+
+  public void setCurrency(@javax.annotation.Nullable String currency) {
+    this.currency = currency;
   }
 
 
@@ -184,6 +208,7 @@ public class ReverseBatchJournalRequestEntriesInner implements Serializable {
     }
     ReverseBatchJournalRequestEntriesInner reverseBatchJournalRequestEntriesInner = (ReverseBatchJournalRequestEntriesInner) o;
     return Objects.equals(this.amount, reverseBatchJournalRequestEntriesInner.amount) &&
+        Objects.equals(this.currency, reverseBatchJournalRequestEntriesInner.currency) &&
         Objects.equals(this.description, reverseBatchJournalRequestEntriesInner.description) &&
         Objects.equals(this.fromAccount, reverseBatchJournalRequestEntriesInner.fromAccount)&&
         Objects.equals(this.additionalProperties, reverseBatchJournalRequestEntriesInner.additionalProperties);
@@ -191,7 +216,7 @@ public class ReverseBatchJournalRequestEntriesInner implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(amount, description, fromAccount, additionalProperties);
+    return Objects.hash(amount, currency, description, fromAccount, additionalProperties);
   }
 
   @Override
@@ -199,6 +224,7 @@ public class ReverseBatchJournalRequestEntriesInner implements Serializable {
     StringBuilder sb = new StringBuilder();
     sb.append("class ReverseBatchJournalRequestEntriesInner {\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
+    sb.append("    currency: ").append(toIndentedString(currency)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    fromAccount: ").append(toIndentedString(fromAccount)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
@@ -220,7 +246,7 @@ public class ReverseBatchJournalRequestEntriesInner implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("amount", "description", "from_account"));
+    openapiFields = new HashSet<String>(Arrays.asList("amount", "currency", "description", "from_account"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -241,6 +267,9 @@ public class ReverseBatchJournalRequestEntriesInner implements Serializable {
         JsonObject jsonObj = jsonElement.getAsJsonObject();
       if ((jsonObj.get("amount") != null && !jsonObj.get("amount").isJsonNull()) && !jsonObj.get("amount").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `amount` to be a primitive type in the JSON string but got `%s`", jsonObj.get("amount").toString()));
+      }
+      if ((jsonObj.get("currency") != null && !jsonObj.get("currency").isJsonNull()) && !jsonObj.get("currency").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `currency` to be a primitive type in the JSON string but got `%s`", jsonObj.get("currency").toString()));
       }
       if ((jsonObj.get("description") != null && !jsonObj.get("description").isJsonNull()) && !jsonObj.get("description").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `description` to be a primitive type in the JSON string but got `%s`", jsonObj.get("description").toString()));

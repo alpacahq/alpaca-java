@@ -21,6 +21,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.UUID;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -48,132 +49,108 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * JIT Securities reports are made available through the API and can be accessed within the hour after 11:30 PM EST on the trade date (T+0). The reports communicate transaction-level details as well as overall settlement amounts, transfer direction, and payment timing.
+ * Instrument for &#x60;qty&#x60;. For options, the contract. Omitted when &#x60;qty&#x60; is missing or zero, when no identifier is known, and on activities recorded before this field was introduced.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
-public class JITReport implements Serializable {
+public class ActivityEventV2Asset implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  public static final String SERIALIZED_NAME_DETAIL = "detail";
-  @SerializedName(SERIALIZED_NAME_DETAIL)
+  public static final String SERIALIZED_NAME_CUSIP = "cusip";
+  @SerializedName(SERIALIZED_NAME_CUSIP)
   @javax.annotation.Nullable
-  private String detail;
+  private String cusip;
 
-  public static final String SERIALIZED_NAME_NET_PAYMENT = "net_payment";
-  @SerializedName(SERIALIZED_NAME_NET_PAYMENT)
+  public static final String SERIALIZED_NAME_ID = "id";
+  @SerializedName(SERIALIZED_NAME_ID)
   @javax.annotation.Nullable
-  private String netPayment;
+  private UUID id;
 
-  public static final String SERIALIZED_NAME_NET_PAYMENT_FINAL = "net_payment_final";
-  @SerializedName(SERIALIZED_NAME_NET_PAYMENT_FINAL)
+  public static final String SERIALIZED_NAME_ISIN = "isin";
+  @SerializedName(SERIALIZED_NAME_ISIN)
   @javax.annotation.Nullable
-  private String netPaymentFinal;
+  private String isin;
 
-  public static final String SERIALIZED_NAME_NET_SUMMARY = "net_summary";
-  @SerializedName(SERIALIZED_NAME_NET_SUMMARY)
+  public static final String SERIALIZED_NAME_SYMBOL = "symbol";
+  @SerializedName(SERIALIZED_NAME_SYMBOL)
   @javax.annotation.Nullable
-  private String netSummary;
+  private String symbol;
 
-  public static final String SERIALIZED_NAME_OBLIGATION = "obligation";
-  @SerializedName(SERIALIZED_NAME_OBLIGATION)
-  @javax.annotation.Nullable
-  private String obligation;
-
-  public JITReport() {
+  public ActivityEventV2Asset() {
   }
 
-  public JITReport detail(@javax.annotation.Nullable String detail) {
-    this.detail = detail;
+  public ActivityEventV2Asset cusip(@javax.annotation.Nullable String cusip) {
+    this.cusip = cusip;
     return this;
   }
 
   /**
-   * Contains all activities that impact cash throughout the trading session including executed trades, trading fees, and corporate actions that involve cash allocations.  content-type &#x3D; application/csv
-   * @return detail
+   * CUSIP. Only present for US assets when permitted by licensing.
+   * @return cusip
    */
   @javax.annotation.Nullable
-  public String getDetail() {
-    return detail;
+  public String getCusip() {
+    return cusip;
   }
 
-  public void setDetail(@javax.annotation.Nullable String detail) {
-    this.detail = detail;
+  public void setCusip(@javax.annotation.Nullable String cusip) {
+    this.cusip = cusip;
   }
 
 
-  public JITReport netPayment(@javax.annotation.Nullable String netPayment) {
-    this.netPayment = netPayment;
+  public ActivityEventV2Asset id(@javax.annotation.Nullable UUID id) {
+    this.id = id;
     return this;
   }
 
   /**
-   * Highlights the net amount due to Alpaca by settlement or to the partner on the date of settlement in a formalized invoice format.  content-type &#x3D; application/pdf
-   * @return netPayment
+   * Asset ID. For options, the contract ID. Only present when &#x60;activity_type&#x60; is &#x60;TRD&#x60;.
+   * @return id
    */
   @javax.annotation.Nullable
-  public String getNetPayment() {
-    return netPayment;
+  public UUID getId() {
+    return id;
   }
 
-  public void setNetPayment(@javax.annotation.Nullable String netPayment) {
-    this.netPayment = netPayment;
+  public void setId(@javax.annotation.Nullable UUID id) {
+    this.id = id;
   }
 
 
-  public JITReport netPaymentFinal(@javax.annotation.Nullable String netPaymentFinal) {
-    this.netPaymentFinal = netPaymentFinal;
+  public ActivityEventV2Asset isin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
     return this;
   }
 
   /**
-   * Includes additional information to account for T+0 and T+1 settling activity to clarify settlement journaling reconciliation. This report is generated after trading session close on T+1.  content-type &#x3D; application/pdf
-   * @return netPaymentFinal
+   * ISIN. Only present when &#x60;activity_type&#x60; is &#x60;TRD&#x60;, and when permitted by licensing.
+   * @return isin
    */
   @javax.annotation.Nullable
-  public String getNetPaymentFinal() {
-    return netPaymentFinal;
+  public String getIsin() {
+    return isin;
   }
 
-  public void setNetPaymentFinal(@javax.annotation.Nullable String netPaymentFinal) {
-    this.netPaymentFinal = netPaymentFinal;
+  public void setIsin(@javax.annotation.Nullable String isin) {
+    this.isin = isin;
   }
 
 
-  public JITReport netSummary(@javax.annotation.Nullable String netSummary) {
-    this.netSummary = netSummary;
+  public ActivityEventV2Asset symbol(@javax.annotation.Nullable String symbol) {
+    this.symbol = symbol;
     return this;
   }
 
   /**
-   * Consists of three columns and a single row, which lists the net money movement to or from Alpaca for T0, T1, and T2.  content-type &#x3D; application/csv
-   * @return netSummary
+   * Symbol. For options, the contract symbol.
+   * @return symbol
    */
   @javax.annotation.Nullable
-  public String getNetSummary() {
-    return netSummary;
+  public String getSymbol() {
+    return symbol;
   }
 
-  public void setNetSummary(@javax.annotation.Nullable String netSummary) {
-    this.netSummary = netSummary;
-  }
-
-
-  public JITReport obligation(@javax.annotation.Nullable String obligation) {
-    this.obligation = obligation;
-    return this;
-  }
-
-  /**
-   * Lists of all open obligations towards the partner that are to be settled.  content-type &#x3D; application/csv
-   * @return obligation
-   */
-  @javax.annotation.Nullable
-  public String getObligation() {
-    return obligation;
-  }
-
-  public void setObligation(@javax.annotation.Nullable String obligation) {
-    this.obligation = obligation;
+  public void setSymbol(@javax.annotation.Nullable String symbol) {
+    this.symbol = symbol;
   }
 
   /**
@@ -189,9 +166,9 @@ public class JITReport implements Serializable {
    *
    * @param key name of the property
    * @param value value of the property
-   * @return the JITReport instance itself
+   * @return the ActivityEventV2Asset instance itself
    */
-  public JITReport putAdditionalProperty(String key, Object value) {
+  public ActivityEventV2Asset putAdditionalProperty(String key, Object value) {
     if (this.additionalProperties == null) {
         this.additionalProperties = new HashMap<String, Object>();
     }
@@ -230,29 +207,27 @@ public class JITReport implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    JITReport jiTReport = (JITReport) o;
-    return Objects.equals(this.detail, jiTReport.detail) &&
-        Objects.equals(this.netPayment, jiTReport.netPayment) &&
-        Objects.equals(this.netPaymentFinal, jiTReport.netPaymentFinal) &&
-        Objects.equals(this.netSummary, jiTReport.netSummary) &&
-        Objects.equals(this.obligation, jiTReport.obligation)&&
-        Objects.equals(this.additionalProperties, jiTReport.additionalProperties);
+    ActivityEventV2Asset activityEventV2Asset = (ActivityEventV2Asset) o;
+    return Objects.equals(this.cusip, activityEventV2Asset.cusip) &&
+        Objects.equals(this.id, activityEventV2Asset.id) &&
+        Objects.equals(this.isin, activityEventV2Asset.isin) &&
+        Objects.equals(this.symbol, activityEventV2Asset.symbol)&&
+        Objects.equals(this.additionalProperties, activityEventV2Asset.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(detail, netPayment, netPaymentFinal, netSummary, obligation, additionalProperties);
+    return Objects.hash(cusip, id, isin, symbol, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class JITReport {\n");
-    sb.append("    detail: ").append(toIndentedString(detail)).append("\n");
-    sb.append("    netPayment: ").append(toIndentedString(netPayment)).append("\n");
-    sb.append("    netPaymentFinal: ").append(toIndentedString(netPaymentFinal)).append("\n");
-    sb.append("    netSummary: ").append(toIndentedString(netSummary)).append("\n");
-    sb.append("    obligation: ").append(toIndentedString(obligation)).append("\n");
+    sb.append("class ActivityEventV2Asset {\n");
+    sb.append("    cusip: ").append(toIndentedString(cusip)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    isin: ").append(toIndentedString(isin)).append("\n");
+    sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -272,7 +247,7 @@ public class JITReport implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("detail", "net_payment", "net_payment_final", "net_summary", "obligation"));
+    openapiFields = new HashSet<String>(Arrays.asList("cusip", "id", "isin", "symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -282,29 +257,26 @@ public class JITReport implements Serializable {
    * Validates the JSON Element and throws an exception if issues found
    *
    * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to JITReport
+   * @throws IOException if the JSON Element is invalid with respect to ActivityEventV2Asset
    */
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
       if (jsonElement == null) {
-        if (!JITReport.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in JITReport is not found in the empty JSON string", JITReport.openapiRequiredFields.toString()));
+        if (!ActivityEventV2Asset.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in ActivityEventV2Asset is not found in the empty JSON string", ActivityEventV2Asset.openapiRequiredFields.toString()));
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("detail") != null && !jsonObj.get("detail").isJsonNull()) && !jsonObj.get("detail").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `detail` to be a primitive type in the JSON string but got `%s`", jsonObj.get("detail").toString()));
+      if ((jsonObj.get("cusip") != null && !jsonObj.get("cusip").isJsonNull()) && !jsonObj.get("cusip").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cusip` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cusip").toString()));
       }
-      if ((jsonObj.get("net_payment") != null && !jsonObj.get("net_payment").isJsonNull()) && !jsonObj.get("net_payment").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `net_payment` to be a primitive type in the JSON string but got `%s`", jsonObj.get("net_payment").toString()));
+      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if ((jsonObj.get("net_payment_final") != null && !jsonObj.get("net_payment_final").isJsonNull()) && !jsonObj.get("net_payment_final").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `net_payment_final` to be a primitive type in the JSON string but got `%s`", jsonObj.get("net_payment_final").toString()));
+      if ((jsonObj.get("isin") != null && !jsonObj.get("isin").isJsonNull()) && !jsonObj.get("isin").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `isin` to be a primitive type in the JSON string but got `%s`", jsonObj.get("isin").toString()));
       }
-      if ((jsonObj.get("net_summary") != null && !jsonObj.get("net_summary").isJsonNull()) && !jsonObj.get("net_summary").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `net_summary` to be a primitive type in the JSON string but got `%s`", jsonObj.get("net_summary").toString()));
-      }
-      if ((jsonObj.get("obligation") != null && !jsonObj.get("obligation").isJsonNull()) && !jsonObj.get("obligation").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `obligation` to be a primitive type in the JSON string but got `%s`", jsonObj.get("obligation").toString()));
+      if ((jsonObj.get("symbol") != null && !jsonObj.get("symbol").isJsonNull()) && !jsonObj.get("symbol").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
       }
   }
 
@@ -312,16 +284,16 @@ public class JITReport implements Serializable {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!JITReport.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'JITReport' and its subtypes
+       if (!ActivityEventV2Asset.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'ActivityEventV2Asset' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<JITReport> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(JITReport.class));
+       final TypeAdapter<ActivityEventV2Asset> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(ActivityEventV2Asset.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<JITReport>() {
+       return (TypeAdapter<T>) new TypeAdapter<ActivityEventV2Asset>() {
            @Override
-           public void write(JsonWriter out, JITReport value) throws IOException {
+           public void write(JsonWriter out, ActivityEventV2Asset value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              obj.remove("additionalProperties");
              // serialize additional properties
@@ -351,12 +323,12 @@ public class JITReport implements Serializable {
            }
 
            @Override
-           public JITReport read(JsonReader in) throws IOException {
+           public ActivityEventV2Asset read(JsonReader in) throws IOException {
              JsonElement jsonElement = elementAdapter.read(in);
              validateJsonElement(jsonElement);
              JsonObject jsonObj = jsonElement.getAsJsonObject();
              // store additional fields in the deserialized instance
-             JITReport instance = thisAdapter.fromJsonTree(jsonObj);
+             ActivityEventV2Asset instance = thisAdapter.fromJsonTree(jsonObj);
              for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
                if (!openapiFields.contains(entry.getKey())) {
                  if (entry.getValue().isJsonPrimitive()) { // primitive type
@@ -383,18 +355,18 @@ public class JITReport implements Serializable {
   }
 
   /**
-   * Create an instance of JITReport given an JSON string
+   * Create an instance of ActivityEventV2Asset given an JSON string
    *
    * @param jsonString JSON string
-   * @return An instance of JITReport
-   * @throws IOException if the JSON string is invalid with respect to JITReport
+   * @return An instance of ActivityEventV2Asset
+   * @throws IOException if the JSON string is invalid with respect to ActivityEventV2Asset
    */
-  public static JITReport fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, JITReport.class);
+  public static ActivityEventV2Asset fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, ActivityEventV2Asset.class);
   }
 
   /**
-   * Convert an instance of JITReport to an JSON string
+   * Convert an instance of ActivityEventV2Asset to an JSON string
    *
    * @return JSON string
    */

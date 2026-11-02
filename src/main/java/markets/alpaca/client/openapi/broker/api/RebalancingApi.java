@@ -27,6 +27,8 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 
 
+import markets.alpaca.client.openapi.broker.model.Error;
+import markets.alpaca.client.openapi.broker.model.GetV1RebalancingPortfolios500Response;
 import markets.alpaca.client.openapi.broker.model.GetV1RebalancingRuns200Response;
 import markets.alpaca.client.openapi.broker.model.GetV1RebalancingSubscriptions200Response;
 import markets.alpaca.client.openapi.broker.model.PatchV1RebalancingPortfoliosPortfolioIdRequest;
@@ -130,8 +132,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> No Content </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> Bad Request </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> Unprocessable Entity  </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call deleteV1RebalancingPortfoliosPortfolioIdCall(@javax.annotation.Nonnull String portfolioId, final ApiCallback _callback) throws ApiException {
@@ -161,6 +166,7 @@ public class RebalancingApi {
         Map<String, Object> localVarFormParams = new HashMap<String, Object>();
 
         final String[] localVarAccepts = {
+            "application/json"
         };
         final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) {
@@ -199,8 +205,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> No Content </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> Bad Request </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> Unprocessable Entity  </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public void deleteV1RebalancingPortfoliosPortfolioId(@javax.annotation.Nonnull String portfolioId) throws ApiException {
@@ -218,8 +227,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> No Content </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> Bad Request </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> Unprocessable Entity  </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<Void> deleteV1RebalancingPortfoliosPortfolioIdWithHttpInfo(@javax.annotation.Nonnull String portfolioId) throws ApiException {
@@ -239,8 +251,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> No Content </td><td>  -  </td></tr>
-        <tr><td> 400 </td><td> Bad Request </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> Unprocessable Entity  </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call deleteV1RebalancingPortfoliosPortfolioIdAsync(@javax.annotation.Nonnull String portfolioId, final ApiCallback<Void> _callback) throws ApiException {
@@ -260,6 +275,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> No Content </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No rebalance run with this ID exists for your correspondent. Check the run ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call deleteV1RebalancingRunsRunIdCall(@javax.annotation.Nonnull String runId, final ApiCallback _callback) throws ApiException {
@@ -289,6 +309,7 @@ public class RebalancingApi {
         Map<String, Object> localVarFormParams = new HashMap<String, Object>();
 
         final String[] localVarAccepts = {
+            "application/json"
         };
         final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) {
@@ -319,7 +340,7 @@ public class RebalancingApi {
 
     /**
      * Cancel Run by ID
-     * Cancels a run. Only runs within certain statuses (QUEUED, CANCELED, SELLS_IN_PROGRESS, BUYS_IN_PROGRESS) are cancelable. If this endpoint is called after orders have been submitted, we&#39;ll attempt to cancel the orders.
+     * Cancels a run so it does not start, or is not retried. Only a run in QUEUED or IN_PROGRESS can be canceled. A run in any other status is rejected. Canceling does not stop a run that is already placing orders: those orders are not canceled, and the run&#39;s final status can replace CANCELED.
      * @param runId the id of the portfolio run (required)
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -327,6 +348,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> No Content </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No rebalance run with this ID exists for your correspondent. Check the run ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public void deleteV1RebalancingRunsRunId(@javax.annotation.Nonnull String runId) throws ApiException {
@@ -335,7 +361,7 @@ public class RebalancingApi {
 
     /**
      * Cancel Run by ID
-     * Cancels a run. Only runs within certain statuses (QUEUED, CANCELED, SELLS_IN_PROGRESS, BUYS_IN_PROGRESS) are cancelable. If this endpoint is called after orders have been submitted, we&#39;ll attempt to cancel the orders.
+     * Cancels a run so it does not start, or is not retried. Only a run in QUEUED or IN_PROGRESS can be canceled. A run in any other status is rejected. Canceling does not stop a run that is already placing orders: those orders are not canceled, and the run&#39;s final status can replace CANCELED.
      * @param runId the id of the portfolio run (required)
      * @return ApiResponse&lt;Void&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -344,6 +370,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> No Content </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No rebalance run with this ID exists for your correspondent. Check the run ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<Void> deleteV1RebalancingRunsRunIdWithHttpInfo(@javax.annotation.Nonnull String runId) throws ApiException {
@@ -353,7 +384,7 @@ public class RebalancingApi {
 
     /**
      * Cancel Run by ID (asynchronously)
-     * Cancels a run. Only runs within certain statuses (QUEUED, CANCELED, SELLS_IN_PROGRESS, BUYS_IN_PROGRESS) are cancelable. If this endpoint is called after orders have been submitted, we&#39;ll attempt to cancel the orders.
+     * Cancels a run so it does not start, or is not retried. Only a run in QUEUED or IN_PROGRESS can be canceled. A run in any other status is rejected. Canceling does not stop a run that is already placing orders: those orders are not canceled, and the run&#39;s final status can replace CANCELED.
      * @param runId the id of the portfolio run (required)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
@@ -363,6 +394,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> No Content </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No rebalance run with this ID exists for your correspondent. Check the run ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call deleteV1RebalancingRunsRunIdAsync(@javax.annotation.Nonnull String runId, final ApiCallback<Void> _callback) throws ApiException {
@@ -382,6 +418,10 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> No Content </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call deleteV1RebalancingSubscriptionsSubscriptionIdCall(@javax.annotation.Nonnull String subscriptionId, final ApiCallback _callback) throws ApiException {
@@ -411,6 +451,7 @@ public class RebalancingApi {
         Map<String, Object> localVarFormParams = new HashMap<String, Object>();
 
         final String[] localVarAccepts = {
+            "application/json"
         };
         final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) {
@@ -449,6 +490,10 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> No Content </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public void deleteV1RebalancingSubscriptionsSubscriptionId(@javax.annotation.Nonnull String subscriptionId) throws ApiException {
@@ -466,6 +511,10 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> No Content </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<Void> deleteV1RebalancingSubscriptionsSubscriptionIdWithHttpInfo(@javax.annotation.Nonnull String subscriptionId) throws ApiException {
@@ -485,6 +534,10 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> No Content </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call deleteV1RebalancingSubscriptionsSubscriptionIdAsync(@javax.annotation.Nonnull String subscriptionId, final ApiCallback<Void> _callback) throws ApiException {
@@ -508,6 +561,10 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Array of Portfolios </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getV1RebalancingPortfoliosCall(@javax.annotation.Nullable String name, @javax.annotation.Nullable String description, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable String status, final ApiCallback _callback) throws ApiException {
@@ -595,6 +652,10 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Array of Portfolios </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public List<Portfolio> getV1RebalancingPortfolios(@javax.annotation.Nullable String name, @javax.annotation.Nullable String description, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable String status) throws ApiException {
@@ -617,6 +678,10 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Array of Portfolios </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<List<Portfolio>> getV1RebalancingPortfoliosWithHttpInfo(@javax.annotation.Nullable String name, @javax.annotation.Nullable String description, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable String status) throws ApiException {
@@ -641,6 +706,10 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Array of Portfolios </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getV1RebalancingPortfoliosAsync(@javax.annotation.Nullable String name, @javax.annotation.Nullable String description, @javax.annotation.Nullable String symbol, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable String status, final ApiCallback<List<Portfolio>> _callback) throws ApiException {
@@ -661,6 +730,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getV1RebalancingPortfoliosPortfolioIdCall(@javax.annotation.Nonnull String portfolioId, final ApiCallback _callback) throws ApiException {
@@ -730,6 +804,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public Portfolio getV1RebalancingPortfoliosPortfolioId(@javax.annotation.Nonnull String portfolioId) throws ApiException {
@@ -748,6 +827,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<Portfolio> getV1RebalancingPortfoliosPortfolioIdWithHttpInfo(@javax.annotation.Nonnull String portfolioId) throws ApiException {
@@ -768,6 +852,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getV1RebalancingPortfoliosPortfolioIdAsync(@javax.annotation.Nonnull String portfolioId, final ApiCallback<Portfolio> _callback) throws ApiException {
@@ -782,8 +871,8 @@ public class RebalancingApi {
      * @param accountId Any runs for this account_id will be returned (optional)
      * @param status Status of portfolio run to filter by (optional)
      * @param type Type of portfolio run (full_rebalance, invest_cash) (optional)
-     * @param pageToken Pagination token (optional)
-     * @param limit Max number of runs to return per page (optional)
+     * @param pageToken Offset into the result set for pagination. Defaults to 0 when omitted. (optional, default to 0)
+     * @param limit Maximum number of runs to return. Defaults to 100. (optional, default to 100)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -792,9 +881,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The runs which match the query </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getV1RebalancingRunsCall(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String status, @javax.annotation.Nullable String type, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String limit, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call getV1RebalancingRunsCall(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String status, @javax.annotation.Nullable String type, @javax.annotation.Nullable Integer pageToken, @javax.annotation.Nullable Integer limit, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -859,7 +952,7 @@ public class RebalancingApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call getV1RebalancingRunsValidateBeforeCall(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String status, @javax.annotation.Nullable String type, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String limit, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call getV1RebalancingRunsValidateBeforeCall(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String status, @javax.annotation.Nullable String type, @javax.annotation.Nullable Integer pageToken, @javax.annotation.Nullable Integer limit, final ApiCallback _callback) throws ApiException {
         return getV1RebalancingRunsCall(accountId, status, type, pageToken, limit, _callback);
 
     }
@@ -870,8 +963,8 @@ public class RebalancingApi {
      * @param accountId Any runs for this account_id will be returned (optional)
      * @param status Status of portfolio run to filter by (optional)
      * @param type Type of portfolio run (full_rebalance, invest_cash) (optional)
-     * @param pageToken Pagination token (optional)
-     * @param limit Max number of runs to return per page (optional)
+     * @param pageToken Offset into the result set for pagination. Defaults to 0 when omitted. (optional, default to 0)
+     * @param limit Maximum number of runs to return. Defaults to 100. (optional, default to 100)
      * @return GetV1RebalancingRuns200Response
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -879,9 +972,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The runs which match the query </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
-    public GetV1RebalancingRuns200Response getV1RebalancingRuns(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String status, @javax.annotation.Nullable String type, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String limit) throws ApiException {
+    public GetV1RebalancingRuns200Response getV1RebalancingRuns(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String status, @javax.annotation.Nullable String type, @javax.annotation.Nullable Integer pageToken, @javax.annotation.Nullable Integer limit) throws ApiException {
         ApiResponse<GetV1RebalancingRuns200Response> localVarResp = getV1RebalancingRunsWithHttpInfo(accountId, status, type, pageToken, limit);
         return localVarResp.getData();
     }
@@ -892,8 +989,8 @@ public class RebalancingApi {
      * @param accountId Any runs for this account_id will be returned (optional)
      * @param status Status of portfolio run to filter by (optional)
      * @param type Type of portfolio run (full_rebalance, invest_cash) (optional)
-     * @param pageToken Pagination token (optional)
-     * @param limit Max number of runs to return per page (optional)
+     * @param pageToken Offset into the result set for pagination. Defaults to 0 when omitted. (optional, default to 0)
+     * @param limit Maximum number of runs to return. Defaults to 100. (optional, default to 100)
      * @return ApiResponse&lt;GetV1RebalancingRuns200Response&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -901,9 +998,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The runs which match the query </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<GetV1RebalancingRuns200Response> getV1RebalancingRunsWithHttpInfo(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String status, @javax.annotation.Nullable String type, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String limit) throws ApiException {
+    public ApiResponse<GetV1RebalancingRuns200Response> getV1RebalancingRunsWithHttpInfo(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String status, @javax.annotation.Nullable String type, @javax.annotation.Nullable Integer pageToken, @javax.annotation.Nullable Integer limit) throws ApiException {
         okhttp3.Call localVarCall = getV1RebalancingRunsValidateBeforeCall(accountId, status, type, pageToken, limit, null);
         Type localVarReturnType = new TypeToken<GetV1RebalancingRuns200Response>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -915,8 +1016,8 @@ public class RebalancingApi {
      * @param accountId Any runs for this account_id will be returned (optional)
      * @param status Status of portfolio run to filter by (optional)
      * @param type Type of portfolio run (full_rebalance, invest_cash) (optional)
-     * @param pageToken Pagination token (optional)
-     * @param limit Max number of runs to return per page (optional)
+     * @param pageToken Offset into the result set for pagination. Defaults to 0 when omitted. (optional, default to 0)
+     * @param limit Maximum number of runs to return. Defaults to 100. (optional, default to 100)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -925,9 +1026,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The runs which match the query </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getV1RebalancingRunsAsync(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String status, @javax.annotation.Nullable String type, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String limit, final ApiCallback<GetV1RebalancingRuns200Response> _callback) throws ApiException {
+    public okhttp3.Call getV1RebalancingRunsAsync(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String status, @javax.annotation.Nullable String type, @javax.annotation.Nullable Integer pageToken, @javax.annotation.Nullable Integer limit, final ApiCallback<GetV1RebalancingRuns200Response> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = getV1RebalancingRunsValidateBeforeCall(accountId, status, type, pageToken, limit, _callback);
         Type localVarReturnType = new TypeToken<GetV1RebalancingRuns200Response>(){}.getType();
@@ -945,6 +1050,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The run object </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No rebalance run with this ID exists for your correspondent. Check the run ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getV1RebalancingRunsRunIdCall(@javax.annotation.Nonnull String runId, final ApiCallback _callback) throws ApiException {
@@ -1014,6 +1124,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The run object </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No rebalance run with this ID exists for your correspondent. Check the run ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public PortfolioRun getV1RebalancingRunsRunId(@javax.annotation.Nonnull String runId) throws ApiException {
@@ -1032,6 +1147,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The run object </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No rebalance run with this ID exists for your correspondent. Check the run ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<PortfolioRun> getV1RebalancingRunsRunIdWithHttpInfo(@javax.annotation.Nonnull String runId) throws ApiException {
@@ -1052,6 +1172,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The run object </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No rebalance run with this ID exists for your correspondent. Check the run ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getV1RebalancingRunsRunIdAsync(@javax.annotation.Nonnull String runId, final ApiCallback<PortfolioRun> _callback) throws ApiException {
@@ -1065,8 +1190,8 @@ public class RebalancingApi {
      * Build call for getV1RebalancingSubscriptions
      * @param accountId Any subscriptions for this account_id will be returned (optional)
      * @param portfolioId Portfolio ID (optional)
-     * @param pageToken Pagination token (optional)
-     * @param limit Max number of subscriptions to return per page (optional)
+     * @param pageToken Offset into the result set for pagination. Defaults to 0 when omitted. (optional, default to 0)
+     * @param limit Maximum number of subscriptions to return. Defaults to 100. (optional, default to 100)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -1075,9 +1200,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getV1RebalancingSubscriptionsCall(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String limit, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call getV1RebalancingSubscriptionsCall(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable Integer pageToken, @javax.annotation.Nullable Integer limit, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -1138,7 +1267,7 @@ public class RebalancingApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call getV1RebalancingSubscriptionsValidateBeforeCall(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String limit, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call getV1RebalancingSubscriptionsValidateBeforeCall(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable Integer pageToken, @javax.annotation.Nullable Integer limit, final ApiCallback _callback) throws ApiException {
         return getV1RebalancingSubscriptionsCall(accountId, portfolioId, pageToken, limit, _callback);
 
     }
@@ -1148,8 +1277,8 @@ public class RebalancingApi {
      * Lists subscriptions
      * @param accountId Any subscriptions for this account_id will be returned (optional)
      * @param portfolioId Portfolio ID (optional)
-     * @param pageToken Pagination token (optional)
-     * @param limit Max number of subscriptions to return per page (optional)
+     * @param pageToken Offset into the result set for pagination. Defaults to 0 when omitted. (optional, default to 0)
+     * @param limit Maximum number of subscriptions to return. Defaults to 100. (optional, default to 100)
      * @return GetV1RebalancingSubscriptions200Response
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1157,9 +1286,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
-    public GetV1RebalancingSubscriptions200Response getV1RebalancingSubscriptions(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String limit) throws ApiException {
+    public GetV1RebalancingSubscriptions200Response getV1RebalancingSubscriptions(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable Integer pageToken, @javax.annotation.Nullable Integer limit) throws ApiException {
         ApiResponse<GetV1RebalancingSubscriptions200Response> localVarResp = getV1RebalancingSubscriptionsWithHttpInfo(accountId, portfolioId, pageToken, limit);
         return localVarResp.getData();
     }
@@ -1169,8 +1302,8 @@ public class RebalancingApi {
      * Lists subscriptions
      * @param accountId Any subscriptions for this account_id will be returned (optional)
      * @param portfolioId Portfolio ID (optional)
-     * @param pageToken Pagination token (optional)
-     * @param limit Max number of subscriptions to return per page (optional)
+     * @param pageToken Offset into the result set for pagination. Defaults to 0 when omitted. (optional, default to 0)
+     * @param limit Maximum number of subscriptions to return. Defaults to 100. (optional, default to 100)
      * @return ApiResponse&lt;GetV1RebalancingSubscriptions200Response&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -1178,9 +1311,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<GetV1RebalancingSubscriptions200Response> getV1RebalancingSubscriptionsWithHttpInfo(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String limit) throws ApiException {
+    public ApiResponse<GetV1RebalancingSubscriptions200Response> getV1RebalancingSubscriptionsWithHttpInfo(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable Integer pageToken, @javax.annotation.Nullable Integer limit) throws ApiException {
         okhttp3.Call localVarCall = getV1RebalancingSubscriptionsValidateBeforeCall(accountId, portfolioId, pageToken, limit, null);
         Type localVarReturnType = new TypeToken<GetV1RebalancingSubscriptions200Response>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -1191,8 +1328,8 @@ public class RebalancingApi {
      * Lists subscriptions
      * @param accountId Any subscriptions for this account_id will be returned (optional)
      * @param portfolioId Portfolio ID (optional)
-     * @param pageToken Pagination token (optional)
-     * @param limit Max number of subscriptions to return per page (optional)
+     * @param pageToken Offset into the result set for pagination. Defaults to 0 when omitted. (optional, default to 0)
+     * @param limit Maximum number of subscriptions to return. Defaults to 100. (optional, default to 100)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -1201,9 +1338,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call getV1RebalancingSubscriptionsAsync(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String limit, final ApiCallback<GetV1RebalancingSubscriptions200Response> _callback) throws ApiException {
+    public okhttp3.Call getV1RebalancingSubscriptionsAsync(@javax.annotation.Nullable String accountId, @javax.annotation.Nullable String portfolioId, @javax.annotation.Nullable Integer pageToken, @javax.annotation.Nullable Integer limit, final ApiCallback<GetV1RebalancingSubscriptions200Response> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = getV1RebalancingSubscriptionsValidateBeforeCall(accountId, portfolioId, pageToken, limit, _callback);
         Type localVarReturnType = new TypeToken<GetV1RebalancingSubscriptions200Response>(){}.getType();
@@ -1221,6 +1362,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The portfolio subscription </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No subscription with this ID exists for your correspondent. Check the subscription ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getV1RebalancingSubscriptionsSubscriptionIdCall(@javax.annotation.Nonnull String subscriptionId, final ApiCallback _callback) throws ApiException {
@@ -1290,6 +1436,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The portfolio subscription </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No subscription with this ID exists for your correspondent. Check the subscription ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public PortfolioSubscription getV1RebalancingSubscriptionsSubscriptionId(@javax.annotation.Nonnull String subscriptionId) throws ApiException {
@@ -1308,6 +1459,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The portfolio subscription </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No subscription with this ID exists for your correspondent. Check the subscription ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<PortfolioSubscription> getV1RebalancingSubscriptionsSubscriptionIdWithHttpInfo(@javax.annotation.Nonnull String subscriptionId) throws ApiException {
@@ -1328,6 +1484,11 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The portfolio subscription </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No subscription with this ID exists for your correspondent. Check the subscription ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call getV1RebalancingSubscriptionsSubscriptionIdAsync(@javax.annotation.Nonnull String subscriptionId, final ApiCallback<PortfolioSubscription> _callback) throws ApiException {
@@ -1349,6 +1510,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The updated portfolio </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call patchV1RebalancingPortfoliosPortfolioIdCall(@javax.annotation.Nonnull String portfolioId, @javax.annotation.Nullable PatchV1RebalancingPortfoliosPortfolioIdRequest patchV1RebalancingPortfoliosPortfolioIdRequest, final ApiCallback _callback) throws ApiException {
@@ -1420,6 +1588,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The updated portfolio </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public Portfolio patchV1RebalancingPortfoliosPortfolioId(@javax.annotation.Nonnull String portfolioId, @javax.annotation.Nullable PatchV1RebalancingPortfoliosPortfolioIdRequest patchV1RebalancingPortfoliosPortfolioIdRequest) throws ApiException {
@@ -1439,6 +1614,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The updated portfolio </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<Portfolio> patchV1RebalancingPortfoliosPortfolioIdWithHttpInfo(@javax.annotation.Nonnull String portfolioId, @javax.annotation.Nullable PatchV1RebalancingPortfoliosPortfolioIdRequest patchV1RebalancingPortfoliosPortfolioIdRequest) throws ApiException {
@@ -1460,6 +1642,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The updated portfolio </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call patchV1RebalancingPortfoliosPortfolioIdAsync(@javax.annotation.Nonnull String portfolioId, @javax.annotation.Nullable PatchV1RebalancingPortfoliosPortfolioIdRequest patchV1RebalancingPortfoliosPortfolioIdRequest, final ApiCallback<Portfolio> _callback) throws ApiException {
@@ -1480,6 +1669,12 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Check whether the portfolio was created before retrying, because this request is not idempotent. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call postV1RebalancingPortfoliosCall(@javax.annotation.Nullable PostV1RebalancingPortfoliosRequest postV1RebalancingPortfoliosRequest, final ApiCallback _callback) throws ApiException {
@@ -1544,6 +1739,12 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Check whether the portfolio was created before retrying, because this request is not idempotent. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public Portfolio postV1RebalancingPortfolios(@javax.annotation.Nullable PostV1RebalancingPortfoliosRequest postV1RebalancingPortfoliosRequest) throws ApiException {
@@ -1562,6 +1763,12 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Check whether the portfolio was created before retrying, because this request is not idempotent. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<Portfolio> postV1RebalancingPortfoliosWithHttpInfo(@javax.annotation.Nullable PostV1RebalancingPortfoliosRequest postV1RebalancingPortfoliosRequest) throws ApiException {
@@ -1582,6 +1789,12 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Check whether the portfolio was created before retrying, because this request is not idempotent. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call postV1RebalancingPortfoliosAsync(@javax.annotation.Nullable PostV1RebalancingPortfoliosRequest postV1RebalancingPortfoliosRequest, final ApiCallback<Portfolio> _callback) throws ApiException {
@@ -1602,6 +1815,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to perform this action, or rebalancing is not permitted for this correspondent or account. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> The resource does not exist or is not visible to this correspondent. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Check whether the run was created before retrying, because this request is not idempotent. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call postV1RebalancingRunsCall(@javax.annotation.Nonnull PostV1RebalancingRunsRequest postV1RebalancingRunsRequest, final ApiCallback _callback) throws ApiException {
@@ -1630,6 +1850,7 @@ public class RebalancingApi {
         Map<String, Object> localVarFormParams = new HashMap<String, Object>();
 
         final String[] localVarAccepts = {
+            "application/json"
         };
         final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) {
@@ -1669,6 +1890,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to perform this action, or rebalancing is not permitted for this correspondent or account. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> The resource does not exist or is not visible to this correspondent. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Check whether the run was created before retrying, because this request is not idempotent. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public void postV1RebalancingRuns(@javax.annotation.Nonnull PostV1RebalancingRunsRequest postV1RebalancingRunsRequest) throws ApiException {
@@ -1686,6 +1914,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to perform this action, or rebalancing is not permitted for this correspondent or account. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> The resource does not exist or is not visible to this correspondent. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Check whether the run was created before retrying, because this request is not idempotent. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<Void> postV1RebalancingRunsWithHttpInfo(@javax.annotation.Nonnull PostV1RebalancingRunsRequest postV1RebalancingRunsRequest) throws ApiException {
@@ -1705,6 +1940,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to perform this action, or rebalancing is not permitted for this correspondent or account. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> The resource does not exist or is not visible to this correspondent. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Check whether the run was created before retrying, because this request is not idempotent. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call postV1RebalancingRunsAsync(@javax.annotation.Nonnull PostV1RebalancingRunsRequest postV1RebalancingRunsRequest, final ApiCallback<Void> _callback) throws ApiException {
@@ -1724,6 +1966,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to perform this action, or rebalancing is not permitted for this correspondent or account. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No account with that ID exists for your correspondent. Check the account ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Check whether the subscription was created before retrying, because this request is not idempotent. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call postV1RebalancingSubscriptionsCall(@javax.annotation.Nullable PostV1RebalancingSubscriptionsRequest postV1RebalancingSubscriptionsRequest, final ApiCallback _callback) throws ApiException {
@@ -1788,6 +2037,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to perform this action, or rebalancing is not permitted for this correspondent or account. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No account with that ID exists for your correspondent. Check the account ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Check whether the subscription was created before retrying, because this request is not idempotent. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public PortfolioSubscription postV1RebalancingSubscriptions(@javax.annotation.Nullable PostV1RebalancingSubscriptionsRequest postV1RebalancingSubscriptionsRequest) throws ApiException {
@@ -1806,6 +2062,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to perform this action, or rebalancing is not permitted for this correspondent or account. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No account with that ID exists for your correspondent. Check the account ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Check whether the subscription was created before retrying, because this request is not idempotent. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<PortfolioSubscription> postV1RebalancingSubscriptionsWithHttpInfo(@javax.annotation.Nullable PostV1RebalancingSubscriptionsRequest postV1RebalancingSubscriptionsRequest) throws ApiException {
@@ -1826,6 +2089,13 @@ public class RebalancingApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again. </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> These credentials are not allowed to perform this action, or rebalancing is not permitted for this correspondent or account. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No account with that ID exists for your correspondent. Check the account ID and try again. </td><td>  -  </td></tr>
+        <tr><td> 415 </td><td> The Content-Type header is not application/json. Set Content-Type to application/json and send the body again. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request failed validation or cannot be completed in its current state. The message describes the reason. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Something went wrong on our side while handling the request. Check whether the subscription was created before retrying, because this request is not idempotent. If it keeps happening, contact support. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call postV1RebalancingSubscriptionsAsync(@javax.annotation.Nullable PostV1RebalancingSubscriptionsRequest postV1RebalancingSubscriptionsRequest, final ApiCallback<PortfolioSubscription> _callback) throws ApiException {

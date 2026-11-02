@@ -25,7 +25,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * Represents the exchange where an asset is traded.  For Stocks: - AMEX - ARCA - BATS - NYSE - NASDAQ - NYSEARCA - OTC  For Crypto: - CRYPTO
+ * Represents the exchange where an asset is traded.  For Stocks: - AMEX - ARCA - BATS - NYSE - NASDAQ - NYSEARCA - OTC - TXSE  For Crypto: - CRYPTO - ERSX - CRXL  For crypto perpetuals: - ASCX  Index symbols: - INDEX  INDEX is the artificial exchange for index symbols such as SPX.
  */
 @JsonAdapter(Exchange.Adapter.class)
 public enum Exchange implements Serializable {
@@ -42,7 +42,19 @@ public enum Exchange implements Serializable {
   
   NYSEARCA("NYSEARCA"),
   
-  OTC("OTC");
+  OTC("OTC"),
+  
+  TXSE("TXSE"),
+  
+  CRYPTO("CRYPTO"),
+  
+  ERSX("ERSX"),
+  
+  CRXL("CRXL"),
+  
+  ASCX("ASCX"),
+  
+  INDEX("INDEX");
 
   private String value;
 

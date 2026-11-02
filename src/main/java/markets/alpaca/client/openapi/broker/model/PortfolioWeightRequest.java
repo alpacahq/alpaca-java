@@ -20,10 +20,10 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Arrays;
-import markets.alpaca.client.openapi.broker.model.PortfolioWeightRequestOneOf;
-import markets.alpaca.client.openapi.broker.model.PortfolioWeightRequestOneOf1;
-import markets.alpaca.client.openapi.broker.model.PortfolioWeightRequestPercent;
+import markets.alpaca.client.openapi.broker.model.PortfolioWeightAssetEntry;
+import markets.alpaca.client.openapi.broker.model.PortfolioWeightCashEntry;
 import java.io.Serializable;
 
 
@@ -73,8 +73,8 @@ public class PortfolioWeightRequest extends AbstractOpenApiSchema implements Ser
                 return null; // this class only serializes 'PortfolioWeightRequest' and its subtypes
             }
             final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-            final TypeAdapter<PortfolioWeightRequestOneOf> adapterPortfolioWeightRequestOneOf = gson.getDelegateAdapter(this, TypeToken.get(PortfolioWeightRequestOneOf.class));
-            final TypeAdapter<PortfolioWeightRequestOneOf1> adapterPortfolioWeightRequestOneOf1 = gson.getDelegateAdapter(this, TypeToken.get(PortfolioWeightRequestOneOf1.class));
+            final TypeAdapter<PortfolioWeightCashEntry> adapterPortfolioWeightCashEntry = gson.getDelegateAdapter(this, TypeToken.get(PortfolioWeightCashEntry.class));
+            final TypeAdapter<PortfolioWeightAssetEntry> adapterPortfolioWeightAssetEntry = gson.getDelegateAdapter(this, TypeToken.get(PortfolioWeightAssetEntry.class));
 
             return (TypeAdapter<T>) new TypeAdapter<PortfolioWeightRequest>() {
                 @Override
@@ -84,19 +84,19 @@ public class PortfolioWeightRequest extends AbstractOpenApiSchema implements Ser
                         return;
                     }
 
-                    // check if the actual instance is of the type `PortfolioWeightRequestOneOf`
-                    if (value.getActualInstance() instanceof PortfolioWeightRequestOneOf) {
-                        JsonElement element = adapterPortfolioWeightRequestOneOf.toJsonTree((PortfolioWeightRequestOneOf)value.getActualInstance());
+                    // check if the actual instance is of the type `PortfolioWeightCashEntry`
+                    if (value.getActualInstance() instanceof PortfolioWeightCashEntry) {
+                        JsonElement element = adapterPortfolioWeightCashEntry.toJsonTree((PortfolioWeightCashEntry)value.getActualInstance());
                         elementAdapter.write(out, element);
                         return;
                     }
-                    // check if the actual instance is of the type `PortfolioWeightRequestOneOf1`
-                    if (value.getActualInstance() instanceof PortfolioWeightRequestOneOf1) {
-                        JsonElement element = adapterPortfolioWeightRequestOneOf1.toJsonTree((PortfolioWeightRequestOneOf1)value.getActualInstance());
+                    // check if the actual instance is of the type `PortfolioWeightAssetEntry`
+                    if (value.getActualInstance() instanceof PortfolioWeightAssetEntry) {
+                        JsonElement element = adapterPortfolioWeightAssetEntry.toJsonTree((PortfolioWeightAssetEntry)value.getActualInstance());
                         elementAdapter.write(out, element);
                         return;
                     }
-                    throw new IOException("Failed to serialize as the type doesn't match oneOf schemas: PortfolioWeightRequestOneOf, PortfolioWeightRequestOneOf1");
+                    throw new IOException("Failed to serialize as the type doesn't match oneOf schemas: PortfolioWeightAssetEntry, PortfolioWeightCashEntry");
                 }
 
                 @Override
@@ -108,29 +108,29 @@ public class PortfolioWeightRequest extends AbstractOpenApiSchema implements Ser
                     ArrayList<String> errorMessages = new ArrayList<>();
                     TypeAdapter actualAdapter = elementAdapter;
 
-                    // deserialize PortfolioWeightRequestOneOf
+                    // deserialize PortfolioWeightCashEntry
                     try {
                         // validate the JSON object to see if any exception is thrown
-                        PortfolioWeightRequestOneOf.validateJsonElement(jsonElement);
-                        actualAdapter = adapterPortfolioWeightRequestOneOf;
+                        PortfolioWeightCashEntry.validateJsonElement(jsonElement);
+                        actualAdapter = adapterPortfolioWeightCashEntry;
                         match++;
-                        log.log(Level.FINER, "Input data matches schema 'PortfolioWeightRequestOneOf'");
+                        log.log(Level.FINER, "Input data matches schema 'PortfolioWeightCashEntry'");
                     } catch (Exception e) {
                         // deserialization failed, continue
-                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for PortfolioWeightRequestOneOf failed with `%s`.", e.getMessage()));
-                        log.log(Level.FINER, "Input data does not match schema 'PortfolioWeightRequestOneOf'", e);
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for PortfolioWeightCashEntry failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'PortfolioWeightCashEntry'", e);
                     }
-                    // deserialize PortfolioWeightRequestOneOf1
+                    // deserialize PortfolioWeightAssetEntry
                     try {
                         // validate the JSON object to see if any exception is thrown
-                        PortfolioWeightRequestOneOf1.validateJsonElement(jsonElement);
-                        actualAdapter = adapterPortfolioWeightRequestOneOf1;
+                        PortfolioWeightAssetEntry.validateJsonElement(jsonElement);
+                        actualAdapter = adapterPortfolioWeightAssetEntry;
                         match++;
-                        log.log(Level.FINER, "Input data matches schema 'PortfolioWeightRequestOneOf1'");
+                        log.log(Level.FINER, "Input data matches schema 'PortfolioWeightAssetEntry'");
                     } catch (Exception e) {
                         // deserialization failed, continue
-                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for PortfolioWeightRequestOneOf1 failed with `%s`.", e.getMessage()));
-                        log.log(Level.FINER, "Input data does not match schema 'PortfolioWeightRequestOneOf1'", e);
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for PortfolioWeightAssetEntry failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'PortfolioWeightAssetEntry'", e);
                     }
 
                     if (match == 1) {
@@ -158,8 +158,8 @@ public class PortfolioWeightRequest extends AbstractOpenApiSchema implements Ser
     }
 
     static {
-        schemas.put("PortfolioWeightRequestOneOf", PortfolioWeightRequestOneOf.class);
-        schemas.put("PortfolioWeightRequestOneOf1", PortfolioWeightRequestOneOf1.class);
+        schemas.put("PortfolioWeightCashEntry", PortfolioWeightCashEntry.class);
+        schemas.put("PortfolioWeightAssetEntry", PortfolioWeightAssetEntry.class);
     }
 
     @Override
@@ -170,30 +170,30 @@ public class PortfolioWeightRequest extends AbstractOpenApiSchema implements Ser
     /**
      * Set the instance that matches the oneOf child schema, check
      * the instance parameter is valid against the oneOf child schemas:
-     * PortfolioWeightRequestOneOf, PortfolioWeightRequestOneOf1
+     * PortfolioWeightAssetEntry, PortfolioWeightCashEntry
      *
      * It could be an instance of the 'oneOf' schemas.
      */
     @Override
     public void setActualInstance(Object instance) {
-        if (instance instanceof PortfolioWeightRequestOneOf) {
+        if (instance instanceof PortfolioWeightCashEntry) {
             super.setActualInstance(instance);
             return;
         }
 
-        if (instance instanceof PortfolioWeightRequestOneOf1) {
+        if (instance instanceof PortfolioWeightAssetEntry) {
             super.setActualInstance(instance);
             return;
         }
 
-        throw new RuntimeException("Invalid instance type. Must be PortfolioWeightRequestOneOf, PortfolioWeightRequestOneOf1");
+        throw new RuntimeException("Invalid instance type. Must be PortfolioWeightAssetEntry, PortfolioWeightCashEntry");
     }
 
     /**
      * Get the actual instance, which can be the following:
-     * PortfolioWeightRequestOneOf, PortfolioWeightRequestOneOf1
+     * PortfolioWeightAssetEntry, PortfolioWeightCashEntry
      *
-     * @return The actual instance (PortfolioWeightRequestOneOf, PortfolioWeightRequestOneOf1)
+     * @return The actual instance (PortfolioWeightAssetEntry, PortfolioWeightCashEntry)
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -202,27 +202,27 @@ public class PortfolioWeightRequest extends AbstractOpenApiSchema implements Ser
     }
 
     /**
-     * Get the actual instance of `PortfolioWeightRequestOneOf`. If the actual instance is not `PortfolioWeightRequestOneOf`,
+     * Get the actual instance of `PortfolioWeightCashEntry`. If the actual instance is not `PortfolioWeightCashEntry`,
      * the ClassCastException will be thrown.
      *
-     * @return The actual instance of `PortfolioWeightRequestOneOf`
-     * @throws ClassCastException if the instance is not `PortfolioWeightRequestOneOf`
+     * @return The actual instance of `PortfolioWeightCashEntry`
+     * @throws ClassCastException if the instance is not `PortfolioWeightCashEntry`
      */
     @SuppressWarnings("unchecked")
-    public PortfolioWeightRequestOneOf getPortfolioWeightRequestOneOf() throws ClassCastException {
-        return (PortfolioWeightRequestOneOf)super.getActualInstance();
+    public PortfolioWeightCashEntry getPortfolioWeightCashEntry() throws ClassCastException {
+        return (PortfolioWeightCashEntry)super.getActualInstance();
     }
 
     /**
-     * Get the actual instance of `PortfolioWeightRequestOneOf1`. If the actual instance is not `PortfolioWeightRequestOneOf1`,
+     * Get the actual instance of `PortfolioWeightAssetEntry`. If the actual instance is not `PortfolioWeightAssetEntry`,
      * the ClassCastException will be thrown.
      *
-     * @return The actual instance of `PortfolioWeightRequestOneOf1`
-     * @throws ClassCastException if the instance is not `PortfolioWeightRequestOneOf1`
+     * @return The actual instance of `PortfolioWeightAssetEntry`
+     * @throws ClassCastException if the instance is not `PortfolioWeightAssetEntry`
      */
     @SuppressWarnings("unchecked")
-    public PortfolioWeightRequestOneOf1 getPortfolioWeightRequestOneOf1() throws ClassCastException {
-        return (PortfolioWeightRequestOneOf1)super.getActualInstance();
+    public PortfolioWeightAssetEntry getPortfolioWeightAssetEntry() throws ClassCastException {
+        return (PortfolioWeightAssetEntry)super.getActualInstance();
     }
 
     /**
@@ -235,24 +235,24 @@ public class PortfolioWeightRequest extends AbstractOpenApiSchema implements Ser
         // validate oneOf schemas one by one
         int validCount = 0;
         ArrayList<String> errorMessages = new ArrayList<>();
-        // validate the json string with PortfolioWeightRequestOneOf
+        // validate the json string with PortfolioWeightCashEntry
         try {
-            PortfolioWeightRequestOneOf.validateJsonElement(jsonElement);
+            PortfolioWeightCashEntry.validateJsonElement(jsonElement);
             validCount++;
         } catch (Exception e) {
-            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for PortfolioWeightRequestOneOf failed with `%s`.", e.getMessage()));
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for PortfolioWeightCashEntry failed with `%s`.", e.getMessage()));
             // continue to the next one
         }
-        // validate the json string with PortfolioWeightRequestOneOf1
+        // validate the json string with PortfolioWeightAssetEntry
         try {
-            PortfolioWeightRequestOneOf1.validateJsonElement(jsonElement);
+            PortfolioWeightAssetEntry.validateJsonElement(jsonElement);
             validCount++;
         } catch (Exception e) {
-            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for PortfolioWeightRequestOneOf1 failed with `%s`.", e.getMessage()));
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for PortfolioWeightAssetEntry failed with `%s`.", e.getMessage()));
             // continue to the next one
         }
         if (validCount != 1) {
-            throw new IOException(String.format(java.util.Locale.ROOT, "The JSON string is invalid for PortfolioWeightRequest with oneOf schemas: PortfolioWeightRequestOneOf, PortfolioWeightRequestOneOf1. %d class(es) match the result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", validCount, errorMessages, jsonElement.toString()));
+            throw new IOException(String.format(java.util.Locale.ROOT, "The JSON string is invalid for PortfolioWeightRequest with oneOf schemas: PortfolioWeightAssetEntry, PortfolioWeightCashEntry. %d class(es) match the result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", validCount, errorMessages, jsonElement.toString()));
         }
     }
 

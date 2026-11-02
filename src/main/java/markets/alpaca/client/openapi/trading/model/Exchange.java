@@ -25,7 +25,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * Represents the current exchanges Alpaca supports. List is currently:  - AMEX - ARCA - BATS - NYSE - NASDAQ - NYSEARCA - OTC - CRYPTO
+ * Represents the current exchanges Alpaca supports. List is currently:  US equities: - AMEX - ARCA - BATS - NYSE - NASDAQ - NYSEARCA - OTC - TXSE  Crypto: - CRYPTO - ERSX - CRXL  Crypto perpetuals: - ASCX  Index symbols: - INDEX  INDEX is the artificial exchange for index symbols such as SPX.
  */
 @JsonAdapter(Exchange.Adapter.class)
 public enum Exchange implements Serializable {
@@ -44,7 +44,17 @@ public enum Exchange implements Serializable {
   
   OTC("OTC"),
   
-  CRYPTO("CRYPTO");
+  CRYPTO("CRYPTO"),
+  
+  TXSE("TXSE"),
+  
+  ERSX("ERSX"),
+  
+  CRXL("CRXL"),
+  
+  ASCX("ASCX"),
+  
+  INDEX("INDEX");
 
   private String value;
 

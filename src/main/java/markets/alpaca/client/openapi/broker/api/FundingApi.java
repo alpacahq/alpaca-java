@@ -35,9 +35,11 @@ import markets.alpaca.client.openapi.broker.model.CreateJITSettlementRequest;
 import markets.alpaca.client.openapi.broker.model.CreateTransferRequest;
 import markets.alpaca.client.openapi.broker.model.DailyTradingLimit;
 import markets.alpaca.client.openapi.broker.model.Error;
+import java.io.File;
 import markets.alpaca.client.openapi.broker.model.GetV1TransfersJitLedgerIdBalances200Response;
-import markets.alpaca.client.openapi.broker.model.GetV1TransfersJitReports200Response;
 import markets.alpaca.client.openapi.broker.model.JITLedgerAccount;
+import markets.alpaca.client.openapi.broker.model.JITReportDownloadURL;
+import markets.alpaca.client.openapi.broker.model.JITReportType;
 import java.time.LocalDate;
 import markets.alpaca.client.openapi.broker.model.SettlementResponse;
 import markets.alpaca.client.openapi.broker.model.SettlementsResponse;
@@ -2074,10 +2076,10 @@ public class FundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> The report file when response_type is inline or omitted, or a temporary download link when response_type is download_url. </td><td>  * Content-Disposition - Present when the report file is returned inline. Names the file with the same value that download_url returns in &#x60;filename&#x60;. <br>  </td></tr>
      </table>
      */
-    public okhttp3.Call getV1TransfersJitReportsCall(@javax.annotation.Nonnull String reportType, @javax.annotation.Nonnull LocalDate systemDate, @javax.annotation.Nullable String assetClass, @javax.annotation.Nullable String responseType, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call getV1TransfersJitReportsCall(@javax.annotation.Nonnull JITReportType reportType, @javax.annotation.Nonnull LocalDate systemDate, @javax.annotation.Nullable String assetClass, @javax.annotation.Nullable String responseType, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -2119,7 +2121,9 @@ public class FundingApi {
         }
 
         final String[] localVarAccepts = {
-            "application/json"
+            "application/json",
+            "application/pdf",
+            "text/csv"
         };
         final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) {
@@ -2138,7 +2142,7 @@ public class FundingApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call getV1TransfersJitReportsValidateBeforeCall(@javax.annotation.Nonnull String reportType, @javax.annotation.Nonnull LocalDate systemDate, @javax.annotation.Nullable String assetClass, @javax.annotation.Nullable String responseType, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call getV1TransfersJitReportsValidateBeforeCall(@javax.annotation.Nonnull JITReportType reportType, @javax.annotation.Nonnull LocalDate systemDate, @javax.annotation.Nullable String assetClass, @javax.annotation.Nullable String responseType, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'reportType' is set
         if (reportType == null) {
             throw new ApiException("Missing the required parameter 'reportType' when calling getV1TransfersJitReports(Async)");
@@ -2155,50 +2159,50 @@ public class FundingApi {
 
     /**
      * Retrieve JIT Reports
-     * Retrieves a JIT report for the requested report type and system date. By default, the report is returned inline. For large reports, use response_type&#x3D;download_url to receive a temporary signed download URL. 
+     * Retrieves a JIT report for the requested report type and system date. By default, the report is returned inline. For large reports, use response_type&#x3D;download_url to receive a temporary signed download URL.  Generated SDKs return the JSON response. To retrieve a report through an SDK, set response_type&#x3D;download_url and download the file from &#x60;url&#x60;. 
      * @param reportType The type of report you want to get. (required)
      * @param systemDate Date of file generation. (required)
      * @param assetClass The asset class to retrieve for. (optional)
      * @param responseType Controls how the report is returned. Use inline to return the report content directly in the response. Use download_url to return a temporary signed URL that can be used to download the generated report. If omitted, the default value is inline.  (optional, default to inline)
-     * @return GetV1TransfersJitReports200Response
+     * @return JITReportDownloadURL
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> The report file when response_type is inline or omitted, or a temporary download link when response_type is download_url. </td><td>  * Content-Disposition - Present when the report file is returned inline. Names the file with the same value that download_url returns in &#x60;filename&#x60;. <br>  </td></tr>
      </table>
      */
-    public GetV1TransfersJitReports200Response getV1TransfersJitReports(@javax.annotation.Nonnull String reportType, @javax.annotation.Nonnull LocalDate systemDate, @javax.annotation.Nullable String assetClass, @javax.annotation.Nullable String responseType) throws ApiException {
-        ApiResponse<GetV1TransfersJitReports200Response> localVarResp = getV1TransfersJitReportsWithHttpInfo(reportType, systemDate, assetClass, responseType);
+    public JITReportDownloadURL getV1TransfersJitReports(@javax.annotation.Nonnull JITReportType reportType, @javax.annotation.Nonnull LocalDate systemDate, @javax.annotation.Nullable String assetClass, @javax.annotation.Nullable String responseType) throws ApiException {
+        ApiResponse<JITReportDownloadURL> localVarResp = getV1TransfersJitReportsWithHttpInfo(reportType, systemDate, assetClass, responseType);
         return localVarResp.getData();
     }
 
     /**
      * Retrieve JIT Reports
-     * Retrieves a JIT report for the requested report type and system date. By default, the report is returned inline. For large reports, use response_type&#x3D;download_url to receive a temporary signed download URL. 
+     * Retrieves a JIT report for the requested report type and system date. By default, the report is returned inline. For large reports, use response_type&#x3D;download_url to receive a temporary signed download URL.  Generated SDKs return the JSON response. To retrieve a report through an SDK, set response_type&#x3D;download_url and download the file from &#x60;url&#x60;. 
      * @param reportType The type of report you want to get. (required)
      * @param systemDate Date of file generation. (required)
      * @param assetClass The asset class to retrieve for. (optional)
      * @param responseType Controls how the report is returned. Use inline to return the report content directly in the response. Use download_url to return a temporary signed URL that can be used to download the generated report. If omitted, the default value is inline.  (optional, default to inline)
-     * @return ApiResponse&lt;GetV1TransfersJitReports200Response&gt;
+     * @return ApiResponse&lt;JITReportDownloadURL&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> The report file when response_type is inline or omitted, or a temporary download link when response_type is download_url. </td><td>  * Content-Disposition - Present when the report file is returned inline. Names the file with the same value that download_url returns in &#x60;filename&#x60;. <br>  </td></tr>
      </table>
      */
-    public ApiResponse<GetV1TransfersJitReports200Response> getV1TransfersJitReportsWithHttpInfo(@javax.annotation.Nonnull String reportType, @javax.annotation.Nonnull LocalDate systemDate, @javax.annotation.Nullable String assetClass, @javax.annotation.Nullable String responseType) throws ApiException {
+    public ApiResponse<JITReportDownloadURL> getV1TransfersJitReportsWithHttpInfo(@javax.annotation.Nonnull JITReportType reportType, @javax.annotation.Nonnull LocalDate systemDate, @javax.annotation.Nullable String assetClass, @javax.annotation.Nullable String responseType) throws ApiException {
         okhttp3.Call localVarCall = getV1TransfersJitReportsValidateBeforeCall(reportType, systemDate, assetClass, responseType, null);
-        Type localVarReturnType = new TypeToken<GetV1TransfersJitReports200Response>(){}.getType();
+        Type localVarReturnType = new TypeToken<JITReportDownloadURL>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
 
     /**
      * Retrieve JIT Reports (asynchronously)
-     * Retrieves a JIT report for the requested report type and system date. By default, the report is returned inline. For large reports, use response_type&#x3D;download_url to receive a temporary signed download URL. 
+     * Retrieves a JIT report for the requested report type and system date. By default, the report is returned inline. For large reports, use response_type&#x3D;download_url to receive a temporary signed download URL.  Generated SDKs return the JSON response. To retrieve a report through an SDK, set response_type&#x3D;download_url and download the file from &#x60;url&#x60;. 
      * @param reportType The type of report you want to get. (required)
      * @param systemDate Date of file generation. (required)
      * @param assetClass The asset class to retrieve for. (optional)
@@ -2210,13 +2214,13 @@ public class FundingApi {
      <table border="1">
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
-        <tr><td> 200 </td><td> OK </td><td>  -  </td></tr>
+        <tr><td> 200 </td><td> The report file when response_type is inline or omitted, or a temporary download link when response_type is download_url. </td><td>  * Content-Disposition - Present when the report file is returned inline. Names the file with the same value that download_url returns in &#x60;filename&#x60;. <br>  </td></tr>
      </table>
      */
-    public okhttp3.Call getV1TransfersJitReportsAsync(@javax.annotation.Nonnull String reportType, @javax.annotation.Nonnull LocalDate systemDate, @javax.annotation.Nullable String assetClass, @javax.annotation.Nullable String responseType, final ApiCallback<GetV1TransfersJitReports200Response> _callback) throws ApiException {
+    public okhttp3.Call getV1TransfersJitReportsAsync(@javax.annotation.Nonnull JITReportType reportType, @javax.annotation.Nonnull LocalDate systemDate, @javax.annotation.Nullable String assetClass, @javax.annotation.Nullable String responseType, final ApiCallback<JITReportDownloadURL> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = getV1TransfersJitReportsValidateBeforeCall(reportType, systemDate, assetClass, responseType, _callback);
-        Type localVarReturnType = new TypeToken<GetV1TransfersJitReports200Response>(){}.getType();
+        Type localVarReturnType = new TypeToken<JITReportDownloadURL>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
     }

@@ -743,6 +743,402 @@ components:
                 field: beneficiary_entity_name
                 value_type: string
             type: ONE_OF
+    rebalancing_account_not_found:
+      description: Check the account ID and try again.
+      summary: No account with that ID exists for your correspondent
+      value:
+        code: 40410000
+        message: account not found
+    rebalancing_account_not_found_for_id:
+      description: 'Check the account ID and try again. Message template: account not found for {account_id}'
+      summary: No account with the ID in the message exists for your correspondent
+      value:
+        code: 40410000
+        message: account not found for bf2b0f93-f296-4276-a9cf-288586cf4fb7
+    rebalancing_account_not_funded:
+      description: Fund the account and try again.
+      summary: The account has no equity to rebalance
+      value:
+        code: 42210000
+        message: account is not funded
+    rebalancing_active_run_exists:
+      description: Cancel that run or wait until it finishes, then try again.
+      summary: The account already has a rebalance run in progress
+      value:
+        code: 40010001
+        message: there is already an active run. Please cancel previous run or wait until the run is completed
+    rebalancing_amount_not_decimal:
+      description: 'Send a numeric amount and try again. Message template: amount must be a decimal: {parse_error}'
+      summary: The amount is not a valid decimal number
+      value:
+        code: 40010001
+        message: 'amount must be a decimal: can''t convert not-a-number to decimal'
+    rebalancing_asset_not_found:
+      description: 'Check the symbol in the message and try again. Message template: could not find asset {symbol}'
+      summary: A symbol in the weights is not a known asset
+      value:
+        code: 40010001
+        message: could not find asset ZZZZ
+    rebalancing_asset_not_fractionable:
+      description: 'Choose a fractionable asset and try again. Message template: only assets which are fractionable are allowed. {symbol} is not fractionable'
+      summary: The asset named in the message cannot be traded in fractional quantity, so it cannot be used in a portfolio
+      value:
+        code: 40010001
+        message: only assets which are fractionable are allowed. BRK.A is not fractionable
+    rebalancing_asset_symbol_required:
+      description: Set the symbol and try again.
+      summary: A weight of type asset is missing its symbol
+      value:
+        code: 40010001
+        message: asset symbol must be specified with type asset
+    rebalancing_calendar_day_not_mmdd:
+      description: 'Use that format and try again. Message template: calendar conditions day must be in MM-DD format: {time_parse_error}'
+      summary: An annual calendar condition has a day that is not in MM-DD format
+      value:
+        code: 40010001
+        message: 'calendar conditions day must be in MM-DD format: parsing time "13-40" as "01-02": month out of range'
+    rebalancing_calendar_day_not_number:
+      description: 'Use a day from 1 to 31 and try again. Message template: calendar conditions day must be a number: {parse_error}'
+      summary: A monthly or quarterly calendar condition has a day that is not a number
+      value:
+        code: 40010001
+        message: 'calendar conditions day must be a number: strconv.Atoi: parsing "abc": invalid syntax'
+    rebalancing_calendar_day_out_of_range:
+      description: Use a day in that range and try again.
+      summary: A monthly or quarterly calendar condition has a day outside 1 to 31
+      value:
+        code: 40010001
+        message: calendar conditions must have a valid day between 1 and 31 inclusive
+    rebalancing_calendar_day_required:
+      description: Set the day and try again.
+      summary: A calendar rebalance condition is missing its day
+      value:
+        code: 40010001
+        message: calendar conditions must have day specified
+    rebalancing_calendar_subtype_invalid:
+      description: Use `weekly`, `monthly`, `quarterly`, or `annually`.
+      summary: A calendar rebalance condition has a missing or unsupported subtype
+      value:
+        code: 40010001
+        message: 'calendar conditions must have sub_type: weekly, monthly, annually, quarterly'
+    rebalancing_calendar_weekday_invalid:
+      description: Use monday, tuesday, wednesday, thursday, or friday.
+      summary: A weekly calendar condition has a day that is not a weekday name
+      value:
+        code: 40010001
+        message: 'calendar conditions must have day: [monday tuesday wednesday thursday friday]'
+    rebalancing_cash_weight_percent_empty:
+      description: 'Set a numeric percent and try again. Message template: weights[{index}].percent: {parse_error}'
+      summary: A cash weight has an empty percent
+      value:
+        code: 40010001
+        message: 'weights[0].percent: can''t convert  to decimal'
+    rebalancing_condition_percent_not_decimal:
+      description: 'Send a numeric percent and try again. Message template: rebalance_conditions[{index}].percent: {parse_error}'
+      summary: The percent on the rebalance condition named in the message is not a valid decimal
+      value:
+        code: 40010001
+        message: 'rebalance_conditions[0].percent: can''t convert not-a-number to decimal'
+    rebalancing_cooldown_days_invalid:
+      description: Set `cooldown_days` to 1 or greater and try again.
+      summary: The cooldown is missing or less than one day
+      value:
+        code: 40010001
+        message: cooldown_days must be greater than 0
+    rebalancing_correspondent_not_found:
+      description: Check the API key and try again.
+      summary: The correspondent for these credentials could not be found
+      value:
+        code: 40410000
+        message: correspondent not found
+    rebalancing_crypto_asset:
+      description: 'Remove the symbol named in the message and try again. Message template: crypto assets are not allowed: {symbol}'
+      summary: Cryptocurrency cannot be used in a portfolio
+      value:
+        code: 40010001
+        message: 'crypto assets are not allowed: BTC/USD'
+    rebalancing_crypto_position:
+      description: Close those positions and try again.
+      summary: The account holds cryptocurrency, so it cannot be subscribed to a portfolio
+      value:
+        code: 40010001
+        message: cannot create portfolio subscription when you have active position(s) in crypto
+    rebalancing_drift_percent_not_decimal:
+      description: 'Send a numeric percent and try again. Message template: drift_band conditions percent must be a decimal: {parse_error}'
+      summary: A drift band percent is not a valid decimal number
+      value:
+        code: 40010001
+        message: 'drift_band conditions percent must be a decimal: can''t convert not-a-number to decimal'
+    rebalancing_drift_percent_not_positive:
+      description: Use a percent greater than zero and try again.
+      summary: A drift band condition has a negative percent
+      value:
+        code: 40010001
+        message: drift_band conditions must have positive percent
+    rebalancing_drift_percent_precision:
+      description: Round it to two decimal places and try again.
+      summary: A drift band percent has more than two decimal places
+      value:
+        code: 40010001
+        message: drift_band conditions only support percent up to two 2 decimal places
+    rebalancing_drift_percent_required:
+      description: Set the percent and try again.
+      summary: A drift band condition is missing its percent
+      value:
+        code: 40010001
+        message: drift_band conditions must have percent specified
+    rebalancing_drift_subtype_invalid:
+      description: Use `absolute` or `relative`.
+      summary: A drift band condition has a missing or unsupported subtype
+      value:
+        code: 40010001
+        message: drift_band conditions must have sub_type absolute or relative
+    rebalancing_duplicate_absolute_drift:
+      description: Remove the extra one and try again.
+      summary: Only one absolute drift band condition is allowed
+      value:
+        code: 40010001
+        message: you can only have one absolute drift_band type rebalance condition
+    rebalancing_duplicate_asset:
+      description: 'The message names the symbol. Include each symbol only once and try again. Message template: duplicate assets are not allowed. {symbol} is duplicated'
+      summary: The same symbol appears more than once in the weights
+      value:
+        code: 40010001
+        message: duplicate assets are not allowed. AAPL is duplicated
+    rebalancing_duplicate_calendar_condition:
+      description: Remove the extra one and try again.
+      summary: Only one calendar rebalance condition is allowed
+      value:
+        code: 40010001
+        message: you can only have one calendar type rebalance condition
+    rebalancing_duplicate_on_update_condition:
+      description: Remove the extra `on_portfolio_update` condition and try again.
+      summary: Only one on portfolio update condition is allowed
+      value:
+        code: 40010001
+        message: you can only have one on_portfolio_update type rebalance condition
+    rebalancing_duplicate_relative_drift:
+      description: Remove the extra one and try again.
+      summary: Only one relative drift band condition is allowed
+      value:
+        code: 40010001
+        message: you can only have one relative drift_band type rebalance condition
+    rebalancing_empty_portfolio_update:
+      description: Send at least one of `name`, `description`, `cooldown_days`, `weights`, or `rebalance_conditions`.
+      summary: The update did not include any fields to change
+      value:
+        code: 40010001
+        message: 'update request must contain at least one of the following fields: name, description, cooldown_days, weights, rebalance_conditions'
+    rebalancing_insufficient_permission:
+      description: Use credentials with the required permission and try again.
+      summary: These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent
+      value:
+        code: 40310000
+        message: insufficient permission
+    rebalancing_internal_server_error:
+      description: If it keeps happening, contact support.
+      summary: Something went wrong on our side
+      value:
+        code: 50010000
+        message: internal server error occurred
+    rebalancing_invalid_portfolio_id:
+      description: Check `portfolio_id` and try again.
+      summary: The portfolio ID in the path is not a valid UUID
+      value:
+        code: 40010001
+        message: invalid portfolio_id
+    rebalancing_invalid_query_parameter:
+      description: 'The message names the parameter. Correct it and try again. Message template: invalid {name}'
+      summary: A query parameter is invalid or was sent more than once
+      value:
+        code: 40010001
+        message: invalid status
+    rebalancing_invalid_request:
+      description: Retry it. If it keeps happening, contact support.
+      summary: A valid client IP address could not be read from the request
+      value:
+        code: 40010001
+        message: invalid request
+    rebalancing_invalid_run_id:
+      description: Check `run_id` and try again.
+      summary: The run ID in the path is not a valid UUID
+      value:
+        code: 40010001
+        message: invalid run_id
+    rebalancing_invalid_subscription_id:
+      description: Check `subscription_id` and try again.
+      summary: The subscription ID in the path is not a valid UUID
+      value:
+        code: 40010001
+        message: invalid subscription_id
+    rebalancing_jit_correspondent:
+      description: Contact support if this correspondent needs rebalancing.
+      summary: This correspondent uses just-in-time buying power, so rebalancing is not permitted
+      value:
+        code: 40310000
+        message: rebalancing not permitted for JIT correspondents
+    rebalancing_manual_run_with_subscription:
+      description: Unsubscribe first, or omit the weights and run against the subscription.
+      summary: This account already has a subscription, so a manual run with its own weights cannot be created
+      value:
+        code: 40010001
+        message: cannot create manual rebalance run with active subscription
+    rebalancing_nested_portfolio_weights:
+      description: Contact support.
+      summary: This portfolio includes a nested portfolio weight, which cannot be updated or deleted through this API
+      value:
+        code: 40010001
+        message: 'publishing portfolio status changed: portfolio contains nested portfolio weights that cannot be represented in a rebalancer event'
+    rebalancing_non_usd_account:
+      description: This account uses another currency, so the request was rejected.
+      summary: Rebalancing is only available for USD accounts
+      value:
+        code: 40310000
+        message: rebalancing not permitted for Non-USD accounts
+    rebalancing_on_update_day_forbidden:
+      description: Remove `day` from the `on_portfolio_update` condition and try again.
+      summary: An on portfolio update condition cannot include a day
+      value:
+        code: 40010001
+        message: on_portfolio_update conditions cannot have day specified
+    rebalancing_on_update_percent_forbidden:
+      description: Remove `percent` from the `on_portfolio_update` condition and try again.
+      summary: An on portfolio update condition cannot include a percent
+      value:
+        code: 40010001
+        message: on_portfolio_update conditions cannot have percent specified
+    rebalancing_on_update_subtype_forbidden:
+      description: Remove `sub_type` from the `on_portfolio_update` condition and try again.
+      summary: An on portfolio update condition cannot include a subtype
+      value:
+        code: 40010001
+        message: on_portfolio_update conditions cannot have sub_type specified
+    rebalancing_open_orders:
+      description: Wait until those orders finish, then try again.
+      summary: The account has open orders, so it cannot be subscribed to a portfolio
+      value:
+        code: 40010001
+        message: cannot create portfolio subscription when you have open orders
+    rebalancing_partial_liquidation_unsupported:
+      description: Use a supported run type and try again.
+      summary: Partial liquidation runs are not supported
+      value:
+        code: 40010001
+        message: partial_liquidation is currently not supported
+    rebalancing_pattern_day_trader:
+      description: Subscribe an account that is not a pattern day trader.
+      summary: Pattern day trader accounts cannot be subscribed to a portfolio
+      value:
+        code: 40010001
+        message: cannot subscribe to a portfolio as a pattern day trader
+    rebalancing_portfolio_already_inactive:
+      description: The portfolio is already inactive, so no further action is needed.
+      summary: The portfolio is already inactive, so there is nothing to delete
+      value:
+        code: 40010001
+        message: nothing to delete
+    rebalancing_portfolio_has_subscriptions:
+      description: Unsubscribe those accounts first.
+      summary: Accounts are still subscribed to this portfolio, so it cannot be deleted
+      value:
+        code: 40010001
+        message: there are active subscriptions to this portfolio
+    rebalancing_portfolio_not_found:
+      description: Check the portfolio ID and try again.
+      summary: No portfolio with this ID exists for your correspondent
+      value:
+        code: 40410000
+        message: portfolio not found
+    rebalancing_portfolio_unavailable:
+      description: Check the portfolio ID and try again.
+      summary: The portfolio does not exist, is not active, or does not belong to your correspondent
+      value:
+        code: 40010001
+        message: the given portfolio does not exist
+    rebalancing_request_body_invalid:
+      description: Send a JSON body that matches the endpoint and try again.
+      summary: The request body is missing, is not valid JSON, or has a value of the wrong type
+      value:
+        code: 40010000
+        message: request body format is invalid
+    rebalancing_run_cannot_be_canceled:
+      description: Only a run in `QUEUED` or `IN_PROGRESS` can be canceled.
+      summary: This run cannot be canceled because it is not queued or in progress
+      value:
+        code: 42210000
+        message: run cannot be canceled
+    rebalancing_run_not_found:
+      description: Check the run ID and try again.
+      summary: No rebalance run with this ID exists for your correspondent
+      value:
+        code: 40410000
+        message: rebalance run not found
+    rebalancing_schema_validation_failed:
+      description: Check the body against the endpoint and try again.
+      summary: The JSON body is missing a required field or uses a value that is not allowed
+      value:
+        code: 40010001
+        message: request parameters are invalid
+    rebalancing_subscription_already_exists:
+      description: An account can have only one. Unsubscribe it before creating another.
+      summary: The account already has a subscription
+      value:
+        code: 42210000
+        message: an account can only have one active subscription
+    rebalancing_subscription_not_found:
+      description: Check the subscription ID and try again.
+      summary: No subscription with this ID exists for your correspondent
+      value:
+        code: 40410000
+        message: subscription not found
+    rebalancing_subscription_nothing_to_delete:
+      description: Check the subscription ID.
+      summary: No subscription with this ID exists for your correspondent, so there is nothing to delete
+      value:
+        code: 42210000
+        message: nothing to delete
+    rebalancing_subscription_required:
+      description: Subscribe the account, or send weights for a one-off run.
+      summary: This account is not subscribed to a portfolio, and the request did not include weights
+      value:
+        code: 40410000
+        message: no subscription for account
+    rebalancing_unauthorized:
+      description: Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+      summary: The request is not authenticated
+      value:
+        code: 40110000
+        message: request is not authorized
+    rebalancing_unexpected_error:
+      description: If it keeps happening, contact support.
+      summary: Something went wrong on our side while handling the request
+      value:
+        error: Internal Server Error
+        message: An unexpected error occurred
+    rebalancing_unsupported_media_type:
+      description: Set Content-Type to application/json and send the body again.
+      summary: The Content-Type header is not application/json
+      value:
+        code: 41510000
+        message: unsupported media type
+    rebalancing_weight_percent_not_decimal:
+      description: 'Send a numeric percent and try again. Message template: percent must be a decimal: {parse_error}'
+      summary: A weight percent is not a valid decimal number
+      value:
+        code: 40010001
+        message: 'percent must be a decimal: can''t convert not-a-number to decimal'
+    rebalancing_weight_percent_not_positive:
+      description: Increase it and try again.
+      summary: A weight percent must be greater than zero
+      value:
+        code: 40010001
+        message: percent must be greater than zero
+    rebalancing_weights_must_sum_to_100:
+      description: 'The message includes the current total. Adjust the weights and try again. Message template: portfolio weights must add up to 100. Total is currently: {total}'
+      summary: The weight percents must add up to exactly 100
+      value:
+        code: 40010001
+        message: 'portfolio weights must add up to 100. Total is currently: 90'
   headers:
     DeprecatedParams:
       description: |
@@ -1237,8 +1633,8 @@ components:
           type: string
         is_default:
           description: |
-            True if this is the default APR tier. Only one APR tier can be default per currency.
-          example: true
+            Whether this is the default APR tier for its currency. Each currency has at most one default tier. When true, an account that signs the required Alpaca Customer Agreement revision without providing cash_interest may be automatically enrolled in this tier. Do not rely on a default tier for enrollment; always set apr_tier_name explicitly via Create Account or Update Account.
+          example: false
           type: boolean
         name:
           description: The unique name of the APR tier
@@ -1564,8 +1960,13 @@ components:
     AcatsInitiateTransferDetails:
       description: |
         Transfer details. The two transfer types are mutually exclusive in what they accept:
-        - `FULL`: do not include the `cash` or `securities` objects (the entire account will be transferred). Including either is rejected with HTTP 400.
+        - `FULL`: do not include a non-empty `cash` or `securities.equities` array (the entire account will be transferred). Including either non-empty is rejected with HTTP 400.
         - `PARTIAL`: specify which assets to transfer using the `cash` and/or `securities` objects. At least one of the two must be present and non-empty, otherwise the request is rejected with HTTP 400.
+      discriminator:
+        mapping:
+          FULL: '#/components/schemas/FullTransfer'
+          PARTIAL: '#/components/schemas/PartialTransfer'
+        propertyName: type
       example:
         cash:
           - amount: '10000'
@@ -1579,54 +1980,18 @@ components:
               position: SHORT
         type: PARTIAL
       oneOf:
-        - description: Transfers the entire account. Must not carry `cash` or `securities`.
-          not:
-            anyOf:
-              - required:
-                  - cash
-              - required:
-                  - securities
-          properties:
-            type:
-              enum:
-                - FULL
-              type: string
-          title: Full transfer
-        - anyOf:
-            - properties:
-                cash:
-                  minItems: 1
-                  type: array
-              required:
-                - cash
-            - properties:
-                securities:
-                  properties:
-                    equities:
-                      minItems: 1
-                      type: array
-                  required:
-                    - equities
-                  type: object
-              required:
-                - securities
-          description: Transfers selected assets. Must carry a non-empty `cash` array, a non-empty `securities.equities` array, or both.
-          properties:
-            type:
-              enum:
-                - PARTIAL
-              type: string
-          title: Partial transfer
+        - $ref: '#/components/schemas/FullTransfer'
+        - $ref: '#/components/schemas/PartialTransfer'
       properties:
         cash:
-          description: Cash amounts to transfer. Only used for PARTIAL transfers. Must not be included for FULL transfers.
+          description: Cash amounts to transfer. Only used for PARTIAL transfers. Must be omitted or empty for FULL transfers.
           items:
             $ref: '#/components/schemas/AcatsCashBalance'
           type: array
         securities:
           allOf:
-            - description: Securities to transfer. Only used for PARTIAL transfers. Must not be included for FULL transfers.
             - $ref: '#/components/schemas/AcatsSecurities'
+          description: Securities to transfer. Only used for PARTIAL transfers. Must be omitted or empty for FULL transfers.
         type:
           $ref: '#/components/schemas/AcatsInitiateTransferType'
       required:
@@ -2074,8 +2439,7 @@ components:
     AccountCashInterestPost:
       description: |
         The configuration of the account's USD cash interest program when creating an account.
-        If cash_interest is not provided and there is a default APR tier defined, that tier will be used.
-        To enroll the account in a non-default APR tier, provide the cash_interest object with the desired apr_tier_name. The status should not be specified on enrollment.
+        If cash_interest is not provided and the request signs the required Alpaca Customer Agreement revision, the account may be enrolled in a default APR tier automatically. Do not rely on this; provide the cash_interest object with the desired apr_tier_name. The status should not be specified on enrollment.
         The response will contain a status of PENDING_CHANGE. An event showing the status change to ACTIVE will be generated when the enrollment is complete.
       properties:
         USD:
@@ -2893,6 +3257,34 @@ components:
       description: Represents an account activity, sent over the Event Streaming API.
       title: ActivityEventV2
       type: object
+    ActivityEventV2Asset:
+      description: Instrument for `qty`. For options, the contract. Omitted when `qty` is missing or zero, when no identifier is known, and on activities recorded before this field was introduced.
+      examples:
+        - cusip: '037833100'
+          id: 790f3f26-4e7c-4f46-93f4-0425a28873da
+          symbol: AAPL
+        - id: 5b4ec3b4-6a1f-4a47-9b8e-2f6c1d0a9e31
+          isin: HK0000069689
+          symbol: 1299:XHKG
+      properties:
+        cusip:
+          description: CUSIP. Only present for US assets when permitted by licensing.
+          example: '037833100'
+          type: string
+        id:
+          description: Asset ID. For options, the contract ID. Only present when `activity_type` is `TRD`.
+          example: 790f3f26-4e7c-4f46-93f4-0425a28873da
+          format: uuid
+          type: string
+        isin:
+          description: ISIN. Only present when `activity_type` is `TRD`, and when permitted by licensing.
+          example: US0378331005
+          type: string
+        symbol:
+          description: Symbol. For options, the contract symbol.
+          example: AAPL
+          type: string
+      type: object
     ActivityEventV2CommonFields:
       description: Represents the common fields for all Activity V2 Events
       properties:
@@ -2906,6 +3298,8 @@ components:
         activity_type:
           description: The type of the activity, which can be trade or any of the non trade activities
           type: string
+        asset:
+          $ref: '#/components/schemas/ActivityEventV2Asset'
         at:
           description: Timestamp of event
           format: date-time
@@ -4208,7 +4602,9 @@ components:
       enum:
         - us_equity
         - us_option
+        - us_index
         - crypto
+        - crypto_perp
         - ipo
       type: string
     AssetEntryRequirements:
@@ -4388,12 +4784,13 @@ components:
           items:
             properties:
               amount:
-                description: Journal amount in USD
+                description: Journal amount in the entry's `currency`
                 type:
                   - string
                   - 'null'
               currency:
-                description: Currency code in ISO format
+                description: The currency of the journal. Defaults to the system currency (for example, USD in the US or EUR in the EU) when omitted. Correspondents with local currency trading enabled must
+                  send this field, and the value must be the system currency or one of the correspondent's enabled currencies. All entries in a batch should use the same currency.
                 type:
                   - string
                   - 'null'
@@ -5968,15 +6365,17 @@ components:
           - any status = pending will be pending forever
       examples:
         - amount: '51'
-          description: test text /fixtures/status=rejected/fixtures/
+          description: Move cash to a customer account
           entry_type: JNLC
-          from_account: c94bu7rn-4483-4199-840f-6c5fe0b7ca24
-          to_account: fn68sbrk-6f2a-433c-8c33-17b66b8941fa
+          from_account: 7c891489-574f-4f9a-82f0-4082a07f4736
+          to_account: 2d47a229-0c25-40a2-8cc7-b2c8821ff93a
       properties:
         amount:
           description: Required if `entry_type` = `JNLC`
           type: string
         currency:
+          description: The currency of the journal. Defaults to the system currency (for example, USD in the US or EUR in the EU) when omitted. Correspondents with local currency trading enabled must send
+            this field, and the value must be the system currency or one of the correspondent's enabled currencies
           type: string
         description:
           description: Max 1024 characters. Can include fixtures for amounts that are above the transaction limit
@@ -6788,9 +7187,20 @@ components:
         - NASDAQ
         - NYSEARCA
         - OTC
+        - TXSE
 
         For Crypto:
         - CRYPTO
+        - ERSX
+        - CRXL
+
+        For crypto perpetuals:
+        - ASCX
+
+        Index symbols:
+        - INDEX
+
+        INDEX is the artificial exchange for index symbols such as SPX.
       enum:
         - AMEX
         - ARCA
@@ -6799,6 +7209,12 @@ components:
         - NASDAQ
         - NYSEARCA
         - OTC
+        - TXSE
+        - CRYPTO
+        - ERSX
+        - CRXL
+        - ASCX
+        - INDEX
       example: NASDAQ
       title: Exchange
       type: string
@@ -7145,6 +7561,41 @@ components:
           type: object
       description: Forward stock split
       type: object
+    FullTransfer:
+      allOf:
+        - properties:
+            type:
+              enum:
+                - FULL
+              type: string
+          required:
+            - type
+          type: object
+        - not:
+            properties:
+              cash:
+                minItems: 1
+                type: array
+            required:
+              - cash
+            type: object
+          type: object
+        - not:
+            properties:
+              securities:
+                properties:
+                  equities:
+                    minItems: 1
+                    type: array
+                required:
+                  - equities
+                type: object
+            required:
+              - securities
+            type: object
+          type: object
+      description: Transfers the entire account. `cash` and `securities.equities`, if sent, must be empty.
+      title: Full transfer
     FundingDetail:
       description: |
         Gets funding details that can be used to settle and collect funds in each available currency.
@@ -7967,42 +8418,6 @@ components:
           type: string
       title: JITLedgerAccount
       type: object
-    JITReport:
-      description: JIT Securities reports are made available through the API and can be accessed within the hour after 11:30 PM EST on the trade date (T+0). The reports communicate transaction-level details
-        as well as overall settlement amounts, transfer direction, and payment timing.
-      properties:
-        detail:
-          description: |-
-            Contains all activities that impact cash throughout the trading session including executed trades, trading fees, and corporate actions that involve cash allocations.
-
-            content-type = application/csv
-          type: string
-        net_payment:
-          description: |-
-            Highlights the net amount due to Alpaca by settlement or to the partner on the date of settlement in a formalized invoice format.
-
-            content-type = application/pdf
-          type: string
-        net_payment_final:
-          description: |-
-            Includes additional information to account for T+0 and T+1 settling activity to clarify settlement journaling reconciliation. This report is generated after trading session close on T+1.
-
-            content-type = application/pdf
-          type: string
-        net_summary:
-          description: |-
-            Consists of three columns and a single row, which lists the net money movement to or from Alpaca for T0, T1, and T2.
-
-            content-type = application/csv
-          type: string
-        obligation:
-          description: |-
-            Lists of all open obligations towards the partner that are to be settled.
-
-            content-type = application/csv
-          type: string
-      title: JITReport
-      type: object
     JITReportDownloadURL:
       properties:
         expires_at:
@@ -8021,6 +8436,45 @@ components:
         - filename
         - expires_at
       type: object
+    JITReportType:
+      description: Report file to retrieve. Availability depends on the correspondent's JIT configuration. The `_v2` suffix identifies a file format, not JIT generation v2.
+      enum:
+        - detail
+        - detail_v2
+        - net_summary
+        - net_summary_v2
+        - net_payment
+        - net_payment_final
+        - gross_summary
+        - gross_summary_v2
+        - gross_payment
+        - gross_payment_final
+        - obligation
+        - obligation_v2
+        - settlement
+        - balance
+        - summary
+        - payment
+      example: gross_summary_v2
+      title: JITReportType
+      type: string
+      x-enumDescriptions:
+        balance: CSV snapshot of settled and unsettled cash by account and currency for the report date.
+        detail: CSV transaction details with explicit settlement dates and legacy T+N category labels.
+        detail_v2: CSV transaction details with settlement dates, execution timestamps, and entry subtypes.
+        gross_payment: Gross payment invoice in PDF using the legacy T+N presentation.
+        gross_payment_final: Final gross payment invoice in PDF using the legacy T+N presentation.
+        gross_summary: CSV gross totals by currency in T+0/T+1/T+2 buckets.
+        gross_summary_v2: CSV gross totals by explicit settlement date and currency, with no T+N columns.
+        net_payment: Net payment invoice in PDF using the legacy T+N presentation.
+        net_payment_final: Final net payment invoice in PDF using the legacy T+N presentation.
+        net_summary: CSV signed totals by currency in T+0/T+1/T+2 buckets. Crypto uses T+0 only.
+        net_summary_v2: CSV signed totals by explicit settlement date and currency, with no T+N columns.
+        obligation: CSV individual settlement Obligations, including earlier Obligations that remain open.
+        obligation_v2: CSV Obligations grouped by account, settlement date, currency, and direction across report dates.
+        payment: Legacy alias for gross_payment.
+        settlement: CSV open settlement records with explicit settlement dates and external references.
+        summary: Legacy alias for gross_summary.
     JNLC:
       allOf:
         - $ref: '#/components/schemas/JournalBase'
@@ -8107,6 +8561,11 @@ components:
       allOf:
         - $ref: '#/components/schemas/CommonJournalActivityV2'
         - properties:
+            issuer:
+              description: Issuer of the tokenized asset, on tokenization mint and redeem journals (`activity_subtype` `ITNJ`). Same value as `issuer` on the related tokenization request. Omitted for other
+                journals and for journals booked before this field was added.
+              example: xstocks
+              type: string
             symbol:
               description: The symbol of the security involved with the activity
               type: string
@@ -9959,6 +10418,47 @@ components:
         - content
       title: OwnerDocumentUploadRequest
       type: object
+    PartialTransfer:
+      description: Transfers selected assets. Must carry a non-empty `cash` array, a non-empty `securities.equities` array, or both.
+      if:
+        not:
+          properties:
+            cash:
+              minItems: 1
+              type: array
+          required:
+            - cash
+          type: object
+        type: object
+      properties:
+        cash:
+          description: Cash amounts to transfer.
+          items:
+            $ref: '#/components/schemas/AcatsCashBalance'
+          type: array
+        securities:
+          $ref: '#/components/schemas/AcatsSecurities'
+        type:
+          enum:
+            - PARTIAL
+          type: string
+      required:
+        - type
+      then:
+        properties:
+          securities:
+            properties:
+              equities:
+                minItems: 1
+                type: array
+            required:
+              - equities
+            type: object
+        required:
+          - securities
+        type: object
+      title: Partial transfer
+      type: object
     PartyAgreementType:
       description: |
         Per-party agreement types. These agreements are signed at the party level
@@ -10231,7 +10731,7 @@ components:
         |:------------------:|:-----:|:--------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------:|
         | QUEUED             | No    | The run has been queued, waiting for our system to process it.                   | Runs only executed when the US market is open and there's at least 15 minutes before the market closes.              |
         | IN_PROGRESS        | No    | Portfolio adjustment is in progress.                                             |                                                                                                                      |
-        | CANCELED           | Yes   | Portfolio run canceled, before being picked up by Alpaca's background processing |                                                                                                                      |
+        | CANCELED           | Yes, unless the run was already placing orders | Portfolio run canceled before it started, or while waiting to be retried | If the run was already placing orders, those orders are not canceled and the run's final status can replace CANCELED. |
         | CANCELED_MID_RUN   | Yes   | Portfolio run canceled while executing.                                          | The portfolio's state is in between the pre-run and post-run state, manual remediation or job re-run is recommended. |
         | ERROR              | Yes   | There was an error while rebalancing the portfolio.                              | The portfolio's state is in between the pre-run and post-run state, manual remediation or job re-run is recommended. |
         | TIMEOUT            | Yes   | A timeout occurred while rebalancing the portfolio.                               | The portfolio's state is in between the pre-run and post-run state, manual remediation or job re-run is recommended. |
@@ -10268,26 +10768,54 @@ components:
           type: string
       title: PortfolioSubscription
       type: object
-    PortfolioWeightRequest:
-      oneOf:
-        - properties:
-            type:
-              enum:
-                - cash
+    PortfolioWeightAssetEntry:
+      allOf:
+        - $ref: '#/components/schemas/PortfolioWeightRequestBase'
         - properties:
             symbol:
               type: string
             type:
               enum:
                 - asset
+              type: string
           required:
+            - type
             - symbol
+          type: object
+      description: An asset weight. `symbol` is required.
+      title: PortfolioWeightAssetEntry
+    PortfolioWeightCashEntry:
+      allOf:
+        - $ref: '#/components/schemas/PortfolioWeightRequestBase'
+        - properties:
+            type:
+              enum:
+                - cash
+              type: string
+          required:
+            - type
+          type: object
+      description: A cash weight. `symbol` is optional and may be null.
+      title: PortfolioWeightCashEntry
+    PortfolioWeightRequest:
+      description: Weight entry in a portfolio create or update request, selected by `type`.
+      discriminator:
+        mapping:
+          asset: '#/components/schemas/PortfolioWeightAssetEntry'
+          cash: '#/components/schemas/PortfolioWeightCashEntry'
+        propertyName: type
+      oneOf:
+        - $ref: '#/components/schemas/PortfolioWeightCashEntry'
+        - $ref: '#/components/schemas/PortfolioWeightAssetEntry'
+      title: PortfolioWeightRequest
+    PortfolioWeightRequestBase:
+      description: Shared fields for a portfolio weight in a create or update request.
       properties:
         percent:
           description: Percentage allocated to this weight. Values must be greater than zero, and all supplied weights must total exactly 100.
-          type:
-            - string
-            - number
+          example: '50'
+          format: decimal
+          type: string
         symbol:
           description: Asset symbol. Required and non-null when `type` is `asset`.
           type:
@@ -10302,7 +10830,7 @@ components:
       required:
         - type
         - percent
-      title: PortfolioWeightRequest
+      title: PortfolioWeightRequestBase
       type: object
     PortfolioWeights:
       properties:
@@ -10608,7 +11136,11 @@ components:
           items:
             properties:
               amount:
-                description: Journal amount in USD
+                description: Journal amount in the entry's `currency`
+                type: string
+              currency:
+                description: The currency of the journal. Defaults to the system currency (for example, USD in the US or EUR in the EU) when omitted. Correspondents with local currency trading enabled must
+                  send this field, and the value must be the system currency or one of the correspondent's enabled currencies
                 type: string
               description:
                 description: Journal description, gets returned in the response
@@ -11646,6 +12178,8 @@ components:
         tokenization_request_id:
           description: Unique identifier of the tokenization request set by Alpaca
           type: string
+        transfer_status:
+          $ref: '#/components/schemas/TokenizationTransferStatus'
         tx_hash:
           description: Transaction hash of the completed request on the blockchain
           type:
@@ -11693,6 +12227,22 @@ components:
         - redeem
       example: mint
       title: TokenizationRequestType
+      type: string
+    TokenizationTransferStatus:
+      description: |-
+        Whether Alpaca has moved the underlying shares for this tokenization request. Independent of `status`: `status` can stay `pending` until the issuer completes the on-chain mint or redeem, while `transfer_status` becomes `completed` as soon as the shares move.
+
+        - `pending`: the shares have not moved yet.
+        - `completed`: the shares have moved. Account activities can lag until after end-of-day posting.
+        - `rejected`: the share transfer failed.
+
+        Returned by the list and get tokenization request endpoints. Omitted when Alpaca has no share transfer for the request, for example when the request was rejected during validation.
+      enum:
+        - pending
+        - completed
+        - rejected
+      example: completed
+      title: TokenizationTransferStatus
       type: string
     TradeAccount:
       description: |-
@@ -12971,6 +13521,18 @@ components:
           format: decimal
           type: string
       title: USDPosition
+      type: object
+    UnexpectedError:
+      description: Returned when request handling stops unexpectedly. This body has no numeric code.
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - error
+        - message
+      title: UnexpectedError
       type: object
     UnitSplitActivityV2:
       allOf:
@@ -15970,6 +16532,7 @@ paths:
                 status: completed
                 token_symbol: TSLAx
                 tokenization_request_id: 5b1d6a3e-7f0a-4d2c-b8e1-9e6f1c0d2c4a
+                transfer_status: completed
                 tx_hash: 5J7ZxK4QwR3vH2pY1aB6sN8cM9tD0fA2eXyVwUjL3kPqR4mZcF7nB1tA8sH6dG2pE
                 type: mint
                 underlying_symbol: TSLA
@@ -16044,6 +16607,7 @@ paths:
                 status: completed
                 token_symbol: TSLAx
                 tokenization_request_id: 5b1d6a3e-7f0a-4d2c-b8e1-9e6f1c0d2c4a
+                transfer_status: completed
                 tx_hash: 5J7ZxK4QwR3vH2pY1aB6sN8cM9tD0fA2eXyVwUjL3kPqR4mZcF7nB1tA8sH6dG2pE
                 type: mint
                 underlying_symbol: TSLA
@@ -16118,6 +16682,7 @@ paths:
                 status: completed
                 token_symbol: TSLAx
                 tokenization_request_id: 5b1d6a3e-7f0a-4d2c-b8e1-9e6f1c0d2c4a
+                transfer_status: completed
                 tx_hash: 5J7ZxK4QwR3vH2pY1aB6sN8cM9tD0fA2eXyVwUjL3kPqR4mZcF7nB1tA8sH6dG2pE
                 type: mint
                 underlying_symbol: TSLA
@@ -19203,6 +19768,48 @@ paths:
                   $ref: '#/components/schemas/Portfolio'
                 type: array
           description: Array of Portfolios
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again.
+        '422':
+          content:
+            application/json:
+              examples:
+                invalid_query_parameter:
+                  $ref: '#/components/examples/rebalancing_invalid_query_parameter'
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support.
       summary: List Portfolios
       tags:
         - Rebalancing
@@ -19243,6 +19850,125 @@ paths:
               schema:
                 $ref: '#/components/schemas/Portfolio'
           description: OK
+        '400':
+          content:
+            application/json:
+              examples:
+                request_body_invalid:
+                  $ref: '#/components/examples/rebalancing_request_body_invalid'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again.
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again.
+        '415':
+          content:
+            application/json:
+              examples:
+                unsupported_media_type:
+                  $ref: '#/components/examples/rebalancing_unsupported_media_type'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The Content-Type header is not application/json. Set Content-Type to application/json and send the body again.
+        '422':
+          content:
+            application/json:
+              examples:
+                asset_not_found:
+                  $ref: '#/components/examples/rebalancing_asset_not_found'
+                asset_not_fractionable:
+                  $ref: '#/components/examples/rebalancing_asset_not_fractionable'
+                asset_symbol_required:
+                  $ref: '#/components/examples/rebalancing_asset_symbol_required'
+                calendar_day_not_mmdd:
+                  $ref: '#/components/examples/rebalancing_calendar_day_not_mmdd'
+                calendar_day_not_number:
+                  $ref: '#/components/examples/rebalancing_calendar_day_not_number'
+                calendar_day_out_of_range:
+                  $ref: '#/components/examples/rebalancing_calendar_day_out_of_range'
+                calendar_day_required:
+                  $ref: '#/components/examples/rebalancing_calendar_day_required'
+                calendar_subtype_invalid:
+                  $ref: '#/components/examples/rebalancing_calendar_subtype_invalid'
+                calendar_weekday_invalid:
+                  $ref: '#/components/examples/rebalancing_calendar_weekday_invalid'
+                cash_weight_percent_empty:
+                  $ref: '#/components/examples/rebalancing_cash_weight_percent_empty'
+                condition_percent_not_decimal:
+                  $ref: '#/components/examples/rebalancing_condition_percent_not_decimal'
+                cooldown_days_invalid:
+                  $ref: '#/components/examples/rebalancing_cooldown_days_invalid'
+                crypto_asset:
+                  $ref: '#/components/examples/rebalancing_crypto_asset'
+                drift_percent_not_decimal:
+                  $ref: '#/components/examples/rebalancing_drift_percent_not_decimal'
+                drift_percent_not_positive:
+                  $ref: '#/components/examples/rebalancing_drift_percent_not_positive'
+                drift_percent_precision:
+                  $ref: '#/components/examples/rebalancing_drift_percent_precision'
+                drift_percent_required:
+                  $ref: '#/components/examples/rebalancing_drift_percent_required'
+                drift_subtype_invalid:
+                  $ref: '#/components/examples/rebalancing_drift_subtype_invalid'
+                duplicate_absolute_drift:
+                  $ref: '#/components/examples/rebalancing_duplicate_absolute_drift'
+                duplicate_asset:
+                  $ref: '#/components/examples/rebalancing_duplicate_asset'
+                duplicate_calendar_condition:
+                  $ref: '#/components/examples/rebalancing_duplicate_calendar_condition'
+                duplicate_on_update_condition:
+                  $ref: '#/components/examples/rebalancing_duplicate_on_update_condition'
+                duplicate_relative_drift:
+                  $ref: '#/components/examples/rebalancing_duplicate_relative_drift'
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+                on_update_day_forbidden:
+                  $ref: '#/components/examples/rebalancing_on_update_day_forbidden'
+                on_update_percent_forbidden:
+                  $ref: '#/components/examples/rebalancing_on_update_percent_forbidden'
+                on_update_subtype_forbidden:
+                  $ref: '#/components/examples/rebalancing_on_update_subtype_forbidden'
+                schema_validation_failed:
+                  $ref: '#/components/examples/rebalancing_schema_validation_failed'
+                weight_percent_not_decimal:
+                  $ref: '#/components/examples/rebalancing_weight_percent_not_decimal'
+                weight_percent_not_positive:
+                  $ref: '#/components/examples/rebalancing_weight_percent_not_positive'
+                weights_must_sum_to_100:
+                  $ref: '#/components/examples/rebalancing_weights_must_sum_to_100'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Check whether the portfolio was created before retrying, because this request is not idempotent. If it keeps happening,
+            contact support.
       summary: Create Portfolio
       tags:
         - Rebalancing
@@ -19254,10 +19980,63 @@ paths:
       responses:
         '204':
           description: No Content
-        '400':
-          description: Bad Request
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again.
+        '404':
+          content:
+            application/json:
+              examples:
+                portfolio_not_found:
+                  $ref: '#/components/examples/rebalancing_portfolio_not_found'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again.
         '422':
-          description: 'Unprocessable Entity '
+          content:
+            application/json:
+              examples:
+                invalid_portfolio_id:
+                  $ref: '#/components/examples/rebalancing_invalid_portfolio_id'
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+                nested_portfolio_weights:
+                  $ref: '#/components/examples/rebalancing_nested_portfolio_weights'
+                portfolio_already_inactive:
+                  $ref: '#/components/examples/rebalancing_portfolio_already_inactive'
+                portfolio_has_subscriptions:
+                  $ref: '#/components/examples/rebalancing_portfolio_has_subscriptions'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support.
       summary: Inactivate Portfolio By ID
       tags:
         - Rebalancing
@@ -19278,6 +20057,57 @@ paths:
               schema:
                 $ref: '#/components/schemas/Portfolio'
           description: OK
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again.
+        '404':
+          content:
+            application/json:
+              examples:
+                portfolio_not_found:
+                  $ref: '#/components/examples/rebalancing_portfolio_not_found'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again.
+        '422':
+          content:
+            application/json:
+              examples:
+                invalid_portfolio_id:
+                  $ref: '#/components/examples/rebalancing_invalid_portfolio_id'
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support.
       summary: Get Portfolio by ID
       tags:
         - Rebalancing
@@ -19326,6 +20156,137 @@ paths:
               schema:
                 $ref: '#/components/schemas/Portfolio'
           description: The updated portfolio
+        '400':
+          content:
+            application/json:
+              examples:
+                request_body_invalid:
+                  $ref: '#/components/examples/rebalancing_request_body_invalid'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again.
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again.
+        '404':
+          content:
+            application/json:
+              examples:
+                portfolio_not_found:
+                  $ref: '#/components/examples/rebalancing_portfolio_not_found'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: No portfolio with this ID exists for your correspondent. Check the portfolio ID and try again.
+        '415':
+          content:
+            application/json:
+              examples:
+                unsupported_media_type:
+                  $ref: '#/components/examples/rebalancing_unsupported_media_type'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The Content-Type header is not application/json. Set Content-Type to application/json and send the body again.
+        '422':
+          content:
+            application/json:
+              examples:
+                asset_not_found:
+                  $ref: '#/components/examples/rebalancing_asset_not_found'
+                asset_not_fractionable:
+                  $ref: '#/components/examples/rebalancing_asset_not_fractionable'
+                asset_symbol_required:
+                  $ref: '#/components/examples/rebalancing_asset_symbol_required'
+                calendar_day_not_mmdd:
+                  $ref: '#/components/examples/rebalancing_calendar_day_not_mmdd'
+                calendar_day_not_number:
+                  $ref: '#/components/examples/rebalancing_calendar_day_not_number'
+                calendar_day_out_of_range:
+                  $ref: '#/components/examples/rebalancing_calendar_day_out_of_range'
+                calendar_day_required:
+                  $ref: '#/components/examples/rebalancing_calendar_day_required'
+                calendar_subtype_invalid:
+                  $ref: '#/components/examples/rebalancing_calendar_subtype_invalid'
+                calendar_weekday_invalid:
+                  $ref: '#/components/examples/rebalancing_calendar_weekday_invalid'
+                cash_weight_percent_empty:
+                  $ref: '#/components/examples/rebalancing_cash_weight_percent_empty'
+                condition_percent_not_decimal:
+                  $ref: '#/components/examples/rebalancing_condition_percent_not_decimal'
+                crypto_asset:
+                  $ref: '#/components/examples/rebalancing_crypto_asset'
+                drift_percent_not_decimal:
+                  $ref: '#/components/examples/rebalancing_drift_percent_not_decimal'
+                drift_percent_not_positive:
+                  $ref: '#/components/examples/rebalancing_drift_percent_not_positive'
+                drift_percent_precision:
+                  $ref: '#/components/examples/rebalancing_drift_percent_precision'
+                drift_percent_required:
+                  $ref: '#/components/examples/rebalancing_drift_percent_required'
+                drift_subtype_invalid:
+                  $ref: '#/components/examples/rebalancing_drift_subtype_invalid'
+                duplicate_absolute_drift:
+                  $ref: '#/components/examples/rebalancing_duplicate_absolute_drift'
+                duplicate_asset:
+                  $ref: '#/components/examples/rebalancing_duplicate_asset'
+                duplicate_calendar_condition:
+                  $ref: '#/components/examples/rebalancing_duplicate_calendar_condition'
+                duplicate_on_update_condition:
+                  $ref: '#/components/examples/rebalancing_duplicate_on_update_condition'
+                duplicate_relative_drift:
+                  $ref: '#/components/examples/rebalancing_duplicate_relative_drift'
+                empty_portfolio_update:
+                  $ref: '#/components/examples/rebalancing_empty_portfolio_update'
+                invalid_portfolio_id:
+                  $ref: '#/components/examples/rebalancing_invalid_portfolio_id'
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+                nested_portfolio_weights:
+                  $ref: '#/components/examples/rebalancing_nested_portfolio_weights'
+                on_update_day_forbidden:
+                  $ref: '#/components/examples/rebalancing_on_update_day_forbidden'
+                on_update_percent_forbidden:
+                  $ref: '#/components/examples/rebalancing_on_update_percent_forbidden'
+                on_update_subtype_forbidden:
+                  $ref: '#/components/examples/rebalancing_on_update_subtype_forbidden'
+                schema_validation_failed:
+                  $ref: '#/components/examples/rebalancing_schema_validation_failed'
+                weight_percent_not_decimal:
+                  $ref: '#/components/examples/rebalancing_weight_percent_not_decimal'
+                weight_percent_not_positive:
+                  $ref: '#/components/examples/rebalancing_weight_percent_not_positive'
+                weights_must_sum_to_100:
+                  $ref: '#/components/examples/rebalancing_weights_must_sum_to_100'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support.
       summary: Update Portfolio by ID
       tags:
         - Rebalancing
@@ -19356,16 +20317,25 @@ paths:
           name: type
           schema:
             type: string
-        - description: Pagination token
+        - description: Offset into the result set for pagination. Defaults to 0 when omitted.
           in: query
           name: page_token
           schema:
-            type: string
-        - description: Max number of runs to return per page
+            default: 0
+            example: 100
+            format: int32
+            maximum: 1000000
+            minimum: 0
+            type: integer
+        - description: Maximum number of runs to return. Defaults to 100.
           in: query
           name: limit
           schema:
-            type: string
+            default: 100
+            example: 100
+            format: int32
+            minimum: 1
+            type: integer
       responses:
         '200':
           content:
@@ -19373,7 +20343,15 @@ paths:
               schema:
                 properties:
                   next_page_token:
-                    $ref: '#/components/schemas/NextPageToken'
+                    description: |
+                      Offset to use as the next page_token, or null when there are no more
+                      runs. Set only when the page is full (result count equals the
+                      requested limit).
+                    example: 100
+                    format: int32
+                    type:
+                      - integer
+                      - 'null'
                   runs:
                     example:
                       - account_id: 4db36989-6565-4011-9126-39fe6b3d9bf6
@@ -19391,6 +20369,48 @@ paths:
                   - next_page_token
                 type: object
           description: The runs which match the query
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again.
+        '422':
+          content:
+            application/json:
+              examples:
+                invalid_query_parameter:
+                  $ref: '#/components/examples/rebalancing_invalid_query_parameter'
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support.
       summary: List All Runs.
       tags:
         - Rebalancing
@@ -19460,17 +20480,178 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          content:
+            application/json:
+              examples:
+                request_body_invalid:
+                  $ref: '#/components/examples/rebalancing_request_body_invalid'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again.
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+                jit_correspondent:
+                  $ref: '#/components/examples/rebalancing_jit_correspondent'
+                non_usd_account:
+                  $ref: '#/components/examples/rebalancing_non_usd_account'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to perform this action, or rebalancing is not permitted for this correspondent or account.
+        '404':
+          content:
+            application/json:
+              examples:
+                account_not_found_for_id:
+                  $ref: '#/components/examples/rebalancing_account_not_found_for_id'
+                correspondent_not_found:
+                  $ref: '#/components/examples/rebalancing_correspondent_not_found'
+                portfolio_not_found:
+                  $ref: '#/components/examples/rebalancing_portfolio_not_found'
+                subscription_required:
+                  $ref: '#/components/examples/rebalancing_subscription_required'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The resource does not exist or is not visible to this correspondent.
+        '415':
+          content:
+            application/json:
+              examples:
+                unsupported_media_type:
+                  $ref: '#/components/examples/rebalancing_unsupported_media_type'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The Content-Type header is not application/json. Set Content-Type to application/json and send the body again.
+        '422':
+          content:
+            application/json:
+              examples:
+                account_not_funded:
+                  $ref: '#/components/examples/rebalancing_account_not_funded'
+                active_run_exists:
+                  $ref: '#/components/examples/rebalancing_active_run_exists'
+                amount_not_decimal:
+                  $ref: '#/components/examples/rebalancing_amount_not_decimal'
+                asset_not_found:
+                  $ref: '#/components/examples/rebalancing_asset_not_found'
+                asset_not_fractionable:
+                  $ref: '#/components/examples/rebalancing_asset_not_fractionable'
+                asset_symbol_required:
+                  $ref: '#/components/examples/rebalancing_asset_symbol_required'
+                cash_weight_percent_empty:
+                  $ref: '#/components/examples/rebalancing_cash_weight_percent_empty'
+                crypto_asset:
+                  $ref: '#/components/examples/rebalancing_crypto_asset'
+                duplicate_asset:
+                  $ref: '#/components/examples/rebalancing_duplicate_asset'
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+                manual_run_with_subscription:
+                  $ref: '#/components/examples/rebalancing_manual_run_with_subscription'
+                partial_liquidation_unsupported:
+                  $ref: '#/components/examples/rebalancing_partial_liquidation_unsupported'
+                schema_validation_failed:
+                  $ref: '#/components/examples/rebalancing_schema_validation_failed'
+                weight_percent_not_decimal:
+                  $ref: '#/components/examples/rebalancing_weight_percent_not_decimal'
+                weight_percent_not_positive:
+                  $ref: '#/components/examples/rebalancing_weight_percent_not_positive'
+                weights_must_sum_to_100:
+                  $ref: '#/components/examples/rebalancing_weights_must_sum_to_100'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Check whether the run was created before retrying, because this request is not idempotent. If it keeps happening, contact
+            support.
       summary: Create Run
       tags:
         - Rebalancing
   /v1/rebalancing/runs/{run_id}:
     delete:
-      description: Cancels a run. Only runs within certain statuses (QUEUED, CANCELED, SELLS_IN_PROGRESS, BUYS_IN_PROGRESS) are cancelable. If this endpoint is called after orders have been submitted, we'll
-        attempt to cancel the orders.
+      description: 'Cancels a run so it does not start, or is not retried. Only a run in QUEUED or IN_PROGRESS can be canceled. A run in any other status is rejected. Canceling does not stop a run that
+        is already placing orders: those orders are not canceled, and the run''s final status can replace CANCELED.'
       operationId: delete-v1-rebalancing-runs-run_id
       responses:
         '204':
           description: No Content
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again.
+        '404':
+          content:
+            application/json:
+              examples:
+                run_not_found:
+                  $ref: '#/components/examples/rebalancing_run_not_found'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: No rebalance run with this ID exists for your correspondent. Check the run ID and try again.
+        '422':
+          content:
+            application/json:
+              examples:
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+                invalid_run_id:
+                  $ref: '#/components/examples/rebalancing_invalid_run_id'
+                run_cannot_be_canceled:
+                  $ref: '#/components/examples/rebalancing_run_cannot_be_canceled'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support.
       summary: Cancel Run by ID
       tags:
         - Rebalancing
@@ -19491,6 +20672,57 @@ paths:
               schema:
                 $ref: '#/components/schemas/PortfolioRun'
           description: The run object
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again.
+        '404':
+          content:
+            application/json:
+              examples:
+                run_not_found:
+                  $ref: '#/components/examples/rebalancing_run_not_found'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: No rebalance run with this ID exists for your correspondent. Check the run ID and try again.
+        '422':
+          content:
+            application/json:
+              examples:
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+                invalid_run_id:
+                  $ref: '#/components/examples/rebalancing_invalid_run_id'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support.
       summary: Get Run by ID
       tags:
         - Rebalancing
@@ -19516,16 +20748,25 @@ paths:
           name: portfolio_id
           schema:
             type: string
-        - description: Pagination token
+        - description: Offset into the result set for pagination. Defaults to 0 when omitted.
           in: query
           name: page_token
           schema:
-            type: string
-        - description: Max number of subscriptions to return per page
+            default: 0
+            example: 100
+            format: int32
+            maximum: 1000000
+            minimum: 0
+            type: integer
+        - description: Maximum number of subscriptions to return. Defaults to 100.
           in: query
           name: limit
           schema:
-            type: string
+            default: 100
+            example: 100
+            format: int32
+            minimum: 1
+            type: integer
       responses:
         '200':
           content:
@@ -19533,7 +20774,15 @@ paths:
               schema:
                 properties:
                   next_page_token:
-                    $ref: '#/components/schemas/NextPageToken'
+                    description: |
+                      Offset to use as the next page_token, or null when there are no more
+                      subscriptions. Set only when the page is full (result count equals the
+                      requested limit).
+                    example: 100
+                    format: int32
+                    type:
+                      - integer
+                      - 'null'
                   subscriptions:
                     items:
                       $ref: '#/components/schemas/PortfolioSubscription'
@@ -19543,6 +20792,48 @@ paths:
                   - next_page_token
                 type: object
           description: OK
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again.
+        '422':
+          content:
+            application/json:
+              examples:
+                invalid_query_parameter:
+                  $ref: '#/components/examples/rebalancing_invalid_query_parameter'
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support.
       summary: List All Subscriptions
       tags:
         - Rebalancing
@@ -19569,6 +20860,92 @@ paths:
               schema:
                 $ref: '#/components/schemas/PortfolioSubscription'
           description: OK
+        '400':
+          content:
+            application/json:
+              examples:
+                request_body_invalid:
+                  $ref: '#/components/examples/rebalancing_request_body_invalid'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request body is missing, is not valid JSON, or has a value of the wrong type. Send a JSON body that matches the endpoint and try again.
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+                jit_correspondent:
+                  $ref: '#/components/examples/rebalancing_jit_correspondent'
+                non_usd_account:
+                  $ref: '#/components/examples/rebalancing_non_usd_account'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to perform this action, or rebalancing is not permitted for this correspondent or account.
+        '404':
+          content:
+            application/json:
+              examples:
+                account_not_found:
+                  $ref: '#/components/examples/rebalancing_account_not_found'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: No account with that ID exists for your correspondent. Check the account ID and try again.
+        '415':
+          content:
+            application/json:
+              examples:
+                unsupported_media_type:
+                  $ref: '#/components/examples/rebalancing_unsupported_media_type'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The Content-Type header is not application/json. Set Content-Type to application/json and send the body again.
+        '422':
+          content:
+            application/json:
+              examples:
+                active_run_exists:
+                  $ref: '#/components/examples/rebalancing_active_run_exists'
+                crypto_position:
+                  $ref: '#/components/examples/rebalancing_crypto_position'
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+                open_orders:
+                  $ref: '#/components/examples/rebalancing_open_orders'
+                pattern_day_trader:
+                  $ref: '#/components/examples/rebalancing_pattern_day_trader'
+                portfolio_unavailable:
+                  $ref: '#/components/examples/rebalancing_portfolio_unavailable'
+                schema_validation_failed:
+                  $ref: '#/components/examples/rebalancing_schema_validation_failed'
+                subscription_already_exists:
+                  $ref: '#/components/examples/rebalancing_subscription_already_exists'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Check whether the subscription was created before retrying, because this request is not idempotent. If it keeps happening,
+            contact support.
       summary: Create Subscription
       tags:
         - Rebalancing
@@ -19579,6 +20956,50 @@ paths:
       responses:
         '204':
           description: No Content
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again.
+        '422':
+          content:
+            application/json:
+              examples:
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+                invalid_subscription_id:
+                  $ref: '#/components/examples/rebalancing_invalid_subscription_id'
+                subscription_nothing_to_delete:
+                  $ref: '#/components/examples/rebalancing_subscription_nothing_to_delete'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support.
       summary: Unsubscribe Account (Delete Subscription)
       tags:
         - Rebalancing
@@ -19598,6 +21019,57 @@ paths:
               schema:
                 $ref: '#/components/schemas/PortfolioSubscription'
           description: The portfolio subscription
+        '401':
+          content:
+            application/json:
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/rebalancing_unauthorized'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request is not authenticated. Send a valid API key ID and secret, or a Broker Dashboard session, and try again.
+        '403':
+          content:
+            application/json:
+              examples:
+                insufficient_permission:
+                  $ref: '#/components/examples/rebalancing_insufficient_permission'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: These credentials are not allowed to call this endpoint, or rebalancing is not enabled for the correspondent. Use credentials with the required permission and try again.
+        '404':
+          content:
+            application/json:
+              examples:
+                subscription_not_found:
+                  $ref: '#/components/examples/rebalancing_subscription_not_found'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: No subscription with this ID exists for your correspondent. Check the subscription ID and try again.
+        '422':
+          content:
+            application/json:
+              examples:
+                invalid_request:
+                  $ref: '#/components/examples/rebalancing_invalid_request'
+                invalid_subscription_id:
+                  $ref: '#/components/examples/rebalancing_invalid_subscription_id'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request failed validation or cannot be completed in its current state. The message describes the reason.
+        '500':
+          content:
+            application/json:
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/rebalancing_internal_server_error'
+                unexpected_error:
+                  $ref: '#/components/examples/rebalancing_unexpected_error'
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/UnexpectedError'
+          description: Something went wrong on our side while handling the request. Retry with backoff. If it keeps happening, contact support.
       summary: Get Subscription by ID
       tags:
         - Rebalancing
@@ -21287,6 +22759,8 @@ paths:
     get:
       description: |
         Retrieves a JIT report for the requested report type and system date. By default, the report is returned inline. For large reports, use response_type=download_url to receive a temporary signed download URL.
+
+        Generated SDKs return the JSON response. To retrieve a report through an SDK, set response_type=download_url and download the file from `url`.
       operationId: get-v1-transfers-jit-reports
       parameters:
         - description: The type of report you want to get.
@@ -21294,17 +22768,9 @@ paths:
           name: report_type
           required: true
           schema:
-            enum:
-              - detail
-              - net_summary
-              - net_payment
-              - net_payment_final
-              - gross_summary
-              - gross_payment
-              - gross_payment_final
-              - obligation
-            type: string
+            $ref: '#/components/schemas/JITReportType'
         - description: Date of file generation.
+          example: '2026-10-14'
           in: query
           name: system_date
           required: true
@@ -21340,18 +22806,28 @@ paths:
                   summary: Download URL response
                   value:
                     expires_at: '2026-04-14T23:55:00Z'
-                    filename: jit_detail_2026-04-14.csv
+                    filename: ALPC-2026-04-14-common_stock-detail.csv
                     url: <signed_s3_url>
-                inline:
-                  description: Returned when response_type is inline or omitted.
-                  summary: Inline report response
-                  value:
-                    detail: <report_content>
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/JITReport'
-                  - $ref: '#/components/schemas/JITReportDownloadURL'
-          description: OK
+                $ref: '#/components/schemas/JITReportDownloadURL'
+            application/pdf:
+              schema:
+                description: PDF payment report file, returned as an attachment.
+                format: binary
+                type: string
+            text/csv:
+              schema:
+                description: CSV report file, returned as an attachment.
+                format: binary
+                type: string
+          description: The report file when response_type is inline or omitted, or a temporary download link when response_type is download_url.
+          headers:
+            Content-Disposition:
+              description: Present when the report file is returned inline. Names the file with the same value that download_url returns in `filename`.
+              example: attachment;filename=ALPC-2026-04-14-common_stock-detail.csv
+              schema:
+                example: attachment;filename=ALPC-2026-04-14-common_stock-detail.csv
+                type: string
       summary: Retrieve JIT Reports
       tags:
         - Funding

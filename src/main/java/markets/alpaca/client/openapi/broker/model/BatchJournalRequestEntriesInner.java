@@ -120,7 +120,7 @@ public class BatchJournalRequestEntriesInner implements Serializable {
   }
 
   /**
-   * Journal amount in USD
+   * Journal amount in the entry&#39;s &#x60;currency&#x60;
    * @return amount
    */
   @javax.annotation.Nullable
@@ -139,7 +139,7 @@ public class BatchJournalRequestEntriesInner implements Serializable {
   }
 
   /**
-   * Currency code in ISO format
+   * The currency of the journal. Defaults to the system currency (for example, USD in the US or EUR in the EU) when omitted. Correspondents with local currency trading enabled must send this field, and the value must be the system currency or one of the correspondent&#39;s enabled currencies. All entries in a batch should use the same currency.
    * @return currency
    */
   @javax.annotation.Nullable

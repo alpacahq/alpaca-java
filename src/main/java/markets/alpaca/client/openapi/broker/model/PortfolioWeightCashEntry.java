@@ -20,9 +20,8 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.List;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -50,44 +49,134 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * PartialTransferAnyOf1Securities
+ * A cash weight. &#x60;symbol&#x60; is optional and may be null.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
-public class PartialTransferAnyOf1Securities implements Serializable {
+public class PortfolioWeightCashEntry implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  public static final String SERIALIZED_NAME_EQUITIES = "equities";
-  @SerializedName(SERIALIZED_NAME_EQUITIES)
+  public static final String SERIALIZED_NAME_PERCENT = "percent";
+  @SerializedName(SERIALIZED_NAME_PERCENT)
   @javax.annotation.Nonnull
-  private List<Object> equities = new ArrayList<>();
+  private BigDecimal percent;
 
-  public PartialTransferAnyOf1Securities() {
-  }
+  public static final String SERIALIZED_NAME_SYMBOL = "symbol";
+  @SerializedName(SERIALIZED_NAME_SYMBOL)
+  @javax.annotation.Nullable
+  private String symbol;
 
-  public PartialTransferAnyOf1Securities equities(@javax.annotation.Nonnull List<Object> equities) {
-    this.equities = equities;
-    return this;
-  }
+  /**
+   * Gets or Sets type
+   */
+  @JsonAdapter(TypeEnum.Adapter.class)
+  public enum TypeEnum {
+    CASH("cash");
 
-  public PartialTransferAnyOf1Securities addEquitiesItem(Object equitiesItem) {
-    if (this.equities == null) {
-      this.equities = new ArrayList<>();
+    private String value;
+
+    TypeEnum(String value) {
+      this.value = value;
     }
-    this.equities.add(equitiesItem);
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static TypeEnum fromValue(String value) {
+      for (TypeEnum b : TypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<TypeEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final TypeEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public TypeEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return TypeEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      TypeEnum.fromValue(value);
+    }
+  }
+
+  public static final String SERIALIZED_NAME_TYPE = "type";
+  @SerializedName(SERIALIZED_NAME_TYPE)
+  @javax.annotation.Nonnull
+  private TypeEnum type;
+
+  public PortfolioWeightCashEntry() {
+  }
+
+  public PortfolioWeightCashEntry percent(@javax.annotation.Nonnull BigDecimal percent) {
+    this.percent = percent;
     return this;
   }
 
   /**
-   * Get equities
-   * @return equities
+   * Percentage allocated to this weight. Values must be greater than zero, and all supplied weights must total exactly 100.
+   * @return percent
    */
   @javax.annotation.Nonnull
-  public List<Object> getEquities() {
-    return equities;
+  public BigDecimal getPercent() {
+    return percent;
   }
 
-  public void setEquities(@javax.annotation.Nonnull List<Object> equities) {
-    this.equities = equities;
+  public void setPercent(@javax.annotation.Nonnull BigDecimal percent) {
+    this.percent = percent;
+  }
+
+
+  public PortfolioWeightCashEntry symbol(@javax.annotation.Nullable String symbol) {
+    this.symbol = symbol;
+    return this;
+  }
+
+  /**
+   * Asset symbol. Required and non-null when &#x60;type&#x60; is &#x60;asset&#x60;.
+   * @return symbol
+   */
+  @javax.annotation.Nullable
+  public String getSymbol() {
+    return symbol;
+  }
+
+  public void setSymbol(@javax.annotation.Nullable String symbol) {
+    this.symbol = symbol;
+  }
+
+
+  public PortfolioWeightCashEntry type(@javax.annotation.Nonnull TypeEnum type) {
+    this.type = type;
+    return this;
+  }
+
+  /**
+   * Get type
+   * @return type
+   */
+  @javax.annotation.Nonnull
+  public TypeEnum getType() {
+    return type;
+  }
+
+  public void setType(@javax.annotation.Nonnull TypeEnum type) {
+    this.type = type;
   }
 
   /**
@@ -103,9 +192,9 @@ public class PartialTransferAnyOf1Securities implements Serializable {
    *
    * @param key name of the property
    * @param value value of the property
-   * @return the PartialTransferAnyOf1Securities instance itself
+   * @return the PortfolioWeightCashEntry instance itself
    */
-  public PartialTransferAnyOf1Securities putAdditionalProperty(String key, Object value) {
+  public PortfolioWeightCashEntry putAdditionalProperty(String key, Object value) {
     if (this.additionalProperties == null) {
         this.additionalProperties = new HashMap<String, Object>();
     }
@@ -144,21 +233,25 @@ public class PartialTransferAnyOf1Securities implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PartialTransferAnyOf1Securities partialTransferAnyOf1Securities = (PartialTransferAnyOf1Securities) o;
-    return Objects.equals(this.equities, partialTransferAnyOf1Securities.equities)&&
-        Objects.equals(this.additionalProperties, partialTransferAnyOf1Securities.additionalProperties);
+    PortfolioWeightCashEntry portfolioWeightCashEntry = (PortfolioWeightCashEntry) o;
+    return Objects.equals(this.percent, portfolioWeightCashEntry.percent) &&
+        Objects.equals(this.symbol, portfolioWeightCashEntry.symbol) &&
+        Objects.equals(this.type, portfolioWeightCashEntry.type)&&
+        Objects.equals(this.additionalProperties, portfolioWeightCashEntry.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(equities, additionalProperties);
+    return Objects.hash(percent, symbol, type, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PartialTransferAnyOf1Securities {\n");
-    sb.append("    equities: ").append(toIndentedString(equities)).append("\n");
+    sb.append("class PortfolioWeightCashEntry {\n");
+    sb.append("    percent: ").append(toIndentedString(percent)).append("\n");
+    sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -178,54 +271,59 @@ public class PartialTransferAnyOf1Securities implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("equities"));
+    openapiFields = new HashSet<String>(Arrays.asList("percent", "symbol", "type"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("equities"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("percent", "type"));
   }
 
   /**
    * Validates the JSON Element and throws an exception if issues found
    *
    * @param jsonElement JSON Element
-   * @throws IOException if the JSON Element is invalid with respect to PartialTransferAnyOf1Securities
+   * @throws IOException if the JSON Element is invalid with respect to PortfolioWeightCashEntry
    */
   public static void validateJsonElement(JsonElement jsonElement) throws IOException {
       if (jsonElement == null) {
-        if (!PartialTransferAnyOf1Securities.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
-          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PartialTransferAnyOf1Securities is not found in the empty JSON string", PartialTransferAnyOf1Securities.openapiRequiredFields.toString()));
+        if (!PortfolioWeightCashEntry.openapiRequiredFields.isEmpty()) { // has required fields but JSON element is null
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PortfolioWeightCashEntry is not found in the empty JSON string", PortfolioWeightCashEntry.openapiRequiredFields.toString()));
         }
       }
 
       // check to make sure all required properties/fields are present in the JSON string
-      for (String requiredField : PartialTransferAnyOf1Securities.openapiRequiredFields) {
+      for (String requiredField : PortfolioWeightCashEntry.openapiRequiredFields) {
         if (jsonElement.getAsJsonObject().get(requiredField) == null) {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      // ensure the required json array is present
-      if (jsonObj.get("equities") == null) {
-        throw new IllegalArgumentException("Expected the field `linkedContent` to be an array in the JSON string but got `null`");
-      } else if (!jsonObj.get("equities").isJsonArray()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `equities` to be an array in the JSON string but got `%s`", jsonObj.get("equities").toString()));
+      if (!jsonObj.get("percent").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `percent` to be a primitive type in the JSON string but got `%s`", jsonObj.get("percent").toString()));
       }
+      if ((jsonObj.get("symbol") != null && !jsonObj.get("symbol").isJsonNull()) && !jsonObj.get("symbol").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
+      }
+      if (!jsonObj.get("type").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("type").toString()));
+      }
+      // validate the required field `type`
+      TypeEnum.validateJsonElement(jsonObj.get("type"));
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!PartialTransferAnyOf1Securities.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'PartialTransferAnyOf1Securities' and its subtypes
+       if (!PortfolioWeightCashEntry.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'PortfolioWeightCashEntry' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<PartialTransferAnyOf1Securities> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(PartialTransferAnyOf1Securities.class));
+       final TypeAdapter<PortfolioWeightCashEntry> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(PortfolioWeightCashEntry.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<PartialTransferAnyOf1Securities>() {
+       return (TypeAdapter<T>) new TypeAdapter<PortfolioWeightCashEntry>() {
            @Override
-           public void write(JsonWriter out, PartialTransferAnyOf1Securities value) throws IOException {
+           public void write(JsonWriter out, PortfolioWeightCashEntry value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              obj.remove("additionalProperties");
              // serialize additional properties
@@ -255,12 +353,12 @@ public class PartialTransferAnyOf1Securities implements Serializable {
            }
 
            @Override
-           public PartialTransferAnyOf1Securities read(JsonReader in) throws IOException {
+           public PortfolioWeightCashEntry read(JsonReader in) throws IOException {
              JsonElement jsonElement = elementAdapter.read(in);
              validateJsonElement(jsonElement);
              JsonObject jsonObj = jsonElement.getAsJsonObject();
              // store additional fields in the deserialized instance
-             PartialTransferAnyOf1Securities instance = thisAdapter.fromJsonTree(jsonObj);
+             PortfolioWeightCashEntry instance = thisAdapter.fromJsonTree(jsonObj);
              for (Map.Entry<String, JsonElement> entry : jsonObj.entrySet()) {
                if (!openapiFields.contains(entry.getKey())) {
                  if (entry.getValue().isJsonPrimitive()) { // primitive type
@@ -287,18 +385,18 @@ public class PartialTransferAnyOf1Securities implements Serializable {
   }
 
   /**
-   * Create an instance of PartialTransferAnyOf1Securities given an JSON string
+   * Create an instance of PortfolioWeightCashEntry given an JSON string
    *
    * @param jsonString JSON string
-   * @return An instance of PartialTransferAnyOf1Securities
-   * @throws IOException if the JSON string is invalid with respect to PartialTransferAnyOf1Securities
+   * @return An instance of PortfolioWeightCashEntry
+   * @throws IOException if the JSON string is invalid with respect to PortfolioWeightCashEntry
    */
-  public static PartialTransferAnyOf1Securities fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, PartialTransferAnyOf1Securities.class);
+  public static PortfolioWeightCashEntry fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, PortfolioWeightCashEntry.class);
   }
 
   /**
-   * Convert an instance of PartialTransferAnyOf1Securities to an JSON string
+   * Convert an instance of PortfolioWeightCashEntry to an JSON string
    *
    * @return JSON string
    */
