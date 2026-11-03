@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * The account&#39;s Fully Paid Securities Lending (FPSL) configuration. To enroll the account for a market, specify the tier_id. The status should not be specified on enrollment. Currently only the US market is supported. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class AccountFPSLPost implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * The interest&#39;s details. Please note that the object might not be set if interest has not yet been calculated for the loan. Additionally, interest details may be adjusted retroactively at any time until interests are finalized for the month. The loan&#39;s changed &#x60;updated_at&#x60; field can indicate such an adjustment. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class FPSLInterest implements Serializable {
   private static final long serialVersionUID = 1L;
 

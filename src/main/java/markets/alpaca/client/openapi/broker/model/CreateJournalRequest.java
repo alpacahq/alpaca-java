@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Journals API allows you to move cash or securities from one account to another.  This model represents the fields you can specify when creating a Journal  Fixture Rules  - No Fixtures   - anything below limit is executed immediately   - anything above limit is pending until executed at EOD, - With Fixtures   - any status &#x3D; rejected will be rejected EOD   - any status &#x3D; pending will be pending forever
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class CreateJournalRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 

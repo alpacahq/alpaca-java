@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Estimated on-chain fee breakdown for a proposed crypto withdrawal, including the total fee and the underlying network (gas) fee.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class WalletFeeEstimateResponse implements Serializable {
   private static final long serialVersionUID = 1L;
 

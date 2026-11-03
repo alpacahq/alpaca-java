@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Additional wire instructions used to explicitly specify intermediary (correspondent) banks for international wire transfers. If omitted, intermediary banks may be automatically selected by downstream institutions, which can result in delays or additional charges. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class BankAdditionalFields implements Serializable {
   private static final long serialVersionUID = 1L;
 

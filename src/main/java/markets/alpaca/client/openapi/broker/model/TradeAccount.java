@@ -55,7 +55,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * This is an extended version of the Account model found [in the trading api](https://alpaca.markets/docs/api-references/trading-api/account/#account-entity).  Extra data has been added that would be useful for brokers.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class TradeAccount implements Serializable {
   private static final long serialVersionUID = 1L;
 

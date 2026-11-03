@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Transfers selected assets. Must carry a non-empty &#x60;cash&#x60; array, a non-empty &#x60;securities.equities&#x60; array, or both.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class PartialTransfer implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Virtual Asset Service Provider returned by the directory search.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class VASP implements Serializable {
   private static final long serialVersionUID = 1L;
 

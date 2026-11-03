@@ -55,7 +55,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * The positions API provides information about an account&#39;s current open positions. The response will include information such as cost basis, shares traded, and market value, which will be updated live as price information is updated. Once a position is closed, it will no longer be queryable through this API.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class Position implements Serializable {
   private static final long serialVersionUID = 1L;
 

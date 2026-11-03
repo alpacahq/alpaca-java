@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Request body for initiating an incoming ACATS transfer.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class AcatsInitiateTransferRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -55,7 +55,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents a set of securities observed by a user.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class Watchlist implements Serializable {
   private static final long serialVersionUID = 1L;
 

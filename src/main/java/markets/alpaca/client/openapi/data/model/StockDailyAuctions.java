@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * Opening and closing auction prices for a given day. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class StockDailyAuctions implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Capital gains distribution. Used for both Long-Term (LTCG) and Short-Term (STCG) sub-types. Each activity represents a single leg; &#x60;long_term_rate&#x60; and/or &#x60;short_term_rate&#x60; are populated based on the source event, and &#x60;rate&#x60; matches the leg&#39;s own rate.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class CGDActivityV2 implements Serializable {
   private static final long serialVersionUID = 1L;
 

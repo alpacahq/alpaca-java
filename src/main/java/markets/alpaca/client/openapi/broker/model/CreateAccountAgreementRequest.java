@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Request to create a per-account agreement. Per-account agreements are tied to a specific trading account and require an &#x60;account_id&#x60;. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class CreateAccountAgreementRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 

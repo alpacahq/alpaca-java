@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Advanced instructions for Direct Market Access (DMA) routing. When &#x60;algorithm&#x60; is &#x60;DMA&#x60;, the order is routed directly to the exchange specified in &#x60;destination&#x60;. Note that this feature is only available to partners/correspondents who have been enabled for DMA.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class AdvancedInstructions implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * A signed agreement between a party and Alpaca, as returned by &#x60;POST /v1/agreements&#x60;. Includes both per-party and per-account agreements. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class SignedAgreement implements Serializable {
   private static final long serialVersionUID = 1L;
 

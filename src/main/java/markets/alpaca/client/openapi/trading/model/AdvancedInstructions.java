@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Advanced instructions for Elite Smart Router: https://docs.alpaca.markets/docs/alpaca-elite-smart-router
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class AdvancedInstructions implements Serializable {
   private static final long serialVersionUID = 1L;
 

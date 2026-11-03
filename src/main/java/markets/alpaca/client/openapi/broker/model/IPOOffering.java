@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * An IPO (Initial Public Offering) offering exposed via the IPO discovery REST API. Returned by &#x60;GET /v1/ipos&#x60; and &#x60;GET /v1/ipos/{offering_reference}&#x60;.  Most IPO lifecycle changes (new offerings, prospectus availability, 60-minute mail, allocations, cancellations) are pushed in real time over the [IPO Events Stream](#operation/subscribeToIPOEventsSSE). 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class IPOOffering implements Serializable {
   private static final long serialVersionUID = 1L;
 
