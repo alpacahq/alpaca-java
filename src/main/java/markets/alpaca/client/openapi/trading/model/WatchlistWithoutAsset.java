@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * The watchlist API provides CRUD operation for the account&#39;s watchlist. An account can have multiple watchlists and each is uniquely identified by id but can also be addressed by user-defined name. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class WatchlistWithoutAsset implements Serializable {
   private static final long serialVersionUID = 1L;
 

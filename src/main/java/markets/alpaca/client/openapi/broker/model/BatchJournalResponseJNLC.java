@@ -56,7 +56,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * A cash journal result returned by the forward batch endpoint.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class BatchJournalResponseJNLC implements Serializable {
   private static final long serialVersionUID = 1L;
 

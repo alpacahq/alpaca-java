@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * The best bid and ask information for a given fixed income security. A value of 0 means there is no active bid or ask for that field. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class FixedIncomeQuote implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -62,7 +62,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * This is copy of Order response schemas as a workaround of displaying issue of nested Order recursively for legs
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class OrderLeg implements Serializable {
   private static final long serialVersionUID = 1L;
 

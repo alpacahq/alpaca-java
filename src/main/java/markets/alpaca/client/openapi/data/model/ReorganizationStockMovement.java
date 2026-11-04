@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * A stock allocation leg in a reorganization.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class ReorganizationStockMovement implements Serializable {
   private static final long serialVersionUID = 1L;
 

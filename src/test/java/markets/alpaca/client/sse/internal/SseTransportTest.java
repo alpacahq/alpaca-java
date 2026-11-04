@@ -197,7 +197,10 @@ class SseTransportTest {
               }
             })) {
       assertTrue(latch.await(3, TimeUnit.SECONDS));
-      assertEquals("evt-2", subscription.lastEventId().orElseThrow());
+      // The resume cursor is committed after the listener returns, so the delivery latch can
+      // open before lastEventId is visible.
+      awaitCondition(
+          () -> "evt-2".equals(subscription.lastEventId().orElse(null)), Duration.ofSeconds(1));
     }
 
     assertNull(server.takeRequest().getHeader("Last-Event-ID"));
@@ -1292,7 +1295,9 @@ class SseTransportTest {
     assertTrue(callbackFinished.await(3, TimeUnit.SECONDS));
     assertTrue(closed.await(3, TimeUnit.SECONDS));
     assertEquals(1, eventCount.get());
-    assertEquals("first", subscription.lastEventId().orElseThrow());
+    // Closing from the listener returns before the transport commits that event's id.
+    awaitCondition(
+        () -> "first".equals(subscription.lastEventId().orElse(null)), Duration.ofSeconds(1));
     assertEquals(AlpacaSseState.CLOSED, subscription.state());
   }
 
