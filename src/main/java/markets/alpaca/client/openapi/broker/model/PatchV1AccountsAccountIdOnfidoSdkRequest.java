@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * PatchV1AccountsAccountIdOnfidoSdkRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class PatchV1AccountsAccountIdOnfidoSdkRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 

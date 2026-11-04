@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Max margin multiplier was changed by admin to this value
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class AdminConfigurationsEventMaxMarginMultiplier implements Serializable {
   private static final long serialVersionUID = 1L;
 

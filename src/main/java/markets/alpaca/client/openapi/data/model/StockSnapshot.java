@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * A snapshot provides the latest trade, latest quote, latest minute bar, current daily bar and previous daily bar. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class StockSnapshot implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Fixed income interest fields (INT/FI). Variants from the same activity type:  - Coupon: &#x60;interest_type&#x60; is &#x60;coupon&#x60;. Includes &#x60;rate&#x60; (no &#x60;price&#x60; / &#x60;accrued_interest_rate&#x60;). No &#x60;order_id&#x60;. - Accrued interest on call: &#x60;interest_type&#x60; is &#x60;accrued&#x60;. Includes &#x60;price&#x60; and &#x60;accrued_interest_rate&#x60; (no &#x60;rate&#x60;). No &#x60;order_id&#x60;. - Trade accrued: &#x60;interest_type&#x60; is &#x60;accrued&#x60;. Includes &#x60;order_id&#x60; so the interest NTA can be linked to the fill. &#x60;parent_id&#x60; is set when a parent trade &#x60;ref_id&#x60; is available.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class CommonFixedIncomeInterestActivityV2 implements Serializable {
   private static final long serialVersionUID = 1L;
 

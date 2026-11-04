@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * The greeks for the contract calculated using the Black-Scholes model.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class OptionGreeks implements Serializable {
   private static final long serialVersionUID = 1L;
 

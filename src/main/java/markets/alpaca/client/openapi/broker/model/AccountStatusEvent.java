@@ -55,7 +55,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents a change to certain account properties, sent over the events streaming API. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class AccountStatusEvent implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * This property is included when the account&#39;s FPSL information had changed due to an enrollment, tier change, or unenrollment. The from and to status or tier id will be included in the event, depending on the change. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class AccountFPSLEvent implements Serializable {
   private static final long serialVersionUID = 1L;
 

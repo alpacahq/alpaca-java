@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * The account&#39;s Fully Paid Securities Lending (FPSL) configuration. Use this property to change the account&#39;s configuration for the FPSL program. To enroll the account for a market, specify the tier_id. The status should not be specified on enrollment. To change the tier, specify the new tier_id. The status should not be specified on tier changes. To unenroll, set the status to INACTIVE. To re-enroll the account, set the status to ACTIVE. You can also specify the tier_id in case you want to change it. Currently only US market is supported. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class AccountFPSLPatch implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -72,7 +72,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents an account with all data available. If your api response is missing some of these fields, there is a good chance you are using a route that returns &#x60;Account&#x60; instances instead of these.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class AccountExtended implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Activity details for a fill or partial_fill event
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class ActivityV2DetailTRD implements Serializable {
   private static final long serialVersionUID = 1L;
 

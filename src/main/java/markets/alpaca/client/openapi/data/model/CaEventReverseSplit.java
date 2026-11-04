@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * Reverse stock split payload delivered when &#x60;event_type &#x3D;&#x3D; reverse_split_corporateaction_event&#x60;. Corresponds to &#x60;reverse_splits&#x60; on the REST [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions) response, but every decimal field is emitted as a JSON string to preserve precision on the wire. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class CaEventReverseSplit implements Serializable {
   private static final long serialVersionUID = 1L;
 
