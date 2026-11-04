@@ -47,6 +47,23 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   completion is independent from terminal listener delivery. Review callback-heavy applications
   before upgrading.
 
+Adopting later upstream Broker, Trading, and Market Data specs
+([#99](https://github.com/alpacahq/alpaca-java/pull/99),
+[#115](https://github.com/alpacahq/alpaca-java/pull/115)):
+
+- Trading crypto-transfer creation is removed.
+- Portfolio history uses a timeframe enum, string date bounds, and `List<Long>` timestamps. The
+  Broker account id is a `UUID`.
+- Broker JIT reports return a download URL for a selected report type. Rebalancing run and
+  subscription lists use integer page tokens and limits.
+- ACATS partial transfers and rebalancing portfolio weights are concrete models. Their generated
+  union wrappers are removed, and transfer payloads require `type`.
+- `TokenizationRequest` drops `account` and `issuerAccount`. Use `clientAccountId` and
+  `clientExternalAccountId`. Broker mint and redeem requests drop `clientId`.
+- VASP search requires `vasps`, and admin-action events require separate belongs-to and created-by
+  fields. Activity side, the PTP exception flag, Broker beneficiaries, and some admin-action types
+  use narrower types.
+
 ### Added
 
 - Broker and Trading `FixedIncomeInterestType` (`coupon`, `accrued`), plus `interest_type`,
@@ -64,6 +81,9 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
 - Additive Broker SSE capabilities including structured failure and closure callbacks, optional
   reconnect, and asynchronous retrieval of one account-activity event.
 - A `0.1.4` to `0.2.0` SSE migration guide and conservative Broker cancellation codemod.
+- Broker agreement creation, FX trade activities, and ACATS admin-action events.
+- Order group role, activity-event assets, tokenization transfer status, and additional exchange
+  codes.
 
 ### Changed
 
@@ -80,6 +100,7 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   fields, and fail closed when a detail payload cannot be identified safely.
 - The pinned Broker NTA operation now declares its actual `text/event-stream` media type, and
   generation checks verify every pinned SSE operation has an explicit handwritten support decision.
+- `FEEActivityV2` no longer requires `parent_id`.
 
 ### Migration
 

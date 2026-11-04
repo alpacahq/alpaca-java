@@ -208,7 +208,10 @@ final class TradingActivityEventDecoder {
     }
 
     ActivityEventV2 event = commonFields(root);
-    if ("FILL".equals(activityType)) {
+    // The REST activities endpoint labels fills "FILL"; the live Activity SSE endpoint labels
+    // the same trade events "TRD" (documented on ActivityEventV2Asset: "Only present when
+    // activity_type is TRD"). Both route to the same trade detail schema.
+    if ("FILL".equals(activityType) || "TRD".equals(activityType)) {
       ActivityV2DetailTRD.validateJsonElement(details);
       event.setDetails(
           new ActivityEventV2AllOfDetails(

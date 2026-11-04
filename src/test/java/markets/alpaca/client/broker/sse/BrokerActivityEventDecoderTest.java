@@ -37,6 +37,36 @@ class BrokerActivityEventDecoderTest {
   }
 
   @Test
+  void decodesTradeActivityTypeSentByTheLiveActivitySseEndpoint() throws Exception {
+    // The REST activities endpoint labels fills "FILL"; the live Activity SSE endpoint labels the
+    // same trade events "TRD".
+    var event =
+        decoder.decode(
+            eventJson(
+                "TRD",
+                null,
+                """
+                {"side":"buy","symbol":"BTC/USD","cum_qty":"0.00000004",
+                "asset_id":"276e2673-764b-4ab6-a611-caf665ca6340",
+                "order_id":"40d6b29c-f736-461d-976f-77f5094da277","leaves_qty":"0.000120017",
+                "order_status":"filled","execution_type":"fill",
+                "client_order_id":"834ae647-fef5-457b-8648-2bbfbe94a1e9"}
+                """
+                    .replace("\n", "")));
+
+    assertEquals("TRD", event.getActivityType());
+    assertInstanceOf(ActivityV2DetailTRD.class, event.getDetails().getActualInstance());
+  }
+
+  @Test
+  void decodesCryptoFeeActivityToFeeDetailModel() throws Exception {
+    var event = decoder.decode(eventJson("CFEE", null, "{\"system_date\":\"2026-10-22\"}"));
+
+    var nta = assertInstanceOf(ActivityV2DetailNTA.class, event.getDetails().getActualInstance());
+    assertInstanceOf(FEEActivityV2.class, nta.getActualInstance());
+  }
+
+  @Test
   void discriminatesStructurallyOverlappingDividendDetails() throws Exception {
     assertDividend("DIV", "CDIV", CDIVActivityV2.class, dividendDetails(true));
     assertDividend("DIV", "SPD", DIVSPDActivityV2.class, dividendDetails(true));
