@@ -58,7 +58,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents structure of an AcatsStatus type AdminAction.  Sent for ACATS transfers on accounts of correspondents with ACATS API access, whenever the transfer changes state: when the transfer is created (&#x60;PENDING&#x60;), when it is approved and submitted to DTCC (&#x60;IN_PROGRESS&#x60;), on each subsequent DTCC status change, and when it is &#x60;REJECTED&#x60; or &#x60;SETTLED&#x60;. Sent for both incoming and outgoing transfers, including transfers not initiated through the ACATS API.  The same status may be delivered more than once for a transfer. Use &#x60;context.acats_id&#x60; to correlate events with the transfer returned by the ACATS endpoints. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class AdminActionAcatsStatus implements Serializable {
   private static final long serialVersionUID = 1L;
 

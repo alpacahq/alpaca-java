@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * Latest fixed-income prices keyed by ISIN.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class FixedIncomeLatestPricesResp implements Serializable {
   private static final long serialVersionUID = 1L;
 

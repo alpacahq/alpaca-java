@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Transfers the entire account. &#x60;cash&#x60; and &#x60;securities.equities&#x60;, if sent, must be empty.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class FullTransfer implements Serializable {
   private static final long serialVersionUID = 1L;
 

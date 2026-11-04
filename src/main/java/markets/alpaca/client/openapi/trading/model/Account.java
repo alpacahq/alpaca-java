@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * The account API serves important information related to an account, including account status, funds available for trade, funds available for withdrawal, and various flags relevant to an account&#39;s ability to trade. An account maybe be blocked for just for trades (trades_blocked flag) or for both trades and transfers (account_blocked flag) if Alpaca identifies the account to engaging in any suspicious activity. Please note that cryptocurrencies are not eligible assets to be used as collateral for margin accounts and will require the asset be traded using cash only. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class Account implements Serializable {
   private static final long serialVersionUID = 1L;
 

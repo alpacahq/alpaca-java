@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * An option trade.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class OptionTrade implements Serializable {
   private static final long serialVersionUID = 1L;
 

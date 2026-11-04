@@ -56,7 +56,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Assets are sorted by asset class, exchange and symbol. Some assets are not tradable with Alpaca. These assets will be marked with the flag tradable&#x3D;false
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.25.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class Asset implements Serializable {
   private static final long serialVersionUID = 1L;
 
