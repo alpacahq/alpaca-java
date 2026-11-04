@@ -13,6 +13,11 @@ public final class ActivityDetailSchemaResolver {
     return switch (type.toUpperCase(Locale.ROOT)) {
       case "ACATC" -> "AcatcActivityV2";
       case "ACATS" -> "AcatsActivityV2";
+      // The pinned OAS documents CFEE (crypto fee) but does not yet define a dedicated detail
+      // schema. Its payload carries only the fields FEEActivityV2 already models, and every other
+      // system_date-only candidate ties with it structurally; resolve explicitly until the
+      // contract supplies a CFEE-specific schema.
+      case "CFEE" -> "FEEActivityV2";
       case "CGD" -> oneOf(detail, "", "LTCG", "STCG") ? "CGDActivityV2" : null;
       // The pinned OAS documents CSD but does not yet define a CSD detail schema. Preserve the
       // event with the structurally compatible CSW model until the contract supplies one.
