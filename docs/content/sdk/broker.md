@@ -311,8 +311,10 @@ Protocol and non-retryable HTTP failures are terminal; retryable HTTP and transp
 the configured reconnect policy. When reconnect is enabled, the malformed event's SSE ID becomes
 the transport cursor sent in `Last-Event-ID` after invoking the failure callback—even if that
 callback throws. Broker endpoints document endpoint-specific query cursors rather than
-`Last-Event-ID`; after an empty SSE `id:`, a configured initial ID or an original `since`,
-`since_id`, or `since_ulid` lower bound keeps replay possible. Cursorless subscriptions fail closed
+`Last-Event-ID`. After an empty SSE `id:`, a configured initial ID or an original `since`,
+`since_id`, or `since_ulid` lower bound keeps replay possible. The rebalancer stream also accepts
+`Last-Event-Id`, which the API uses as `since_id`, and that supplied header is kept as its lower
+bound in the same case. Cursorless subscriptions fail closed
 rather than reconnecting with a possible gap, including when an established connection drops before
 supplying any event ID. Applications that require gap replay should configure the appropriate lower
 bound and deduplicate events. Activity V2
@@ -326,7 +328,10 @@ operation is not wrapped; use the supported funding-status stream. Admin-action 
 required `type` field to select the generated legacy-note, liquidation, or transaction-cancel
 model while retaining `SubscribeToAdminActionSSE200ResponseInner` as the listener type. Missing,
 unknown, or schema-invalid admin-action types invoke the malformed-event callback and follow the
-same continue-and-advance policy as other Broker decode failures.
+same continue-and-advance policy as other Broker decode failures. Rebalancer events use
+`subscribeToRebalancerEvents`. `event_type` selects the generated portfolio-status, run-created, or
+run-status model inside `RebalancerEvent`. `lastEventId` is sent as the documented
+`Last-Event-Id` header, which the API treats as `since_id`.
 
 New listeners can use `onEventFailure(...)` for malformed-event ID/type metadata,
 `onHttpFailure(...)` for structured HTTP failures, `onRetryChanged(...)` for server retry hints,

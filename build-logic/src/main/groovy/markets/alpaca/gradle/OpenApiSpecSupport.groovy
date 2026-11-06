@@ -356,6 +356,9 @@ final class OpenApiSpecSupport {
                 contract('subscribeToJournalStatusV2SSE', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#subscribeToJournalStatus'),
+                contract('subscribeToRebalancerEventsSSE', 'supported',
+                    'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
+                        '#subscribeToRebalancerEvents'),
                 contract('subscribeToSystemEventV2SSE', 'supported',
                     'markets.alpaca.client.broker.sse.BrokerEventsSseClient' +
                         '#subscribeToSystemEvents'),
@@ -520,6 +523,9 @@ final class OpenApiSpecSupport {
             brokerSseShape('subscribeToJournalStatusV2SSE',
                 activityRange + [queryParameter('id', 'string')],
                 'array-ref:#/components/schemas/JournalStatusEventV2'),
+            brokerSseShape('subscribeToRebalancerEventsSSE',
+                activityRange + [headerParameter('Last-Event-Id', 'string', 'ulid')],
+                'array-ref:#/components/schemas/RebalancerEvent'),
             brokerSseShape('subscribeToSystemEventV2SSE',
                 activityRange,
                 'array-ref:#/components/schemas/SystemEventV2'),
@@ -701,6 +707,12 @@ final class OpenApiSpecSupport {
         def schema = [type: type]
         if (format != null) schema.format = format
         parameterSignature([name: name, in: 'query', schema: schema])
+    }
+
+    private static String headerParameter(String name, String type, String format = null) {
+        def schema = [type: type]
+        if (format != null) schema.format = format
+        parameterSignature([name: name, in: 'header', schema: schema])
     }
 
     private static String pathParameter(String name, String type, String format = null) {

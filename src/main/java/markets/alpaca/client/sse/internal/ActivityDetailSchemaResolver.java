@@ -78,6 +78,7 @@ public final class ActivityDetailSchemaResolver {
             case "MA.CMA", "MA.SMA", "MA.SCMA" -> "OpcaMAActivityV2";
             case "NC.CNC", "NC.SNC", "NC.SCNC" -> "OpcaNCActivityV2";
             case "SPIN" -> "OpcaSPINActivityV2";
+            case "CGD.LTCG", "CGD.STCG" -> "OpcaCGDActivityV2";
             case "SPLIT.FSPLIT" -> "OpcaFSPLITActivityV2";
             case "SPLIT.RSPLIT" -> "OpcaRSPLITActivityV2";
             case "SPLIT.USPLIT" -> "OpcaUSPLITActivityV2";

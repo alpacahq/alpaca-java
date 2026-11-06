@@ -44,6 +44,7 @@ import markets.alpaca.client.openapi.trading.model.OPEXCActivityV2;
 import markets.alpaca.client.openapi.trading.model.OPEXPActivityV2;
 import markets.alpaca.client.openapi.trading.model.OPTRDActivityV2;
 import markets.alpaca.client.openapi.trading.model.OpcaCDIVActivityV2;
+import markets.alpaca.client.openapi.trading.model.OpcaCGDActivityV2;
 import markets.alpaca.client.openapi.trading.model.OpcaFSPLITActivityV2;
 import markets.alpaca.client.openapi.trading.model.OpcaMAActivityV2;
 import markets.alpaca.client.openapi.trading.model.OpcaNCActivityV2;
@@ -172,6 +173,8 @@ final class TradingActivityEventDecoder {
               "OpcaRSPLITActivityV2",
               OpcaRSPLITActivityV2.class,
               OpcaRSPLITActivityV2::validateJsonElement),
+          candidate(
+              "OpcaCGDActivityV2", OpcaCGDActivityV2.class, OpcaCGDActivityV2::validateJsonElement),
           candidate("OPASNActivityV2", OPASNActivityV2.class, OPASNActivityV2::validateJsonElement),
           candidate("OPEXCActivityV2", OPEXCActivityV2.class, OPEXCActivityV2::validateJsonElement),
           candidate("OPEXPActivityV2", OPEXPActivityV2.class, OPEXPActivityV2::validateJsonElement),

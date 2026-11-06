@@ -465,10 +465,13 @@ For compatibility, a malformed Broker event invokes `onFailure` for that event a
 connection continues. Its SSE ID becomes the `Last-Event-ID` transport cursor after the callback.
 Admin-action streams retain the generated `SubscribeToAdminActionSSE200ResponseInner` listener
 type, while the required `type` field selects its concrete generated model without relying on the
-ambiguous generated `oneOf` adapter.
+ambiguous generated `oneOf` adapter. Rebalancer streams use `subscribeToRebalancerEvents` and select
+`RebalancerEvent` from `event_type` the same way. That stream also accepts `lastEventId`, sent as
+the documented `Last-Event-Id` header.
 Broker endpoints document endpoint-specific `since`/`since_id`/`since_ulid` query cursors. After an
-empty SSE `id:`, a configured initial ID or original lower-bound query keeps replay possible;
-cursorless subscriptions fail closed rather than reconnecting with a possible gap, including when an
+empty SSE `id:`, a configured initial ID or that original lower-bound query keeps replay possible.
+The rebalancer stream also keeps a supplied `Last-Event-Id` header as its lower bound.
+Cursorless subscriptions fail closed rather than reconnecting with a possible gap, including when an
 established connection drops before supplying any event ID. Applications that require gap replay
 should configure the appropriate request option and deduplicate.
 Protocol and non-retryable HTTP failures are terminal;

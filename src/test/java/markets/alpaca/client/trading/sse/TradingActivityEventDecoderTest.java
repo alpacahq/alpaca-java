@@ -11,6 +11,7 @@ import markets.alpaca.client.openapi.trading.model.CSWActivityV2;
 import markets.alpaca.client.openapi.trading.model.DIVSPDActivityV2;
 import markets.alpaca.client.openapi.trading.model.FEEActivityV2;
 import markets.alpaca.client.openapi.trading.model.FixedIncomeRedemptionActivityV2;
+import markets.alpaca.client.openapi.trading.model.OpcaCGDActivityV2;
 import markets.alpaca.client.openapi.trading.model.RightsDistributionActivityV2;
 import org.junit.jupiter.api.Test;
 
@@ -69,6 +70,25 @@ class TradingActivityEventDecoderTest {
 
     var nta = assertInstanceOf(ActivityV2DetailNTA.class, event.getDetails().getActualInstance());
     assertInstanceOf(FEEActivityV2.class, nta.getActualInstance());
+  }
+
+  @Test
+  void decodesOptionsCapitalGainsDistributionToGeneratedDetailModel() throws Exception {
+    var event =
+        decoder.decode(
+            eventJson(
+                "OPCA",
+                "CGD.LTCG",
+                """
+                {"system_date":"2026-10-01","position_date":"2026-09-30",
+                "new_contract_symbol":"AAPL251219C00100000",
+                "old_contract_symbol":"AAPL251219C00105000",
+                "cusip":"037833100","rate":"0.25","symbol":"AAPL"}
+                """
+                    .replace("\n", "")));
+
+    var nta = assertInstanceOf(ActivityV2DetailNTA.class, event.getDetails().getActualInstance());
+    assertInstanceOf(OpcaCGDActivityV2.class, nta.getActualInstance());
   }
 
   @Test

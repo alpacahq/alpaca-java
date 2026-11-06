@@ -6,9 +6,11 @@
  * opens them through the SDK's incremental OkHttp transport so applications can receive live Broker
  * events, await connection metadata, distinguish per-event decoding failures, opt into reconnects,
  * and close subscriptions explicitly. Gap replay uses each endpoint's documented {@code since_id}
- * or {@code since_ulid} request option. Rich default listener methods preserve legacy failure/close
- * callback shapes without duplicate delivery. The exposed OkHttp {@code EventSource} is a
- * request/cancel compatibility facade; new code should close the subscription directly.
+ * or {@code since_ulid} request option. The rebalancer stream also accepts {@code Last-Event-Id},
+ * which the API uses as {@code since_id}. Rich default listener methods preserve legacy
+ * failure/close callback shapes without duplicate delivery. The exposed OkHttp
+ * {@code EventSource} is a request/cancel compatibility facade; new code should close the
+ * subscription directly.
  *
  * @see markets.alpaca.client.broker.sse.BrokerEventsSseClient
  */

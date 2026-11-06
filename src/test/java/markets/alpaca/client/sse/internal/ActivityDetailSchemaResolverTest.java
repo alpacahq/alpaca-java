@@ -19,6 +19,8 @@ class ActivityDetailSchemaResolverTest {
     // FEEActivityV2, so it is resolved explicitly rather than left to ambiguous structural
     // matching (see ActivityDetailSchemaResolver).
     assertEquals("FEEActivityV2", ActivityDetailSchemaResolver.resolve("CFEE", null));
+    assertEquals("OpcaCGDActivityV2", ActivityDetailSchemaResolver.resolve("OPCA", "CGD.LTCG"));
+    assertEquals("OpcaCGDActivityV2", ActivityDetailSchemaResolver.resolve("OPCA", "CGD.STCG"));
 
     assertNull(ActivityDetailSchemaResolver.resolve("INT", "MGN"));
     assertNull(ActivityDetailSchemaResolver.resolve("DIV", null));
