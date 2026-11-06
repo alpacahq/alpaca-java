@@ -2,6 +2,7 @@ package markets.alpaca.client.trading.sse;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Set;
 import markets.alpaca.client.openapi.trading.model.ActivityEventV2;
 import markets.alpaca.client.openapi.trading.model.ActivityV2DetailNTA;
 import markets.alpaca.client.openapi.trading.model.ActivityV2DetailTRD;
@@ -94,7 +95,8 @@ class TradingActivityEventDecoderTest {
   @Test
   void registryCoversEveryGeneratedNtaCandidate() {
     assertEquals(
-        ActivityV2DetailNTA.schemas.keySet(), TradingActivityEventDecoder.candidateSchemaNames());
+        Set.copyOf(ActivityV2DetailNTA.schemas.values()),
+        TradingActivityEventDecoder.candidateClasses());
     assertFalse(
         ActivityV2DetailNTA.schemas.containsKey("CSDActivityV2"),
         "Remove the temporary CSD-to-CSW mapping when generation provides CSDActivityV2");
