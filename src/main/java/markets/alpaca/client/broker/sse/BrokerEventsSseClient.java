@@ -21,6 +21,7 @@ import markets.alpaca.client.openapi.broker.model.IPOEvent;
 import markets.alpaca.client.openapi.broker.model.JournalStatusEvent;
 import markets.alpaca.client.openapi.broker.model.JournalStatusEventV2;
 import markets.alpaca.client.openapi.broker.model.NonTradeActivityEvent;
+import markets.alpaca.client.openapi.broker.model.RebalancerEvent;
 import markets.alpaca.client.openapi.broker.model.StatusFundingEvent;
 import markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner;
 import markets.alpaca.client.openapi.broker.model.SystemEventV2;
@@ -348,6 +349,43 @@ public final class BrokerEventsSseClient {
         new BrokerSseIdentifiedDateTimeOptions(since, until, sinceId, untilId, id), listener);
   }
 
+  /**
+   * Opens the Broker rebalancer events SSE stream.
+   *
+   * <p>{@code lastEventId} is sent as the {@code Last-Event-Id} header. The Broker API uses that
+   * header as {@code since_id} and rejects it together with {@code since}.
+   */
+  public BrokerSseSubscription subscribeToRebalancerEvents(
+      BrokerSseRebalancerOptions options, BrokerSseEventListener<RebalancerEvent> listener)
+      throws ApiException {
+    Objects.requireNonNull(options, "options must not be null");
+    return open(
+        eventsApi
+            .subscribeToRebalancerEventsSSECall(
+                options.since(),
+                options.until(),
+                options.sinceId(),
+                options.untilId(),
+                options.lastEventId(),
+                null)
+            .request(),
+        new BrokerRebalancerEventDecoder()::decode,
+        listener);
+  }
+
+  /** Opens the Broker rebalancer events SSE stream with explicit cursor filters. */
+  public BrokerSseSubscription subscribeToRebalancerEvents(
+      OffsetDateTime since,
+      OffsetDateTime until,
+      String sinceId,
+      String untilId,
+      String lastEventId,
+      BrokerSseEventListener<RebalancerEvent> listener)
+      throws ApiException {
+    return subscribeToRebalancerEvents(
+        new BrokerSseRebalancerOptions(since, until, sinceId, untilId, lastEventId), listener);
+  }
+
   /** Opens the Broker system events SSE stream. */
   public BrokerSseSubscription subscribeToSystemEvents(
       BrokerSseDateTimeOptions options, BrokerSseEventListener<SystemEventV2> listener)
@@ -549,6 +587,10 @@ public final class BrokerEventsSseClient {
 
   private static Request withResumeCursor(
       Request request, String eventId, String fallbackEventId, boolean reconnect) {
+    String suppliedResumeId = suppliedLastEventId(request);
+    if (eventId == null && !reconnect && suppliedResumeId != null) {
+      return SseTransport.withLastEventIdHeader(request, suppliedResumeId);
+    }
     Request resumedRequest = SseTransport.withLastEventIdHeader(request, eventId);
     if (eventId == null && !reconnect) return resumedRequest;
     if (eventId != null && !eventId.isEmpty()) return resumedRequest;
@@ -560,10 +602,19 @@ public final class BrokerEventsSseClient {
         || request.url().queryParameter("since_ulid") != null) {
       return resumedRequest;
     }
+    if (suppliedResumeId != null) {
+      return SseTransport.withLastEventIdHeader(request, suppliedResumeId);
+    }
     throw new AlpacaSseProtocolException(
         eventId == null
             ? "Cannot resume a cursorless Broker stream before receiving an SSE id"
             : "Cannot resume a cursorless Broker stream after an empty SSE id");
+  }
+
+  private static String suppliedLastEventId(Request request) {
+    String supplied = request.header("Last-Event-ID");
+    if (supplied == null || supplied.isEmpty()) return null;
+    return supplied;
   }
 
   private static <T> AlpacaSseListener<T> adapt(

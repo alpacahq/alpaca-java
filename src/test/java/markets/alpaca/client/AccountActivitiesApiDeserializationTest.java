@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import markets.alpaca.client.http.AlpacaHttpConfig;
 import markets.alpaca.client.openapi.trading.api.AccountActivitiesApi;
+import markets.alpaca.client.openapi.trading.model.ActivityTypeFilter;
 import markets.alpaca.client.openapi.trading.model.GetAccountActivitiesByActivityType200ResponseInner;
 import markets.alpaca.client.openapi.trading.model.NonTradeActivities;
 import markets.alpaca.client.openapi.trading.model.TradingActivities;
@@ -76,7 +77,8 @@ class AccountActivitiesApiDeserializationTest {
       var api = new AccountActivitiesApi(client);
 
       var response =
-          api.getAccountActivitiesByActivityType("FILL", null, null, null, null, null, null, null);
+          api.getAccountActivitiesByActivityType(
+              ActivityTypeFilter.FILL, null, null, null, null, null, null, null);
 
       assertEquals(1, response.size());
       var activity = assertInstanceOf(TradingActivities.class, response.get(0).getActualInstance());

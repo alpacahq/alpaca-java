@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import markets.alpaca.client.openapi.broker.model.Order;
+import markets.alpaca.client.openapi.broker.model.PortfolioRunInitiator;
 import markets.alpaca.client.openapi.broker.model.PortfolioRunStatus;
+import markets.alpaca.client.openapi.broker.model.PortfolioRunType;
 import markets.alpaca.client.openapi.broker.model.PortfolioWeights;
 import markets.alpaca.client.openapi.broker.model.SkippedOrder;
 import java.io.Serializable;
@@ -85,62 +87,10 @@ public class PortfolioRun implements Serializable {
   @javax.annotation.Nullable
   private String id;
 
-  /**
-   * system or api
-   */
-  @JsonAdapter(InitiatedFromEnum.Adapter.class)
-  public enum InitiatedFromEnum {
-    SYSTEM("system"),
-    
-    API("api");
-
-    private String value;
-
-    InitiatedFromEnum(String value) {
-      this.value = value;
-    }
-
-    public String getValue() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    public static InitiatedFromEnum fromValue(String value) {
-      for (InitiatedFromEnum b : InitiatedFromEnum.values()) {
-        if (b.value.equals(value)) {
-          return b;
-        }
-      }
-      throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-
-    public static class Adapter extends TypeAdapter<InitiatedFromEnum> {
-      @Override
-      public void write(final JsonWriter jsonWriter, final InitiatedFromEnum enumeration) throws IOException {
-        jsonWriter.value(enumeration.getValue());
-      }
-
-      @Override
-      public InitiatedFromEnum read(final JsonReader jsonReader) throws IOException {
-        String value =  jsonReader.nextString();
-        return InitiatedFromEnum.fromValue(value);
-      }
-    }
-
-    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
-      String value = jsonElement.getAsString();
-      InitiatedFromEnum.fromValue(value);
-    }
-  }
-
   public static final String SERIALIZED_NAME_INITIATED_FROM = "initiated_from";
   @SerializedName(SERIALIZED_NAME_INITIATED_FROM)
   @javax.annotation.Nullable
-  private InitiatedFromEnum initiatedFrom;
+  private PortfolioRunInitiator initiatedFrom;
 
   public static final String SERIALIZED_NAME_ORDERS = "orders";
   @SerializedName(SERIALIZED_NAME_ORDERS)
@@ -167,62 +117,10 @@ public class PortfolioRun implements Serializable {
   @javax.annotation.Nullable
   private PortfolioRunStatus status;
 
-  /**
-   * full_rebalance or invest_cash
-   */
-  @JsonAdapter(TypeEnum.Adapter.class)
-  public enum TypeEnum {
-    FULL_REBALANCE("full_rebalance"),
-    
-    INVEST_CASH("invest_cash");
-
-    private String value;
-
-    TypeEnum(String value) {
-      this.value = value;
-    }
-
-    public String getValue() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    public static TypeEnum fromValue(String value) {
-      for (TypeEnum b : TypeEnum.values()) {
-        if (b.value.equals(value)) {
-          return b;
-        }
-      }
-      throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-
-    public static class Adapter extends TypeAdapter<TypeEnum> {
-      @Override
-      public void write(final JsonWriter jsonWriter, final TypeEnum enumeration) throws IOException {
-        jsonWriter.value(enumeration.getValue());
-      }
-
-      @Override
-      public TypeEnum read(final JsonReader jsonReader) throws IOException {
-        String value =  jsonReader.nextString();
-        return TypeEnum.fromValue(value);
-      }
-    }
-
-    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
-      String value = jsonElement.getAsString();
-      TypeEnum.fromValue(value);
-    }
-  }
-
   public static final String SERIALIZED_NAME_TYPE = "type";
   @SerializedName(SERIALIZED_NAME_TYPE)
   @javax.annotation.Nullable
-  private TypeEnum type;
+  private PortfolioRunType type;
 
   public static final String SERIALIZED_NAME_UPDATED_AT = "updated_at";
   @SerializedName(SERIALIZED_NAME_UPDATED_AT)
@@ -340,21 +238,21 @@ public class PortfolioRun implements Serializable {
   }
 
 
-  public PortfolioRun initiatedFrom(@javax.annotation.Nullable InitiatedFromEnum initiatedFrom) {
+  public PortfolioRun initiatedFrom(@javax.annotation.Nullable PortfolioRunInitiator initiatedFrom) {
     this.initiatedFrom = initiatedFrom;
     return this;
   }
 
   /**
-   * system or api
+   * Get initiatedFrom
    * @return initiatedFrom
    */
   @javax.annotation.Nullable
-  public InitiatedFromEnum getInitiatedFrom() {
+  public PortfolioRunInitiator getInitiatedFrom() {
     return initiatedFrom;
   }
 
-  public void setInitiatedFrom(@javax.annotation.Nullable InitiatedFromEnum initiatedFrom) {
+  public void setInitiatedFrom(@javax.annotation.Nullable PortfolioRunInitiator initiatedFrom) {
     this.initiatedFrom = initiatedFrom;
   }
 
@@ -470,21 +368,21 @@ public class PortfolioRun implements Serializable {
   }
 
 
-  public PortfolioRun type(@javax.annotation.Nullable TypeEnum type) {
+  public PortfolioRun type(@javax.annotation.Nullable PortfolioRunType type) {
     this.type = type;
     return this;
   }
 
   /**
-   * full_rebalance or invest_cash
+   * Get type
    * @return type
    */
   @javax.annotation.Nullable
-  public TypeEnum getType() {
+  public PortfolioRunType getType() {
     return type;
   }
 
-  public void setType(@javax.annotation.Nullable TypeEnum type) {
+  public void setType(@javax.annotation.Nullable PortfolioRunType type) {
     this.type = type;
   }
 
@@ -693,12 +591,9 @@ public class PortfolioRun implements Serializable {
       if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
-      if ((jsonObj.get("initiated_from") != null && !jsonObj.get("initiated_from").isJsonNull()) && !jsonObj.get("initiated_from").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `initiated_from` to be a primitive type in the JSON string but got `%s`", jsonObj.get("initiated_from").toString()));
-      }
       // validate the optional field `initiated_from`
       if (jsonObj.get("initiated_from") != null && !jsonObj.get("initiated_from").isJsonNull()) {
-        InitiatedFromEnum.validateJsonElement(jsonObj.get("initiated_from"));
+        PortfolioRunInitiator.validateJsonElement(jsonObj.get("initiated_from"));
       }
       if (jsonObj.get("orders") != null && !jsonObj.get("orders").isJsonNull()) {
         JsonArray jsonArrayorders = jsonObj.getAsJsonArray("orders");
@@ -738,12 +633,9 @@ public class PortfolioRun implements Serializable {
       if (jsonObj.get("status") != null && !jsonObj.get("status").isJsonNull()) {
         PortfolioRunStatus.validateJsonElement(jsonObj.get("status"));
       }
-      if ((jsonObj.get("type") != null && !jsonObj.get("type").isJsonNull()) && !jsonObj.get("type").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("type").toString()));
-      }
       // validate the optional field `type`
       if (jsonObj.get("type") != null && !jsonObj.get("type").isJsonNull()) {
-        TypeEnum.validateJsonElement(jsonObj.get("type"));
+        PortfolioRunType.validateJsonElement(jsonObj.get("type"));
       }
       if ((jsonObj.get("updated_at") != null && !jsonObj.get("updated_at").isJsonNull()) && !jsonObj.get("updated_at").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `updated_at` to be a primitive type in the JSON string but got `%s`", jsonObj.get("updated_at").toString()));

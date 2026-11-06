@@ -21,7 +21,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import markets.alpaca.client.openapi.broker.model.Order;
+import markets.alpaca.client.openapi.broker.model.PositionClosedResponseBody;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -49,7 +49,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * Represents the result of asking the api to close a position.  &#x60;body&#x60; is the Order used to close out the position.
+ * Represents the result of asking the api to close a position.  When &#x60;status&#x60; is 200, &#x60;body&#x60; is the Order used to close out the position. For any other &#x60;status&#x60;, &#x60;body&#x60; is the error object describing why the close was rejected.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class PositionClosedResponse implements Serializable {
@@ -58,7 +58,7 @@ public class PositionClosedResponse implements Serializable {
   public static final String SERIALIZED_NAME_BODY = "body";
   @SerializedName(SERIALIZED_NAME_BODY)
   @javax.annotation.Nullable
-  private Order body;
+  private PositionClosedResponseBody body;
 
   public static final String SERIALIZED_NAME_STATUS = "status";
   @SerializedName(SERIALIZED_NAME_STATUS)
@@ -73,7 +73,7 @@ public class PositionClosedResponse implements Serializable {
   public PositionClosedResponse() {
   }
 
-  public PositionClosedResponse body(@javax.annotation.Nullable Order body) {
+  public PositionClosedResponse body(@javax.annotation.Nullable PositionClosedResponseBody body) {
     this.body = body;
     return this;
   }
@@ -83,11 +83,11 @@ public class PositionClosedResponse implements Serializable {
    * @return body
    */
   @javax.annotation.Nullable
-  public Order getBody() {
+  public PositionClosedResponseBody getBody() {
     return body;
   }
 
-  public void setBody(@javax.annotation.Nullable Order body) {
+  public void setBody(@javax.annotation.Nullable PositionClosedResponseBody body) {
     this.body = body;
   }
 
@@ -249,7 +249,7 @@ public class PositionClosedResponse implements Serializable {
         JsonObject jsonObj = jsonElement.getAsJsonObject();
       // validate the optional field `body`
       if (jsonObj.get("body") != null && !jsonObj.get("body").isJsonNull()) {
-        Order.validateJsonElement(jsonObj.get("body"));
+        PositionClosedResponseBody.validateJsonElement(jsonObj.get("body"));
       }
       if (!jsonObj.get("symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));

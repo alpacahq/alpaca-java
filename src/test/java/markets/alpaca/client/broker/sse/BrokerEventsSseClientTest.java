@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -18,6 +19,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import markets.alpaca.client.AlpacaClientFactory;
 import markets.alpaca.client.AlpacaCredentials;
 import markets.alpaca.client.openapi.broker.model.AdminActionLiquidation;
+import markets.alpaca.client.openapi.broker.model.RebalancerEvent;
+import markets.alpaca.client.openapi.broker.model.RebalancerPortfolioStatusChangedEvent;
 import markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner;
 import markets.alpaca.client.openapi.broker.model.TradeUpdateEventV2;
 import markets.alpaca.client.sse.AlpacaSseCallbackException;
@@ -240,6 +243,97 @@ class BrokerEventsSseClientTest {
     var request = server.takeRequest(3, TimeUnit.SECONDS);
     assertNotNull(request);
     assertEquals("/v2/events/admin-actions", request.getPath());
+  }
+
+  @Test
+  void subscribeToRebalancerEvents_sendsResumeHeaderAndDecodesPortfolioEvent() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody(
+                "data: " + BrokerRebalancerEventDecoderTest.portfolioStatusChangedJson() + "\n\n"));
+
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS, httpClient);
+    brokerClient.setBasePath(serverBasePath());
+    var sse = new BrokerEventsSseClient(brokerClient);
+    var received = new AtomicReference<RebalancerEvent>();
+    var eventLatch = new CountDownLatch(1);
+
+    try (var subscription =
+        sse.subscribeToRebalancerEvents(
+            BrokerSseRebalancerOptions.builder()
+                .since(OffsetDateTime.parse("2026-10-05T14:30:00Z"))
+                .sinceId("01K6Q6ZJ7M2X3T0E4B9N8RCW5D")
+                .lastEventId("01K6Q70B3D8H5S2V9F1G6KTMXE")
+                .build(),
+            new BrokerSseEventListener<>() {
+              @Override
+              public void onEvent(RebalancerEvent event) {
+                received.set(event);
+                eventLatch.countDown();
+              }
+            })) {
+      assertTrue(eventLatch.await(3, TimeUnit.SECONDS), "rebalancer event must be delivered");
+    }
+
+    assertInstanceOf(
+        RebalancerPortfolioStatusChangedEvent.class, received.get().getActualInstance());
+    var request = server.takeRequest(3, TimeUnit.SECONDS);
+    assertNotNull(request);
+    assertTrue(request.getPath().startsWith("/v2/events/rebalancer?"));
+    assertTrue(request.getPath().contains("since_id=01K6Q6ZJ7M2X3T0E4B9N8RCW5D"));
+    assertEquals("01K6Q70B3D8H5S2V9F1G6KTMXE", request.getHeader("Last-Event-Id"));
+  }
+
+  @Test
+  void emptyRebalancerEventIdReplaysFromSuppliedLastEventId() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody(
+                "id:\ndata: "
+                    + BrokerRebalancerEventDecoderTest.portfolioStatusChangedJson()
+                    + "\n\n"));
+    server.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", "text/event-stream")
+            .setBody(
+                "id: 01K6Q74R9W2C7N4J0P3Y5HQZAB\ndata: "
+                    + BrokerRebalancerEventDecoderTest.runCreatedJson()
+                    + "\n\n"));
+
+    var brokerClient = AlpacaClientFactory.brokerClient(CREDS, httpClient);
+    brokerClient.setBasePath(serverBasePath());
+    var policy =
+        AlpacaSseReconnectPolicy.builder()
+            .initialBackoff(Duration.ofMillis(1))
+            .maxBackoff(Duration.ofMillis(1))
+            .jitterRatio(0)
+            .build();
+    var sse =
+        new BrokerEventsSseClient(
+            brokerClient, AlpacaSseOptions.builder().reconnectPolicy(policy).build());
+    var eventLatch = new CountDownLatch(2);
+
+    try (var subscription =
+        sse.subscribeToRebalancerEvents(
+            BrokerSseRebalancerOptions.builder().lastEventId("01K6Q70B3D8H5S2V9F1G6KTMXE").build(),
+            new BrokerSseEventListener<>() {
+              @Override
+              public void onEvent(RebalancerEvent event) {
+                eventLatch.countDown();
+              }
+            })) {
+      assertTrue(eventLatch.await(3, TimeUnit.SECONDS), "both rebalancer events must be delivered");
+    }
+
+    assertEquals(
+        "01K6Q70B3D8H5S2V9F1G6KTMXE",
+        server.takeRequest(3, TimeUnit.SECONDS).getHeader("Last-Event-Id"));
+    assertEquals(
+        "01K6Q70B3D8H5S2V9F1G6KTMXE",
+        server.takeRequest(3, TimeUnit.SECONDS).getHeader("Last-Event-Id"));
   }
 
   @Test

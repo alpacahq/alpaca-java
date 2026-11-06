@@ -347,7 +347,7 @@ public class CorporateActionsApi {
     public okhttp3.Call subscribeToCorporateActionsEventsSSECall(@javax.annotation.Nullable List<CorporateActionEventType> type, @javax.annotation.Nullable String region, @javax.annotation.Nullable OffsetDateTime since, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable String sinceId, @javax.annotation.Nullable String untilId, @javax.annotation.Nullable String lastEventId, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
-        String[] localBasePaths = new String[] { "https://stream.data.alpaca.markets", "https://stream.data.sandbox.alpaca.markets", "https://stream.data.staging-v2.tradetalk.us" };
+        String[] localBasePaths = new String[] { "https://stream.data.alpaca.markets", "https://stream.data.sandbox.alpaca.markets" };
 
         // Determine Base Path to Use
         if (localCustomBaseUrl != null){

@@ -52,6 +52,7 @@ import markets.alpaca.client.openapi.trading.model.OPEXCActivityV2;
 import markets.alpaca.client.openapi.trading.model.OPEXPActivityV2;
 import markets.alpaca.client.openapi.trading.model.OPTRDActivityV2;
 import markets.alpaca.client.openapi.trading.model.OpcaCDIVActivityV2;
+import markets.alpaca.client.openapi.trading.model.OpcaCGDActivityV2;
 import markets.alpaca.client.openapi.trading.model.OpcaFSPLITActivityV2;
 import markets.alpaca.client.openapi.trading.model.OpcaMAActivityV2;
 import markets.alpaca.client.openapi.trading.model.OpcaNCActivityV2;
@@ -145,6 +146,7 @@ public class ActivityV2DetailNTA extends AbstractOpenApiSchema implements Serial
             final TypeAdapter<OpcaFSPLITActivityV2> adapterOpcaFSPLITActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OpcaFSPLITActivityV2.class));
             final TypeAdapter<OpcaUSPLITActivityV2> adapterOpcaUSPLITActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OpcaUSPLITActivityV2.class));
             final TypeAdapter<OpcaRSPLITActivityV2> adapterOpcaRSPLITActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OpcaRSPLITActivityV2.class));
+            final TypeAdapter<OpcaCGDActivityV2> adapterOpcaCGDActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OpcaCGDActivityV2.class));
             final TypeAdapter<OPASNActivityV2> adapterOPASNActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OPASNActivityV2.class));
             final TypeAdapter<OPEXCActivityV2> adapterOPEXCActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OPEXCActivityV2.class));
             final TypeAdapter<OPEXPActivityV2> adapterOPEXPActivityV2 = gson.getDelegateAdapter(this, TypeToken.get(OPEXPActivityV2.class));
@@ -333,6 +335,12 @@ public class ActivityV2DetailNTA extends AbstractOpenApiSchema implements Serial
                         elementAdapter.write(out, element);
                         return;
                     }
+                    // check if the actual instance is of the type `OpcaCGDActivityV2`
+                    if (value.getActualInstance() instanceof OpcaCGDActivityV2) {
+                        JsonElement element = adapterOpcaCGDActivityV2.toJsonTree((OpcaCGDActivityV2)value.getActualInstance());
+                        elementAdapter.write(out, element);
+                        return;
+                    }
                     // check if the actual instance is of the type `OPASNActivityV2`
                     if (value.getActualInstance() instanceof OPASNActivityV2) {
                         JsonElement element = adapterOPASNActivityV2.toJsonTree((OPASNActivityV2)value.getActualInstance());
@@ -435,7 +443,7 @@ public class ActivityV2DetailNTA extends AbstractOpenApiSchema implements Serial
                         elementAdapter.write(out, element);
                         return;
                     }
-                    throw new IOException("Failed to serialize as the type doesn't match oneOf schemas: AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FXTRDActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2");
+                    throw new IOException("Failed to serialize as the type doesn't match oneOf schemas: AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FXTRDActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaCGDActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2");
                 }
 
                 @Override
@@ -771,6 +779,18 @@ public class ActivityV2DetailNTA extends AbstractOpenApiSchema implements Serial
                         errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaRSPLITActivityV2 failed with `%s`.", e.getMessage()));
                         log.log(Level.FINER, "Input data does not match schema 'OpcaRSPLITActivityV2'", e);
                     }
+                    // deserialize OpcaCGDActivityV2
+                    try {
+                        // validate the JSON object to see if any exception is thrown
+                        OpcaCGDActivityV2.validateJsonElement(jsonElement);
+                        actualAdapter = adapterOpcaCGDActivityV2;
+                        match++;
+                        log.log(Level.FINER, "Input data matches schema 'OpcaCGDActivityV2'");
+                    } catch (Exception e) {
+                        // deserialization failed, continue
+                        errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaCGDActivityV2 failed with `%s`.", e.getMessage()));
+                        log.log(Level.FINER, "Input data does not match schema 'OpcaCGDActivityV2'", e);
+                    }
                     // deserialize OPASNActivityV2
                     try {
                         // validate the JSON object to see if any exception is thrown
@@ -1028,6 +1048,7 @@ public class ActivityV2DetailNTA extends AbstractOpenApiSchema implements Serial
         schemas.put("OpcaFSPLITActivityV2", OpcaFSPLITActivityV2.class);
         schemas.put("OpcaUSPLITActivityV2", OpcaUSPLITActivityV2.class);
         schemas.put("OpcaRSPLITActivityV2", OpcaRSPLITActivityV2.class);
+        schemas.put("OpcaCGDActivityV2", OpcaCGDActivityV2.class);
         schemas.put("OPASNActivityV2", OPASNActivityV2.class);
         schemas.put("OPEXCActivityV2", OPEXCActivityV2.class);
         schemas.put("OPEXPActivityV2", OPEXPActivityV2.class);
@@ -1055,7 +1076,7 @@ public class ActivityV2DetailNTA extends AbstractOpenApiSchema implements Serial
     /**
      * Set the instance that matches the oneOf child schema, check
      * the instance parameter is valid against the oneOf child schemas:
-     * AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FXTRDActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2
+     * AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FXTRDActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaCGDActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2
      *
      * It could be an instance of the 'oneOf' schemas.
      */
@@ -1196,6 +1217,11 @@ public class ActivityV2DetailNTA extends AbstractOpenApiSchema implements Serial
             return;
         }
 
+        if (instance instanceof OpcaCGDActivityV2) {
+            super.setActualInstance(instance);
+            return;
+        }
+
         if (instance instanceof OPASNActivityV2) {
             super.setActualInstance(instance);
             return;
@@ -1281,14 +1307,14 @@ public class ActivityV2DetailNTA extends AbstractOpenApiSchema implements Serial
             return;
         }
 
-        throw new RuntimeException("Invalid instance type. Must be AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FXTRDActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2");
+        throw new RuntimeException("Invalid instance type. Must be AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FXTRDActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaCGDActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2");
     }
 
     /**
      * Get the actual instance, which can be the following:
-     * AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FXTRDActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2
+     * AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FXTRDActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaCGDActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2
      *
-     * @return The actual instance (AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FXTRDActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2)
+     * @return The actual instance (AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FXTRDActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaCGDActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2)
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -1618,6 +1644,18 @@ public class ActivityV2DetailNTA extends AbstractOpenApiSchema implements Serial
     @SuppressWarnings("unchecked")
     public OpcaRSPLITActivityV2 getOpcaRSPLITActivityV2() throws ClassCastException {
         return (OpcaRSPLITActivityV2)super.getActualInstance();
+    }
+
+    /**
+     * Get the actual instance of `OpcaCGDActivityV2`. If the actual instance is not `OpcaCGDActivityV2`,
+     * the ClassCastException will be thrown.
+     *
+     * @return The actual instance of `OpcaCGDActivityV2`
+     * @throws ClassCastException if the instance is not `OpcaCGDActivityV2`
+     */
+    @SuppressWarnings("unchecked")
+    public OpcaCGDActivityV2 getOpcaCGDActivityV2() throws ClassCastException {
+        return (OpcaCGDActivityV2)super.getActualInstance();
     }
 
     /**
@@ -2050,6 +2088,14 @@ public class ActivityV2DetailNTA extends AbstractOpenApiSchema implements Serial
             errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaRSPLITActivityV2 failed with `%s`.", e.getMessage()));
             // continue to the next one
         }
+        // validate the json string with OpcaCGDActivityV2
+        try {
+            OpcaCGDActivityV2.validateJsonElement(jsonElement);
+            validCount++;
+        } catch (Exception e) {
+            errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OpcaCGDActivityV2 failed with `%s`.", e.getMessage()));
+            // continue to the next one
+        }
         // validate the json string with OPASNActivityV2
         try {
             OPASNActivityV2.validateJsonElement(jsonElement);
@@ -2187,7 +2233,7 @@ public class ActivityV2DetailNTA extends AbstractOpenApiSchema implements Serial
             // continue to the next one
         }
         if (validCount != 1) {
-            throw new IOException(String.format(java.util.Locale.ROOT, "The JSON string is invalid for ActivityV2DetailNTA with oneOf schemas: AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FXTRDActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2. %d class(es) match the result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", validCount, errorMessages, jsonElement.toString()));
+            throw new IOException(String.format(java.util.Locale.ROOT, "The JSON string is invalid for ActivityV2DetailNTA with oneOf schemas: AcatcActivityV2, AcatsActivityV2, CDIVActivityV2, CGDActivityV2, CSWActivityV2, DIVNRAActivityV2, DIVSPDActivityV2, DIVWHActivityV2, ExchangeOfferActivityV2, FEEActivityV2, FOPTActivityV2, FXTRDActivityV2, FixedIncomeInterestActivityV2, FixedIncomeRedemptionActivityV2, ForwardSplitActivityV2, JNLCActivityV2, JNLSActivityV2, MAActivityV2, MEMActivityV2, NCActivityV2, OCTActivityV2, OPASNActivityV2, OPCSHActivityV2, OPEXCActivityV2, OPEXPActivityV2, OPTRDActivityV2, OpcaCDIVActivityV2, OpcaCGDActivityV2, OpcaFSPLITActivityV2, OpcaMAActivityV2, OpcaNCActivityV2, OpcaRSPLITActivityV2, OpcaSDIVActivityV2, OpcaSPINActivityV2, OpcaUSPLITActivityV2, REOActivityV2, ReverseSplitActivityV2, RightsDistributionActivityV2, RightsSubscriptionElectionActivityV2, SDIVActivityV2, SpinoffActivityV2, TenderOfferActivityV2, UnitSplitActivityV2, WRMActivityV2, WarrantExerciseElectionActivityV2. %d class(es) match the result, expected 1. Detailed failure message for oneOf schemas: %s. JSON: %s", validCount, errorMessages, jsonElement.toString()));
         }
     }
 

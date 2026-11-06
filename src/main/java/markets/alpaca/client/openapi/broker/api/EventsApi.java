@@ -35,6 +35,7 @@ import markets.alpaca.client.openapi.broker.model.JournalStatusEventV2;
 import java.time.LocalDate;
 import markets.alpaca.client.openapi.broker.model.NonTradeActivityEvent;
 import java.time.OffsetDateTime;
+import markets.alpaca.client.openapi.broker.model.RebalancerEvent;
 import markets.alpaca.client.openapi.broker.model.StatusFundingEvent;
 import markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner;
 import markets.alpaca.client.openapi.broker.model.SystemEventV2;
@@ -74,6 +75,8 @@ import java.util.Map;
  *   <li><b>{@code subscribeToJournalStatusSSE}</b>: Subscribe to Journal Events (SSE) (Legacy)</li>
  * 
  *   <li><b>{@code subscribeToJournalStatusV2SSE}</b>: Subscribe to Journal Events (SSE)</li>
+ * 
+ *   <li><b>{@code subscribeToRebalancerEventsSSE}</b>: Subscribe to Rebalancer Events (SSE)</li>
  * 
  *   <li><b>{@code subscribeToSystemEventV2SSE}</b>: Subscribe to System Events (SSE)</li>
  * 
@@ -1405,6 +1408,164 @@ public class EventsApi {
 
         okhttp3.Call localVarCall = subscribeToJournalStatusV2SSEValidateBeforeCall(since, until, sinceId, untilId, id, _callback);
         Type localVarReturnType = new TypeToken<List<JournalStatusEventV2>>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+    /**
+     * Build call for subscribeToRebalancerEventsSSE
+     * @param since Format: RFC3339 or YYYY-MM-DD (optional)
+     * @param until Format: RFC3339 or YYYY-MM-DD (optional)
+     * @param sinceId ULID &#x60;event_id&#x60; to resume the stream from. The first event returned will be the one immediately after &#x60;since_id&#x60;. (optional)
+     * @param untilId ULID &#x60;event_id&#x60; at which the stream will end (inclusive). Useful for backfills. (optional)
+     * @param lastEventId Used as &#x60;since_id&#x60;, taking precedence over the &#x60;since_id&#x60; query parameter. Can&#39;t be combined with &#x60;since&#x60;. (optional)
+     * @param _callback Callback for upload/download progress
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Connected. Events will now start streaming as long as you keep the connection open. </td><td>  -  </td></tr>
+     </table>
+     */
+    public okhttp3.Call subscribeToRebalancerEventsSSECall(@javax.annotation.Nullable OffsetDateTime since, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable String sinceId, @javax.annotation.Nullable String untilId, @javax.annotation.Nullable String lastEventId, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v2/events/rebalancer";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        if (since != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("since", since));
+        }
+
+        if (until != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("until", until));
+        }
+
+        if (sinceId != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("since_id", sinceId));
+        }
+
+        if (untilId != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("until_id", untilId));
+        }
+
+        final String[] localVarAccepts = {
+            "text/event-stream"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        if (lastEventId != null) {
+            localVarHeaderParams.put("Last-Event-Id", localVarApiClient.parameterToString(lastEventId));
+        }
+
+
+        String[] localVarAuthNames = new String[] { "BasicAuth" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call subscribeToRebalancerEventsSSEValidateBeforeCall(@javax.annotation.Nullable OffsetDateTime since, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable String sinceId, @javax.annotation.Nullable String untilId, @javax.annotation.Nullable String lastEventId, final ApiCallback _callback) throws ApiException {
+        return subscribeToRebalancerEventsSSECall(since, until, sinceId, untilId, lastEventId, _callback);
+
+    }
+
+    /**
+     * Subscribe to Rebalancer Events (SSE)
+     * The Events API provides event push as well as historical queries via SSE (server sent events).  This stream is correspondent-scoped and v2-only. A subscriber receives rebalancer events for their own correspondent. Every &#x60;event_id&#x60; is a ULID.  You can listen to portfolio status changes, portfolio run creation, and portfolio run status changes.  Historical events are streamed immediately if queried, and updates are pushed as events occur.  Query Params Rules: - &#x60;since&#x60; required if &#x60;until&#x60; specified - &#x60;since_id&#x60; required if &#x60;until_id&#x60; specified - &#x60;since&#x60; and &#x60;since_id&#x60; can&#39;t be used at the same time - &#x60;until&#x60; and &#x60;until_id&#x60; can&#39;t be used at the same time  Behavior: - if &#x60;since&#x60; or &#x60;since_id&#x60; not specified this will not return any historic data - if &#x60;until&#x60; or &#x60;until_id&#x60; reached stream will end (status 200) - the &#x60;Last-Event-Id&#x60; request header, when present, is used as &#x60;since_id&#x60; and takes precedence over the &#x60;since_id&#x60; query parameter. Combining it with &#x60;since&#x60; returns an error, the same as sending &#x60;since&#x60; and &#x60;since_id&#x60; together. - &#x60;since&#x60; and &#x60;until&#x60; select events by the time encoded in &#x60;event_id&#x60; (when the event was emitted), not by &#x60;at&#x60;. To resume reliably, use &#x60;since_id&#x60; or &#x60;Last-Event-Id&#x60;.  ---  **Event types**  &#x60;event_type&#x60; selects the payload:  - &#x60;portfolio.status_changed&#x60; carries the portfolio snapshot. Weights and rebalance conditions are included. &#x60;symbol&#x60; is always present on a weight and is &#x60;null&#x60; for cash. - &#x60;run.created&#x60; and &#x60;run.status_changed&#x60; both carry the full run snapshot: &#x60;id&#x60;, &#x60;account_id&#x60;, &#x60;portfolio_id&#x60;, &#x60;type&#x60;, &#x60;initiated_from&#x60;, &#x60;status&#x60;, &#x60;reason&#x60;, &#x60;created_at&#x60;, &#x60;updated_at&#x60;, &#x60;completed_at&#x60;, and &#x60;canceled_at&#x60;. &#x60;weights&#x60;, &#x60;orders&#x60;, &#x60;failed_orders&#x60;, and &#x60;skipped_orders&#x60; are omitted; read them from &#x60;GET /v1/rebalancing/runs/{run_id}&#x60;. - Run &#x60;status&#x60; on this stream is &#x60;QUEUED&#x60;, &#x60;IN_PROGRESS&#x60;, &#x60;CANCELED&#x60;, &#x60;ERROR&#x60;, &#x60;TIMEOUT&#x60;, &#x60;COMPLETED_ADJUSTED&#x60;, or &#x60;COMPLETED_SUCCESS&#x60;. &#x60;CANCELED_MID_RUN&#x60; is not sent.  &#x60;correspondent&#x60; is not included in the event JSON.  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3. 
+     * @param since Format: RFC3339 or YYYY-MM-DD (optional)
+     * @param until Format: RFC3339 or YYYY-MM-DD (optional)
+     * @param sinceId ULID &#x60;event_id&#x60; to resume the stream from. The first event returned will be the one immediately after &#x60;since_id&#x60;. (optional)
+     * @param untilId ULID &#x60;event_id&#x60; at which the stream will end (inclusive). Useful for backfills. (optional)
+     * @param lastEventId Used as &#x60;since_id&#x60;, taking precedence over the &#x60;since_id&#x60; query parameter. Can&#39;t be combined with &#x60;since&#x60;. (optional)
+     * @return List&lt;RebalancerEvent&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Connected. Events will now start streaming as long as you keep the connection open. </td><td>  -  </td></tr>
+     </table>
+     */
+    public List<RebalancerEvent> subscribeToRebalancerEventsSSE(@javax.annotation.Nullable OffsetDateTime since, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable String sinceId, @javax.annotation.Nullable String untilId, @javax.annotation.Nullable String lastEventId) throws ApiException {
+        ApiResponse<List<RebalancerEvent>> localVarResp = subscribeToRebalancerEventsSSEWithHttpInfo(since, until, sinceId, untilId, lastEventId);
+        return localVarResp.getData();
+    }
+
+    /**
+     * Subscribe to Rebalancer Events (SSE)
+     * The Events API provides event push as well as historical queries via SSE (server sent events).  This stream is correspondent-scoped and v2-only. A subscriber receives rebalancer events for their own correspondent. Every &#x60;event_id&#x60; is a ULID.  You can listen to portfolio status changes, portfolio run creation, and portfolio run status changes.  Historical events are streamed immediately if queried, and updates are pushed as events occur.  Query Params Rules: - &#x60;since&#x60; required if &#x60;until&#x60; specified - &#x60;since_id&#x60; required if &#x60;until_id&#x60; specified - &#x60;since&#x60; and &#x60;since_id&#x60; can&#39;t be used at the same time - &#x60;until&#x60; and &#x60;until_id&#x60; can&#39;t be used at the same time  Behavior: - if &#x60;since&#x60; or &#x60;since_id&#x60; not specified this will not return any historic data - if &#x60;until&#x60; or &#x60;until_id&#x60; reached stream will end (status 200) - the &#x60;Last-Event-Id&#x60; request header, when present, is used as &#x60;since_id&#x60; and takes precedence over the &#x60;since_id&#x60; query parameter. Combining it with &#x60;since&#x60; returns an error, the same as sending &#x60;since&#x60; and &#x60;since_id&#x60; together. - &#x60;since&#x60; and &#x60;until&#x60; select events by the time encoded in &#x60;event_id&#x60; (when the event was emitted), not by &#x60;at&#x60;. To resume reliably, use &#x60;since_id&#x60; or &#x60;Last-Event-Id&#x60;.  ---  **Event types**  &#x60;event_type&#x60; selects the payload:  - &#x60;portfolio.status_changed&#x60; carries the portfolio snapshot. Weights and rebalance conditions are included. &#x60;symbol&#x60; is always present on a weight and is &#x60;null&#x60; for cash. - &#x60;run.created&#x60; and &#x60;run.status_changed&#x60; both carry the full run snapshot: &#x60;id&#x60;, &#x60;account_id&#x60;, &#x60;portfolio_id&#x60;, &#x60;type&#x60;, &#x60;initiated_from&#x60;, &#x60;status&#x60;, &#x60;reason&#x60;, &#x60;created_at&#x60;, &#x60;updated_at&#x60;, &#x60;completed_at&#x60;, and &#x60;canceled_at&#x60;. &#x60;weights&#x60;, &#x60;orders&#x60;, &#x60;failed_orders&#x60;, and &#x60;skipped_orders&#x60; are omitted; read them from &#x60;GET /v1/rebalancing/runs/{run_id}&#x60;. - Run &#x60;status&#x60; on this stream is &#x60;QUEUED&#x60;, &#x60;IN_PROGRESS&#x60;, &#x60;CANCELED&#x60;, &#x60;ERROR&#x60;, &#x60;TIMEOUT&#x60;, &#x60;COMPLETED_ADJUSTED&#x60;, or &#x60;COMPLETED_SUCCESS&#x60;. &#x60;CANCELED_MID_RUN&#x60; is not sent.  &#x60;correspondent&#x60; is not included in the event JSON.  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3. 
+     * @param since Format: RFC3339 or YYYY-MM-DD (optional)
+     * @param until Format: RFC3339 or YYYY-MM-DD (optional)
+     * @param sinceId ULID &#x60;event_id&#x60; to resume the stream from. The first event returned will be the one immediately after &#x60;since_id&#x60;. (optional)
+     * @param untilId ULID &#x60;event_id&#x60; at which the stream will end (inclusive). Useful for backfills. (optional)
+     * @param lastEventId Used as &#x60;since_id&#x60;, taking precedence over the &#x60;since_id&#x60; query parameter. Can&#39;t be combined with &#x60;since&#x60;. (optional)
+     * @return ApiResponse&lt;List&lt;RebalancerEvent&gt;&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Connected. Events will now start streaming as long as you keep the connection open. </td><td>  -  </td></tr>
+     </table>
+     */
+    public ApiResponse<List<RebalancerEvent>> subscribeToRebalancerEventsSSEWithHttpInfo(@javax.annotation.Nullable OffsetDateTime since, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable String sinceId, @javax.annotation.Nullable String untilId, @javax.annotation.Nullable String lastEventId) throws ApiException {
+        okhttp3.Call localVarCall = subscribeToRebalancerEventsSSEValidateBeforeCall(since, until, sinceId, untilId, lastEventId, null);
+        Type localVarReturnType = new TypeToken<List<RebalancerEvent>>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    /**
+     * Subscribe to Rebalancer Events (SSE) (asynchronously)
+     * The Events API provides event push as well as historical queries via SSE (server sent events).  This stream is correspondent-scoped and v2-only. A subscriber receives rebalancer events for their own correspondent. Every &#x60;event_id&#x60; is a ULID.  You can listen to portfolio status changes, portfolio run creation, and portfolio run status changes.  Historical events are streamed immediately if queried, and updates are pushed as events occur.  Query Params Rules: - &#x60;since&#x60; required if &#x60;until&#x60; specified - &#x60;since_id&#x60; required if &#x60;until_id&#x60; specified - &#x60;since&#x60; and &#x60;since_id&#x60; can&#39;t be used at the same time - &#x60;until&#x60; and &#x60;until_id&#x60; can&#39;t be used at the same time  Behavior: - if &#x60;since&#x60; or &#x60;since_id&#x60; not specified this will not return any historic data - if &#x60;until&#x60; or &#x60;until_id&#x60; reached stream will end (status 200) - the &#x60;Last-Event-Id&#x60; request header, when present, is used as &#x60;since_id&#x60; and takes precedence over the &#x60;since_id&#x60; query parameter. Combining it with &#x60;since&#x60; returns an error, the same as sending &#x60;since&#x60; and &#x60;since_id&#x60; together. - &#x60;since&#x60; and &#x60;until&#x60; select events by the time encoded in &#x60;event_id&#x60; (when the event was emitted), not by &#x60;at&#x60;. To resume reliably, use &#x60;since_id&#x60; or &#x60;Last-Event-Id&#x60;.  ---  **Event types**  &#x60;event_type&#x60; selects the payload:  - &#x60;portfolio.status_changed&#x60; carries the portfolio snapshot. Weights and rebalance conditions are included. &#x60;symbol&#x60; is always present on a weight and is &#x60;null&#x60; for cash. - &#x60;run.created&#x60; and &#x60;run.status_changed&#x60; both carry the full run snapshot: &#x60;id&#x60;, &#x60;account_id&#x60;, &#x60;portfolio_id&#x60;, &#x60;type&#x60;, &#x60;initiated_from&#x60;, &#x60;status&#x60;, &#x60;reason&#x60;, &#x60;created_at&#x60;, &#x60;updated_at&#x60;, &#x60;completed_at&#x60;, and &#x60;canceled_at&#x60;. &#x60;weights&#x60;, &#x60;orders&#x60;, &#x60;failed_orders&#x60;, and &#x60;skipped_orders&#x60; are omitted; read them from &#x60;GET /v1/rebalancing/runs/{run_id}&#x60;. - Run &#x60;status&#x60; on this stream is &#x60;QUEUED&#x60;, &#x60;IN_PROGRESS&#x60;, &#x60;CANCELED&#x60;, &#x60;ERROR&#x60;, &#x60;TIMEOUT&#x60;, &#x60;COMPLETED_ADJUSTED&#x60;, or &#x60;COMPLETED_SUCCESS&#x60;. &#x60;CANCELED_MID_RUN&#x60; is not sent.  &#x60;correspondent&#x60; is not included in the event JSON.  ---  Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn&#39;t have full support for representing SSE style responses from an API, so if you are using a generated client and don&#39;t specify a &#x60;since&#x60; and &#x60;until&#x60; there is a good chance the generated clients will hang waiting for the response to end.  If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3. 
+     * @param since Format: RFC3339 or YYYY-MM-DD (optional)
+     * @param until Format: RFC3339 or YYYY-MM-DD (optional)
+     * @param sinceId ULID &#x60;event_id&#x60; to resume the stream from. The first event returned will be the one immediately after &#x60;since_id&#x60;. (optional)
+     * @param untilId ULID &#x60;event_id&#x60; at which the stream will end (inclusive). Useful for backfills. (optional)
+     * @param lastEventId Used as &#x60;since_id&#x60;, taking precedence over the &#x60;since_id&#x60; query parameter. Can&#39;t be combined with &#x60;since&#x60;. (optional)
+     * @param _callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Connected. Events will now start streaming as long as you keep the connection open. </td><td>  -  </td></tr>
+     </table>
+     */
+    public okhttp3.Call subscribeToRebalancerEventsSSEAsync(@javax.annotation.Nullable OffsetDateTime since, @javax.annotation.Nullable OffsetDateTime until, @javax.annotation.Nullable String sinceId, @javax.annotation.Nullable String untilId, @javax.annotation.Nullable String lastEventId, final ApiCallback<List<RebalancerEvent>> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = subscribeToRebalancerEventsSSEValidateBeforeCall(since, until, sinceId, untilId, lastEventId, _callback);
+        Type localVarReturnType = new TypeToken<List<RebalancerEvent>>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
     }

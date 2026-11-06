@@ -27,6 +27,7 @@ import java.util.UUID;
 import markets.alpaca.client.openapi.broker.model.AccountCashInterestPost;
 import markets.alpaca.client.openapi.broker.model.AccountConfigurations;
 import markets.alpaca.client.openapi.broker.model.AccountCreationType;
+import markets.alpaca.client.openapi.broker.model.AccountDRIPRequest;
 import markets.alpaca.client.openapi.broker.model.AccountFPSLPost;
 import markets.alpaca.client.openapi.broker.model.AccountSubType;
 import markets.alpaca.client.openapi.broker.model.Agreement;
@@ -115,6 +116,11 @@ public class AccountCreationRequest implements Serializable {
   @SerializedName(SERIALIZED_NAME_DOCUMENTS)
   @javax.annotation.Nullable
   private List<OwnerDocumentUploadRequest> documents = new ArrayList<>();
+
+  public static final String SERIALIZED_NAME_DRIP = "drip";
+  @SerializedName(SERIALIZED_NAME_DRIP)
+  @javax.annotation.Nullable
+  private AccountDRIPRequest drip;
 
   public static final String SERIALIZED_NAME_ENABLED_ASSETS = "enabled_assets";
   @SerializedName(SERIALIZED_NAME_ENABLED_ASSETS)
@@ -600,6 +606,25 @@ public class AccountCreationRequest implements Serializable {
   }
 
 
+  public AccountCreationRequest drip(@javax.annotation.Nullable AccountDRIPRequest drip) {
+    this.drip = drip;
+    return this;
+  }
+
+  /**
+   * Get drip
+   * @return drip
+   */
+  @javax.annotation.Nullable
+  public AccountDRIPRequest getDrip() {
+    return drip;
+  }
+
+  public void setDrip(@javax.annotation.Nullable AccountDRIPRequest drip) {
+    this.drip = drip;
+  }
+
+
   public AccountCreationRequest enabledAssets(@javax.annotation.Nullable List<EnabledAssetClass> enabledAssets) {
     this.enabledAssets = enabledAssets;
     return this;
@@ -899,6 +924,7 @@ public class AccountCreationRequest implements Serializable {
         Objects.equals(this.contact, accountCreationRequest.contact) &&
         Objects.equals(this.disclosures, accountCreationRequest.disclosures) &&
         Objects.equals(this.documents, accountCreationRequest.documents) &&
+        Objects.equals(this.drip, accountCreationRequest.drip) &&
         Objects.equals(this.enabledAssets, accountCreationRequest.enabledAssets) &&
         Objects.equals(this.entityId, accountCreationRequest.entityId) &&
         Objects.equals(this.fpsl, accountCreationRequest.fpsl) &&
@@ -916,7 +942,7 @@ public class AccountCreationRequest implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(accountSubType, accountType, agreements, allowInstantAch, beneficiaries, cashInterest, contact, disclosures, documents, enabledAssets, entityId, fpsl, identity, investmentObjective, investmentTimeHorizon, liquidityNeeds, minorIdentity, primaryAccountHolderId, riskTolerance, tradingConfigurations, trustedContact, additionalProperties);
+    return Objects.hash(accountSubType, accountType, agreements, allowInstantAch, beneficiaries, cashInterest, contact, disclosures, documents, drip, enabledAssets, entityId, fpsl, identity, investmentObjective, investmentTimeHorizon, liquidityNeeds, minorIdentity, primaryAccountHolderId, riskTolerance, tradingConfigurations, trustedContact, additionalProperties);
   }
 
   @Override
@@ -932,6 +958,7 @@ public class AccountCreationRequest implements Serializable {
     sb.append("    contact: ").append(toIndentedString(contact)).append("\n");
     sb.append("    disclosures: ").append(toIndentedString(disclosures)).append("\n");
     sb.append("    documents: ").append(toIndentedString(documents)).append("\n");
+    sb.append("    drip: ").append(toIndentedString(drip)).append("\n");
     sb.append("    enabledAssets: ").append(toIndentedString(enabledAssets)).append("\n");
     sb.append("    entityId: ").append(toIndentedString(entityId)).append("\n");
     sb.append("    fpsl: ").append(toIndentedString(fpsl)).append("\n");
@@ -963,7 +990,7 @@ public class AccountCreationRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("account_sub_type", "account_type", "agreements", "allow_instant_ach", "beneficiaries", "cash_interest", "contact", "disclosures", "documents", "enabled_assets", "entity_id", "fpsl", "identity", "investment_objective", "investment_time_horizon", "liquidity_needs", "minor_identity", "primary_account_holder_id", "risk_tolerance", "trading_configurations", "trusted_contact"));
+    openapiFields = new HashSet<String>(Arrays.asList("account_sub_type", "account_type", "agreements", "allow_instant_ach", "beneficiaries", "cash_interest", "contact", "disclosures", "documents", "drip", "enabled_assets", "entity_id", "fpsl", "identity", "investment_objective", "investment_time_horizon", "liquidity_needs", "minor_identity", "primary_account_holder_id", "risk_tolerance", "trading_configurations", "trusted_contact"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -1043,6 +1070,10 @@ public class AccountCreationRequest implements Serializable {
             OwnerDocumentUploadRequest.validateJsonElement(jsonArraydocuments.get(i));
           };
         }
+      }
+      // validate the optional field `drip`
+      if (jsonObj.get("drip") != null && !jsonObj.get("drip").isJsonNull()) {
+        AccountDRIPRequest.validateJsonElement(jsonObj.get("drip"));
       }
       // ensure the optional json data is an array if present
       if (jsonObj.get("enabled_assets") != null && !jsonObj.get("enabled_assets").isJsonNull() && !jsonObj.get("enabled_assets").isJsonArray()) {

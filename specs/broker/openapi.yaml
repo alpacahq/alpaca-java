@@ -495,6 +495,70 @@ components:
         trail_price: null
         type: limit
         updated_at: '2023-12-12T21:35:49.102504673Z'
+    RebalancerEventPortfolioStatusChanged:
+      summary: Portfolio status changed
+      value:
+        at: '2026-10-05T14:30:00.123456Z'
+        event_id: 01K6Q6ZJ7M2X3T0E4B9N8RCW5D
+        event_type: portfolio.status_changed
+        portfolio:
+          cooldown_days: 7
+          created_at: '2026-09-01T12:00:00Z'
+          description: 60/40 with a cash sleeve
+          id: 2d49d00e-ab1c-4014-89d8-70c5f64df2fc
+          name: Balanced
+          rebalance_conditions:
+            - percent: '5'
+              sub_type: absolute
+              type: drift_band
+            - day: '15'
+              sub_type: monthly
+              type: calendar
+          status: active
+          updated_at: '2026-10-05T14:30:00.123456Z'
+          weights:
+            - percent: '60'
+              symbol: SPY
+              type: asset
+            - percent: '40'
+              symbol: null
+              type: cash
+    RebalancerEventRunCreated:
+      summary: Portfolio run created
+      value:
+        at: '2026-10-05T14:31:00Z'
+        event_id: 01K6Q70B3D8H5S2V9F1G6KTMXE
+        event_type: run.created
+        run:
+          account_id: 6221407b-32b2-3e6b-a7fe-cd79e1b68ba3
+          canceled_at: null
+          completed_at: null
+          created_at: '2026-10-05T14:31:00Z'
+          id: bdc8e56f-cd91-448d-bb46-a4593cde2f95
+          initiated_from: system
+          portfolio_id: 2d49d00e-ab1c-4014-89d8-70c5f64df2fc
+          reason: null
+          status: QUEUED
+          type: full_rebalance
+          updated_at: '2026-10-05T14:31:00Z'
+    RebalancerEventRunStatusChanged:
+      summary: Portfolio run status changed
+      value:
+        at: '2026-10-05T14:33:12Z'
+        event_id: 01K6Q74R9W2C7N4J0P3Y5HQZAB
+        event_type: run.status_changed
+        run:
+          account_id: 6221407b-32b2-3e6b-a7fe-cd79e1b68ba3
+          canceled_at: null
+          completed_at: '2026-10-05T14:33:12Z'
+          created_at: '2026-10-05T14:31:00Z'
+          id: bdc8e56f-cd91-448d-bb46-a4593cde2f95
+          initiated_from: system
+          portfolio_id: 2d49d00e-ab1c-4014-89d8-70c5f64df2fc
+          reason: null
+          status: COMPLETED_SUCCESS
+          type: full_rebalance
+          updated_at: '2026-10-05T14:33:12Z'
     TradeUpdateEventV2BracketLegNew:
       description: A `new` event for the take-profit leg of a bracket order, sent when the leg is routed after the entry order fills. `legs` is null on stream events, so `group_id` and `group_role` identify
         the order's group and role.
@@ -1195,45 +1259,12 @@ components:
         format: uuid
         type: string
     ActivityType:
-      description: see ActivityType model for details about what the different types mean
+      description: Activity type to filter by. Accepted values are the activity types recognized by the backend.
       in: path
       name: activity_type
       required: true
       schema:
-        enum:
-          - FILL
-          - ACATC
-          - ACATS
-          - CGD
-          - CIL
-          - CSD
-          - CSW
-          - DIV
-          - DIVCGL
-          - DIVCGS
-          - DIVNRA
-          - DIVROC
-          - DIVTXEX
-          - FEE
-          - INT
-          - MEM
-          - JNLC
-          - JNLS
-          - MA
-          - OPASN
-          - OPCA
-          - OPCSH
-          - OPEXC
-          - OPEXP
-          - OPTRD
-          - PTC
-          - REO
-          - REORG
-          - SPIN
-          - SPLIT
-          - FOPT
-          - OCT
-        type: string
+        $ref: '#/components/schemas/ActivityTypeFilter'
     After:
       description: The response will include only ones submitted after this timestamp (exclusive)
       in: query
@@ -2363,6 +2394,8 @@ components:
           items:
             $ref: '#/components/schemas/OwnerDocument'
           type: array
+        drip:
+          $ref: '#/components/schemas/AccountDRIPResponse'
         enabled_assets:
           description: Assets the user has enabled and is able to trade once status and/or crypto_status are ACTIVE
           items:
@@ -2551,6 +2584,8 @@ components:
           items:
             $ref: '#/components/schemas/OwnerDocumentUploadRequest'
           type: array
+        drip:
+          $ref: '#/components/schemas/AccountDRIPRequest'
         enabled_assets:
           description: Will default to `us_equity`. Alpaca has the ability to update the default value upon request.
           items:
@@ -2628,6 +2663,41 @@ components:
       example: trading
       title: AccountCreationType
       type: string
+    AccountDRIPRequest:
+      description: |
+        This feature is available in sandbox for beta partners only.
+
+        The account's dividend reinvestment (DRIP) setting. Omit `drip` to keep the current setting.
+
+        To turn DRIP on, the account must have a signed customer agreement at the revision that Alpaca requires. The agreement can already be on the account, or you can send it in `agreements` in the same request. Otherwise the request fails with HTTP 422, and the error message names the required revision.
+
+        DRIP enrollment must be available in the environment. While it is not, a request that turns DRIP on is accepted with HTTP 200 and does not enroll the account. The agreement is not checked, and the response has no `drip` object unless the account was enrolled before.
+
+        DRIP is not available for `donor_advised`, `trust`, `omnibus_sub`, and `omnibus_non_disclosed` accounts. A request that turns DRIP on for one of these accounts fails with HTTP 422, even while DRIP enrollment is unavailable. A request that turns DRIP off is accepted.
+      example:
+        equities_dividend_reinvestments: true
+      properties:
+        equities_dividend_reinvestments:
+          description: If true, Alpaca reinvests eligible cash dividends on US equities in the same security.
+          example: true
+          type: boolean
+      type: object
+    AccountDRIPResponse:
+      description: |
+        This feature is available in sandbox for beta partners only.
+
+        The account's dividend reinvestment (DRIP) setting.
+        This field is returned only when DRIP was turned on for the account at least once.
+      example:
+        equities_dividend_reinvestments: true
+      properties:
+        equities_dividend_reinvestments:
+          description: If true, Alpaca reinvests eligible cash dividends on US equities in the same security.
+          example: true
+          type: boolean
+      required:
+        - equities_dividend_reinvestments
+      type: object
     AccountDocument:
       description: A document associated with an account
       example:
@@ -2776,6 +2846,8 @@ components:
           items:
             $ref: '#/components/schemas/OwnerDocument'
           type: array
+        drip:
+          $ref: '#/components/schemas/AccountDRIPResponse'
         enabled_assets:
           items:
             $ref: '#/components/schemas/EnabledAssetClass'
@@ -3193,6 +3265,8 @@ components:
           $ref: '#/components/schemas/Contact'
         disclosures:
           $ref: '#/components/schemas/Disclosures'
+        drip:
+          $ref: '#/components/schemas/AccountDRIPRequest'
         enabled_assets:
           description: |
             The asset classes enabled on the account. Omit this field to leave the
@@ -3370,6 +3444,12 @@ components:
         This field is optional and may not always be populated, depending on the activity type and the available data.
         Each `activity_type` has a set of valid `activity_sub_type` values.
 
+        This field is a free-form string rather than a closed enum: sub-type codes
+        originate from several upstream clearing, corporate-action, and international-fee
+        systems, and new codes can appear without a corresponding API change. The mapping
+        below documents the sub-types known at the time of writing; it is not guaranteed
+        to be exhaustive.
+
         Full mapping of `activity_type` to `activity_sub_type`:
 
         - **CGD**: Capital Gains Distribution activity sub-types:
@@ -3392,6 +3472,8 @@ components:
           - **NRV**: Non-Retail Venue Fee
           - **COM**: Commission
           - **CAT**: Consolidated Audit Trail Fee
+          - **ICF**: Index Contract Fee
+          - **EPI**: Exchange Proprietary Fee
 
         - **INT**: Interest-related activity sub-types:
           - **MGN**: Margin Interest
@@ -3452,9 +3534,13 @@ components:
       type: string
     ActivityType:
       description: |-
-        Represents the various kinds of activity.
+        Entry type returned on an activity. The listing returns the stored entry type.
+        It omits `ECJL`, crypto-deposit `JNLC`, and `SWP`.
 
-        TradeActivity's will always have the type `FILL`
+        `TRANS` and `MISC` are filter aliases. They are not returned as `activity_type`.
+        This is the known set. A new clearing code can appear without an API change.
+
+        Trade activities always have the type `FILL`.
 
         - **FILL**
           Order Fills (Partial/Full)
@@ -3462,34 +3548,78 @@ components:
           ACATS IN/OUT (Cash)
         - **ACATS**
           ACATS IN/OUT (Securities)
+        - **ALLOC**
+          Allocation
+        - **CFEE**
+          Crypto fee
         - **CGD**
           Capital Gains Distribution
         - **CIL**
           Cash in Lieu of Stock
+        - **CORR**
+          Correction
         - **CSD**
-          Cash Disbursement (+)
+          Cash deposit (+), including returned withdrawals
+        - **CSR**
+          Cash receipt (-)
         - **CSW**
-          Cash Withdrawable
+          Cash withdrawal (-), including returned deposits
         - **DIV**
           Dividend
         - **DIVCGL**
           Dividend (Capital Gains Long Term)
         - **DIVCGS**
           Dividend (Capital Gains Short Term)
+        - **DIVFEE**
+          Dividend fee
+        - **DIVFT**
+          Dividend adjusted (Foreign Tax Withheld)
         - **DIVNRA**
           Dividend Adjusted (NRA Withheld)
         - **DIVROC**
           Dividend Return of Capital
+        - **DIVTW**
+          Dividend adjusted (Tefra Withheld)
         - **DIVTXEX**
           Dividend (Tax Exempt)
+        - **DIVWH**
+          Dividend withholding
+        - **DTCS**
+          DTC security settlement
+        - **DVF**
+          DVP flip
+        - **ECEXP**
+          Event contract expiration
+        - **EXTRD**
+          External trade
         - **FEE**
-          REG and TAF Fees
+          Fee denominated in USD. See `activity_sub_type` for the specific fee.
+        - **FIMAT**
+          Fixed income maturity
+        - **FXCNV**
+          FX conversion
+        - **FXTRD**
+          FX trade
         - **INT**
           Interest (Credit/Margin)
+        - **INTNRA**
+          Interest adjusted (NRA Withheld)
+        - **INTTW**
+          Interest adjusted (Tefra Withheld)
+        - **INVPNL**
+          Inventory profit and loss
+        - **JNL**
+          Journal entry
         - **JNLC**
           Journal Entry (Cash)
         - **JNLS**
           Journal Entry (Stock)
+        - **MA**
+          Merger/Acquisition
+        - **MEM**
+          Memopost
+        - **NC**
+          Name change
         - **OPASN**
            Option Assignment
         - **OPCA**
@@ -3502,18 +3632,32 @@ components:
           Option Expiration
         - **OPTRD**
           Option Trade
-        - **MA**
-          Merger/Acquisition
         - **PTC**
           Pass Thru Change
+        - **PTR**
+          Pass Thru Rebate
         - **REO**
           Reorganization
         - **REORG**
           Worthless removal CA
+        - **SC**
+          Symbol change
+        - **SEG**
+          Segregation
         - **SPIN**
           Stock Spinoff
         - **SPLIT**
           Stock Split
+        - **SSO**
+          Former stock spin-off code. Current spin-offs use `SPIN`.
+        - **SSP**
+          Former stock split code. Current splits use `SPLIT`.
+        - **SUB**
+          Subscription
+        - **VOF**
+          Voluntary Offering (tender, warrant, rights, or exchange offers)
+        - **WH**
+          Withholding
         - **FOPT**
           Free of Payment Transfers
         - **OCT**
@@ -3522,21 +3666,42 @@ components:
         - FILL
         - ACATC
         - ACATS
+        - ALLOC
+        - CFEE
         - CGD
         - CIL
+        - CORR
         - CSD
+        - CSR
         - CSW
         - DIV
         - DIVCGL
         - DIVCGS
+        - DIVFEE
+        - DIVFT
         - DIVNRA
         - DIVROC
+        - DIVTW
         - DIVTXEX
+        - DIVWH
+        - DTCS
+        - DVF
+        - ECEXP
+        - EXTRD
         - FEE
+        - FIMAT
+        - FXCNV
+        - FXTRD
         - INT
+        - INTNRA
+        - INTTW
+        - INVPNL
+        - JNL
         - JNLC
         - JNLS
         - MA
+        - MEM
+        - NC
         - OPASN
         - OPCA
         - OPCSH
@@ -3544,13 +3709,95 @@ components:
         - OPEXP
         - OPTRD
         - PTC
+        - PTR
         - REO
         - REORG
+        - SC
+        - SEG
         - SPIN
         - SPLIT
+        - SSO
+        - SSP
+        - SUB
+        - VOF
+        - WH
         - FOPT
         - OCT
       title: ActivityType
+      type: string
+    ActivityTypeFilter:
+      description: |-
+        Activity type used to filter results. These are the values the backend accepts.
+
+        `TRANS` and `MISC` are aliases. A response uses the expanded entry type, not the alias.
+
+        `SWP` is accepted and then omitted from public results.
+
+        - **TRANS**
+          Cash transactions (`CSD`, `CSR`, and `CSW`). Filter value only; not returned as an activity type.
+        - **MISC**
+          A fixed group of less common activity types, such as `ACATC`, `INT`, and `JNLC`. `FEE`, `CFEE`, `DIV`, `SPLIT`, `SPIN`, `OPCA`, `VOF`, `WH`, `OCT`, and a few others are not included, so filter by those types directly. Filter value only; not returned as an activity type.
+      enum:
+        - ACATC
+        - ACATS
+        - ALLOC
+        - CFEE
+        - CGD
+        - CIL
+        - CSD
+        - CSR
+        - CSW
+        - DIV
+        - DIVCGL
+        - DIVCGS
+        - DIVFEE
+        - DIVFT
+        - DIVNRA
+        - DIVROC
+        - DIVTW
+        - DIVTXEX
+        - DIVWH
+        - DVF
+        - ECEXP
+        - EXTRD
+        - FEE
+        - FIMAT
+        - FXCNV
+        - FXTRD
+        - INT
+        - INTNRA
+        - INTTW
+        - INVPNL
+        - JNL
+        - JNLC
+        - JNLS
+        - MA
+        - MEM
+        - NC
+        - OCT
+        - OPASN
+        - OPCA
+        - OPCSH
+        - OPEXC
+        - OPEXP
+        - OPTRD
+        - PTC
+        - PTR
+        - REO
+        - REORG
+        - SC
+        - SPIN
+        - SPLIT
+        - SUB
+        - SWP
+        - TRD
+        - VOF
+        - WH
+        - FOPT
+        - FILL
+        - MISC
+        - TRANS
+      title: ActivityTypeFilter
       type: string
     ActivityV2DetailNTA:
       oneOf:
@@ -3581,6 +3828,7 @@ components:
         - $ref: '#/components/schemas/OpcaFSPLITActivityV2'
         - $ref: '#/components/schemas/OpcaRSPLITActivityV2'
         - $ref: '#/components/schemas/OpcaUSPLITActivityV2'
+        - $ref: '#/components/schemas/OpcaCGDActivityV2'
         - $ref: '#/components/schemas/OPASNActivityV2'
         - $ref: '#/components/schemas/OPEXCActivityV2'
         - $ref: '#/components/schemas/OPEXPActivityV2'
@@ -3624,6 +3872,7 @@ components:
           description: The execution type
           enum:
             - fill
+            - partial_fill
             - trade_correct
             - trade_bust
           type: string
@@ -5493,6 +5742,38 @@ components:
           type: object
       description: Cash withdrawal
       type: object
+    ClosePositionError:
+      additionalProperties:
+        type: string
+      description: The per-position error reported inside a close-all-positions 207 response when a position's `status` is not 200. Other rejection-specific string fields may appear.
+      properties:
+        available:
+          description: Quantity available. On insufficient-quantity rejections, the position quantity available to close.
+          type: string
+        code:
+          description: Alpaca error code, such as `"40310000"`. Usually the HTTP status code followed by a five-digit suffix. Several rejections can share the same code, so check `message` and the other
+            fields for the specific reason.
+          type: string
+        existing_qty:
+          description: Absolute quantity of the existing position. Present only on insufficient-quantity rejections.
+          type: string
+        held_for_options:
+          description: Position quantity held for options. Present only on insufficient-quantity rejections, and only when that hold is positive.
+          type: string
+        held_for_orders:
+          description: Position quantity held by open orders. Present only on insufficient-quantity rejections.
+          type: string
+        message:
+          description: Human-readable reason for the rejection.
+          type: string
+        symbol:
+          description: Symbol the rejection applies to. Set on insufficient-quantity rejections and on some other order rejections, such as admin trading restrictions.
+          type: string
+      required:
+        - code
+        - message
+      title: Close Position Error
+      type: object
     CommissionType:
       default: notional
       description: |-
@@ -7167,8 +7448,10 @@ components:
     Error:
       properties:
         code:
+          description: Alpaca error code, such as `40310000`. Usually the HTTP status code followed by a five-digit suffix. Several errors can share the same code, so check `message` for the specific reason.
           type: number
         message:
+          description: Human-readable reason for the rejection.
           type: string
       required:
         - code
@@ -9391,6 +9674,51 @@ components:
         - $ref: '#/components/schemas/CommonCDIVActivityV2'
       description: Options corporate action of cash dividend or return of capital
       type: object
+    OpcaCGDActivityV2:
+      allOf:
+        - $ref: '#/components/schemas/CommonOPCAActivityV2'
+        - properties:
+            cusip:
+              description: The CUSIP of the underlying security
+              type: string
+            ex_date:
+              description: The ex_date for the underlying capital gains distribution
+              format: date
+              minLength: 1
+              type: string
+            isin:
+              description: The ISIN of the underlying security, when applicable
+              type: string
+            long_term_rate:
+              description: Long-term capital gains distribution rate per share, when applicable
+              type: string
+            payable_date:
+              description: The payable_date for the underlying capital gains distribution
+              format: date
+              minLength: 1
+              type: string
+            rate:
+              description: Combined per-share capital-gains rate (LTCG + STCG). By default this is the strike reduction applied to the option contract; the adjusted strike is reflected in `new_contract_symbol`.
+              type: string
+            record_date:
+              description: The record_date for the underlying capital gains distribution
+              format: date
+              minLength: 1
+              type: string
+            short_term_rate:
+              description: Short-term capital gains distribution rate per share, when applicable
+              type: string
+            symbol:
+              description: The symbol of the underlying security
+              type: string
+          required:
+            - cusip
+            - symbol
+            - rate
+          type: object
+      description: Options corporate action of capital gains distributions. Used for both Long-Term (`CGD.LTCG`) and Short-Term (`CGD.STCG`) sub-types; `CGD.STCG` is emitted only when the distribution has
+        no long-term leg. `rate` is the combined (LTCG + STCG) per-share rate; `long_term_rate` and `short_term_rate` carry the individual legs when present.
+      type: object
     OpcaFSPLITActivityV2:
       allOf:
         - $ref: '#/components/schemas/CommonOPCAActivityV2'
@@ -10686,11 +11014,7 @@ components:
           description: Run ID
           type: string
         initiated_from:
-          description: system or api
-          enum:
-            - system
-            - api
-          type: string
+          $ref: '#/components/schemas/PortfolioRunInitiator'
         orders:
           description: Array of executed orders for this run
           items:
@@ -10710,11 +11034,7 @@ components:
         status:
           $ref: '#/components/schemas/PortfolioRunStatus'
         type:
-          description: full_rebalance or invest_cash
-          enum:
-            - full_rebalance
-            - invest_cash
-          type: string
+          $ref: '#/components/schemas/PortfolioRunType'
         updated_at:
           description: RFC3339 format
           type: string
@@ -10725,6 +11045,15 @@ components:
           type: array
       title: PortfolioRun
       type: object
+    PortfolioRunInitiator:
+      description: 'Who created the run: `system` for runs Alpaca creates (scheduled rebalancing and subscription creation), `api` for runs created with `POST /v1/rebalancing/runs`, or `dashboard` for runs
+        created by a user in the Broker API dashboard.'
+      enum:
+        - system
+        - api
+        - dashboard
+      title: PortfolioRunInitiator
+      type: string
     PortfolioRunStatus:
       description: |-
         |       Status       | Final |                                 Represented State                                |                                                         Notes                                                        |
@@ -10747,6 +11076,14 @@ components:
         - COMPLETED_ADJUSTED
         - COMPLETED_SUCCESS
       title: PortfolioRunStatus
+      type: string
+    PortfolioRunType:
+      description: full_rebalance, partial_liquidation, or invest_cash. partial_liquidation is emitted when a run has that type. Creating one through the REST API is rejected today.
+      enum:
+        - full_rebalance
+        - partial_liquidation
+        - invest_cash
+      title: PortfolioRunType
       type: string
     PortfolioSubscription:
       properties:
@@ -10991,7 +11328,7 @@ components:
       description: |-
         Represents the result of asking the api to close a position.
 
-        `body` is the Order used to close out the position.
+        When `status` is 200, `body` is the Order used to close out the position. For any other `status`, `body` is the error object describing why the close was rejected.
       examples:
         - body:
             asset_class: us_equity
@@ -11031,7 +11368,10 @@ components:
           symbol: AAPL
       properties:
         body:
-          $ref: '#/components/schemas/Order'
+          description: The Order used to close out the position when `status` is 200; otherwise the error object.
+          oneOf:
+            - $ref: '#/components/schemas/Order'
+            - $ref: '#/components/schemas/ClosePositionError'
         status:
           description: Http status code for the attempt to close this position
           type: integer
@@ -11058,6 +11398,226 @@ components:
         - $ref: '#/components/schemas/CommonCaActivityV2'
         - $ref: '#/components/schemas/CommonREOActivityV2'
       description: Reorganization (REO)
+      type: object
+    RebalancerEvent:
+      description: |
+        A correspondent-scoped rebalancer event delivered on `GET /v2/events/rebalancer`.
+
+        `event_type` is one of `portfolio.status_changed`, `run.created`, or `run.status_changed`.
+      discriminator:
+        mapping:
+          portfolio.status_changed: '#/components/schemas/RebalancerPortfolioStatusChangedEvent'
+          run.created: '#/components/schemas/RebalancerRunCreatedEvent'
+          run.status_changed: '#/components/schemas/RebalancerRunStatusChangedEvent'
+        propertyName: event_type
+      oneOf:
+        - $ref: '#/components/schemas/RebalancerPortfolioStatusChangedEvent'
+        - $ref: '#/components/schemas/RebalancerRunCreatedEvent'
+        - $ref: '#/components/schemas/RebalancerRunStatusChangedEvent'
+      title: RebalancerEvent
+    RebalancerEventPortfolio:
+      description: Portfolio snapshot carried on `portfolio.status_changed`, including weights and rebalance conditions.
+      properties:
+        cooldown_days:
+          type: integer
+        created_at:
+          format: date-time
+          type: string
+        description:
+          type: string
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        rebalance_conditions:
+          items:
+            $ref: '#/components/schemas/RebalancerEventRebalanceCondition'
+          type: array
+        status:
+          enum:
+            - active
+            - inactive
+            - needs_adjustment
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+        weights:
+          items:
+            $ref: '#/components/schemas/PortfolioWeights'
+          type: array
+      required:
+        - id
+        - name
+        - status
+        - description
+        - weights
+        - cooldown_days
+        - rebalance_conditions
+        - created_at
+        - updated_at
+      title: RebalancerEventPortfolio
+      type: object
+    RebalancerEventRebalanceCondition:
+      description: Rebalance condition on a `portfolio.status_changed` event. Empty `sub_type`, `percent`, and `day` are omitted.
+      properties:
+        day:
+          description: Calendar day. A lowercase weekday name (`monday` through `friday`) for `weekly`, a day of the month (`1` to `31`) for `monthly` and `quarterly`, and `MM-DD` for `annually`. Omitted
+            when empty.
+          type: string
+        percent:
+          description: Decimal string. Present for drift_band conditions. Omitted when empty.
+          type: string
+        sub_type:
+          description: Omitted when the producer sends no subtype.
+          enum:
+            - absolute
+            - relative
+            - weekly
+            - monthly
+            - quarterly
+            - annually
+          type: string
+        type:
+          enum:
+            - drift_band
+            - calendar
+            - on_portfolio_update
+          type: string
+      required:
+        - type
+      title: RebalancerEventRebalanceCondition
+      type: object
+    RebalancerEventRun:
+      description: Full run snapshot sent on `run.created` and `run.status_changed`. Order lists are omitted; read them from `GET /v1/rebalancing/runs/{run_id}`.
+      properties:
+        account_id:
+          format: uuid
+          type: string
+        canceled_at:
+          format: date-time
+          type:
+            - string
+            - 'null'
+        completed_at:
+          format: date-time
+          type:
+            - string
+            - 'null'
+        created_at:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        initiated_from:
+          $ref: '#/components/schemas/PortfolioRunInitiator'
+        portfolio_id:
+          format: uuid
+          type: string
+        reason:
+          type:
+            - string
+            - 'null'
+        status:
+          description: Run status delivered on the rebalancer stream. `CANCELED_MID_RUN` is a REST portfolio-run status and is not sent on this stream.
+          enum:
+            - QUEUED
+            - IN_PROGRESS
+            - CANCELED
+            - ERROR
+            - TIMEOUT
+            - COMPLETED_ADJUSTED
+            - COMPLETED_SUCCESS
+          type: string
+        type:
+          $ref: '#/components/schemas/PortfolioRunType'
+        updated_at:
+          format: date-time
+          type: string
+      required:
+        - id
+        - account_id
+        - portfolio_id
+        - type
+        - initiated_from
+        - status
+        - reason
+        - created_at
+        - updated_at
+        - completed_at
+        - canceled_at
+      title: RebalancerEventRun
+      type: object
+    RebalancerPortfolioStatusChangedEvent:
+      description: Emitted when a portfolio status changes. `at` is the business time of the transition.
+      properties:
+        at:
+          description: Business time of the portfolio status transition.
+          format: date-time
+          type: string
+        event_id:
+          format: ulid
+          type: string
+        event_type:
+          enum:
+            - portfolio.status_changed
+          type: string
+        portfolio:
+          $ref: '#/components/schemas/RebalancerEventPortfolio'
+      required:
+        - event_id
+        - at
+        - event_type
+        - portfolio
+      title: RebalancerPortfolioStatusChangedEvent
+      type: object
+    RebalancerRunCreatedEvent:
+      description: Emitted when a portfolio run is created. `run` is the full run snapshot, without order lists.
+      properties:
+        at:
+          description: Business time of the run creation.
+          format: date-time
+          type: string
+        event_id:
+          format: ulid
+          type: string
+        event_type:
+          enum:
+            - run.created
+          type: string
+        run:
+          $ref: '#/components/schemas/RebalancerEventRun'
+      required:
+        - event_id
+        - at
+        - event_type
+        - run
+      title: RebalancerRunCreatedEvent
+      type: object
+    RebalancerRunStatusChangedEvent:
+      description: Emitted when a portfolio run status changes. `run` is the same full snapshot sent on `run.created`.
+      properties:
+        at:
+          description: Business time of the run status transition.
+          format: date-time
+          type: string
+        event_id:
+          format: ulid
+          type: string
+        event_type:
+          enum:
+            - run.status_changed
+          type: string
+        run:
+          $ref: '#/components/schemas/RebalancerEventRun'
+      required:
+        - event_id
+        - at
+        - event_type
+        - run
+      title: RebalancerRunStatusChangedEvent
       type: object
     RebalancingConditions:
       properties:
@@ -11577,9 +12137,12 @@ components:
           minLength: 1
           type: string
         entity_type:
-          description: Valid values are BankRelationship, WireBank, Transfer and FundingWallet.
-          format: uuid
-          minLength: 1
+          description: Type of funding entity that `entity_id` identifies.
+          enum:
+            - BankRelationship
+            - WireBank
+            - Transfer
+            - FundingWallet
           type: string
         event_id:
           description: lexically sortable, monotonically increasing character array
@@ -11975,6 +12538,13 @@ components:
       type: object
     TokenizationMintRequest:
       properties:
+        client_request_id:
+          description: |-
+            Optional label of your choosing for this mint request. It is returned on the mint response and on the tokenization request, and you can retrieve the request by it with the Get Tokenization Request by `client_request_id` endpoint. If multiple requests within the same account share the same `client_request_id`, the endpoint returns the most recent matching request. To prevent duplicate processing, use the `Idempotency-Key` header.
+
+            Must be at most 128 printable ASCII characters with no leading or trailing whitespace.
+          maxLength: 128
+          type: string
         issuer:
           $ref: '#/components/schemas/TokenizationIssuer'
         network:
@@ -11998,6 +12568,9 @@ components:
       type: object
     TokenizationMintResponse:
       properties:
+        client_request_id:
+          description: The `client_request_id` supplied on the mint request. Omitted when none was supplied.
+          type: string
         created_at:
           format: date-time
           type: string
@@ -16942,16 +17515,28 @@ paths:
               - XRP
               - ARB
             type: string
-        - description: Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both 'chain' and
-            'network' are specified, 'chain' will take precedence and 'network' will be ignored. If 'chain' and 'network' are not specified, the default 'network' (ethereum) will be used.
+        - deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Use `chain` instead.
+
+            Since: 2026-11-02
+            Sunset: 2027-02-02
+
+            ---
+
+            Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both 'chain' and 'network' are specified, 'chain' will take precedence and 'network' will be ignored. If 'chain' and 'network' are not specified, the default 'network' (ethereum) will be used.
           in: query
           name: network
           schema:
-            deprecated: true
             enum:
               - ethereum
               - solana
             type: string
+          x-deprecation:
+            reason: Use `chain` instead.
+            since: '2026-11-02'
+            sunset: '2027-02-02'
   /v1/accounts/{account_id}/wallets/transfers:
     get:
       description: Returns an array of all transfers associated with the given account across all wallets.
@@ -17199,7 +17784,7 @@ paths:
           name: activity_types
           schema:
             items:
-              $ref: '#/components/schemas/ActivityType'
+              $ref: '#/components/schemas/ActivityTypeFilter'
             type: array
           style: form
         - description: The activity category. Cannot be used with "activity_types" parameter.
@@ -22185,8 +22770,8 @@ paths:
         - Trading
   /v1/trading/accounts/{account_id}/positions:
     delete:
-      description: Closes (liquidates) all of the account's open long and short positions. A response will be provided for each order that is attempted to be cancelled. If an order is no longer cancelable,
-        the server will respond with status 500 and reject the request.
+      description: 'Closes (liquidates) all of the account''s open long and short positions. The 207 response contains one result per position: `body` is the closing Order when `status` is 200, otherwise
+        the error describing why that position was not closed.'
       operationId: closeAllPositionsForAccount
       parameters:
         - $ref: '#/components/parameters/AccountID'
@@ -22200,6 +22785,53 @@ paths:
           content:
             application/json:
               examples:
+                Partially Closed:
+                  value:
+                    - body:
+                        asset_class: us_equity
+                        asset_id: a4778bc8-fad1-47b7-87fe-d5cde10d43f4
+                        canceled_at: null
+                        client_order_id: 17dbfab4-cb86-4e0a-8fa6-f0606b0a9a4e
+                        created_at: '2022-05-13T16:25:29.336330998Z'
+                        expired_at: null
+                        extended_hours: false
+                        failed_at: null
+                        filled_at: null
+                        filled_avg_price: null
+                        filled_qty: '0'
+                        hwm: null
+                        id: d1143025-89fc-4952-8936-db2409d899f3
+                        legs: null
+                        limit_price: null
+                        notional: null
+                        order_class: ''
+                        order_type: market
+                        qty: '4'
+                        replaced_at: null
+                        replaced_by: null
+                        replaces: null
+                        side: sell
+                        source: null
+                        status: accepted
+                        stop_price: null
+                        submitted_at: '2022-05-13T16:25:29.335776073Z'
+                        symbol: TSLA
+                        time_in_force: day
+                        trail_percent: null
+                        trail_price: null
+                        type: market
+                        updated_at: '2022-05-13T16:25:29.336330998Z'
+                      status: 200
+                      symbol: TSLA
+                    - body:
+                        available: '2'
+                        code: 40310000
+                        existing_qty: '2'
+                        held_for_orders: '0'
+                        message: 'insufficient qty available for order (requested: 10, available: 2)'
+                        symbol: NVDA
+                      status: 403
+                      symbol: NVDA
                 example-1:
                   value:
                     - body:
@@ -22243,8 +22875,31 @@ paths:
                   $ref: '#/components/schemas/PositionClosedResponse'
                 type: array
           description: HTTP 207 Multi-Status with body; an array of objects that include the order id and http status code for each status request.
+        '422':
+          content:
+            application/json:
+              examples:
+                Invalid cancel_orders:
+                  value:
+                    code: 40010001
+                    message: cancel_orders must be true or false
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: |-
+            Invalid Parameters.
+
+            One or more parameters provided are invalid.
         '500':
-          description: Failed to liquidate some positions
+          content:
+            application/json:
+              examples:
+                Internal Server Error:
+                  value:
+                    code: 50010000
+                    message: internal server error occurred
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Request-level failure; no per-position results are returned. Positions that fail to close are reported in the 207 response.
       summary: Close All Positions for an Account
       tags:
         - Trading
@@ -23430,6 +24085,97 @@ paths:
                 type: array
           description: Connected. Events will now start streaming as long as you keep the connection open.
       summary: Subscribe to Journal Events (SSE)
+      tags:
+        - Events
+  /v2/events/rebalancer:
+    get:
+      description: |
+        The Events API provides event push as well as historical queries via SSE (server sent events).
+
+        This stream is correspondent-scoped and v2-only. A subscriber receives rebalancer events for their own correspondent. Every `event_id` is a ULID.
+
+        You can listen to portfolio status changes, portfolio run creation, and portfolio run status changes.
+
+        Historical events are streamed immediately if queried, and updates are pushed as events occur.
+
+        Query Params Rules:
+        - `since` required if `until` specified
+        - `since_id` required if `until_id` specified
+        - `since` and `since_id` can't be used at the same time
+        - `until` and `until_id` can't be used at the same time
+
+        Behavior:
+        - if `since` or `since_id` not specified this will not return any historic data
+        - if `until` or `until_id` reached stream will end (status 200)
+        - the `Last-Event-Id` request header, when present, is used as `since_id` and takes precedence over the `since_id` query parameter. Combining it with `since` returns an error, the same as sending `since` and `since_id` together.
+        - `since` and `until` select events by the time encoded in `event_id` (when the event was emitted), not by `at`. To resume reliably, use `since_id` or `Last-Event-Id`.
+
+        ---
+
+        **Event types**
+
+        `event_type` selects the payload:
+
+        - `portfolio.status_changed` carries the portfolio snapshot. Weights and rebalance conditions are included. `symbol` is always present on a weight and is `null` for cash.
+        - `run.created` and `run.status_changed` both carry the full run snapshot: `id`, `account_id`, `portfolio_id`, `type`, `initiated_from`, `status`, `reason`, `created_at`, `updated_at`, `completed_at`, and `canceled_at`. `weights`, `orders`, `failed_orders`, and `skipped_orders` are omitted; read them from `GET /v1/rebalancing/runs/{run_id}`.
+        - Run `status` on this stream is `QUEUED`, `IN_PROGRESS`, `CANCELED`, `ERROR`, `TIMEOUT`, `COMPLETED_ADJUSTED`, or `COMPLETED_SUCCESS`. `CANCELED_MID_RUN` is not sent.
+
+        `correspondent` is not included in the event JSON.
+
+        ---
+
+        Note for people using the clients generated from this OAS spec. Currently OAS-3 doesn't have full support for representing SSE style responses from an API, so if you are using a generated client and don't specify a `since` and `until` there is a good chance the generated clients will hang waiting for the response to end.
+
+        If you require the streaming capabilities we recommend not using the generated clients for this specific usecase until the OAS-3 standards come to a consensus on how to represent this correctly in OAS-3.
+      operationId: subscribeToRebalancerEventsSSE
+      parameters:
+        - description: 'Format: RFC3339 or YYYY-MM-DD'
+          in: query
+          name: since
+          schema:
+            format: date-time
+            type: string
+        - description: 'Format: RFC3339 or YYYY-MM-DD'
+          in: query
+          name: until
+          schema:
+            format: date-time
+            type: string
+        - description: ULID `event_id` to resume the stream from. The first event returned will be the one immediately after `since_id`.
+          in: query
+          name: since_id
+          schema:
+            format: ulid
+            type: string
+        - description: ULID `event_id` at which the stream will end (inclusive). Useful for backfills.
+          in: query
+          name: until_id
+          schema:
+            format: ulid
+            type: string
+        - description: Used as `since_id`, taking precedence over the `since_id` query parameter. Can't be combined with `since`.
+          in: header
+          name: Last-Event-Id
+          schema:
+            format: ulid
+            type: string
+      responses:
+        '200':
+          content:
+            text/event-stream:
+              examples:
+                PortfolioStatusChanged:
+                  $ref: '#/components/examples/RebalancerEventPortfolioStatusChanged'
+                RunCreated:
+                  $ref: '#/components/examples/RebalancerEventRunCreated'
+                RunStatusChanged:
+                  $ref: '#/components/examples/RebalancerEventRunStatusChanged'
+              schema:
+                items:
+                  $ref: '#/components/schemas/RebalancerEvent'
+                type: array
+          description: Connected. Events will now start streaming as long as you keep the connection open.
+      summary: Subscribe to Rebalancer Events (SSE)
       tags:
         - Events
   /v2/events/system:

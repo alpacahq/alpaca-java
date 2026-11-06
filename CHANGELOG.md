@@ -47,6 +47,22 @@ Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/al
   completion is independent from terminal listener delivery. Review callback-heavy applications
   before upgrading.
 
+Adopting the upstream OpenAPI specs on `bot/openapi-adopt`
+([#120](https://github.com/alpacahq/alpaca-java/pull/120)):
+
+- Broker `AccountsApi.getAccountActivities` and `getAccountActivitiesByType`, and Trading
+  `AccountActivitiesApi.getAccountActivities` and `getAccountActivitiesByActivityType`, take
+  `ActivityTypeFilter` instead of `ActivityType` or `String`.
+- Broker `PortfolioRun.getType()` and `getInitiatedFrom()` return `PortfolioRunType` and
+  `PortfolioRunInitiator`. The nested `TypeEnum` and `InitiatedFromEnum` are removed.
+- Broker and Trading `PositionClosedResponse.getBody()` returns `PositionClosedResponseBody`
+  instead of `Order`.
+- Broker `StatusFundingEvent.getEntityType()` returns `EntityTypeEnum` instead of `UUID`.
+- Market Data `StockApi` bar methods take `List<StockAdjustment>` for `adjustment` instead of
+  `String`.
+- `ActivityType.MISC` and `ActivityType.TRANS` are removed from Trading `ActivityType` and
+  `NonTradeActivities`.
+
 Adopting later upstream Broker, Trading, and Market Data specs
 ([#99](https://github.com/alpacahq/alpaca-java/pull/99),
 [#115](https://github.com/alpacahq/alpaca-java/pull/115)):
@@ -84,6 +100,11 @@ Adopting later upstream Broker, Trading, and Market Data specs
 - Broker agreement creation, FX trade activities, and ACATS admin-action events.
 - Order group role, activity-event assets, tokenization transfer status, and additional exchange
   codes.
+- Broker `subscribeToRebalancerEvents` SSE client for `GET /v2/events/rebalancer`, with
+  `BrokerSseRebalancerOptions` (`lastEventId` is sent as `Last-Event-Id`) and the `RebalancerEvent`
+  models.
+- Broker `AccountDRIPRequest` and `AccountDRIPResponse`, plus `drip` on Broker account models.
+- Trading and Broker `OpcaCGDActivityV2` and `ActivityTypeFilter`.
 
 ### Changed
 
@@ -101,6 +122,11 @@ Adopting later upstream Broker, Trading, and Market Data specs
 - The pinned Broker NTA operation now declares its actual `text/event-stream` media type, and
   generation checks verify every pinned SSE operation has an explicit handwritten support decision.
 - `FEEActivityV2` no longer requires `parent_id`.
+
+### Fixed
+
+- Trading and Broker `OPCA` activities with subtype `CGD.LTCG` or `CGD.STCG` decode to
+  `OpcaCGDActivityV2`.
 
 ### Migration
 

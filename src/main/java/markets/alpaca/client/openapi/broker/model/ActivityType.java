@@ -25,7 +25,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * Represents the various kinds of activity.  TradeActivity&#39;s will always have the type &#x60;FILL&#x60;  - **FILL**   Order Fills (Partial/Full) - **ACATC**   ACATS IN/OUT (Cash) - **ACATS**   ACATS IN/OUT (Securities) - **CGD**   Capital Gains Distribution - **CIL**   Cash in Lieu of Stock - **CSD**   Cash Disbursement (+) - **CSW**   Cash Withdrawable - **DIV**   Dividend - **DIVCGL**   Dividend (Capital Gains Long Term) - **DIVCGS**   Dividend (Capital Gains Short Term) - **DIVNRA**   Dividend Adjusted (NRA Withheld) - **DIVROC**   Dividend Return of Capital - **DIVTXEX**   Dividend (Tax Exempt) - **FEE**   REG and TAF Fees - **INT**   Interest (Credit/Margin) - **JNLC**   Journal Entry (Cash) - **JNLS**   Journal Entry (Stock) - **OPASN**    Option Assignment - **OPCA**   Option Corporate Action - **OPCSH**    Option cash deliverable for non-standard contracts - **OPEXC**   Option Exercise - **OPEXP**   Option Expiration - **OPTRD**   Option Trade - **MA**   Merger/Acquisition - **PTC**   Pass Thru Change - **REO**   Reorganization - **REORG**   Worthless removal CA - **SPIN**   Stock Spinoff - **SPLIT**   Stock Split - **FOPT**   Free of Payment Transfers - **OCT**   On Chain Transactions (blockchain deposits/withdrawals)
+ * Entry type returned on an activity. The listing returns the stored entry type. It omits &#x60;ECJL&#x60;, crypto-deposit &#x60;JNLC&#x60;, and &#x60;SWP&#x60;.  &#x60;TRANS&#x60; and &#x60;MISC&#x60; are filter aliases. They are not returned as &#x60;activity_type&#x60;. This is the known set. A new clearing code can appear without an API change.  Trade activities always have the type &#x60;FILL&#x60;.  - **FILL**   Order Fills (Partial/Full) - **ACATC**   ACATS IN/OUT (Cash) - **ACATS**   ACATS IN/OUT (Securities) - **ALLOC**   Allocation - **CFEE**   Crypto fee - **CGD**   Capital Gains Distribution - **CIL**   Cash in Lieu of Stock - **CORR**   Correction - **CSD**   Cash deposit (+), including returned withdrawals - **CSR**   Cash receipt (-) - **CSW**   Cash withdrawal (-), including returned deposits - **DIV**   Dividend - **DIVCGL**   Dividend (Capital Gains Long Term) - **DIVCGS**   Dividend (Capital Gains Short Term) - **DIVFEE**   Dividend fee - **DIVFT**   Dividend adjusted (Foreign Tax Withheld) - **DIVNRA**   Dividend Adjusted (NRA Withheld) - **DIVROC**   Dividend Return of Capital - **DIVTW**   Dividend adjusted (Tefra Withheld) - **DIVTXEX**   Dividend (Tax Exempt) - **DIVWH**   Dividend withholding - **DTCS**   DTC security settlement - **DVF**   DVP flip - **ECEXP**   Event contract expiration - **EXTRD**   External trade - **FEE**   Fee denominated in USD. See &#x60;activity_sub_type&#x60; for the specific fee. - **FIMAT**   Fixed income maturity - **FXCNV**   FX conversion - **FXTRD**   FX trade - **INT**   Interest (Credit/Margin) - **INTNRA**   Interest adjusted (NRA Withheld) - **INTTW**   Interest adjusted (Tefra Withheld) - **INVPNL**   Inventory profit and loss - **JNL**   Journal entry - **JNLC**   Journal Entry (Cash) - **JNLS**   Journal Entry (Stock) - **MA**   Merger/Acquisition - **MEM**   Memopost - **NC**   Name change - **OPASN**    Option Assignment - **OPCA**   Option Corporate Action - **OPCSH**    Option cash deliverable for non-standard contracts - **OPEXC**   Option Exercise - **OPEXP**   Option Expiration - **OPTRD**   Option Trade - **PTC**   Pass Thru Change - **PTR**   Pass Thru Rebate - **REO**   Reorganization - **REORG**   Worthless removal CA - **SC**   Symbol change - **SEG**   Segregation - **SPIN**   Stock Spinoff - **SPLIT**   Stock Split - **SSO**   Former stock spin-off code. Current spin-offs use &#x60;SPIN&#x60;. - **SSP**   Former stock split code. Current splits use &#x60;SPLIT&#x60;. - **SUB**   Subscription - **VOF**   Voluntary Offering (tender, warrant, rights, or exchange offers) - **WH**   Withholding - **FOPT**   Free of Payment Transfers - **OCT**   On Chain Transactions (blockchain deposits/withdrawals)
  */
 @JsonAdapter(ActivityType.Adapter.class)
 public enum ActivityType implements Serializable {
@@ -36,11 +36,19 @@ public enum ActivityType implements Serializable {
   
   ACATS("ACATS"),
   
+  ALLOC("ALLOC"),
+  
+  CFEE("CFEE"),
+  
   CGD("CGD"),
   
   CIL("CIL"),
   
+  CORR("CORR"),
+  
   CSD("CSD"),
+  
+  CSR("CSR"),
   
   CSW("CSW"),
   
@@ -50,21 +58,55 @@ public enum ActivityType implements Serializable {
   
   DIVCGS("DIVCGS"),
   
+  DIVFEE("DIVFEE"),
+  
+  DIVFT("DIVFT"),
+  
   DIVNRA("DIVNRA"),
   
   DIVROC("DIVROC"),
   
+  DIVTW("DIVTW"),
+  
   DIVTXEX("DIVTXEX"),
+  
+  DIVWH("DIVWH"),
+  
+  DTCS("DTCS"),
+  
+  DVF("DVF"),
+  
+  ECEXP("ECEXP"),
+  
+  EXTRD("EXTRD"),
   
   FEE("FEE"),
   
+  FIMAT("FIMAT"),
+  
+  FXCNV("FXCNV"),
+  
+  FXTRD("FXTRD"),
+  
   INT("INT"),
+  
+  INTNRA("INTNRA"),
+  
+  INTTW("INTTW"),
+  
+  INVPNL("INVPNL"),
+  
+  JNL("JNL"),
   
   JNLC("JNLC"),
   
   JNLS("JNLS"),
   
   MA("MA"),
+  
+  MEM("MEM"),
+  
+  NC("NC"),
   
   OPASN("OPASN"),
   
@@ -80,13 +122,29 @@ public enum ActivityType implements Serializable {
   
   PTC("PTC"),
   
+  PTR("PTR"),
+  
   REO("REO"),
   
   REORG("REORG"),
   
+  SC("SC"),
+  
+  SEG("SEG"),
+  
   SPIN("SPIN"),
   
   SPLIT("SPLIT"),
+  
+  SSO("SSO"),
+  
+  SSP("SSP"),
+  
+  SUB("SUB"),
+  
+  VOF("VOF"),
+  
+  WH("WH"),
   
   FOPT("FOPT"),
   

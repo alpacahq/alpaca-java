@@ -108,6 +108,18 @@ public class JSON {
                                 getDiscriminatorValue(readElement, "type"));
                     }
           })
+                .registerTypeSelector(markets.alpaca.client.openapi.broker.model.RebalancerEvent.class, new TypeSelector<markets.alpaca.client.openapi.broker.model.RebalancerEvent>() {
+                    @Override
+                    public Class<? extends markets.alpaca.client.openapi.broker.model.RebalancerEvent> getClassForElement(JsonElement readElement) {
+                        Map<String, Class> classByDiscriminatorValue = new HashMap<String, Class>();
+                        classByDiscriminatorValue.put("portfolio.status_changed", markets.alpaca.client.openapi.broker.model.RebalancerPortfolioStatusChangedEvent.class);
+                        classByDiscriminatorValue.put("run.created", markets.alpaca.client.openapi.broker.model.RebalancerRunCreatedEvent.class);
+                        classByDiscriminatorValue.put("run.status_changed", markets.alpaca.client.openapi.broker.model.RebalancerRunStatusChangedEvent.class);
+                        classByDiscriminatorValue.put("RebalancerEvent", markets.alpaca.client.openapi.broker.model.RebalancerEvent.class);
+                        return getClassByDiscriminator(classByDiscriminatorValue,
+                                getDiscriminatorValue(readElement, "event_type"));
+                    }
+          })
                 .registerTypeSelector(markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner.class, new TypeSelector<markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner>() {
                     @Override
                     public Class<? extends markets.alpaca.client.openapi.broker.model.SubscribeToAdminActionSSE200ResponseInner> getClassForElement(JsonElement readElement) {
@@ -186,6 +198,8 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AccountCashInterestResponse.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AccountConfigurations.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AccountCreationRequest.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AccountDRIPRequest.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AccountDRIPResponse.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AccountDocument.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AccountExtended.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.AccountExtendedUsd.CustomTypeAdapterFactory());
@@ -252,6 +266,7 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.CalendarDay.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.Clock.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.ClockResp.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.ClosePositionError.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.CommonAcatActivityV2.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.CommonCDIVActivityV2.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.CommonCaActivityV2.CustomTypeAdapterFactory());
@@ -372,6 +387,7 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.OPTRDActivityV2.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.OathClientResponse.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.OpcaCDIVActivityV2.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.OpcaCGDActivityV2.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.OpcaFSPLITActivityV2.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.OpcaMAActivityV2.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.OpcaNCActivityV2.CustomTypeAdapterFactory());
@@ -408,6 +424,7 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.PortfolioWeights.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.Position.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.PositionClosedResponse.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.PositionClosedResponseBody.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.PostV1RebalancingPortfoliosRequest.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.PostV1RebalancingRunsRequest.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.PostV1RebalancingRunsRequestAmount.CustomTypeAdapterFactory());
@@ -416,6 +433,13 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.PublicCalendarResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.PublicMarket.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.REOActivityV2.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.RebalancerEvent.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.RebalancerEventPortfolio.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.RebalancerEventRebalanceCondition.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.RebalancerEventRun.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.RebalancerPortfolioStatusChangedEvent.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.RebalancerRunCreatedEvent.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.RebalancerRunStatusChangedEvent.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.RebalancingConditions.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.ReportsResponse.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.RestrictToLiquidationReasons.CustomTypeAdapterFactory());

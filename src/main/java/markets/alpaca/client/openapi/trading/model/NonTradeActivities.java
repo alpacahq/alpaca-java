@@ -65,19 +65,23 @@ public class NonTradeActivities implements Serializable {
    */
   @JsonAdapter(ActivityTypeEnum.Adapter.class)
   public enum ActivityTypeEnum {
-    TRANS("TRANS"),
-    
-    MISC("MISC"),
-    
     ACATC("ACATC"),
     
     ACATS("ACATS"),
+    
+    ALLOC("ALLOC"),
     
     CFEE("CFEE"),
     
     CGD("CGD"),
     
+    CIL("CIL"),
+    
+    CORR("CORR"),
+    
     CSD("CSD"),
+    
+    CSR("CSR"),
     
     CSW("CSW"),
     
@@ -99,13 +103,31 @@ public class NonTradeActivities implements Serializable {
     
     DIVTXEX("DIVTXEX"),
     
+    DIVWH("DIVWH"),
+    
+    DTCS("DTCS"),
+    
+    DVF("DVF"),
+    
+    ECEXP("ECEXP"),
+    
+    EXTRD("EXTRD"),
+    
     FEE("FEE"),
+    
+    FIMAT("FIMAT"),
+    
+    FXCNV("FXCNV"),
+    
+    FXTRD("FXTRD"),
     
     INT("INT"),
     
     INTNRA("INTNRA"),
     
     INTTW("INTTW"),
+    
+    INVPNL("INVPNL"),
     
     JNL("JNL"),
     
@@ -114,6 +136,8 @@ public class NonTradeActivities implements Serializable {
     JNLS("JNLS"),
     
     MA("MA"),
+    
+    MEM("MEM"),
     
     NC("NC"),
     
@@ -137,9 +161,23 @@ public class NonTradeActivities implements Serializable {
     
     REORG("REORG"),
     
+    SC("SC"),
+    
+    SEG("SEG"),
+    
     SPIN("SPIN"),
     
     SPLIT("SPLIT"),
+    
+    SSO("SSO"),
+    
+    SSP("SSP"),
+    
+    SUB("SUB"),
+    
+    VOF("VOF"),
+    
+    WH("WH"),
     
     FOPT("FOPT"),
     
@@ -311,7 +349,7 @@ public class NonTradeActivities implements Serializable {
   }
 
   /**
-   * Represents a more specific classification to the &#x60;activity_type&#x60;. This field is optional and may not always be populated, depending on the activity type and the available data. Each &#x60;activity_type&#x60; has a set of valid &#x60;activity_sub_type&#x60; values.  Full mapping of &#x60;activity_type&#x60; to &#x60;activity_sub_type&#x60;:  - **CGD**: Capital Gains Distribution activity sub-types:   - **LTCG**: Long-Term Capital Gain   - **STCG**: Short-Term Capital Gain  - **DIV**: Dividend activity sub-types:   - **CDIV**: Cash Dividend   - **ROC**: Return of Capital   - **SDIV**: Stock Dividend   - **SPD**: Substitute Payment In Lieu Of Dividend  - **FEE**: Fee-related activity sub-types:   - **REG**: Regulatory Fee   - **TAF**: Trading Activity Fee   - **LCT**: Local Currency Trading Fee   - **ORF**: Options Regulatory Fee   - **OCC**: Options Clearing Corporation Fee   - **NRC**: Non-Retail Commission Fee   - **NRV**: Non-Retail Venue Fee   - **COM**: Commission   - **CAT**: Consolidated Audit Trail Fee  - **INT**: Interest-related activity sub-types:   - **MGN**: Margin Interest   - **CDT**: Credit Interest   - **SWP**: Sweep Interest   - **QII**: Qualified Interest   - **FI**: Fixed Income Interest (coupon or accrued)  - **MA**: Merger and Acquisition activity sub-types:   - **CMA**: Cash Merger   - **SMA**: Stock Merger   - **SCMA**: Stock &amp; Cash Merger  - **NC**: Name Change activity sub types   - **SNC**: Symbol Name Change   - **CNC**: CUSIP Name Change   - **SCNC**: Symbol &amp; CUSIP Name Change  - **OPCA**: Option Corporate Action activity sub-types:   - **DIV.CDIV**: Cash Dividend   - **DIV.ROC**: Return of Capital   - **DIV.SDIV**: Stock Dividend   - **MA.CMA**: Cash Merger   - **MA.SMA**: Stock Merger   - **MA.SCMA**: Stock &amp; Cash Merger   - **NC.CNC**: CUSIP Name Change   - **NC.SNC**: Symbol Name Change   - **NC.SCNC**: Symbol &amp; CUSIP Name Change   - **SPIN**: Spin-off   - **SPLIT.FSPLIT**: Forward Stock Split   - **SPLIT.RSPLIT**: Reverse Stock Split   - **SPLIT.USPLIT**: Unit Split  - **REO**: Reorganization activity sub-types   - **REOS**: Stock only (1 or more stock legs)   - **REOC**: Cash only (1 cash leg)   - **REOSC**: Stock and cash  - **REORG**: Activity sub-types:   - **WRM**: Worthless Removal  - **SPLIT**: Stock Split activity sub-types:   - **FSPLIT**: Forward Stock Split   - **RSPLIT**: Reverse Stock Split   - **USPLIT**: Unit Split  - **VOF**: Voluntary Offering activity sub-types:   - **VTND**: Tender Offer   - **VWRT**: Warrant Exercise   - **VRGT**: Rights Offer   - **VEXH**: Exchange Offer  - **WH**: Withholding activity sub-types:   - **SWH**: State Withholding   - **FWH**: Federal Withholding   - **SLWH**: Sales Withholding
+   * Represents a more specific classification to the &#x60;activity_type&#x60;. This field is optional and may not always be populated, depending on the activity type and the available data. Each &#x60;activity_type&#x60; has a set of valid &#x60;activity_sub_type&#x60; values.  This field is a free-form string rather than a closed enum: sub-type codes originate from several upstream clearing, corporate-action, and international-fee systems, and new codes can appear without a corresponding API change. The mapping below documents the sub-types known at the time of writing; it is not guaranteed to be exhaustive.  Full mapping of &#x60;activity_type&#x60; to &#x60;activity_sub_type&#x60;:  - **CGD**: Capital Gains Distribution activity sub-types:   - **LTCG**: Long-Term Capital Gain   - **STCG**: Short-Term Capital Gain  - **DIV**: Dividend activity sub-types:   - **CDIV**: Cash Dividend   - **ROC**: Return of Capital   - **SDIV**: Stock Dividend   - **SPD**: Substitute Payment In Lieu Of Dividend  - **FEE**: Fee-related activity sub-types:   - **REG**: Regulatory Fee   - **TAF**: Trading Activity Fee   - **LCT**: Local Currency Trading Fee   - **ORF**: Options Regulatory Fee   - **OCC**: Options Clearing Corporation Fee   - **NRC**: Non-Retail Commission Fee   - **NRV**: Non-Retail Venue Fee   - **COM**: Commission   - **CAT**: Consolidated Audit Trail Fee   - **ICF**: Index Contract Fee   - **EPI**: Exchange Proprietary Fee  - **INT**: Interest-related activity sub-types:   - **MGN**: Margin Interest   - **CDT**: Credit Interest   - **SWP**: Sweep Interest   - **QII**: Qualified Interest   - **FI**: Fixed Income Interest (coupon or accrued)  - **MA**: Merger and Acquisition activity sub-types:   - **CMA**: Cash Merger   - **SMA**: Stock Merger   - **SCMA**: Stock &amp; Cash Merger  - **NC**: Name Change activity sub types   - **SNC**: Symbol Name Change   - **CNC**: CUSIP Name Change   - **SCNC**: Symbol &amp; CUSIP Name Change  - **OPCA**: Option Corporate Action activity sub-types:   - **DIV.CDIV**: Cash Dividend   - **DIV.ROC**: Return of Capital   - **DIV.SDIV**: Stock Dividend   - **MA.CMA**: Cash Merger   - **MA.SMA**: Stock Merger   - **MA.SCMA**: Stock &amp; Cash Merger   - **NC.CNC**: CUSIP Name Change   - **NC.SNC**: Symbol Name Change   - **NC.SCNC**: Symbol &amp; CUSIP Name Change   - **SPIN**: Spin-off   - **SPLIT.FSPLIT**: Forward Stock Split   - **SPLIT.RSPLIT**: Reverse Stock Split   - **SPLIT.USPLIT**: Unit Split  - **REO**: Reorganization activity sub-types   - **REOS**: Stock only (1 or more stock legs)   - **REOC**: Cash only (1 cash leg)   - **REOSC**: Stock and cash  - **REORG**: Activity sub-types:   - **WRM**: Worthless Removal  - **SPLIT**: Stock Split activity sub-types:   - **FSPLIT**: Forward Stock Split   - **RSPLIT**: Reverse Stock Split   - **USPLIT**: Unit Split  - **VOF**: Voluntary Offering activity sub-types:   - **VTND**: Tender Offer   - **VWRT**: Warrant Exercise   - **VRGT**: Rights Offer   - **VEXH**: Exchange Offer  - **WH**: Withholding activity sub-types:   - **SWH**: State Withholding   - **FWH**: Federal Withholding   - **SLWH**: Sales Withholding
    * @return activitySubType
    */
   @javax.annotation.Nullable

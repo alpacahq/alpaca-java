@@ -58,6 +58,11 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 public class TokenizationMintResponse implements Serializable {
   private static final long serialVersionUID = 1L;
 
+  public static final String SERIALIZED_NAME_CLIENT_REQUEST_ID = "client_request_id";
+  @SerializedName(SERIALIZED_NAME_CLIENT_REQUEST_ID)
+  @javax.annotation.Nullable
+  private String clientRequestId;
+
   public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
   @javax.annotation.Nonnull
@@ -100,6 +105,25 @@ public class TokenizationMintResponse implements Serializable {
 
   public TokenizationMintResponse() {
   }
+
+  public TokenizationMintResponse clientRequestId(@javax.annotation.Nullable String clientRequestId) {
+    this.clientRequestId = clientRequestId;
+    return this;
+  }
+
+  /**
+   * The &#x60;client_request_id&#x60; supplied on the mint request. Omitted when none was supplied.
+   * @return clientRequestId
+   */
+  @javax.annotation.Nullable
+  public String getClientRequestId() {
+    return clientRequestId;
+  }
+
+  public void setClientRequestId(@javax.annotation.Nullable String clientRequestId) {
+    this.clientRequestId = clientRequestId;
+  }
+
 
   public TokenizationMintResponse createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
@@ -307,7 +331,8 @@ public class TokenizationMintResponse implements Serializable {
       return false;
     }
     TokenizationMintResponse tokenizationMintResponse = (TokenizationMintResponse) o;
-    return Objects.equals(this.createdAt, tokenizationMintResponse.createdAt) &&
+    return Objects.equals(this.clientRequestId, tokenizationMintResponse.clientRequestId) &&
+        Objects.equals(this.createdAt, tokenizationMintResponse.createdAt) &&
         Objects.equals(this.issuer, tokenizationMintResponse.issuer) &&
         Objects.equals(this.network, tokenizationMintResponse.network) &&
         Objects.equals(this.qty, tokenizationMintResponse.qty) &&
@@ -320,13 +345,14 @@ public class TokenizationMintResponse implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdAt, issuer, network, qty, status, tokenSymbol, tokenizationRequestId, underlyingSymbol, additionalProperties);
+    return Objects.hash(clientRequestId, createdAt, issuer, network, qty, status, tokenSymbol, tokenizationRequestId, underlyingSymbol, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TokenizationMintResponse {\n");
+    sb.append("    clientRequestId: ").append(toIndentedString(clientRequestId)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
     sb.append("    network: ").append(toIndentedString(network)).append("\n");
@@ -354,7 +380,7 @@ public class TokenizationMintResponse implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("created_at", "issuer", "network", "qty", "status", "token_symbol", "tokenization_request_id", "underlying_symbol"));
+    openapiFields = new HashSet<String>(Arrays.asList("client_request_id", "created_at", "issuer", "network", "qty", "status", "token_symbol", "tokenization_request_id", "underlying_symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("created_at", "issuer", "network", "qty", "status", "token_symbol", "tokenization_request_id", "underlying_symbol"));
@@ -380,6 +406,9 @@ public class TokenizationMintResponse implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if ((jsonObj.get("client_request_id") != null && !jsonObj.get("client_request_id").isJsonNull()) && !jsonObj.get("client_request_id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `client_request_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("client_request_id").toString()));
+      }
       // validate the required field `issuer`
       TokenizationIssuer.validateJsonElement(jsonObj.get("issuer"));
       // validate the required field `network`

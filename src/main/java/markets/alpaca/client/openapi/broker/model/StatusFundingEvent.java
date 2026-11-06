@@ -75,10 +75,66 @@ public class StatusFundingEvent implements Serializable {
   @javax.annotation.Nonnull
   private UUID entityId;
 
+  /**
+   * Type of funding entity that &#x60;entity_id&#x60; identifies.
+   */
+  @JsonAdapter(EntityTypeEnum.Adapter.class)
+  public enum EntityTypeEnum {
+    BANK_RELATIONSHIP("BankRelationship"),
+    
+    WIRE_BANK("WireBank"),
+    
+    TRANSFER("Transfer"),
+    
+    FUNDING_WALLET("FundingWallet");
+
+    private String value;
+
+    EntityTypeEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static EntityTypeEnum fromValue(String value) {
+      for (EntityTypeEnum b : EntityTypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<EntityTypeEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final EntityTypeEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public EntityTypeEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return EntityTypeEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      EntityTypeEnum.fromValue(value);
+    }
+  }
+
   public static final String SERIALIZED_NAME_ENTITY_TYPE = "entity_type";
   @SerializedName(SERIALIZED_NAME_ENTITY_TYPE)
   @javax.annotation.Nonnull
-  private UUID entityType;
+  private EntityTypeEnum entityType;
 
   public static final String SERIALIZED_NAME_EVENT_ID = "event_id";
   @SerializedName(SERIALIZED_NAME_EVENT_ID)
@@ -179,21 +235,21 @@ public class StatusFundingEvent implements Serializable {
   }
 
 
-  public StatusFundingEvent entityType(@javax.annotation.Nonnull UUID entityType) {
+  public StatusFundingEvent entityType(@javax.annotation.Nonnull EntityTypeEnum entityType) {
     this.entityType = entityType;
     return this;
   }
 
   /**
-   * Valid values are BankRelationship, WireBank, Transfer and FundingWallet.
+   * Type of funding entity that &#x60;entity_id&#x60; identifies.
    * @return entityType
    */
   @javax.annotation.Nonnull
-  public UUID getEntityType() {
+  public EntityTypeEnum getEntityType() {
     return entityType;
   }
 
-  public void setEntityType(@javax.annotation.Nonnull UUID entityType) {
+  public void setEntityType(@javax.annotation.Nonnull EntityTypeEnum entityType) {
     this.entityType = entityType;
   }
 
@@ -418,6 +474,8 @@ public class StatusFundingEvent implements Serializable {
       if (!jsonObj.get("entity_type").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `entity_type` to be a primitive type in the JSON string but got `%s`", jsonObj.get("entity_type").toString()));
       }
+      // validate the required field `entity_type`
+      EntityTypeEnum.validateJsonElement(jsonObj.get("entity_type"));
       if (!jsonObj.get("event_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `event_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("event_id").toString()));
       }

@@ -74,7 +74,7 @@ public class Error implements Serializable {
   }
 
   /**
-   * Get code
+   * Alpaca error code, such as &#x60;40310000&#x60;. Usually the HTTP status code followed by a five-digit suffix. Several errors can share the same code, so check &#x60;message&#x60; for the specific reason.
    * @return code
    */
   @javax.annotation.Nonnull
@@ -93,7 +93,7 @@ public class Error implements Serializable {
   }
 
   /**
-   * Get message
+   * Human-readable reason for the rejection.
    * @return message
    */
   @javax.annotation.Nonnull

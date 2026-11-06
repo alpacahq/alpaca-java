@@ -27,6 +27,7 @@ class SseContractCoverageTest {
             "subscribeToFundingStatus",
             "subscribeToIpoEvents",
             "subscribeToJournalStatus",
+            "subscribeToRebalancerEvents",
             "subscribeToSystemEvents",
             "subscribeToTradeEvents"));
   }
