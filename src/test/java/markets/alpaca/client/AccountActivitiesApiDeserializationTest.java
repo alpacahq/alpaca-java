@@ -77,7 +77,8 @@ class AccountActivitiesApiDeserializationTest {
       var api = new AccountActivitiesApi(client);
 
       var response =
-          api.getAccountActivitiesByActivityType(ActivityTypeFilter.FILL, null, null, null, null, null, null, null);
+          api.getAccountActivitiesByActivityType(
+              ActivityTypeFilter.FILL, null, null, null, null, null, null, null);
 
       assertEquals(1, response.size());
       var activity = assertInstanceOf(TradingActivities.class, response.get(0).getActualInstance());
