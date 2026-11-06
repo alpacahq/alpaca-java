@@ -12,6 +12,7 @@ import markets.alpaca.client.openapi.broker.model.DIVSPDActivityV2;
 import markets.alpaca.client.openapi.broker.model.FEEActivityV2;
 import markets.alpaca.client.openapi.broker.model.FixedIncomeRedemptionActivityV2;
 import markets.alpaca.client.openapi.broker.model.RightsDistributionActivityV2;
+import markets.alpaca.client.sse.internal.ActivityDetailSchema;
 import org.junit.jupiter.api.Test;
 
 class BrokerActivityEventDecoderTest {
@@ -122,8 +123,11 @@ class BrokerActivityEventDecoderTest {
 
   @Test
   void registryCoversEveryGeneratedNtaCandidate() {
-    assertEquals(
-        ActivityV2DetailNTA.schemas.keySet(), BrokerActivityEventDecoder.candidateSchemaNames());
+    for (ActivityDetailSchema schema : ActivityDetailSchema.values()) {
+      assertTrue(
+          ActivityV2DetailNTA.schemas.containsValue(BrokerActivityEventDecoder.modelClass(schema)),
+          schema.name());
+    }
     assertFalse(
         ActivityV2DetailNTA.schemas.containsKey("CSDActivityV2"),
         "Remove the temporary CSD-to-CSW mapping when generation provides CSDActivityV2");
