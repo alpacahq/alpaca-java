@@ -108,7 +108,7 @@ public class CryptoQuote implements Serializable {
   }
 
   /**
-   * Ask size.
+   * Ask size in the base asset (left side of the pair), with no lot multiplier.
    * @return as
    */
   @javax.annotation.Nonnull
@@ -146,7 +146,7 @@ public class CryptoQuote implements Serializable {
   }
 
   /**
-   * Bid size.
+   * Bid size in the base asset (left side of the pair), with no lot multiplier.
    * @return bs
    */
   @javax.annotation.Nonnull

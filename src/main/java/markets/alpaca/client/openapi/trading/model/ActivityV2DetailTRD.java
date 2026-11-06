@@ -88,6 +88,8 @@ public class ActivityV2DetailTRD implements Serializable {
   public enum ExecutionTypeEnum {
     FILL("fill"),
     
+    PARTIAL_FILL("partial_fill"),
+    
     TRADE_CORRECT("trade_correct"),
     
     TRADE_BUST("trade_bust");

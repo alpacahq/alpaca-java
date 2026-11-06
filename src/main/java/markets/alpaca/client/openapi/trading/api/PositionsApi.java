@@ -113,7 +113,8 @@ public class PositionsApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 207 </td><td> Multi-Status with body.  an array of PositionClosed responses </td><td>  -  </td></tr>
-        <tr><td> 500 </td><td> Failed to liquidate </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> Invalid Parameters.  One or more parameters provided are invalid. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Request-level failure; no per-position results are returned. Positions that fail to close are reported in the 207 response. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call deleteAllOpenPositionsCall(@javax.annotation.Nullable Boolean cancelOrders, final ApiCallback _callback) throws ApiException {
@@ -172,7 +173,7 @@ public class PositionsApi {
 
     /**
      * Close All Positions
-     * Closes (liquidates) all of the account&#39;s open long and short positions. A response will be provided for each order that is attempted to be cancelled. If an order is no longer cancelable, the server will respond with status 500 and reject the request.
+     * Closes (liquidates) all of the account&#39;s open long and short positions. The 207 response contains one result per position: &#x60;body&#x60; is the closing Order when &#x60;status&#x60; is 200, otherwise the error describing why that position was not closed.
      * @param cancelOrders If true is specified, cancel all open orders before liquidating all positions. (optional)
      * @return List&lt;PositionClosedResponse&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -181,7 +182,8 @@ public class PositionsApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 207 </td><td> Multi-Status with body.  an array of PositionClosed responses </td><td>  -  </td></tr>
-        <tr><td> 500 </td><td> Failed to liquidate </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> Invalid Parameters.  One or more parameters provided are invalid. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Request-level failure; no per-position results are returned. Positions that fail to close are reported in the 207 response. </td><td>  -  </td></tr>
      </table>
      */
     public List<PositionClosedResponse> deleteAllOpenPositions(@javax.annotation.Nullable Boolean cancelOrders) throws ApiException {
@@ -191,7 +193,7 @@ public class PositionsApi {
 
     /**
      * Close All Positions
-     * Closes (liquidates) all of the account&#39;s open long and short positions. A response will be provided for each order that is attempted to be cancelled. If an order is no longer cancelable, the server will respond with status 500 and reject the request.
+     * Closes (liquidates) all of the account&#39;s open long and short positions. The 207 response contains one result per position: &#x60;body&#x60; is the closing Order when &#x60;status&#x60; is 200, otherwise the error describing why that position was not closed.
      * @param cancelOrders If true is specified, cancel all open orders before liquidating all positions. (optional)
      * @return ApiResponse&lt;List&lt;PositionClosedResponse&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -200,7 +202,8 @@ public class PositionsApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 207 </td><td> Multi-Status with body.  an array of PositionClosed responses </td><td>  -  </td></tr>
-        <tr><td> 500 </td><td> Failed to liquidate </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> Invalid Parameters.  One or more parameters provided are invalid. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Request-level failure; no per-position results are returned. Positions that fail to close are reported in the 207 response. </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<List<PositionClosedResponse>> deleteAllOpenPositionsWithHttpInfo(@javax.annotation.Nullable Boolean cancelOrders) throws ApiException {
@@ -211,7 +214,7 @@ public class PositionsApi {
 
     /**
      * Close All Positions (asynchronously)
-     * Closes (liquidates) all of the account&#39;s open long and short positions. A response will be provided for each order that is attempted to be cancelled. If an order is no longer cancelable, the server will respond with status 500 and reject the request.
+     * Closes (liquidates) all of the account&#39;s open long and short positions. The 207 response contains one result per position: &#x60;body&#x60; is the closing Order when &#x60;status&#x60; is 200, otherwise the error describing why that position was not closed.
      * @param cancelOrders If true is specified, cancel all open orders before liquidating all positions. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
@@ -221,7 +224,8 @@ public class PositionsApi {
        <caption>Response Details</caption>
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 207 </td><td> Multi-Status with body.  an array of PositionClosed responses </td><td>  -  </td></tr>
-        <tr><td> 500 </td><td> Failed to liquidate </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> Invalid Parameters.  One or more parameters provided are invalid. </td><td>  -  </td></tr>
+        <tr><td> 500 </td><td> Request-level failure; no per-position results are returned. Positions that fail to close are reported in the 207 response. </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call deleteAllOpenPositionsAsync(@javax.annotation.Nullable Boolean cancelOrders, final ApiCallback<List<PositionClosedResponse>> _callback) throws ApiException {

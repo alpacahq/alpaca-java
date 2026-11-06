@@ -25,26 +25,30 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * - FILL   Order fills (both partial and full fills)  - TRANS   Cash transactions (both CSD and CSW)  - MISC   Miscellaneous or rarely used activity types (All types except those in TRANS, DIV, or FILL)  - ACATC   ACATS IN/OUT (Cash)  - ACATS   ACATS IN/OUT (Securities)  - CFEE   Crypto fee  - CGD   Capital gains distribution  - CSD   Cash deposit(+)  - CSW   Cash withdrawal(-)  - DIV   Dividends  - DIVCGL   Dividend (capital gains long term)  - DIVCGS   Dividend (capital gains short term)  - DIVFEE   Dividend fee  - DIVFT   Dividend adjusted (Foreign Tax Withheld)  - DIVNRA   Dividend adjusted (NRA Withheld)  - DIVROC   Dividend return of capital  - DIVTW   Dividend adjusted (Tefra Withheld)  - DIVTXEX   Dividend (tax exempt)  - FEE   Fee denominated in USD  - INT   Interest (credit/margin)  - INTNRA   Interest adjusted (NRA Withheld)  - INTTW   Interest adjusted (Tefra Withheld)  - JNL   Journal entry  - JNLC   Journal entry (cash)  - JNLS   Journal entry (stock)  - MA   Merger/Acquisition  - NC   Name change  - OPASN   Option assignment  - OPCA   Option corporate action  - OPCSH   Option cash deliverable for non-standard contracts  - OPEXC   Option exercise  - OPEXP   Option expiration  - OPTRD   Option trade  - PTC   Pass Thru Charge  - PTR   Pass Thru Rebate  - REO   Reorganization  - REORG   Worthless removal CA  - SPIN   Stock spinoff  - SPLIT   Stock split  - FOPT   Free of Payment Transfers  - OCT   On chain transactions (blockchain deposits/withdrawals)
+ * Entry type returned on an activity. The listing returns the stored entry type. It omits ECJL, crypto-deposit JNLC, and SWP.  TRANS and MISC are filter aliases. They are not returned as activity_type. This is the known set. A new clearing code can appear without an API change.  Trade activities always have the type FILL.  - FILL   Order fills (both partial and full fills)  - ACATC   ACATS IN/OUT (Cash)  - ACATS   ACATS IN/OUT (Securities)  - ALLOC   Allocation  - CFEE   Crypto fee  - CGD   Capital gains distribution  - CIL   Cash in lieu of stock  - CORR   Correction  - CSD   Cash deposit (+), including returned withdrawals  - CSR   Cash receipt (-)  - CSW   Cash withdrawal (-), including returned deposits  - DIV   Dividends  - DIVCGL   Dividend (capital gains long term)  - DIVCGS   Dividend (capital gains short term)  - DIVFEE   Dividend fee  - DIVFT   Dividend adjusted (Foreign Tax Withheld)  - DIVNRA   Dividend adjusted (NRA Withheld)  - DIVROC   Dividend return of capital  - DIVTW   Dividend adjusted (Tefra Withheld)  - DIVTXEX   Dividend (tax exempt)  - DIVWH   Dividend withholding  - DTCS   DTC security settlement  - DVF   DVP flip  - ECEXP   Event contract expiration  - EXTRD   External trade  - FEE   Fee denominated in USD. See &#x60;activity_sub_type&#x60; for the specific fee.  - FIMAT   Fixed income maturity  - FXCNV   FX conversion  - FXTRD   FX trade  - INT   Interest (credit/margin)  - INTNRA   Interest adjusted (NRA Withheld)  - INTTW   Interest adjusted (Tefra Withheld)  - INVPNL   Inventory profit and loss  - JNL   Journal entry  - JNLC   Journal entry (cash)  - JNLS   Journal entry (stock)  - MA   Merger/Acquisition  - MEM   Memopost  - NC   Name change  - OPASN   Option assignment  - OPCA   Option corporate action  - OPCSH   Option cash deliverable for non-standard contracts  - OPEXC   Option exercise  - OPEXP   Option expiration  - OPTRD   Option trade  - PTC   Pass Thru Charge  - PTR   Pass Thru Rebate  - REO   Reorganization  - REORG   Worthless removal CA  - SC   Symbol change  - SEG   Segregation  - SPIN   Stock spinoff  - SPLIT   Stock split  - SSO   Former stock spin-off code. Current spin-offs use &#x60;SPIN&#x60;.  - SSP   Former stock split code. Current splits use &#x60;SPLIT&#x60;.  - SUB   Subscription  - VOF   Voluntary offering (tender, warrant, rights, or exchange offers)  - WH   Withholding  - FOPT   Free of Payment Transfers  - OCT   On chain transactions (blockchain deposits/withdrawals)
  */
 @JsonAdapter(ActivityType.Adapter.class)
 public enum ActivityType implements Serializable {
   
   FILL("FILL"),
   
-  TRANS("TRANS"),
-  
-  MISC("MISC"),
-  
   ACATC("ACATC"),
   
   ACATS("ACATS"),
+  
+  ALLOC("ALLOC"),
   
   CFEE("CFEE"),
   
   CGD("CGD"),
   
+  CIL("CIL"),
+  
+  CORR("CORR"),
+  
   CSD("CSD"),
+  
+  CSR("CSR"),
   
   CSW("CSW"),
   
@@ -66,13 +70,31 @@ public enum ActivityType implements Serializable {
   
   DIVTXEX("DIVTXEX"),
   
+  DIVWH("DIVWH"),
+  
+  DTCS("DTCS"),
+  
+  DVF("DVF"),
+  
+  ECEXP("ECEXP"),
+  
+  EXTRD("EXTRD"),
+  
   FEE("FEE"),
+  
+  FIMAT("FIMAT"),
+  
+  FXCNV("FXCNV"),
+  
+  FXTRD("FXTRD"),
   
   INT("INT"),
   
   INTNRA("INTNRA"),
   
   INTTW("INTTW"),
+  
+  INVPNL("INVPNL"),
   
   JNL("JNL"),
   
@@ -81,6 +103,8 @@ public enum ActivityType implements Serializable {
   JNLS("JNLS"),
   
   MA("MA"),
+  
+  MEM("MEM"),
   
   NC("NC"),
   
@@ -104,9 +128,23 @@ public enum ActivityType implements Serializable {
   
   REORG("REORG"),
   
+  SC("SC"),
+  
+  SEG("SEG"),
+  
   SPIN("SPIN"),
   
   SPLIT("SPLIT"),
+  
+  SSO("SSO"),
+  
+  SSP("SSP"),
+  
+  SUB("SUB"),
+  
+  VOF("VOF"),
+  
+  WH("WH"),
   
   FOPT("FOPT"),
   

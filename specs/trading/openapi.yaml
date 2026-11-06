@@ -1027,6 +1027,12 @@ components:
         This field is optional and may not always be populated, depending on the activity type and the available data.
         Each `activity_type` has a set of valid `activity_sub_type` values.
 
+        This field is a free-form string rather than a closed enum: sub-type codes
+        originate from several upstream clearing, corporate-action, and international-fee
+        systems, and new codes can appear without a corresponding API change. The mapping
+        below documents the sub-types known at the time of writing; it is not guaranteed
+        to be exhaustive.
+
         Full mapping of `activity_type` to `activity_sub_type`:
 
         - **CGD**: Capital Gains Distribution activity sub-types:
@@ -1049,6 +1055,8 @@ components:
           - **NRV**: Non-Retail Venue Fee
           - **COM**: Commission
           - **CAT**: Consolidated Audit Trail Fee
+          - **ICF**: Index Contract Fee
+          - **EPI**: Exchange Proprietary Fee
 
         - **INT**: Interest-related activity sub-types:
           - **MGN**: Margin Interest
@@ -1109,14 +1117,16 @@ components:
       type: string
     ActivityType:
       description: |-
+        Entry type returned on an activity. The listing returns the stored entry type.
+        It omits ECJL, crypto-deposit JNLC, and SWP.
+
+        TRANS and MISC are filter aliases. They are not returned as activity_type.
+        This is the known set. A new clearing code can appear without an API change.
+
+        Trade activities always have the type FILL.
+
         - FILL
           Order fills (both partial and full fills)
-
-        - TRANS
-          Cash transactions (both CSD and CSW)
-
-        - MISC
-          Miscellaneous or rarely used activity types (All types except those in TRANS, DIV, or FILL)
 
         - ACATC
           ACATS IN/OUT (Cash)
@@ -1124,17 +1134,29 @@ components:
         - ACATS
           ACATS IN/OUT (Securities)
 
+        - ALLOC
+          Allocation
+
         - CFEE
           Crypto fee
 
         - CGD
           Capital gains distribution
 
+        - CIL
+          Cash in lieu of stock
+
+        - CORR
+          Correction
+
         - CSD
-          Cash deposit(+)
+          Cash deposit (+), including returned withdrawals
+
+        - CSR
+          Cash receipt (-)
 
         - CSW
-          Cash withdrawal(-)
+          Cash withdrawal (-), including returned deposits
 
         - DIV
           Dividends
@@ -1163,8 +1185,32 @@ components:
         - DIVTXEX
           Dividend (tax exempt)
 
+        - DIVWH
+          Dividend withholding
+
+        - DTCS
+          DTC security settlement
+
+        - DVF
+          DVP flip
+
+        - ECEXP
+          Event contract expiration
+
+        - EXTRD
+          External trade
+
         - FEE
-          Fee denominated in USD
+          Fee denominated in USD. See `activity_sub_type` for the specific fee.
+
+        - FIMAT
+          Fixed income maturity
+
+        - FXCNV
+          FX conversion
+
+        - FXTRD
+          FX trade
 
         - INT
           Interest (credit/margin)
@@ -1174,6 +1220,9 @@ components:
 
         - INTTW
           Interest adjusted (Tefra Withheld)
+
+        - INVPNL
+          Inventory profit and loss
 
         - JNL
           Journal entry
@@ -1186,6 +1235,9 @@ components:
 
         - MA
           Merger/Acquisition
+
+        - MEM
+          Memopost
 
         - NC
           Name change
@@ -1220,11 +1272,32 @@ components:
         - REORG
           Worthless removal CA
 
+        - SC
+          Symbol change
+
+        - SEG
+          Segregation
+
         - SPIN
           Stock spinoff
 
         - SPLIT
           Stock split
+
+        - SSO
+          Former stock spin-off code. Current spin-offs use `SPIN`.
+
+        - SSP
+          Former stock split code. Current splits use `SPLIT`.
+
+        - SUB
+          Subscription
+
+        - VOF
+          Voluntary offering (tender, warrant, rights, or exchange offers)
+
+        - WH
+          Withholding
 
         - FOPT
           Free of Payment Transfers
@@ -1233,13 +1306,15 @@ components:
           On chain transactions (blockchain deposits/withdrawals)
       enum:
         - FILL
-        - TRANS
-        - MISC
         - ACATC
         - ACATS
+        - ALLOC
         - CFEE
         - CGD
+        - CIL
+        - CORR
         - CSD
+        - CSR
         - CSW
         - DIV
         - DIVCGL
@@ -1250,14 +1325,24 @@ components:
         - DIVROC
         - DIVTW
         - DIVTXEX
+        - DIVWH
+        - DTCS
+        - DVF
+        - ECEXP
+        - EXTRD
         - FEE
+        - FIMAT
+        - FXCNV
+        - FXTRD
         - INT
         - INTNRA
         - INTTW
+        - INVPNL
         - JNL
         - JNLC
         - JNLS
         - MA
+        - MEM
         - NC
         - OPASN
         - OPCA
@@ -1269,13 +1354,95 @@ components:
         - PTR
         - REO
         - REORG
+        - SC
+        - SEG
         - SPIN
         - SPLIT
+        - SSO
+        - SSP
+        - SUB
+        - VOF
+        - WH
         - FOPT
         - OCT
       examples:
         - FILL
       title: ActivityType
+      type: string
+    ActivityTypeFilter:
+      description: |-
+        Activity type used to filter results. These are the values the backend accepts.
+
+        `TRANS` and `MISC` are aliases. A response uses the expanded entry type, not the alias.
+
+        `SWP` is accepted and then omitted from public results.
+
+        - TRANS
+          Cash transactions (CSD, CSR, and CSW). Filter value only; not returned as an activity type.
+
+        - MISC
+          A fixed group of less common activity types, such as ACATC, INT, and JNLC. FEE, CFEE, DIV, SPLIT, SPIN, OPCA, VOF, WH, OCT, and a few others are not included, so filter by those types directly. Filter value only; not returned as an activity type.
+      enum:
+        - ACATC
+        - ACATS
+        - ALLOC
+        - CFEE
+        - CGD
+        - CIL
+        - CSD
+        - CSR
+        - CSW
+        - DIV
+        - DIVCGL
+        - DIVCGS
+        - DIVFEE
+        - DIVFT
+        - DIVNRA
+        - DIVROC
+        - DIVTW
+        - DIVTXEX
+        - DIVWH
+        - DVF
+        - ECEXP
+        - EXTRD
+        - FEE
+        - FIMAT
+        - FXCNV
+        - FXTRD
+        - INT
+        - INTNRA
+        - INTTW
+        - INVPNL
+        - JNL
+        - JNLC
+        - JNLS
+        - MA
+        - MEM
+        - NC
+        - OCT
+        - OPASN
+        - OPCA
+        - OPCSH
+        - OPEXC
+        - OPEXP
+        - OPTRD
+        - PTC
+        - PTR
+        - REO
+        - REORG
+        - SC
+        - SPIN
+        - SPLIT
+        - SUB
+        - SWP
+        - TRD
+        - VOF
+        - WH
+        - FOPT
+        - FILL
+        - MISC
+        - TRANS
+      title: ActivityTypeFilter
       type: string
     ActivityV2DetailNTA:
       oneOf:
@@ -1306,6 +1473,7 @@ components:
         - $ref: '#/components/schemas/OpcaFSPLITActivityV2'
         - $ref: '#/components/schemas/OpcaUSPLITActivityV2'
         - $ref: '#/components/schemas/OpcaRSPLITActivityV2'
+        - $ref: '#/components/schemas/OpcaCGDActivityV2'
         - $ref: '#/components/schemas/OPASNActivityV2'
         - $ref: '#/components/schemas/OPEXCActivityV2'
         - $ref: '#/components/schemas/OPEXPActivityV2'
@@ -1349,6 +1517,7 @@ components:
           description: The execution type
           enum:
             - fill
+            - partial_fill
             - trade_correct
             - trade_bust
           type: string
@@ -1692,6 +1861,38 @@ components:
           example: 200
           type: integer
       title: CanceledOrderResponse
+      type: object
+    ClosePositionError:
+      additionalProperties:
+        type: string
+      description: The per-position error reported inside a close-all-positions 207 response when a position's `status` is not 200. Other rejection-specific string fields may appear.
+      properties:
+        available:
+          description: Quantity available. On insufficient-quantity rejections, the position quantity available to close.
+          type: string
+        code:
+          description: Alpaca error code, such as `40310000`. Usually the HTTP status code followed by a five-digit suffix. Several rejections can share the same code, so check `message` and the other fields
+            for the specific reason.
+          type: integer
+        existing_qty:
+          description: Absolute quantity of the existing position. Present only on insufficient-quantity rejections.
+          type: string
+        held_for_options:
+          description: Position quantity held for options. Present only on insufficient-quantity rejections, and only when that hold is positive.
+          type: string
+        held_for_orders:
+          description: Position quantity held by open orders. Present only on insufficient-quantity rejections.
+          type: string
+        message:
+          description: Human-readable reason for the rejection.
+          type: string
+        symbol:
+          description: Symbol the rejection applies to. Set on insufficient-quantity rejections and on some other order rejections, such as admin trading restrictions.
+          type: string
+      required:
+        - code
+        - message
+      title: Close Position Error
       type: object
     CommonAcatActivityV2:
       properties:
@@ -2646,8 +2847,10 @@ components:
     Error:
       properties:
         code:
+          description: Alpaca error code, such as `40310000`. Usually the HTTP status code followed by a five-digit suffix. Several errors can share the same code, so check `message` for the specific reason.
           type: number
         message:
+          description: Human-readable reason for the rejection.
           type: string
       required:
         - code
@@ -3239,13 +3442,15 @@ components:
         activity_type:
           type: string
           enum:
-            - TRANS
-            - MISC
             - ACATC
             - ACATS
+            - ALLOC
             - CFEE
             - CGD
+            - CIL
+            - CORR
             - CSD
+            - CSR
             - CSW
             - DIV
             - DIVCGL
@@ -3256,14 +3461,24 @@ components:
             - DIVROC
             - DIVTW
             - DIVTXEX
+            - DIVWH
+            - DTCS
+            - DVF
+            - ECEXP
+            - EXTRD
             - FEE
+            - FIMAT
+            - FXCNV
+            - FXTRD
             - INT
             - INTNRA
             - INTTW
+            - INVPNL
             - JNL
             - JNLC
             - JNLS
             - MA
+            - MEM
             - NC
             - OPASN
             - OPCA
@@ -3275,8 +3490,15 @@ components:
             - PTR
             - REO
             - REORG
+            - SC
+            - SEG
             - SPIN
             - SPLIT
+            - SSO
+            - SSP
+            - SUB
+            - VOF
+            - WH
             - FOPT
             - OCT
         created_at:
@@ -3380,6 +3602,51 @@ components:
         - $ref: '#/components/schemas/CommonOPCAActivityV2'
         - $ref: '#/components/schemas/CommonCDIVActivityV2'
       description: Options corporate action of cash dividend or return of capital
+      type: object
+    OpcaCGDActivityV2:
+      allOf:
+        - $ref: '#/components/schemas/CommonOPCAActivityV2'
+        - properties:
+            cusip:
+              description: The CUSIP of the underlying security
+              type: string
+            ex_date:
+              description: The ex_date for the underlying capital gains distribution
+              format: date
+              minLength: 1
+              type: string
+            isin:
+              description: The ISIN of the underlying security, when applicable
+              type: string
+            long_term_rate:
+              description: Long-term capital gains distribution rate per share, when applicable
+              type: string
+            payable_date:
+              description: The payable_date for the underlying capital gains distribution
+              format: date
+              minLength: 1
+              type: string
+            rate:
+              description: Combined per-share capital-gains rate (LTCG + STCG). By default this is the strike reduction applied to the option contract; the adjusted strike is reflected in `new_contract_symbol`.
+              type: string
+            record_date:
+              description: The record_date for the underlying capital gains distribution
+              format: date
+              minLength: 1
+              type: string
+            short_term_rate:
+              description: Short-term capital gains distribution rate per share, when applicable
+              type: string
+            symbol:
+              description: The symbol of the underlying security
+              type: string
+          required:
+            - cusip
+            - symbol
+            - rate
+          type: object
+      description: Options corporate action of capital gains distributions. Used for both Long-Term (`CGD.LTCG`) and Short-Term (`CGD.STCG`) sub-types; `CGD.STCG` is emitted only when the distribution has
+        no long-term leg. `rate` is the combined (LTCG + STCG) per-share rate; `long_term_rate` and `short_term_rate` carry the individual legs when present.
       type: object
     OpcaFSPLITActivityV2:
       allOf:
@@ -4473,7 +4740,10 @@ components:
       title: Position
       type: object
     PositionClosedResponse:
-      description: 'Represents the result of asking the api to close a position. '
+      description: |-
+        Represents the result of asking the api to close a position.
+
+        When `status` is 200, `body` is the Order used to close out the position. For any other `status`, `body` is the error object describing why the close was rejected.
       examples:
         - body:
             asset_class: us_equity
@@ -4512,7 +4782,10 @@ components:
           symbol: AAPL
       properties:
         body:
-          $ref: '#/components/schemas/Order'
+          description: The Order used to close out the position when `status` is 200; otherwise the error object.
+          oneOf:
+            - $ref: '#/components/schemas/Order'
+            - $ref: '#/components/schemas/ClosePositionError'
         status:
           description: HTTP status code for the attempt to close this position
           type: integer
@@ -4739,6 +5012,13 @@ components:
       type: string
     TokenizationMintRequest:
       properties:
+        client_request_id:
+          description: |-
+            Optional label of your choosing for this mint request. It is returned on the mint response and on the tokenization request, and you can retrieve the request by it with the Get Tokenization Request by `client_request_id` endpoint. If multiple requests within the same account share the same `client_request_id`, the endpoint returns the most recent matching request. To prevent duplicate processing, use the `Idempotency-Key` header.
+
+            Must be at most 128 printable ASCII characters with no leading or trailing whitespace.
+          maxLength: 128
+          type: string
         issuer:
           $ref: '#/components/schemas/TokenizationIssuer'
         network:
@@ -4762,6 +5042,9 @@ components:
       type: object
     TokenizationMintResponse:
       properties:
+        client_request_id:
+          description: The `client_request_id` supplied on the mint request. Omitted when none was supplied.
+          type: string
         created_at:
           format: date-time
           type: string
@@ -6258,7 +6541,7 @@ paths:
           name: activity_types
           schema:
             items:
-              $ref: '#/components/schemas/ActivityType'
+              $ref: '#/components/schemas/ActivityTypeFilter'
             type: array
           style: form
         - description: The activity category. Cannot be used with "activity_types" parameter.
@@ -6338,12 +6621,12 @@ paths:
       description: Returns account activity entries for a specific type of activity.
       operationId: getAccountActivitiesByActivityType
       parameters:
-        - description: The activity type you want to view entries for. A list of valid activity types can be found at the bottom of this page.
+        - description: Activity type to filter by. Accepted values are `ActivityTypeFilter`. `TRANS` and `MISC` expand to the entry types named there.
           in: path
           name: activity_type
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ActivityTypeFilter'
         - description: Filter activities associated with a specific order. Useful for retrieving the fills that make up a completely filled order.
           in: query
           name: order_id
@@ -7705,8 +7988,8 @@ paths:
         - Orders
   /v2/positions:
     delete:
-      description: Closes (liquidates) all of the account's open long and short positions. A response will be provided for each order that is attempted to be cancelled. If an order is no longer cancelable,
-        the server will respond with status 500 and reject the request.
+      description: 'Closes (liquidates) all of the account''s open long and short positions. The 207 response contains one result per position: `body` is the closing Order when `status` is 200, otherwise
+        the error describing why that position was not closed.'
       operationId: deleteAllOpenPositions
       parameters:
         - description: If true is specified, cancel all open orders before liquidating all positions.
@@ -7718,6 +8001,90 @@ paths:
         '207':
           content:
             application/json:
+              examples:
+                All Closed:
+                  value:
+                    - body:
+                        asset_class: us_equity
+                        asset_id: b0b6dd9d-8b9b-48a9-ba46-b9d54906e415
+                        canceled_at: null
+                        client_order_id: 52f8574c-96d5-49b6-94c1-2570a268434e
+                        created_at: '2022-02-04T16:53:29.53427917Z'
+                        expired_at: null
+                        extended_hours: false
+                        failed_at: null
+                        filled_at: null
+                        filled_avg_price: null
+                        filled_qty: '0'
+                        hwm: null
+                        id: f7f25e89-939a-4587-aaf6-414a6b3c341d
+                        legs: null
+                        limit_price: null
+                        notional: null
+                        order_class: ''
+                        order_type: market
+                        qty: '2'
+                        replaced_at: null
+                        replaced_by: null
+                        replaces: null
+                        side: sell
+                        status: accepted
+                        stop_price: null
+                        submitted_at: '2022-02-04T16:53:29.533738219Z'
+                        symbol: AAPL
+                        time_in_force: day
+                        trail_percent: null
+                        trail_price: null
+                        type: market
+                        updated_at: '2022-02-04T16:53:29.53427917Z'
+                      status: 200
+                      symbol: AAPL
+                Partially Closed:
+                  value:
+                    - body:
+                        asset_class: us_equity
+                        asset_id: b0b6dd9d-8b9b-48a9-ba46-b9d54906e415
+                        canceled_at: null
+                        client_order_id: 52f8574c-96d5-49b6-94c1-2570a268434e
+                        created_at: '2022-02-04T16:53:29.53427917Z'
+                        expired_at: null
+                        extended_hours: false
+                        failed_at: null
+                        filled_at: null
+                        filled_avg_price: null
+                        filled_qty: '0'
+                        hwm: null
+                        id: f7f25e89-939a-4587-aaf6-414a6b3c341d
+                        legs: null
+                        limit_price: null
+                        notional: null
+                        order_class: ''
+                        order_type: market
+                        qty: '2'
+                        replaced_at: null
+                        replaced_by: null
+                        replaces: null
+                        side: sell
+                        status: accepted
+                        stop_price: null
+                        submitted_at: '2022-02-04T16:53:29.533738219Z'
+                        symbol: AAPL
+                        time_in_force: day
+                        trail_percent: null
+                        trail_price: null
+                        type: market
+                        updated_at: '2022-02-04T16:53:29.53427917Z'
+                      status: 200
+                      symbol: AAPL
+                    - body:
+                        available: '2'
+                        code: 40310000
+                        existing_qty: '2'
+                        held_for_orders: '0'
+                        message: 'insufficient qty available for order (requested: 10, available: 2)'
+                        symbol: NVDA
+                      status: 403
+                      symbol: NVDA
               schema:
                 items:
                   $ref: '#/components/schemas/PositionClosedResponse'
@@ -7726,8 +8093,31 @@ paths:
             Multi-Status with body.
 
             an array of PositionClosed responses
+        '422':
+          content:
+            application/json:
+              examples:
+                Invalid cancel_orders:
+                  value:
+                    code: 40010001
+                    message: cancel_orders must be true or false
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: |-
+            Invalid Parameters.
+
+            One or more parameters provided are invalid.
         '500':
-          description: Failed to liquidate
+          content:
+            application/json:
+              examples:
+                Internal Server Error:
+                  value:
+                    code: 50010000
+                    message: internal server error occurred
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Request-level failure; no per-position results are returned. Positions that fail to close are reported in the 207 response.
       summary: Close All Positions
       tags:
         - Positions
@@ -8249,16 +8639,28 @@ paths:
           name: chain
           schema:
             $ref: '#/components/schemas/CryptoChain'
-        - description: Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both 'chain' and
-            'network' are specified, 'chain' will take precedence and 'network' will be ignored. If 'chain' and 'network' are not specified, the default 'network' (ethereum) will be used.
+        - deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Use `chain` instead.
+
+            Since: 2026-11-02
+            Sunset: 2027-02-02
+
+            ---
+
+            Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both 'chain' and 'network' are specified, 'chain' will take precedence and 'network' will be ignored. If 'chain' and 'network' are not specified, the default 'network' (ethereum) will be used.
           in: query
           name: network
           schema:
-            deprecated: true
             enum:
               - ethereum
               - solana
             type: string
+          x-deprecation:
+            reason: Use `chain` instead.
+            since: '2026-11-02'
+            sunset: '2027-02-02'
   /v2/wallets/fees/estimate:
     get:
       description: Returns the estimated on-chain network (gas) fee for a proposed crypto withdrawal at current chain conditions. Pass the `asset`, `from_address`, `to_address`, and `amount` you intend

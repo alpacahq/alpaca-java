@@ -762,7 +762,7 @@ public class CryptoFundingApi {
      * Build call for listCryptoFundingWallets
      * @param asset Filter by crypto asset symbol, e.g. BTC, ETH, USDT. If specified and no wallet exists, one will be created. (optional)
      * @param chain Optional chain identifier. Use to request wallets for a specific chain when asset is a multi-chain crypto asset. If not specified, network is considered. (optional)
-     * @param network Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both &#39;chain&#39; and &#39;network&#39; are specified, &#39;chain&#39; will take precedence and &#39;network&#39; will be ignored. If &#39;chain&#39; and &#39;network&#39; are not specified, the default &#39;network&#39; (ethereum) will be used. (optional)
+     * @param network **Deprecation notice:** Use &#x60;chain&#x60; instead.  Since: 2026-11-02 Sunset: 2027-02-02  ---  Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both &#39;chain&#39; and &#39;network&#39; are specified, &#39;chain&#39; will take precedence and &#39;network&#39; will be ignored. If &#39;chain&#39; and &#39;network&#39; are not specified, the default &#39;network&#39; (ethereum) will be used. (optional)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -840,7 +840,7 @@ public class CryptoFundingApi {
      * Lists wallets for the account given in the path parameter. If an asset is specified and no wallet for the account and asset pair exists one will be created. If no asset is specified only existing wallets will be listed for the account. An account may have at most one wallet per asset.
      * @param asset Filter by crypto asset symbol, e.g. BTC, ETH, USDT. If specified and no wallet exists, one will be created. (optional)
      * @param chain Optional chain identifier. Use to request wallets for a specific chain when asset is a multi-chain crypto asset. If not specified, network is considered. (optional)
-     * @param network Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both &#39;chain&#39; and &#39;network&#39; are specified, &#39;chain&#39; will take precedence and &#39;network&#39; will be ignored. If &#39;chain&#39; and &#39;network&#39; are not specified, the default &#39;network&#39; (ethereum) will be used. (optional)
+     * @param network **Deprecation notice:** Use &#x60;chain&#x60; instead.  Since: 2026-11-02 Sunset: 2027-02-02  ---  Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both &#39;chain&#39; and &#39;network&#39; are specified, &#39;chain&#39; will take precedence and &#39;network&#39; will be ignored. If &#39;chain&#39; and &#39;network&#39; are not specified, the default &#39;network&#39; (ethereum) will be used. (optional)
      * @return CryptoWallet
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -860,7 +860,7 @@ public class CryptoFundingApi {
      * Lists wallets for the account given in the path parameter. If an asset is specified and no wallet for the account and asset pair exists one will be created. If no asset is specified only existing wallets will be listed for the account. An account may have at most one wallet per asset.
      * @param asset Filter by crypto asset symbol, e.g. BTC, ETH, USDT. If specified and no wallet exists, one will be created. (optional)
      * @param chain Optional chain identifier. Use to request wallets for a specific chain when asset is a multi-chain crypto asset. If not specified, network is considered. (optional)
-     * @param network Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both &#39;chain&#39; and &#39;network&#39; are specified, &#39;chain&#39; will take precedence and &#39;network&#39; will be ignored. If &#39;chain&#39; and &#39;network&#39; are not specified, the default &#39;network&#39; (ethereum) will be used. (optional)
+     * @param network **Deprecation notice:** Use &#x60;chain&#x60; instead.  Since: 2026-11-02 Sunset: 2027-02-02  ---  Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both &#39;chain&#39; and &#39;network&#39; are specified, &#39;chain&#39; will take precedence and &#39;network&#39; will be ignored. If &#39;chain&#39; and &#39;network&#39; are not specified, the default &#39;network&#39; (ethereum) will be used. (optional)
      * @return ApiResponse&lt;CryptoWallet&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -881,7 +881,7 @@ public class CryptoFundingApi {
      * Lists wallets for the account given in the path parameter. If an asset is specified and no wallet for the account and asset pair exists one will be created. If no asset is specified only existing wallets will be listed for the account. An account may have at most one wallet per asset.
      * @param asset Filter by crypto asset symbol, e.g. BTC, ETH, USDT. If specified and no wallet exists, one will be created. (optional)
      * @param chain Optional chain identifier. Use to request wallets for a specific chain when asset is a multi-chain crypto asset. If not specified, network is considered. (optional)
-     * @param network Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both &#39;chain&#39; and &#39;network&#39; are specified, &#39;chain&#39; will take precedence and &#39;network&#39; will be ignored. If &#39;chain&#39; and &#39;network&#39; are not specified, the default &#39;network&#39; (ethereum) will be used. (optional)
+     * @param network **Deprecation notice:** Use &#x60;chain&#x60; instead.  Since: 2026-11-02 Sunset: 2027-02-02  ---  Deprecated. Use chain instead. Optional network identifier which is used to request wallets for a specific network when asset is a multi-chain crypto asset. When both &#39;chain&#39; and &#39;network&#39; are specified, &#39;chain&#39; will take precedence and &#39;network&#39; will be ignored. If &#39;chain&#39; and &#39;network&#39; are not specified, the default &#39;network&#39; (ethereum) will be used. (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object

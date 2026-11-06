@@ -125,7 +125,7 @@ public class News implements Serializable {
   }
 
   /**
-   * Original author of news article.
+   * Original author of news article (may be empty).
    * @return author
    */
   @javax.annotation.Nonnull
@@ -144,7 +144,7 @@ public class News implements Serializable {
   }
 
   /**
-   * Content of the news article (might contain HTML).
+   * Content of the news article (might contain HTML, may be empty).
    * @return content
    */
   @javax.annotation.Nonnull
@@ -247,7 +247,7 @@ public class News implements Serializable {
   }
 
   /**
-   * Source where the news originated from (e.g. Benzinga).
+   * Source from which the news originated.
    * @return source
    */
   @javax.annotation.Nonnull
@@ -266,7 +266,7 @@ public class News implements Serializable {
   }
 
   /**
-   * Summary text for the article (may be first sentence of content).
+   * Summary text for the article (may be first sentence of content or may be empty).
    * @return summary
    */
   @javax.annotation.Nonnull
