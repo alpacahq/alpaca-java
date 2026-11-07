@@ -1,5 +1,5 @@
-// generated_by: claude-fable-5 / layered-docs 2026-09
-// source_commit: 9a1a58e4da6da89c86a46c5dbc23dd6b21e3b1f0   source_branch: docs/layered-2026-09   generated_at: 2026-10-29T08:30:00Z
+// generated_by: claude-fable-5 (initial 2026-10-29), claude-opus-5-5 (refresh 2026-11-07) / layered-docs 2026-09
+// source_commit: 8ac57386389f643f8b81b2db9b375b44c72c8e79   source_branch: docs/layered-2026-09   generated_at: 2026-11-07T11:16:25Z
 // confidence: medium   review_status: draft-needs-review
 model {
 
@@ -8,7 +8,7 @@ model {
     description '
       Java 17+ client library for the Alpaca Trading, Market Data and Broker APIs, published to Maven Central as markets.alpaca:alpaca-java. REST clients are generated at build time from OpenAPI documents pinned under specs/; WebSocket stream clients and the Trading, Broker and Market Data corporate-actions SSE clients are handwritten. Evidence: README.md, GENERATION.md, settings.gradle, gradle.properties
     '
-    technology 'Java 17 / Gradle 9 / OkHttp 5 / Gson / OpenAPI Generator 7.25 (okhttp-gson)'
+    technology 'Java 17 / Gradle 9 / OkHttp 5 / Gson / OpenAPI Generator 7.26 (okhttp-gson)'
     link https://github.com/alpacahq/alpaca-java 'Repository'
     metadata {
       okf 'docs/okf/system.md'
@@ -62,14 +62,14 @@ model {
     sse_clients = container 'Server-Sent Events clients' {
       #generated #entrypoint
       description '
-        Handwritten SSE layer: a shared bounded, reconnecting transport with lifecycle, callback and subscription types (markets.alpaca.client.sse, internal transport under sse.internal), and API-specific wrappers for Trading account activities, Market Data corporate actions and Broker events. Evidence: src/main/java/markets/alpaca/client/sse/package-info.java, src/main/java/markets/alpaca/client/trading/sse/TradingEventsSseClient.java, src/main/java/markets/alpaca/client/data/sse/CorporateActionsSseClient.java, src/main/java/markets/alpaca/client/broker/sse/BrokerEventsSseClient.java
+        Handwritten SSE layer: a shared bounded, reconnecting transport with lifecycle, callback and subscription types (markets.alpaca.client.sse, internal transport under sse.internal), and API-specific wrappers for Trading account activities, Market Data corporate actions and Broker events (including the Broker rebalancer stream, subscribeToRebalancerEvents with BrokerSseRebalancerOptions). Evidence: src/main/java/markets/alpaca/client/sse/package-info.java, src/main/java/markets/alpaca/client/trading/sse/TradingEventsSseClient.java, src/main/java/markets/alpaca/client/data/sse/CorporateActionsSseClient.java, src/main/java/markets/alpaca/client/broker/sse/BrokerEventsSseClient.java
       '
       technology 'Java / OkHttp SSE'
       link https://github.com/alpacahq/alpaca-java/tree/main/src/main/java/markets/alpaca/client/sse 'Repository'
       metadata {
         okf 'docs/okf/system.md'
         allium 'none: no accepted spec'
-        evidence 'src/main/java/markets/alpaca/client/sse/, src/main/java/markets/alpaca/client/sse/internal/SseTransport.java, src/main/java/markets/alpaca/client/trading/sse/, src/main/java/markets/alpaca/client/data/sse/MarketDataSseEnvironment.java, src/main/java/markets/alpaca/client/broker/sse/, docs/content/sdk/sse-migration.md, CONTRIBUTING.md'
+        evidence 'src/main/java/markets/alpaca/client/sse/, src/main/java/markets/alpaca/client/sse/internal/SseTransport.java, src/main/java/markets/alpaca/client/trading/sse/, src/main/java/markets/alpaca/client/data/sse/MarketDataSseEnvironment.java, src/main/java/markets/alpaca/client/broker/sse/, src/main/java/markets/alpaca/client/broker/sse/BrokerSseRebalancerOptions.java, src/main/java/markets/alpaca/client/broker/sse/BrokerEventsSseClient.java, src/main/java/markets/alpaca/client/broker/sse/BrokerRebalancerEventDecoder.java, CHANGELOG.md, docs/content/sdk/sse-migration.md, CONTRIBUTING.md'
       }
     }
 
@@ -185,7 +185,7 @@ model {
   alpaca_java.ws_streams -[consumes]-> ext_alpaca_trading_api 'WebSocket trade-update stream'
   alpaca_java.sse_clients -[consumes]-> ext_alpaca_trading_api 'account-activity SSE'
   alpaca_java.sse_clients -[consumes]-> ext_alpaca_market_data_api 'corporate-actions SSE'
-  alpaca_java.sse_clients -[consumes]-> ext_alpaca_broker_api 'broker events SSE'
+  alpaca_java.sse_clients -[consumes]-> ext_alpaca_broker_api 'broker events SSE (including rebalancer events)'
   alpaca_java.codegen -[reads]-> ext_alpaca_openapi_specs 'downloads upstream specs for semantic diff and pin adoption'
   alpaca_java -[publishes]-> ext_maven_central 'snapshots on main pushes, releases from dispatched tagged runs'
   alpaca_java -[uses]-> ext_github 'CI, release, drift adoption and Pages deployment'

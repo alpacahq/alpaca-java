@@ -5,12 +5,12 @@ description: Java 17+ client library for the Alpaca Trading, Market Data and Bro
 resource: likec4://alpacahq/alpaca_java
 tags: [alpacahq, sdk, java, generated]
 status: active
-owners: ["@alpacahq/api-dx"]
-timestamp: 2026-10-29T08:30:00Z
-generated_by: claude-fable-5 / layered-docs 2026-09
-source_commit: 9a1a58e4da6da89c86a46c5dbc23dd6b21e3b1f0
+owners: ["@alpacahq/sdk-java"]
+timestamp: 2026-11-07T11:16:25Z
+generated_by: claude-fable-5 (initial 2026-10-29), claude-opus-5-5 (refresh 2026-11-07) / layered-docs 2026-09
+source_commit: 8ac57386389f643f8b81b2db9b375b44c72c8e79
 source_branch: docs/layered-2026-09
-generated_at: 2026-10-29T08:30:00Z
+generated_at: 2026-11-07T11:16:25Z
 confidence: medium
 review_status: draft-needs-review
 links:
@@ -21,16 +21,16 @@ links:
 # Alpaca Java SDK
 
 ## Purpose
-`alpaca-java` is the Java client for the Alpaca Markets APIs, for Java application developers who trade, read market data or run a broker integration on Alpaca (README.md, docs/content/getting-started.md, LLMS.md). It ships as one Maven artifact, `markets.alpaca:alpaca-java`, requires Java 17+, is licensed Apache-2.0 and is owned by the `@alpacahq/api-dx` team (README.md, settings.gradle, LICENSE, .github/CODEOWNERS).
+`alpaca-java` is the Java client for the Alpaca Markets APIs, for Java application developers who trade, read market data or run a broker integration on Alpaca (README.md, docs/content/getting-started.md, LLMS.md). It ships as one Maven artifact, `markets.alpaca:alpaca-java`, requires Java 17+, is licensed Apache-2.0 and is owned by the `@alpacahq/sdk-java` team (README.md, settings.gradle, LICENSE, .github/CODEOWNERS).
 
-REST clients are generated at build time from OpenAPI documents pinned under `specs/` and committed to the source tree. WebSocket stream clients and the Trading, Broker and Market Data corporate-actions SSE clients are handwritten (README.md, GENERATION.md, CONTRIBUTING.md). Status `active` is evidenced by the 50-commit history ending 2026-09 and the `0.2.0-SNAPSHOT` development version (git log, gradle.properties).
+REST clients are generated at build time from OpenAPI documents pinned under `specs/` and committed to the source tree. WebSocket stream clients and the Trading, Broker and Market Data corporate-actions SSE clients are handwritten (README.md, GENERATION.md, CONTRIBUTING.md). Status `active` is evidenced by the latest commit date (2026-11-06) and the `0.2.0-SNAPSHOT` development version (git log, gradle.properties).
 
 ## Capabilities
 - Generated REST clients for the Broker, Market Data and Trading APIs (api, model and http packages) — evidence: `src/main/java/markets/alpaca/client/openapi/`, `GENERATION.md`
 - Handwritten `AlpacaClient` facade (orders, stocks, SSE clients) with builder, `AlpacaClientFactory`, `AlpacaCredentials`, paper/production and sandbox/production environment enums — evidence: `src/main/java/markets/alpaca/client/AlpacaClient.java`, `src/main/java/markets/alpaca/client/AlpacaClientFactory.java`, `src/main/java/markets/alpaca/client/TradingApiEnvironment.java`, `src/main/java/markets/alpaca/client/BrokerApiEnvironment.java`
 - Shared OkHttp configuration with User-Agent and retry interceptors; REST pagination, futures and rate-limit helpers — evidence: `src/main/java/markets/alpaca/client/http/`, `src/main/java/markets/alpaca/client/rest/`
 - WebSocket streams for stock, crypto and news market data and trade updates — evidence: `src/main/java/markets/alpaca/client/ws/`
-- Server-Sent Events: shared bounded, reconnecting transport plus Trading account-activity, Market Data corporate-actions and Broker events wrappers — evidence: `src/main/java/markets/alpaca/client/sse/`, `src/main/java/markets/alpaca/client/trading/sse/`, `src/main/java/markets/alpaca/client/data/sse/`, `src/main/java/markets/alpaca/client/broker/sse/`
+- Server-Sent Events: shared bounded, reconnecting transport plus Trading account-activity, Market Data corporate-actions and Broker events wrappers (Broker includes the rebalancer events stream `GET /v2/events/rebalancer`) — evidence: `src/main/java/markets/alpaca/client/sse/`, `src/main/java/markets/alpaca/client/trading/sse/`, `src/main/java/markets/alpaca/client/data/sse/`, `src/main/java/markets/alpaca/client/broker/sse/`, `src/main/java/markets/alpaca/client/broker/sse/BrokerEventsSseClient.java`, `src/main/java/markets/alpaca/client/broker/sse/BrokerRebalancerEventDecoder.java`, `CHANGELOG.md` (Unreleased, rebalancer entry)
 - OpenAPI pin adoption, semantic diff and Java-surface compatibility tooling — evidence: `build-logic/src/main/groovy/alpaca.openapi-generation.gradle`, `scripts/adopt_openapi.py`, `scripts/sdk_api_diff.py`
 - Docusaurus documentation site with synced Javadocs and runnable examples — evidence: `docs/README.md`, `examples/README.md`
 
@@ -40,12 +40,12 @@ REST clients are generated at build time from OpenAPI documents pinned under `sp
 **Outbound:**
 - Trading API REST at `https://api.alpaca.markets` / `https://paper-api.alpaca.markets`; trade-update WebSocket at `/stream` on the same hosts; account-activity SSE (src/main/java/markets/alpaca/client/TradingApiEnvironment.java, src/main/java/markets/alpaca/client/ws/TradingEnvironment.java, src/main/java/markets/alpaca/client/trading/sse/TradingEventsSseClient.java).
 - Market Data API REST at `https://data.alpaca.markets` / `https://data.sandbox.alpaca.markets`; WebSocket and corporate-actions SSE on `stream.data.alpaca.markets` / `stream.data.sandbox.alpaca.markets` (src/main/java/markets/alpaca/client/openapi/data/http/ApiClient.java, src/main/java/markets/alpaca/client/ws/AlpacaStreamEnvironment.java, src/main/java/markets/alpaca/client/data/sse/MarketDataSseEnvironment.java).
-- Broker API REST and SSE at `https://broker-api.alpaca.markets` / `https://broker-api.sandbox.alpaca.markets` (src/main/java/markets/alpaca/client/BrokerApiEnvironment.java).
+- Broker API REST and SSE at `https://broker-api.alpaca.markets` / `https://broker-api.sandbox.alpaca.markets`, including the Broker rebalancer events SSE stream (`GET /v2/events/rebalancer`) (src/main/java/markets/alpaca/client/BrokerApiEnvironment.java, src/main/java/markets/alpaca/client/broker/sse/BrokerEventsSseClient.java, specs/broker/openapi.yaml, CHANGELOG.md, docs/content/sdk/broker.md).
 - Build-time only: public OpenAPI documents at docs.alpaca.markets for adopt/drift flows (scripts/upstream_openapi_urls.json, GENERATION.md).
 
 ## Dependencies
 - OkHttp 5.5.1 (okhttp, okhttp-sse, logging-interceptor), Gson 2.15.0, gson-fire, commons-lang3, swagger-annotations — runtime HTTP, WebSocket, SSE and JSON — evidence `gradle/libs.versions.toml`
-- OpenAPI Generator 7.25.0 (okhttp-gson library) and SnakeYAML 2.7 — build-time generation and spec preprocessing — evidence `gradle/libs.versions.toml`, `GENERATION.md`
+- OpenAPI Generator 7.26.0 (okhttp-gson library) and SnakeYAML 2.7 — build-time generation and spec preprocessing — evidence `gradle/libs.versions.toml`, `GENERATION.md`
 - JUnit 6.1.3, MockWebServer, JaCoCo, SpotBugs, Spotless, Checkstyle, japicmp — tests, quality and public-API compatibility checks — evidence `gradle/libs.versions.toml`, `build-logic/src/main/groovy/alpaca.quality.gradle`, `config/checkstyle/checkstyle.xml`
 - Python 3 helpers for adopt, diff, migration and release tooling — evidence `scripts/requirements.txt`, `scripts/`
 - Node 22 / Docusaurus for the documentation site — evidence `docs/package.json`, `.github/workflows/deploy-docs.yml`
@@ -83,5 +83,6 @@ none — no accepted spec (no `.allium` files in the repository; mode fresh).
 
 ## Open questions
 - > Unverified: the container split in the LikeC4 model groups Java packages and sibling builds of a single published artifact along the handwritten-package boundaries in CONTRIBUTING.md; it is a readability choice, not a deployment boundary.
-- > Unverified: the clone history is 50 commits (from 2026-07 release 0.1.1 onward per CHANGELOG.md); design rationale before that is not available in the repository.
+- > Unverified (confidence: low): the local clone is shallow — 73 commits starting 2026-10-07; the full commit history was not available, so design rationale recorded only in older commits or pull requests may be missing (CHANGELOG.md records releases from 0.1.1, 2026-07-16).
+- > Unverified: provenance `generated_at` is the refresh time taken from the system clock (UTC); the initial generation time on 2026-10-29 is recorded date-only in log.md.
 - > Unverified: the ADR candidate `src/main/java/markets/alpaca/client/openapi/broker/model/OwnerDocumentUploadRequest.java` is a generated model and records no decision.

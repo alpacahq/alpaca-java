@@ -10,11 +10,11 @@ affects: [alpaca_java.client_facade, alpaca_java.ws_streams, alpaca_java.sse_cli
 allium: []
 evidence: [README.md, AGENTS.md, CONTRIBUTING.md, LLMS.md, src/main/java/markets/alpaca/client/AlpacaClientFactory.java, src/main/java/markets/alpaca/client/ws/, src/main/java/markets/alpaca/client/sse/package-info.java]
 tags: [alpacahq, adr, generated]
-timestamp: 2026-10-29T08:30:00Z
-generated_by: claude-fable-5 / layered-docs 2026-09
-source_commit: 9a1a58e4da6da89c86a46c5dbc23dd6b21e3b1f0
+timestamp: 2026-11-07T11:16:25Z
+generated_by: claude-fable-5 (initial 2026-10-29), claude-opus-5-5 (refresh 2026-11-07) / layered-docs 2026-09
+source_commit: 8ac57386389f643f8b81b2db9b375b44c72c8e79
 source_branch: docs/layered-2026-09
-generated_at: 2026-10-29T08:30:00Z
+generated_at: 2026-11-07T11:16:25Z
 confidence: medium
 review_status: draft-needs-review
 ---
