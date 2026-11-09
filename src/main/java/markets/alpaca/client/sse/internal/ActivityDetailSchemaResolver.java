@@ -1,95 +1,242 @@
 package markets.alpaca.client.sse.internal;
 
 import java.util.Locale;
+import markets.alpaca.client.openapi.trading.model.ActivityType;
 
-/** Maps Activity V2 type/subtype pairs to generated concrete detail schema names. */
+/**
+ * Maps Activity V2 type/subtype pairs to a {@link ActivityDetailSchema}.
+ *
+ * <p>Trading and Broker each have a {@code resolve} overload that switches on its own generated
+ * {@code ActivityType}. A constant or rule that exists on only one API is changed in that overload.
+ * Subtypes stay strings: the contract describes them as free-form and does not generate an enum.
+ * {@code TRD} is an {@code ActivityTypeFilter} value used by the live activity stream; the decoders
+ * handle it before calling this class. Decoders bind the returned schema to their own generated
+ * model class.
+ */
 public final class ActivityDetailSchemaResolver {
 
   private ActivityDetailSchemaResolver() {}
 
-  public static String resolve(String type, String subtype) {
+  /** Trading activity types. A Trading-only constant or rule is changed in this method. */
+  public static ActivityDetailSchema resolve(ActivityType type, String subtype) {
     if (type == null) return null;
-    String detail = value(subtype);
-    return switch (type.toUpperCase(Locale.ROOT)) {
-      case "ACATC" -> "AcatcActivityV2";
-      case "ACATS" -> "AcatsActivityV2";
-      // The pinned OAS documents CFEE (crypto fee) but does not yet define a dedicated detail
-      // schema. Its payload carries only the fields FEEActivityV2 already models, and every other
-      // system_date-only candidate ties with it structurally; resolve explicitly until the
-      // contract supplies a CFEE-specific schema.
-      case "CFEE" -> "FEEActivityV2";
-      case "CGD" -> oneOf(detail, "", "LTCG", "STCG") ? "CGDActivityV2" : null;
-      // The pinned OAS documents CSD but does not yet define a CSD detail schema. Preserve the
-      // event with the structurally compatible CSW model until the contract supplies one.
-      case "CSD", "CSW" -> "CSWActivityV2";
-      case "DIV" ->
+    String detail = normalizeSubtype(subtype);
+    return switch (type) {
+      case ACATC -> ActivityDetailSchema.ACATC;
+      case ACATS -> ActivityDetailSchema.ACATS;
+      // CFEE has no dedicated detail schema; FEE avoids ambiguous system_date-only matches.
+      case CFEE -> ActivityDetailSchema.FEE;
+      case CGD -> oneOf(detail, "", "LTCG", "STCG") ? ActivityDetailSchema.CGD : null;
+      // CSD has no dedicated detail schema; preserve it with the compatible CSW model.
+      case CSD, CSW -> ActivityDetailSchema.CSW;
+      case DIV ->
           switch (detail) {
-            case "CDIV", "ROC" -> "CDIVActivityV2";
-            case "SDIV" -> "SDIVActivityV2";
-            case "SPD" -> "DIVSPDActivityV2";
+            case "CDIV", "ROC" -> ActivityDetailSchema.CDIV;
+            case "SDIV" -> ActivityDetailSchema.SDIV;
+            case "SPD" -> ActivityDetailSchema.DIVSPD;
             default -> null;
           };
-      case "DIVROC" -> "CDIVActivityV2";
-      // The pinned OAS accepts DIVTXEX but has no dedicated detail schema. Tax-exempt dividends
-      // use the cash-dividend detail shape; explicit dispatch avoids its structural tie with SPD.
-      case "DIVTXEX" -> "CDIVActivityV2";
-      case "DIVNRA" -> "DIVNRAActivityV2";
-      case "FEE" ->
+      case DIVROC -> ActivityDetailSchema.CDIV;
+      // Tax-exempt dividends use the cash-dividend shape, which structurally ties with SPD.
+      case DIVTXEX -> ActivityDetailSchema.CDIV;
+      case DIVNRA -> ActivityDetailSchema.DIVNRA;
+      case FEE ->
           oneOf(detail, "REG", "TAF", "LCT", "ORF", "OCC", "NRC", "NRV", "COM", "CAT")
-              ? "FEEActivityV2"
+              ? ActivityDetailSchema.FEE
               : null;
-      case "FOPT" -> "FOPTActivityV2";
-      case "FXTRD" -> "FXTRDActivityV2";
-      case "INT" -> "FI".equals(detail) ? "FixedIncomeInterestActivityV2" : null;
-      case "JNLC" -> "JNLCActivityV2";
-      case "JNLS" -> "JNLSActivityV2";
-      case "MA" -> oneOf(detail, "CMA", "SMA", "SCMA") ? "MAActivityV2" : null;
-      case "MEM" -> "MEMActivityV2";
-      case "NC" -> oneOf(detail, "SNC", "CNC", "SCNC") ? "NCActivityV2" : null;
-      case "OCT" -> "OCTActivityV2";
-      case "OPASN" -> "OPASNActivityV2";
-      case "OPCSH" -> "OPCSHActivityV2";
-      case "OPEXC" -> "OPEXCActivityV2";
-      case "OPEXP" -> "OPEXPActivityV2";
-      case "OPTRD" -> "OPTRDActivityV2";
-      case "REO" -> oneOf(detail, "REOS", "REOC", "REOSC") ? "REOActivityV2" : null;
-      case "REORG" -> "WRM".equals(detail) ? "WRMActivityV2" : null;
-      case "SPIN" -> "SpinoffActivityV2";
-      case "SPLIT" ->
+      case FOPT -> ActivityDetailSchema.FOPT;
+      case FXTRD -> ActivityDetailSchema.FXTRD;
+      case INT -> "FI".equals(detail) ? ActivityDetailSchema.FIXED_INCOME_INTEREST : null;
+      case JNLC -> ActivityDetailSchema.JNLC;
+      case JNLS -> ActivityDetailSchema.JNLS;
+      case MA -> oneOf(detail, "CMA", "SMA", "SCMA") ? ActivityDetailSchema.MA : null;
+      case MEM -> ActivityDetailSchema.MEM;
+      case NC -> oneOf(detail, "SNC", "CNC", "SCNC") ? ActivityDetailSchema.NC : null;
+      case OCT -> ActivityDetailSchema.OCT;
+      case OPASN -> ActivityDetailSchema.OPASN;
+      case OPCSH -> ActivityDetailSchema.OPCSH;
+      case OPEXC -> ActivityDetailSchema.OPEXC;
+      case OPEXP -> ActivityDetailSchema.OPEXP;
+      case OPTRD -> ActivityDetailSchema.OPTRD;
+      case REO -> oneOf(detail, "REOS", "REOC", "REOSC") ? ActivityDetailSchema.REO : null;
+      case REORG -> "WRM".equals(detail) ? ActivityDetailSchema.WRM : null;
+      case SPIN -> ActivityDetailSchema.SPINOFF;
+      case SPLIT ->
           switch (detail) {
-            case "FSPLIT" -> "ForwardSplitActivityV2";
-            case "RSPLIT" -> "ReverseSplitActivityV2";
-            case "USPLIT" -> "UnitSplitActivityV2";
+            case "FSPLIT" -> ActivityDetailSchema.FORWARD_SPLIT;
+            case "RSPLIT" -> ActivityDetailSchema.REVERSE_SPLIT;
+            case "USPLIT" -> ActivityDetailSchema.UNIT_SPLIT;
             default -> null;
           };
-      case "VOF" ->
+      case VOF ->
           switch (detail) {
-            case "VTND" -> "TenderOfferActivityV2";
-            case "VWRT" -> "WarrantExerciseElectionActivityV2";
-            case "VRGT" -> "RightsSubscriptionElectionActivityV2";
-            case "VEXH" -> "ExchangeOfferActivityV2";
+            case "VTND" -> ActivityDetailSchema.TENDER_OFFER;
+            case "VWRT" -> ActivityDetailSchema.WARRANT_EXERCISE;
+            case "VRGT" -> ActivityDetailSchema.RIGHTS_SUBSCRIPTION;
+            case "VEXH" -> ActivityDetailSchema.EXCHANGE_OFFER;
             default -> null;
           };
-      case "WH" -> oneOf(detail, "SWH", "FWH", "SLWH") ? "DIVWHActivityV2" : null;
-      case "OPCA" ->
+      case WH -> oneOf(detail, "SWH", "FWH", "SLWH") ? ActivityDetailSchema.DIVWH : null;
+      case OPCA ->
           switch (detail) {
-            case "DIV.CDIV", "DIV.ROC" -> "OpcaCDIVActivityV2";
-            case "DIV.SDIV" -> "OpcaSDIVActivityV2";
-            case "MA.CMA", "MA.SMA", "MA.SCMA" -> "OpcaMAActivityV2";
-            case "NC.CNC", "NC.SNC", "NC.SCNC" -> "OpcaNCActivityV2";
-            case "SPIN" -> "OpcaSPINActivityV2";
-            case "CGD.LTCG", "CGD.STCG" -> "OpcaCGDActivityV2";
-            case "SPLIT.FSPLIT" -> "OpcaFSPLITActivityV2";
-            case "SPLIT.RSPLIT" -> "OpcaRSPLITActivityV2";
-            case "SPLIT.USPLIT" -> "OpcaUSPLITActivityV2";
+            case "DIV.CDIV", "DIV.ROC" -> ActivityDetailSchema.OPCA_CDIV;
+            case "DIV.SDIV" -> ActivityDetailSchema.OPCA_SDIV;
+            case "MA.CMA", "MA.SMA", "MA.SCMA" -> ActivityDetailSchema.OPCA_MA;
+            case "NC.CNC", "NC.SNC", "NC.SCNC" -> ActivityDetailSchema.OPCA_NC;
+            case "SPIN" -> ActivityDetailSchema.OPCA_SPINOFF;
+            case "CGD.LTCG", "CGD.STCG" -> ActivityDetailSchema.OPCA_CGD;
+            case "SPLIT.FSPLIT" -> ActivityDetailSchema.OPCA_FORWARD_SPLIT;
+            case "SPLIT.RSPLIT" -> ActivityDetailSchema.OPCA_REVERSE_SPLIT;
+            case "SPLIT.USPLIT" -> ActivityDetailSchema.OPCA_UNIT_SPLIT;
             default -> null;
           };
-      default -> null;
+      // No dedicated detail schema: decoders use structural fallback. Add new constants to the
+      // mapped cases above or to this list so the compiler flags unhandled generated types.
+      case FILL,
+          ALLOC,
+          CIL,
+          CORR,
+          CSR,
+          DIVCGL,
+          DIVCGS,
+          DIVFEE,
+          DIVFT,
+          DIVTW,
+          DIVWH,
+          DTCS,
+          DVF,
+          ECEXP,
+          EXTRD,
+          FIMAT,
+          FXCNV,
+          INTNRA,
+          INTTW,
+          INVPNL,
+          JNL,
+          PTC,
+          PTR,
+          SC,
+          SEG,
+          SSO,
+          SSP,
+          SUB ->
+          null;
     };
   }
 
-  private static String value(String value) {
-    return value == null ? "" : value.toUpperCase(Locale.ROOT);
+  /** Broker activity types. A Broker-only constant or rule is changed in this method. */
+  public static ActivityDetailSchema resolve(
+      markets.alpaca.client.openapi.broker.model.ActivityType type, String subtype) {
+    if (type == null) return null;
+    String detail = normalizeSubtype(subtype);
+    return switch (type) {
+      case ACATC -> ActivityDetailSchema.ACATC;
+      case ACATS -> ActivityDetailSchema.ACATS;
+      // CFEE has no dedicated detail schema; FEE avoids ambiguous system_date-only matches.
+      case CFEE -> ActivityDetailSchema.FEE;
+      case CGD -> oneOf(detail, "", "LTCG", "STCG") ? ActivityDetailSchema.CGD : null;
+      // CSD has no dedicated detail schema; preserve it with the compatible CSW model.
+      case CSD, CSW -> ActivityDetailSchema.CSW;
+      case DIV ->
+          switch (detail) {
+            case "CDIV", "ROC" -> ActivityDetailSchema.CDIV;
+            case "SDIV" -> ActivityDetailSchema.SDIV;
+            case "SPD" -> ActivityDetailSchema.DIVSPD;
+            default -> null;
+          };
+      case DIVROC -> ActivityDetailSchema.CDIV;
+      // Tax-exempt dividends use the cash-dividend shape, which structurally ties with SPD.
+      case DIVTXEX -> ActivityDetailSchema.CDIV;
+      case DIVNRA -> ActivityDetailSchema.DIVNRA;
+      case FEE ->
+          oneOf(detail, "REG", "TAF", "LCT", "ORF", "OCC", "NRC", "NRV", "COM", "CAT")
+              ? ActivityDetailSchema.FEE
+              : null;
+      case FOPT -> ActivityDetailSchema.FOPT;
+      case FXTRD -> ActivityDetailSchema.FXTRD;
+      case INT -> "FI".equals(detail) ? ActivityDetailSchema.FIXED_INCOME_INTEREST : null;
+      case JNLC -> ActivityDetailSchema.JNLC;
+      case JNLS -> ActivityDetailSchema.JNLS;
+      case MA -> oneOf(detail, "CMA", "SMA", "SCMA") ? ActivityDetailSchema.MA : null;
+      case MEM -> ActivityDetailSchema.MEM;
+      case NC -> oneOf(detail, "SNC", "CNC", "SCNC") ? ActivityDetailSchema.NC : null;
+      case OCT -> ActivityDetailSchema.OCT;
+      case OPASN -> ActivityDetailSchema.OPASN;
+      case OPCSH -> ActivityDetailSchema.OPCSH;
+      case OPEXC -> ActivityDetailSchema.OPEXC;
+      case OPEXP -> ActivityDetailSchema.OPEXP;
+      case OPTRD -> ActivityDetailSchema.OPTRD;
+      case REO -> oneOf(detail, "REOS", "REOC", "REOSC") ? ActivityDetailSchema.REO : null;
+      case REORG -> "WRM".equals(detail) ? ActivityDetailSchema.WRM : null;
+      case SPIN -> ActivityDetailSchema.SPINOFF;
+      case SPLIT ->
+          switch (detail) {
+            case "FSPLIT" -> ActivityDetailSchema.FORWARD_SPLIT;
+            case "RSPLIT" -> ActivityDetailSchema.REVERSE_SPLIT;
+            case "USPLIT" -> ActivityDetailSchema.UNIT_SPLIT;
+            default -> null;
+          };
+      case VOF ->
+          switch (detail) {
+            case "VTND" -> ActivityDetailSchema.TENDER_OFFER;
+            case "VWRT" -> ActivityDetailSchema.WARRANT_EXERCISE;
+            case "VRGT" -> ActivityDetailSchema.RIGHTS_SUBSCRIPTION;
+            case "VEXH" -> ActivityDetailSchema.EXCHANGE_OFFER;
+            default -> null;
+          };
+      case WH -> oneOf(detail, "SWH", "FWH", "SLWH") ? ActivityDetailSchema.DIVWH : null;
+      case OPCA ->
+          switch (detail) {
+            case "DIV.CDIV", "DIV.ROC" -> ActivityDetailSchema.OPCA_CDIV;
+            case "DIV.SDIV" -> ActivityDetailSchema.OPCA_SDIV;
+            case "MA.CMA", "MA.SMA", "MA.SCMA" -> ActivityDetailSchema.OPCA_MA;
+            case "NC.CNC", "NC.SNC", "NC.SCNC" -> ActivityDetailSchema.OPCA_NC;
+            case "SPIN" -> ActivityDetailSchema.OPCA_SPINOFF;
+            case "CGD.LTCG", "CGD.STCG" -> ActivityDetailSchema.OPCA_CGD;
+            case "SPLIT.FSPLIT" -> ActivityDetailSchema.OPCA_FORWARD_SPLIT;
+            case "SPLIT.RSPLIT" -> ActivityDetailSchema.OPCA_REVERSE_SPLIT;
+            case "SPLIT.USPLIT" -> ActivityDetailSchema.OPCA_UNIT_SPLIT;
+            default -> null;
+          };
+      // No dedicated detail schema: decoders use structural fallback. Add new constants to the
+      // mapped cases above or to this list so the compiler flags unhandled generated types.
+      case FILL,
+          ALLOC,
+          CIL,
+          CORR,
+          CSR,
+          DIVCGL,
+          DIVCGS,
+          DIVFEE,
+          DIVFT,
+          DIVTW,
+          DIVWH,
+          DTCS,
+          DVF,
+          ECEXP,
+          EXTRD,
+          FIMAT,
+          FXCNV,
+          INTNRA,
+          INTTW,
+          INVPNL,
+          JNL,
+          PTC,
+          PTR,
+          SC,
+          SEG,
+          SSO,
+          SSP,
+          SUB ->
+          null;
+    };
+  }
+
+  /**
+   * Returns the subtype in upper case, or an empty string when absent, so it is safe to switch on.
+   */
+  private static String normalizeSubtype(String subtype) {
+    return subtype == null ? "" : subtype.toUpperCase(Locale.ROOT);
   }
 
   private static boolean oneOf(String value, String... expected) {

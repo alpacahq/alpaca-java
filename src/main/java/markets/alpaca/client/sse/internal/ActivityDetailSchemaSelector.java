@@ -15,18 +15,16 @@ public final class ActivityDetailSchemaSelector {
 
   private ActivityDetailSchemaSelector() {}
 
-  public static String uniqueMostSpecific(
-      JsonObject details, List<String> matches, Map<String, Class<?>> schemas) {
-    String selected = null;
+  public static Class<?> uniqueMostSpecific(JsonObject details, List<Class<?>> matches) {
+    Class<?> selected = null;
     int selectedScore = -1;
     boolean tied = false;
-    for (String schema : matches) {
-      Class<?> modelClass = schemas.get(schema);
+    for (Class<?> modelClass : matches) {
       if (modelClass == null) continue;
       Set<String> fields = FIELDS.computeIfAbsent(modelClass, ActivityDetailSchemaSelector::fields);
       int score = (int) details.keySet().stream().filter(fields::contains).count();
       if (score > selectedScore) {
-        selected = schema;
+        selected = modelClass;
         selectedScore = score;
         tied = false;
       } else if (score == selectedScore) {
