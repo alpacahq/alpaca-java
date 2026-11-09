@@ -90,7 +90,37 @@ public final class ActivityDetailSchemaResolver {
             case "SPLIT.USPLIT" -> ActivityDetailSchema.OPCA_UNIT_SPLIT;
             default -> null;
           };
-      default -> null;
+      // No dedicated detail schema: decoders use structural fallback. Add new constants to the
+      // mapped cases above or to this list so the compiler flags unhandled generated types.
+      case FILL,
+          ALLOC,
+          CIL,
+          CORR,
+          CSR,
+          DIVCGL,
+          DIVCGS,
+          DIVFEE,
+          DIVFT,
+          DIVTW,
+          DIVWH,
+          DTCS,
+          DVF,
+          ECEXP,
+          EXTRD,
+          FIMAT,
+          FXCNV,
+          INTNRA,
+          INTTW,
+          INVPNL,
+          JNL,
+          PTC,
+          PTR,
+          SC,
+          SEG,
+          SSO,
+          SSP,
+          SUB ->
+          null;
     };
   }
 
@@ -168,7 +198,37 @@ public final class ActivityDetailSchemaResolver {
             case "SPLIT.USPLIT" -> ActivityDetailSchema.OPCA_UNIT_SPLIT;
             default -> null;
           };
-      default -> null;
+      // No dedicated detail schema: decoders use structural fallback. Add new constants to the
+      // mapped cases above or to this list so the compiler flags unhandled generated types.
+      case FILL,
+          ALLOC,
+          CIL,
+          CORR,
+          CSR,
+          DIVCGL,
+          DIVCGS,
+          DIVFEE,
+          DIVFT,
+          DIVTW,
+          DIVWH,
+          DTCS,
+          DVF,
+          ECEXP,
+          EXTRD,
+          FIMAT,
+          FXCNV,
+          INTNRA,
+          INTTW,
+          INVPNL,
+          JNL,
+          PTC,
+          PTR,
+          SC,
+          SEG,
+          SSO,
+          SSP,
+          SUB ->
+          null;
     };
   }
 
