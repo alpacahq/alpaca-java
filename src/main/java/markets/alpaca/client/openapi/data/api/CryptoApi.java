@@ -38,6 +38,7 @@ import markets.alpaca.client.openapi.data.model.CryptoQuotesResp;
 import markets.alpaca.client.openapi.data.model.CryptoSnapshotsResp;
 import markets.alpaca.client.openapi.data.model.CryptoTradesResp;
 import java.time.OffsetDateTime;
+import markets.alpaca.client.openapi.data.model.Sort;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -136,7 +137,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call cryptoBarsCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call cryptoBarsCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -210,7 +211,7 @@ public class CryptoApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call cryptoBarsValidateBeforeCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call cryptoBarsValidateBeforeCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'loc' is set
         if (loc == null) {
             throw new ApiException("Missing the required parameter 'loc' when calling cryptoBars(Async)");
@@ -255,7 +256,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public CryptoBarsResp cryptoBars(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
+    public CryptoBarsResp cryptoBars(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
         ApiResponse<CryptoBarsResp> localVarResp = cryptoBarsWithHttpInfo(loc, symbols, timeframe, start, end, limit, pageToken, sort);
         return localVarResp.getData();
     }
@@ -285,7 +286,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<CryptoBarsResp> cryptoBarsWithHttpInfo(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
+    public ApiResponse<CryptoBarsResp> cryptoBarsWithHttpInfo(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
         okhttp3.Call localVarCall = cryptoBarsValidateBeforeCall(loc, symbols, timeframe, start, end, limit, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<CryptoBarsResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -317,7 +318,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call cryptoBarsAsync(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<CryptoBarsResp> _callback) throws ApiException {
+    public okhttp3.Call cryptoBarsAsync(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<CryptoBarsResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = cryptoBarsValidateBeforeCall(loc, symbols, timeframe, start, end, limit, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<CryptoBarsResp>(){}.getType();
@@ -988,7 +989,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call cryptoQuotesCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call cryptoQuotesCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -1058,7 +1059,7 @@ public class CryptoApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call cryptoQuotesValidateBeforeCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call cryptoQuotesValidateBeforeCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'loc' is set
         if (loc == null) {
             throw new ApiException("Missing the required parameter 'loc' when calling cryptoQuotes(Async)");
@@ -1097,7 +1098,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public CryptoQuotesResp cryptoQuotes(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
+    public CryptoQuotesResp cryptoQuotes(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
         ApiResponse<CryptoQuotesResp> localVarResp = cryptoQuotesWithHttpInfo(loc, symbols, start, end, limit, pageToken, sort);
         return localVarResp.getData();
     }
@@ -1126,7 +1127,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<CryptoQuotesResp> cryptoQuotesWithHttpInfo(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
+    public ApiResponse<CryptoQuotesResp> cryptoQuotesWithHttpInfo(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
         okhttp3.Call localVarCall = cryptoQuotesValidateBeforeCall(loc, symbols, start, end, limit, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<CryptoQuotesResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -1157,7 +1158,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call cryptoQuotesAsync(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<CryptoQuotesResp> _callback) throws ApiException {
+    public okhttp3.Call cryptoQuotesAsync(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<CryptoQuotesResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = cryptoQuotesValidateBeforeCall(loc, symbols, start, end, limit, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<CryptoQuotesResp>(){}.getType();
@@ -1348,7 +1349,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call cryptoTradesCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call cryptoTradesCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -1418,7 +1419,7 @@ public class CryptoApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call cryptoTradesValidateBeforeCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call cryptoTradesValidateBeforeCall(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'loc' is set
         if (loc == null) {
             throw new ApiException("Missing the required parameter 'loc' when calling cryptoTrades(Async)");
@@ -1457,7 +1458,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public CryptoTradesResp cryptoTrades(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
+    public CryptoTradesResp cryptoTrades(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
         ApiResponse<CryptoTradesResp> localVarResp = cryptoTradesWithHttpInfo(loc, symbols, start, end, limit, pageToken, sort);
         return localVarResp.getData();
     }
@@ -1486,7 +1487,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<CryptoTradesResp> cryptoTradesWithHttpInfo(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
+    public ApiResponse<CryptoTradesResp> cryptoTradesWithHttpInfo(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
         okhttp3.Call localVarCall = cryptoTradesValidateBeforeCall(loc, symbols, start, end, limit, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<CryptoTradesResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -1517,7 +1518,7 @@ public class CryptoApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call cryptoTradesAsync(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<CryptoTradesResp> _callback) throws ApiException {
+    public okhttp3.Call cryptoTradesAsync(@javax.annotation.Nonnull CryptoHistoricalLoc loc, @javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<CryptoTradesResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = cryptoTradesValidateBeforeCall(loc, symbols, start, end, limit, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<CryptoTradesResp>(){}.getType();

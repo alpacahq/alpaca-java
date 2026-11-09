@@ -1564,6 +1564,9 @@ components:
     IdempotencyKeyConflict:
       content:
         application/json:
+          example:
+            code: 42210000
+            message: idempotency key reused with a different request body
           schema:
             $ref: '#/components/schemas/Error'
       description: The idempotency key was already used with a different request payload.
@@ -2160,12 +2163,12 @@ components:
       properties:
         page_token_next:
           allOf:
-            - description: Page token for the next page of transfers. Pass it back in the `page_token` query parameter to fetch that page. Not returned when the caller is on the last page.
             - $ref: '#/components/schemas/AcatsPageToken'
+          description: Page token for the next page of transfers. Pass it back in the `page_token` query parameter to fetch that page. Not returned when the caller is on the last page.
         page_token_previous:
           allOf:
-            - description: Page token for the previous page of transfers. Pass it back in the `page_token` query parameter to fetch that page. Not returned when the caller is on the first page.
             - $ref: '#/components/schemas/AcatsPageToken'
+          description: Page token for the previous page of transfers. Pass it back in the `page_token` query parameter to fetch that page. Not returned when the caller is on the first page.
         pending_transfers:
           description: The count of ACATS transfers pending review
           example: 37
@@ -2554,6 +2557,7 @@ components:
           allOf:
             - $ref: '#/components/schemas/AccountSubType'
           description: The account subtype. Required for IRA accounts.
+          example: traditional
         account_type:
           allOf:
             - $ref: '#/components/schemas/AccountCreationType'
@@ -4057,22 +4061,18 @@ components:
           type: string
         belongs_to:
           allOf:
-            - deprecated: true
-              description: |-
-                **Deprecation notice:**
-                Never sent by the stream. Use belongs_to_kind and belongs_to_id_reference instead.
-
-                Since: 2026-09-30
-                Sunset: 2027-01-13
-
-                ---
-
-                Deprecated. Not sent by the stream; use `belongs_to_kind` and `belongs_to_id_reference` instead.
-              x-deprecation:
-                reason: Never sent by the stream. Use belongs_to_kind and belongs_to_id_reference instead.
-                since: '2026-09-30'
-                sunset: '2027-01-13'
             - $ref: '#/components/schemas/AdminActionBelongsTo'
+          deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Never sent by the stream. Use belongs_to_kind and belongs_to_id_reference instead.
+
+            Since: 2026-09-30
+            Sunset: 2027-01-13
+          x-deprecation:
+            reason: Never sent by the stream. Use belongs_to_kind and belongs_to_id_reference instead.
+            since: '2026-09-30'
+            sunset: '2027-01-13'
         belongs_to_id_reference:
           description: The ID of the entity that this event belongs to
           type: string
@@ -4085,22 +4085,18 @@ components:
           type: string
         created_by:
           allOf:
-            - deprecated: true
-              description: |-
-                **Deprecation notice:**
-                Never sent by the stream. Use created_by_kind and created_by_id_reference instead.
-
-                Since: 2026-09-30
-                Sunset: 2027-01-13
-
-                ---
-
-                Deprecated. Not sent by the stream; use `created_by_kind` and `created_by_id_reference` instead.
-              x-deprecation:
-                reason: Never sent by the stream. Use created_by_kind and created_by_id_reference instead.
-                since: '2026-09-30'
-                sunset: '2027-01-13'
             - $ref: '#/components/schemas/AdminActionCreatedBy'
+          deprecated: true
+          description: |-
+            **Deprecation notice:**
+            Never sent by the stream. Use created_by_kind and created_by_id_reference instead.
+
+            Since: 2026-09-30
+            Sunset: 2027-01-13
+          x-deprecation:
+            reason: Never sent by the stream. Use created_by_kind and created_by_id_reference instead.
+            since: '2026-09-30'
+            sunset: '2027-01-13'
         created_by_id_reference:
           description: The ID of the entity that created this event
           type: string
@@ -6067,6 +6063,7 @@ components:
       type: object
     CommonOptionsActivityV2:
       allOf:
+        - $ref: '#/components/schemas/CommonNTAActivityV2'
         - description: Shared fields for option-related non-trade activity records.
           properties:
             contract_symbol:
@@ -6081,7 +6078,6 @@ components:
           required:
             - group_id
           type: object
-        - $ref: '#/components/schemas/CommonNTAActivityV2'
     CommonREOActivityV2:
       description: |-
         Reorganization (REO) activity sub-types:
@@ -8705,10 +8701,12 @@ components:
       properties:
         expires_at:
           description: Timestamp when the signed URL expires.
+          example: '2026-04-14T23:55:00Z'
           format: date-time
           type: string
         filename:
           description: Name of the generated report file.
+          example: ALPC-2026-04-14-common_stock-detail.csv
           type: string
         url:
           description: Temporary signed URL used to download the report.
@@ -10974,10 +10972,13 @@ components:
       title: PortfolioHistory
       type: object
     PortfolioHistoryError:
+      description: Error returned by the portfolio history endpoint.
       properties:
         code:
+          example: 40010001
           type: integer
         message:
+          example: 'query: "timeframe": invalid value: "2Min"'
           type: string
       required:
         - code
@@ -18143,6 +18144,7 @@ paths:
                   signed_at: '2024-01-15T10:30:00Z'
             schema:
               $ref: '#/components/schemas/CreateAgreementRequest'
+        description: The signed agreement to record for the party. Include `account_id` for per-account agreements.
         required: true
       responses:
         '201':

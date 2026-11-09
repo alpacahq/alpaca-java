@@ -56,6 +56,16 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 public class OPEXCActivityV2 implements Serializable {
   private static final long serialVersionUID = 1L;
 
+  public static final String SERIALIZED_NAME_GROUP_ID = "group_id";
+  @SerializedName(SERIALIZED_NAME_GROUP_ID)
+  @javax.annotation.Nullable
+  private UUID groupId;
+
+  public static final String SERIALIZED_NAME_SYSTEM_DATE = "system_date";
+  @SerializedName(SERIALIZED_NAME_SYSTEM_DATE)
+  @javax.annotation.Nonnull
+  private LocalDate systemDate;
+
   public static final String SERIALIZED_NAME_CONTRACT_SYMBOL = "contract_symbol";
   @SerializedName(SERIALIZED_NAME_CONTRACT_SYMBOL)
   @javax.annotation.Nullable
@@ -71,18 +81,46 @@ public class OPEXCActivityV2 implements Serializable {
   @javax.annotation.Nullable
   private String symbol;
 
-  public static final String SERIALIZED_NAME_GROUP_ID = "group_id";
-  @SerializedName(SERIALIZED_NAME_GROUP_ID)
-  @javax.annotation.Nullable
-  private UUID groupId;
-
-  public static final String SERIALIZED_NAME_SYSTEM_DATE = "system_date";
-  @SerializedName(SERIALIZED_NAME_SYSTEM_DATE)
-  @javax.annotation.Nonnull
-  private LocalDate systemDate;
-
   public OPEXCActivityV2() {
   }
+
+  public OPEXCActivityV2 groupId(@javax.annotation.Nullable UUID groupId) {
+    this.groupId = groupId;
+    return this;
+  }
+
+  /**
+   * Optional group ID which can help grouping together related activities
+   * @return groupId
+   */
+  @javax.annotation.Nullable
+  public UUID getGroupId() {
+    return groupId;
+  }
+
+  public void setGroupId(@javax.annotation.Nullable UUID groupId) {
+    this.groupId = groupId;
+  }
+
+
+  public OPEXCActivityV2 systemDate(@javax.annotation.Nonnull LocalDate systemDate) {
+    this.systemDate = systemDate;
+    return this;
+  }
+
+  /**
+   * The date when the activity was booked
+   * @return systemDate
+   */
+  @javax.annotation.Nonnull
+  public LocalDate getSystemDate() {
+    return systemDate;
+  }
+
+  public void setSystemDate(@javax.annotation.Nonnull LocalDate systemDate) {
+    this.systemDate = systemDate;
+  }
+
 
   public OPEXCActivityV2 contractSymbol(@javax.annotation.Nullable String contractSymbol) {
     this.contractSymbol = contractSymbol;
@@ -140,44 +178,6 @@ public class OPEXCActivityV2 implements Serializable {
     this.symbol = symbol;
   }
 
-
-  public OPEXCActivityV2 groupId(@javax.annotation.Nullable UUID groupId) {
-    this.groupId = groupId;
-    return this;
-  }
-
-  /**
-   * Optional group ID which can help grouping together related activities
-   * @return groupId
-   */
-  @javax.annotation.Nullable
-  public UUID getGroupId() {
-    return groupId;
-  }
-
-  public void setGroupId(@javax.annotation.Nullable UUID groupId) {
-    this.groupId = groupId;
-  }
-
-
-  public OPEXCActivityV2 systemDate(@javax.annotation.Nonnull LocalDate systemDate) {
-    this.systemDate = systemDate;
-    return this;
-  }
-
-  /**
-   * The date when the activity was booked
-   * @return systemDate
-   */
-  @javax.annotation.Nonnull
-  public LocalDate getSystemDate() {
-    return systemDate;
-  }
-
-  public void setSystemDate(@javax.annotation.Nonnull LocalDate systemDate) {
-    this.systemDate = systemDate;
-  }
-
   /**
    * A container for additional, undeclared properties.
    * This is a holder for any undeclared properties as specified with
@@ -233,28 +233,28 @@ public class OPEXCActivityV2 implements Serializable {
       return false;
     }
     OPEXCActivityV2 opEXCActivityV2 = (OPEXCActivityV2) o;
-    return Objects.equals(this.contractSymbol, opEXCActivityV2.contractSymbol) &&
+    return Objects.equals(this.groupId, opEXCActivityV2.groupId) &&
+        Objects.equals(this.systemDate, opEXCActivityV2.systemDate) &&
+        Objects.equals(this.contractSymbol, opEXCActivityV2.contractSymbol) &&
         Objects.equals(this.cusip, opEXCActivityV2.cusip) &&
-        Objects.equals(this.symbol, opEXCActivityV2.symbol) &&
-        Objects.equals(this.groupId, opEXCActivityV2.groupId) &&
-        Objects.equals(this.systemDate, opEXCActivityV2.systemDate)&&
+        Objects.equals(this.symbol, opEXCActivityV2.symbol)&&
         Objects.equals(this.additionalProperties, opEXCActivityV2.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(contractSymbol, cusip, symbol, groupId, systemDate, additionalProperties);
+    return Objects.hash(groupId, systemDate, contractSymbol, cusip, symbol, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class OPEXCActivityV2 {\n");
+    sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
+    sb.append("    systemDate: ").append(toIndentedString(systemDate)).append("\n");
     sb.append("    contractSymbol: ").append(toIndentedString(contractSymbol)).append("\n");
     sb.append("    cusip: ").append(toIndentedString(cusip)).append("\n");
     sb.append("    symbol: ").append(toIndentedString(symbol)).append("\n");
-    sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
-    sb.append("    systemDate: ").append(toIndentedString(systemDate)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -274,7 +274,7 @@ public class OPEXCActivityV2 implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("contract_symbol", "cusip", "symbol", "group_id", "system_date"));
+    openapiFields = new HashSet<String>(Arrays.asList("group_id", "system_date", "contract_symbol", "cusip", "symbol"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("system_date"));
@@ -300,6 +300,9 @@ public class OPEXCActivityV2 implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if ((jsonObj.get("group_id") != null && !jsonObj.get("group_id").isJsonNull()) && !jsonObj.get("group_id").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `group_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("group_id").toString()));
+      }
       if ((jsonObj.get("contract_symbol") != null && !jsonObj.get("contract_symbol").isJsonNull()) && !jsonObj.get("contract_symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `contract_symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("contract_symbol").toString()));
       }
@@ -308,9 +311,6 @@ public class OPEXCActivityV2 implements Serializable {
       }
       if ((jsonObj.get("symbol") != null && !jsonObj.get("symbol").isJsonNull()) && !jsonObj.get("symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));
-      }
-      if ((jsonObj.get("group_id") != null && !jsonObj.get("group_id").isJsonNull()) && !jsonObj.get("group_id").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `group_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("group_id").toString()));
       }
   }
 

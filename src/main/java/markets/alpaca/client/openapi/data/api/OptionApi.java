@@ -35,6 +35,7 @@ import markets.alpaca.client.openapi.data.model.OptionLatestQuotesResp;
 import markets.alpaca.client.openapi.data.model.OptionLatestTradesResp;
 import markets.alpaca.client.openapi.data.model.OptionSnapshotsResp;
 import markets.alpaca.client.openapi.data.model.OptionTradesResp;
+import markets.alpaca.client.openapi.data.model.Sort;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -132,7 +133,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call optionBarsCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call optionBarsCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -205,7 +206,7 @@ public class OptionApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call optionBarsValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call optionBarsValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'symbols' is set
         if (symbols == null) {
             throw new ApiException("Missing the required parameter 'symbols' when calling optionBars(Async)");
@@ -244,7 +245,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public OptionBarsResp optionBars(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
+    public OptionBarsResp optionBars(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
         ApiResponse<OptionBarsResp> localVarResp = optionBarsWithHttpInfo(symbols, timeframe, start, end, limit, pageToken, sort);
         return localVarResp.getData();
     }
@@ -273,7 +274,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<OptionBarsResp> optionBarsWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
+    public ApiResponse<OptionBarsResp> optionBarsWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
         okhttp3.Call localVarCall = optionBarsValidateBeforeCall(symbols, timeframe, start, end, limit, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<OptionBarsResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -304,7 +305,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call optionBarsAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<OptionBarsResp> _callback) throws ApiException {
+    public okhttp3.Call optionBarsAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nonnull String timeframe, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<OptionBarsResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = optionBarsValidateBeforeCall(symbols, timeframe, start, end, limit, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<OptionBarsResp>(){}.getType();
@@ -1351,7 +1352,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call optionTradesCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call optionTradesCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -1420,7 +1421,7 @@ public class OptionApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call optionTradesValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call optionTradesValidateBeforeCall(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'symbols' is set
         if (symbols == null) {
             throw new ApiException("Missing the required parameter 'symbols' when calling optionTrades(Async)");
@@ -1453,7 +1454,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public OptionTradesResp optionTrades(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
+    public OptionTradesResp optionTrades(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
         ApiResponse<OptionTradesResp> localVarResp = optionTradesWithHttpInfo(symbols, start, end, limit, pageToken, sort);
         return localVarResp.getData();
     }
@@ -1481,7 +1482,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<OptionTradesResp> optionTradesWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
+    public ApiResponse<OptionTradesResp> optionTradesWithHttpInfo(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
         okhttp3.Call localVarCall = optionTradesValidateBeforeCall(symbols, start, end, limit, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<OptionTradesResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -1511,7 +1512,7 @@ public class OptionApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call optionTradesAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<OptionTradesResp> _callback) throws ApiException {
+    public okhttp3.Call optionTradesAsync(@javax.annotation.Nonnull String symbols, @javax.annotation.Nullable OffsetDateTime start, @javax.annotation.Nullable OffsetDateTime end, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<OptionTradesResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = optionTradesValidateBeforeCall(symbols, start, end, limit, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<OptionTradesResp>(){}.getType();
