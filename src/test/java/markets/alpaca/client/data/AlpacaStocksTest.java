@@ -57,7 +57,7 @@ class AlpacaStocksTest {
     assertEquals(StockHistoricalFeed.IEX, generated.feed);
     assertEquals("USD", generated.currency);
     assertEquals("next-page", generated.pageToken);
-    assertEquals("asc", generated.sort);
+    assertEquals(Sort.ASC, generated.sort);
   }
 
   @Test
@@ -95,7 +95,7 @@ class AlpacaStocksTest {
     assertNull(generated.symbols);
     assertEquals(25, generated.limit);
     assertEquals(StockHistoricalFeed.SIP, generated.feed);
-    assertEquals("desc", generated.sort);
+    assertEquals(Sort.DESC, generated.sort);
   }
 
   @Test
@@ -146,7 +146,7 @@ class AlpacaStocksTest {
     private StockHistoricalFeed feed;
     private String currency;
     private String pageToken;
-    private String sort;
+    private Sort sort;
 
     @Override
     public StockTradesResp stockTrades(
@@ -158,7 +158,7 @@ class AlpacaStocksTest {
         StockHistoricalFeed feed,
         String currency,
         String pageToken,
-        String sort)
+        Sort sort)
         throws ApiException {
       capture(null, symbols, start, end, limit, asof, feed, currency, pageToken, sort);
       return tradesResponse;
@@ -174,7 +174,7 @@ class AlpacaStocksTest {
         StockHistoricalFeed feed,
         String currency,
         String pageToken,
-        String sort)
+        Sort sort)
         throws ApiException {
       capture(null, symbols, start, end, limit, asof, feed, currency, pageToken, sort);
       return tradesHttpResponse;
@@ -190,7 +190,7 @@ class AlpacaStocksTest {
         StockHistoricalFeed feed,
         String currency,
         String pageToken,
-        String sort)
+        Sort sort)
         throws ApiException {
       capture(symbol, null, start, end, limit, asof, feed, currency, pageToken, sort);
       return singleTradesResponse;
@@ -206,7 +206,7 @@ class AlpacaStocksTest {
         StockHistoricalFeed feed,
         String currency,
         String pageToken,
-        String sort)
+        Sort sort)
         throws ApiException {
       capture(symbol, null, start, end, limit, asof, feed, currency, pageToken, sort);
       return singleTradesHttpResponse;
@@ -222,7 +222,7 @@ class AlpacaStocksTest {
         StockHistoricalFeed feed,
         String currency,
         String pageToken,
-        String sort) {
+        Sort sort) {
       this.symbol = symbol;
       this.symbols = symbols;
       this.start = start;

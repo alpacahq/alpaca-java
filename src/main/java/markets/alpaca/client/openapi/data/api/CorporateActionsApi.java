@@ -34,6 +34,7 @@ import markets.alpaca.client.openapi.data.model.DataQuality;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import markets.alpaca.client.openapi.data.model.Region;
+import markets.alpaca.client.openapi.data.model.Sort;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -123,7 +124,7 @@ public class CorporateActionsApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call corporateActionsCall(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
+    public okhttp3.Call corporateActionsCall(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -212,7 +213,7 @@ public class CorporateActionsApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call corporateActionsValidateBeforeCall(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call corporateActionsValidateBeforeCall(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback _callback) throws ApiException {
         return corporateActionsCall(symbols, cusips, types, region, start, end, ids, limit, dataQuality, pageToken, sort, _callback);
 
     }
@@ -245,7 +246,7 @@ public class CorporateActionsApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public CorporateActionsResp corporateActions(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
+    public CorporateActionsResp corporateActions(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
         ApiResponse<CorporateActionsResp> localVarResp = corporateActionsWithHttpInfo(symbols, cusips, types, region, start, end, ids, limit, dataQuality, pageToken, sort);
         return localVarResp.getData();
     }
@@ -278,7 +279,7 @@ public class CorporateActionsApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public ApiResponse<CorporateActionsResp> corporateActionsWithHttpInfo(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort) throws ApiException {
+    public ApiResponse<CorporateActionsResp> corporateActionsWithHttpInfo(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort) throws ApiException {
         okhttp3.Call localVarCall = corporateActionsValidateBeforeCall(symbols, cusips, types, region, start, end, ids, limit, dataQuality, pageToken, sort, null);
         Type localVarReturnType = new TypeToken<CorporateActionsResp>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
@@ -313,7 +314,7 @@ public class CorporateActionsApi {
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
      */
-    public okhttp3.Call corporateActionsAsync(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable String sort, final ApiCallback<CorporateActionsResp> _callback) throws ApiException {
+    public okhttp3.Call corporateActionsAsync(@javax.annotation.Nullable String symbols, @javax.annotation.Nullable String cusips, @javax.annotation.Nullable String types, @javax.annotation.Nullable Region region, @javax.annotation.Nullable LocalDate start, @javax.annotation.Nullable LocalDate end, @javax.annotation.Nullable String ids, @javax.annotation.Nullable Integer limit, @javax.annotation.Nullable DataQuality dataQuality, @javax.annotation.Nullable String pageToken, @javax.annotation.Nullable Sort sort, final ApiCallback<CorporateActionsResp> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = corporateActionsValidateBeforeCall(symbols, cusips, types, region, start, end, ids, limit, dataQuality, pageToken, sort, _callback);
         Type localVarReturnType = new TypeToken<CorporateActionsResp>(){}.getType();

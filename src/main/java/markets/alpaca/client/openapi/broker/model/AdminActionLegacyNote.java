@@ -219,7 +219,7 @@ public class AdminActionLegacyNote implements Serializable {
   }
 
   /**
-   * **Deprecation notice:** Never sent by the stream. Use belongs_to_kind and belongs_to_id_reference instead.  Since: 2026-09-30 Sunset: 2027-01-13  ---  Deprecated. Not sent by the stream; use &#x60;belongs_to_kind&#x60; and &#x60;belongs_to_id_reference&#x60; instead.
+   * **Deprecation notice:** Never sent by the stream. Use belongs_to_kind and belongs_to_id_reference instead.  Since: 2026-09-30 Sunset: 2027-01-13
    * @return belongsTo
    * @deprecated
    */
@@ -318,7 +318,7 @@ public class AdminActionLegacyNote implements Serializable {
   }
 
   /**
-   * **Deprecation notice:** Never sent by the stream. Use created_by_kind and created_by_id_reference instead.  Since: 2026-09-30 Sunset: 2027-01-13  ---  Deprecated. Not sent by the stream; use &#x60;created_by_kind&#x60; and &#x60;created_by_id_reference&#x60; instead.
+   * **Deprecation notice:** Never sent by the stream. Use created_by_kind and created_by_id_reference instead.  Since: 2026-09-30 Sunset: 2027-01-13
    * @return createdBy
    * @deprecated
    */

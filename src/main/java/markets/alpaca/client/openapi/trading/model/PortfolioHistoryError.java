@@ -48,7 +48,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.trading.http.JSON;
 
 /**
- * PortfolioHistoryError
+ * Error returned by the portfolio history endpoint.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class PortfolioHistoryError implements Serializable {

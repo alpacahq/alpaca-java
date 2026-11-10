@@ -2166,6 +2166,7 @@ components:
       type: object
     CommonOptionsActivityV2:
       allOf:
+        - $ref: '#/components/schemas/CommonNTAActivityV2'
         - description: Shared fields for option-related non-trade activity records.
           properties:
             contract_symbol:
@@ -2180,7 +2181,6 @@ components:
           required:
             - group_id
           type: object
-        - $ref: '#/components/schemas/CommonNTAActivityV2'
     CommonREOActivityV2:
       description: |-
         Reorganization (REO) activity sub-types:
@@ -4507,6 +4507,26 @@ components:
       type: object
     PortfolioHistory:
       description: Timeseries data for equity and profit loss information of the account.
+      example:
+        base_value: 2774.16
+        base_value_asof: '2023-10-18'
+        equity:
+          - 2773.79
+          - 2769.04
+          - 2768.65
+        profit_loss:
+          - -0.37
+          - -5.12
+          - -5.51
+        profit_loss_pct:
+          - -1.0E-4
+          - -0.0018
+          - -0.002
+        timeframe: 15Min
+        timestamp:
+          - 1697722200
+          - 1697723100
+          - 1697724000
       properties:
         base_value:
           description: Basis in dollar of the profit loss calculation.
@@ -4576,10 +4596,13 @@ components:
       title: PortfolioHistory
       type: object
     PortfolioHistoryError:
+      description: Error returned by the portfolio history endpoint.
       properties:
         code:
+          example: 40010001
           type: integer
         message:
+          example: 'query: "timeframe": invalid value: "2Min"'
           type: string
       required:
         - code

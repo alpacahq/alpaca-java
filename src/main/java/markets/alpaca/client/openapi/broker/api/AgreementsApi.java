@@ -91,7 +91,7 @@ public class AgreementsApi {
 
     /**
      * Build call for createAgreement
-     * @param createAgreementRequest  (required)
+     * @param createAgreementRequest The signed agreement to record for the party. Include &#x60;account_id&#x60; for per-account agreements. (required)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -163,7 +163,7 @@ public class AgreementsApi {
     /**
      * Create a Signed Agreement
      * Create a signed agreement for a party.  Use this endpoint to record party-level agreements after party creation (for example &#x60;certifications_and_resolutions_statement&#x60; when it was not included on &#x60;POST /v1/parties&#x60;), or to record per-account agreements that require an &#x60;account_id&#x60;. Party-level agreements cannot be added via &#x60;PATCH /v1/parties/{id}&#x60; — use this endpoint instead.  See [Business Trading Accounts — Party-Level Agreements](https://docs.alpaca.markets/us/docs/business-trading-accounts#party-level-agreements) for the party-first onboarding flow. 
-     * @param createAgreementRequest  (required)
+     * @param createAgreementRequest The signed agreement to record for the party. Include &#x60;account_id&#x60; for per-account agreements. (required)
      * @return SignedAgreement
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -183,7 +183,7 @@ public class AgreementsApi {
     /**
      * Create a Signed Agreement
      * Create a signed agreement for a party.  Use this endpoint to record party-level agreements after party creation (for example &#x60;certifications_and_resolutions_statement&#x60; when it was not included on &#x60;POST /v1/parties&#x60;), or to record per-account agreements that require an &#x60;account_id&#x60;. Party-level agreements cannot be added via &#x60;PATCH /v1/parties/{id}&#x60; — use this endpoint instead.  See [Business Trading Accounts — Party-Level Agreements](https://docs.alpaca.markets/us/docs/business-trading-accounts#party-level-agreements) for the party-first onboarding flow. 
-     * @param createAgreementRequest  (required)
+     * @param createAgreementRequest The signed agreement to record for the party. Include &#x60;account_id&#x60; for per-account agreements. (required)
      * @return ApiResponse&lt;SignedAgreement&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -204,7 +204,7 @@ public class AgreementsApi {
     /**
      * Create a Signed Agreement (asynchronously)
      * Create a signed agreement for a party.  Use this endpoint to record party-level agreements after party creation (for example &#x60;certifications_and_resolutions_statement&#x60; when it was not included on &#x60;POST /v1/parties&#x60;), or to record per-account agreements that require an &#x60;account_id&#x60;. Party-level agreements cannot be added via &#x60;PATCH /v1/parties/{id}&#x60; — use this endpoint instead.  See [Business Trading Accounts — Party-Level Agreements](https://docs.alpaca.markets/us/docs/business-trading-accounts#party-level-agreements) for the party-first onboarding flow. 
-     * @param createAgreementRequest  (required)
+     * @param createAgreementRequest The signed agreement to record for the party. Include &#x60;account_id&#x60; for per-account agreements. (required)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object

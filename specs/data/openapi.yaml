@@ -393,8 +393,8 @@ components:
       name: sort
       schema:
         allOf:
-          - type: string
           - $ref: '#/components/schemas/sort'
+          - type: string
     start:
       description: |
         The inclusive start of the interval. Format: RFC-3339 or YYYY-MM-DD.

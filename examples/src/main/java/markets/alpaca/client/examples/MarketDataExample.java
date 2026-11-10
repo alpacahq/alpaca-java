@@ -50,7 +50,7 @@ public final class MarketDataExample {
     var start = end.minusDays(5);
     var bars =
         stock.stockBarSingle(
-            stockSymbol, "1Day", start, end, 5, null, null, null, null, null, "asc");
+            stockSymbol, "1Day", start, end, 5, null, null, null, null, null, Sort.ASC);
     bars.getBars().forEach(System.out::println);
 
     ExampleSupport.printSection("Latest Stock Quote");
@@ -84,7 +84,7 @@ public final class MarketDataExample {
             OffsetDateTime.now().minusMinutes(5),
             10,
             null,
-            "asc");
+            Sort.ASC);
     cryptoBars
         .getBars()
         .forEach(
