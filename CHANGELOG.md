@@ -24,6 +24,8 @@ remain covered regardless of an `.internal` package-name segment unless document
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-10
+
 ### Breaking
 
 Adopting upstream Broker and Trading specs ([#90](https://github.com/alpacahq/alpaca-java/pull/90)):
