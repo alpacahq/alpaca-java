@@ -15,6 +15,7 @@ import markets.alpaca.client.data.sse.CorporateActionsSseClient;
 import markets.alpaca.client.data.sse.MarketDataSseEnvironment;
 import markets.alpaca.client.openapi.data.api.CorporateActionsApi;
 import markets.alpaca.client.openapi.data.api.StockApi;
+import markets.alpaca.client.openapi.data.model.Sort;
 import markets.alpaca.client.openapi.data.model.StockHistoricalFeed;
 import markets.alpaca.client.openapi.data.model.StockTradesResp;
 import markets.alpaca.client.openapi.data.model.StockTradesRespSingle;
@@ -461,7 +462,7 @@ class AlpacaClientTest {
         StockHistoricalFeed feed,
         String currency,
         String pageToken,
-        String sort)
+        Sort sort)
         throws markets.alpaca.client.openapi.data.http.ApiException {
       return tradesResponse;
     }
@@ -477,7 +478,7 @@ class AlpacaClientTest {
             StockHistoricalFeed feed,
             String currency,
             String pageToken,
-            String sort)
+            Sort sort)
             throws markets.alpaca.client.openapi.data.http.ApiException {
       return tradesHttpResponse;
     }
@@ -492,7 +493,7 @@ class AlpacaClientTest {
         StockHistoricalFeed feed,
         String currency,
         String pageToken,
-        String sort)
+        Sort sort)
         throws markets.alpaca.client.openapi.data.http.ApiException {
       return singleTradesResponse;
     }
@@ -508,7 +509,7 @@ class AlpacaClientTest {
             StockHistoricalFeed feed,
             String currency,
             String pageToken,
-            String sort)
+            Sort sort)
             throws markets.alpaca.client.openapi.data.http.ApiException {
       return singleTradesHttpResponse;
     }
