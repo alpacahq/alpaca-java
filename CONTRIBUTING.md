@@ -70,7 +70,7 @@ Use clear, descriptive commit messages and pull request titles. Conventional Com
 - Java 17 or newer.
 - The repository's Gradle Wrapper (`./gradlew`).
 - Node.js `>=22.23.4 <23` for Docusaurus documentation checks, matching CI.
-- Python 3 and Bash when using the `adoptOpenApi*` tasks.
+- Python 3.10 or newer and Bash when using the `adoptOpenApi*` tasks.
 - `pre-commit` and `lychee` when running the optional local hooks.
 
 ## Setup and checks
