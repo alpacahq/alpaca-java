@@ -13,7 +13,7 @@ openapi-generator    = "7.26.0"
 spotbugs-gradle-plugin = "6.5.13"
 spotless-gradle-plugin = "8.11.0"
 snakeyaml             = "2.7"
-japicmp               = "0.26.5"
+japicmp               = "0.27.0"
 
 [libraries]
 okhttp                  = { module = "com.squareup.okhttp3:okhttp",                    version.ref = "okhttp" }
