@@ -31,15 +31,18 @@ jobs:
             --include-fragments
             README.md
             AGENTS.md
+            CODE_OF_CONDUCT.md
             GENERATION.md
             LLMS.md
             CONTRIBUTING.md
             RELEASING.md
+            SECURITY.md
             TESTING.md
             CHANGELOG.md
             MIGRATIONS.md
             examples/README.md
             docs/README.md
+            .github/PULL_REQUEST_TEMPLATE.md
 
   docs:
     name: Docusaurus docs

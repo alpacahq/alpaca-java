@@ -1,94 +1,87 @@
-Contributing to alpaca-java
-===================================
+# Contributing
 
-Thank you for taking the time to contribute!
-We are very open to contributions that improve the client, add missing features, or fix issues.
+Thanks for helping improve alpaca-java. By participating, you agree to follow our [Code of Conduct](./CODE_OF_CONDUCT.md).
 
-## How do I file a bug / ask a question / request a feature?
+## Choose the right channel
 
-We track these here on GitHub via our [issues](https://github.com/alpacahq/alpaca-java/issues/new/choose), with
-a template for each case that will ask you to fill out some information to better help us solve your issue.
-(Note that not filling out the template or skipping questions is likely to delay resolution and may result in the issue
-being closed for missing information.)
+- **Library / SDK issues:** Bugs, feature requests, or questions specific to this SDK → [GitHub Issues](https://github.com/alpacahq/alpaca-java/issues/new/choose).
+- **Security vulnerabilities:** Do not report them publicly. Follow the private reporting process in our [Security Policy](./SECURITY.md).
+- **Alpaca API bugs:** Bugs in the Alpaca API itself, its OpenAPI specs, or its documentation → [alpacahq/alpaca-api](https://github.com/alpacahq/alpaca-api/issues/new/choose).
+- **Community:** API feature requests, general questions, and dashboard bugs → [Alpaca Community Forum](https://forum.alpaca.markets/) or [Slack](https://alpaca.markets/slack).
+- **Account help:** Questions about your account, funding, or orders → [Support request](https://alpaca.markets/support/request).
+- **Outages:** Service status and incident updates → [Status page](https://status.alpaca.markets/).
 
-> **NOTE** that we can only solve issues with the SDK. To report a bug in the Alpaca API itself, its OpenAPI specs, or its documentation, open an issue in [alpacahq/alpaca-api](https://github.com/alpacahq/alpaca-api/issues/new/choose) instead. For API feature requests and general questions, use the [Community Forum](https://forum.alpaca.markets/) or [Slack](https://alpaca.markets/slack).
+Please do not include credentials, account details, request or trace IDs, or other sensitive information in an issue, discussion, pull request, test, or example.
 
-## How do I contribute code?
+## Contribution policy
 
-1. Fork this repo and create a branch for your changes.
-2. Follow the [Build from source](README.md#build-from-source) section in the README to configure your local environment.
-3. Code away — see [Coding Guidelines](#coding-guidelines) below for what belongs where.
-4. Run `./gradlew check` and `./gradlew build` to verify everything passes. The root `check` task runs unit tests, code checks, and compiles `examples/` so they stay in sync without being packaged in the published artifact.
-5. Open a PR with your changes.
+### Contributions we welcome
 
-This repo uses merge commits, so there is no need to squash commits before opening a PR.
+Focused contributions are welcome when they improve this SDK, including:
 
-## Maintainer releases
+- bug fixes and compatibility improvements;
+- support for documented Alpaca API capabilities;
+- focused tests and reliability improvements;
+- documentation and examples; and
+- maintainability improvements that preserve public behavior.
 
-Read [`RELEASING.md`](RELEASING.md) before creating a release, changing release automation, or
-recovering from a failed publication.
+### Discuss substantial changes first
 
-## Coding Guidelines
+Open an issue before investing in a substantial SDK design, new dependency, broad refactor, or third-party integration. Early discussion helps confirm that the proposal fits the SDK's scope and avoids duplicated or unusable work.
 
-### Generated vs handwritten code
+Bugs in the Alpaca API itself, its OpenAPI specs, or its documentation must be fixed upstream, not patched in this SDK. Report them in [alpacahq/alpaca-api](https://github.com/alpacahq/alpaca-api/issues/new/choose). API feature requests, general questions, and dashboard bugs belong on the [Alpaca Community Forum](https://forum.alpaca.markets/) or [Slack](https://alpaca.markets/slack). Contributions that add support for already documented API capabilities are welcome after the SDK design is agreed with maintainers.
 
-**Never hand-edit files under `src/main/java/markets/alpaca/client/openapi/`** — regenerate with
-`./gradlew generateApis` or adopt upstream via `./gradlew adoptOpenApi` /
-`./gradlew adoptOpenApiBreaking`. See [`GENERATION.md`](GENERATION.md).
-When a pinned spec changes an SSE operation, run `./gradlew checkSseContracts`; the full
-`checkGenerated`/`build` verification runs it as well.
+### Out of scope
 
-Pinned OpenAPI documents live under `specs/`. Handwritten code belongs in:
+This repository does not accept:
 
-- `src/main/java/markets/alpaca/client/` — top-level SDK concepts such as `AlpacaClientFactory` and `AlpacaCredentials`
-- `src/main/java/markets/alpaca/client/data/` — handwritten Market Data helpers
-- `src/main/java/markets/alpaca/client/data/sse/` — Market Data corporate-actions SSE wrapper
-- `src/main/java/markets/alpaca/client/http/` — handwritten OkHttp and retry helpers
-- `src/main/java/markets/alpaca/client/rest/` — handwritten REST utilities
-- `src/main/java/markets/alpaca/client/trading/` — handwritten Trading helpers
-- `src/main/java/markets/alpaca/client/sse/` — shared SSE lifecycle and transport
-- `src/main/java/markets/alpaca/client/trading/sse/` — Trading activity SSE wrapper
-- `src/main/java/markets/alpaca/client/broker/sse/` — Broker Events SSE wrapper
-- `src/main/java/markets/alpaca/client/ws/` — WebSocket stream clients, listeners, subscriptions, and models
+- trading strategies, algorithm design, or investment advice;
+- bugs in the Alpaca API, its OpenAPI specs, or docs.alpaca.markets;
+- API feature requests, dashboard bugs, or outage reports;
+- questions that aren't about this SDK, including questions about your account, funding, or orders;
+- credentials, private account data, request or trace IDs, or other secrets;
+- referral links or promotional content; or
+- unapproved integrations with third-party products or services.
 
-The generated REST packages under `markets.alpaca.client.openapi/**` are owned by OpenAPI Generator. Do not add
-handwritten code there.
+Contributions that add or promote third-party products or services, including provider-specific clients, API calls, hosted endpoints, referral links, or promotional content, require prior written approval from Alpaca before implementation. Open an issue describing the technical scope; repository maintainers will coordinate the necessary internal review and confirm whether the proposal may proceed. Contributors do not need to identify or contact internal approvers.
 
-`markets.alpaca.client.sse.internal` is an implementation package, not supported public API. It is
-excluded from published Javadocs and API compatibility checks. Keep user-facing lifecycle types in
-`markets.alpaca.client.sse`, and do not expose internal transport types from public signatures.
+Using an ordinary open-source dependency or improving generic interoperability does not by itself make a contribution a provider-specific integration. Maintainers will explain when a proposal falls outside this policy. A pull request that proceeds without the required approval may be closed as out of scope, so open an issue first if you are unsure whether a proposal qualifies.
 
-### Fixing generated code behaviour
+## License and contribution terms
 
-Do **not** modify the generated file. Instead:
+The project is licensed under the [Apache License 2.0](./LICENSE). Subject to its full terms, the license permits use, reproduction, modification, and distribution of the software. It does not grant permission to use Alpaca trade names, trademarks, service marks, or product names except as described in the license.
 
-- **Spec bug** → add a preprocessing fix to the relevant task in
-  `build-logic/src/main/groovy/alpaca.openapi-generation.gradle`.
-- **Generator limitation** → wrap the generated class in a handwritten decorator under `src/main/java/`.
+Unless you explicitly state otherwise, a contribution intentionally submitted for inclusion in this project is provided under Apache-2.0 without additional terms, as described in Section 5 of the license. This project does not currently require a separate Contributor License Agreement (CLA) or Developer Certificate of Origin (DCO) sign-off.
 
-### Spec preprocessing fixes
+## Contribution workflow
 
-If generated code breaks due to an upstream spec issue, add a fix to the appropriate `preprocess*Spec` task in
-`build-logic/src/main/groovy/alpaca.openapi-generation.gradle`. Put reusable SnakeYAML transformations in
-`build-logic/src/main/groovy/markets/alpaca/gradle/OpenApiSpecSupport.groovy` and use its `loadSpec` / `dumpYaml`
-helpers. Do **not** patch OAS YAML with regex or raw string substitution, and do **not** modify the source specs in
-`alpaca-docs-private` from this repository.
+1. Search existing issues and pull requests.
+2. Open an issue first for work described under [Discuss substantial changes first](#discuss-substantial-changes-first).
+3. Fork the repository and create a focused branch.
+4. Make the change in handwritten source files or through the documented OpenAPI generation workflow.
+5. Add focused tests for new or changed behavior and update relevant documentation.
+6. Run the relevant checks listed below.
+7. Open a focused pull request, explain why the change is needed, and respond to review feedback.
 
-### WebSocket models
+Use clear, descriptive commit messages and pull request titles. Conventional Commits are not required, and contributors do not need to squash commits before opening a pull request. This repository uses merge commits.
 
-Monetary and price values in WebSocket model records must use `BigDecimal` — never `double` or `float`.
+## Prerequisites
 
-### Testing
+- Java 17 or newer.
+- The repository's Gradle Wrapper (`./gradlew`).
+- Node.js `>=22.23.4 <23` for Docusaurus documentation checks, matching CI.
+- `pre-commit` and `lychee` when running the optional local hooks.
 
-See [`TESTING.md`](TESTING.md) for unit and integration test commands and live-test credentials.
+## Setup and checks
 
-### Code checks
-
-Run the full verification gate:
+Run the standard checks from the repository root:
 
 ```bash
 ./gradlew check
+./gradlew build
 ```
+
+`check` runs unit tests, quality checks, generated-source drift checks, and example compilation. `build` runs the complete verification gate.
 
 Useful focused checks:
 
@@ -96,14 +89,14 @@ Useful focused checks:
 ./gradlew spotlessCheck                 # formatting and import order
 ./gradlew checkstyleMain checkstyleTest # source style checks
 ./gradlew spotbugsMain                  # static bug analysis for handwritten classes
-./gradlew spotlessApply                 # apply formatter changes
-npm run build --prefix docs             # validate generated Docusaurus docs
-pre-commit run markdown-links --all-files  # validate non-Docusaurus Markdown links
-pre-commit run gradle-code-checks --all-files  # same Gradle code checks as CI
+./gradlew checkApiCompatibility         # compare the public JAR with the release baseline
+./gradlew checkSseContracts             # verify pinned SSE coverage
+./gradlew integrationTest               # live read-only tests; skips without credentials
+npm run build --prefix docs             # validate Docusaurus documentation
+pre-commit run markdown-links --all-files
 ```
 
-Generated OpenAPI output under `src/main/java/markets/alpaca/client/openapi/` is excluded from
-formatting and static-analysis checks.
+Apply formatter fixes with `./gradlew spotlessApply`. Generated OpenAPI output under `src/main/java/markets/alpaca/client/openapi/` is excluded from formatting and static-analysis checks.
 
 To run the same checks locally before each commit, install the hooks once:
 
@@ -111,23 +104,56 @@ To run the same checks locally before each commit, install the hooks once:
 pre-commit install
 ```
 
-This installs:
+This installs Markdown link validation (`lychee`), matching CI, and Gradle code checks (`./gradlew spotlessCheck checkstyleMain checkstyleTest spotbugsMain`). To skip Gradle checks for a single commit, use `SKIP=gradle-code-checks git commit ...`.
 
-- Markdown link validation (`lychee`), matching the CI link checker. Requires a local `lychee` binary.
-- Gradle code checks: `./gradlew spotlessCheck checkstyleMain checkstyleTest spotbugsMain`, matching
-  the CI code-checks step. The hook is check-only; apply formatter fixes with `./gradlew spotlessApply`
-  and commit again.
+There is no numeric coverage threshold, but changed behavior must have focused tests. See [`TESTING.md`](./TESTING.md) for unit and integration test commands and live-test credentials.
 
-To skip Gradle checks for a single commit:
+## Testing and financial safety
 
-```bash
-SKIP=gradle-code-checks git commit ...
-```
+- Default repository tests and CI must never place live orders or depend on Alpaca credentials. They must be deterministic and use mocks, fakes, or synthetic fixtures for API behavior.
+- Opt-in integration tests are read-only, skip without credentials, use Trading paper and Broker sandbox credentials, and require bounded SSE replay windows where applicable.
+- Runnable trading examples must use paper trading by default and require an explicit user choice before targeting live trading.
+- Real credentials, account identifiers, account data, and production payloads must never appear in tests, fixtures, examples, or committed logs and artifacts. Remove request and trace IDs from public or committed material; share private diagnostics only through Alpaca Support channels when needed.
 
-## PR Checklist
+## Coding guidelines
 
-- [ ] Generated code (`src/main/java/markets/alpaca/client/openapi/`) was not edited directly.
-- [ ] New behaviour has focused unit tests.
-- [ ] WebSocket monetary values avoid floating-point types (`double`/`float`).
-- [ ] Relevant docs (`README.md`, `AGENTS.md`, `LLMS.md`, `TESTING.md`, `RELEASING.md`) and `CHANGELOG.md` are updated when public behaviour changes.
-- [ ] `./gradlew check` and `./gradlew build` pass locally.
+### Generated versus handwritten code
+
+Never hand-edit files under `src/main/java/markets/alpaca/client/openapi/`. Regenerate with `./gradlew generateApis` or adopt upstream via `./gradlew adoptOpenApi` or `./gradlew adoptOpenApiBreaking`. See [`GENERATION.md`](./GENERATION.md). When a pinned spec changes an SSE operation, run `./gradlew checkSseContracts`; `checkGenerated` and `build` run it as well.
+
+Pinned OpenAPI documents live under `specs/`. Handwritten code belongs under `src/main/java/markets/alpaca/client/`, including the `data/`, `data/sse/`, `http/`, `rest/`, `trading/`, `trading/sse/`, `broker/sse/`, `sse/`, and `ws/` packages. The generated REST packages under `markets.alpaca.client.openapi/**` are owned by OpenAPI Generator. Do not add handwritten code there.
+
+`markets.alpaca.client.sse.internal` is an implementation package, not supported public API. It is excluded from published Javadocs and API compatibility checks. Keep user-facing lifecycle types in `markets.alpaca.client.sse`, and do not expose internal transport types from public signatures.
+
+### Generated-code fixes
+
+Do not modify generated files. For a spec bug, add a preprocessing fix to the relevant task in `build-logic/src/main/groovy/alpaca.openapi-generation.gradle`. For a generator limitation, wrap the generated class in a handwritten decorator under `src/main/java/`.
+
+Put reusable parsed-YAML SnakeYAML transformations in `build-logic/src/main/groovy/markets/alpaca/gradle/OpenApiSpecSupport.groovy` and use its `loadSpec` and `dumpYaml` helpers. Do not patch OpenAPI YAML with regex or raw string substitution, and do not modify source specs in `alpaca-docs-private` from this repository.
+
+### Public API and documentation
+
+Run `./gradlew checkApiCompatibility` before merging changes that could affect the public SDK surface. Read [`MIGRATIONS.md`](./MIGRATIONS.md) and update it with compatibility and upgrade guidance when applicable. Update Javadocs, Docusaurus documentation, examples, and the changelog when public behavior changes.
+
+### WebSocket models
+
+Monetary and price values in WebSocket model records must use `BigDecimal`, never `double` or `float`.
+
+## Maintainer releases
+
+Read [`RELEASING.md`](./RELEASING.md) before creating a release, changing release automation, or recovering from a failed publication.
+
+## Pull request checklist
+
+Before requesting review, confirm that:
+
+- the change is focused and follows the contribution policy;
+- any substantial API, dependency, or third-party work was discussed with maintainers before implementation;
+- `./gradlew checkApiCompatibility` was run when the change could affect the public SDK surface;
+- generated code was not edited directly;
+- new or changed behavior has focused tests when applicable;
+- default tests are deterministic and credential-free and cannot place live orders, trading examples default to paper trading, and fixtures use synthetic data;
+- documentation and examples are updated when applicable;
+- applicable formatting, generation, test, API compatibility, and documentation checks pass;
+- no credentials, account data, request or trace IDs, or other secrets are included; and
+- any provider-specific integration or promotional contribution has written Alpaca approval confirmed by repository maintainers.

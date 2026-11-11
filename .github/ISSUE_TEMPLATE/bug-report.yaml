@@ -1,0 +1,110 @@
+name: 🐞 Bug report
+description: Report reproducible behavior in alpaca-java
+title: "[Bug]: "
+labels: [bug]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Report SDK behavior here in English. Bugs in the Alpaca API itself, its OpenAPI specs, or its documentation go to [alpacahq/alpaca-api](https://github.com/alpacahq/alpaca-api/issues/new/choose). API feature requests, general questions, and dashboard bugs go to the [Community Forum](https://forum.alpaca.markets/) or [Slack](https://alpaca.markets/slack). Questions about your account, funding, or orders go to a [support request](https://alpaca.markets/support/request). Service status and incident updates are on the [status page](https://status.alpaca.markets/).
+
+        Do not disclose suspected security vulnerabilities publicly. Follow the private reporting process in our [Security Policy](https://github.com/alpacahq/alpaca-java/blob/main/SECURITY.md).
+
+        Never include API keys, account details, request or trace IDs, or other secrets.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight
+      options:
+        - label: I searched existing issues and tested the latest applicable SDK release.
+          required: true
+        - label: This report concerns SDK behavior. Bugs in the Alpaca API, its OpenAPI specs, or docs.alpaca.markets go to alpacahq/alpaca-api.
+          required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: SDK area
+      description: Which SDK surface is affected?
+      options:
+        - Trading REST
+        - Broker REST
+        - Market Data REST
+        - Trading activity (SSE)
+        - Broker events (SSE)
+        - Market Data corporate actions (SSE)
+        - Trading WebSocket stream
+        - Market Data WebSocket stream
+        - Authentication or configuration
+        - Maven, Gradle, installation, or Java compatibility
+        - Developer experience
+        - Documentation or examples
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: sdk_version
+    attributes:
+      label: SDK version
+      description: Provide the exact installed alpaca-java version.
+      placeholder: alpaca-java 0.x.y
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Java version, OS, and architecture
+      description: Include the output of `java --version` and your operating system and architecture because networking and WebSocket behavior can differ by environment.
+      placeholder: Java 17.0.12 on macOS arm64
+    validations:
+      required: true
+
+  - type: input
+    id: module
+    attributes:
+      label: SDK package or class
+      description: State which SDK package, class, or client is affected.
+      placeholder: markets.alpaca.client.AlpacaClient
+
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: Current behavior
+      description: Describe what happens, including safe error output.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected behavior
+      description: Describe what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide the smallest runnable example and exact steps.
+      render: java
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Add sanitized logs or other non-sensitive context. Do not post request IDs, trace IDs, account identifiers, or private diagnostics; share those privately through a [support request](https://alpaca.markets/support/request) or the [Security Policy](https://github.com/alpacahq/alpaca-java/blob/main/SECURITY.md) when appropriate.
+
+  - type: checkboxes
+    id: sensitive_data
+    attributes:
+      label: Sensitive-data check
+      options:
+        - label: I removed API keys, credentials, account details, request or trace IDs, and other sensitive information.
+          required: true
