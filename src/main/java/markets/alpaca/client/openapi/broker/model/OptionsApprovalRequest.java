@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * OptionsApprovalRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class OptionsApprovalRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -58,7 +58,7 @@ public class OptionsApprovalRequest implements Serializable {
    * The desired option trading level. 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles.
    */
   @JsonAdapter(LevelEnum.Adapter.class)
-  public enum LevelEnum {
+  public enum LevelEnum implements Serializable {
     NUMBER_1(1),
     
     NUMBER_2(2),

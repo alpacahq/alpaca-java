@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents the results of checking a Photo for CIPInfo
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CIPPhoto implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -93,7 +93,7 @@ public class CIPPhoto implements Serializable {
    * Overall status of the check. Either &#x60;complete&#x60; or &#x60;withdrawn&#x60;.
    */
   @JsonAdapter(StatusEnum.Adapter.class)
-  public enum StatusEnum {
+  public enum StatusEnum implements Serializable {
     COMPLETE("complete"),
     
     WITHDRAWN("withdrawn");

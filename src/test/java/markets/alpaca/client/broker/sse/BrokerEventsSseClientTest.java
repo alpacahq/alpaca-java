@@ -790,15 +790,14 @@ class BrokerEventsSseClientTest {
     ExecutorService callbackExecutor = Executors.newSingleThreadExecutor();
     var releaseExecutor = new CountDownLatch(1);
     var executorBlocked = new CountDownLatch(1);
-    callbackExecutor.execute(
-        () -> {
-          executorBlocked.countDown();
-          try {
-            releaseExecutor.await();
-          } catch (InterruptedException failure) {
-            Thread.currentThread().interrupt();
-          }
-        });
+    callbackExecutor.execute(() -> {
+      executorBlocked.countDown();
+      try {
+        releaseExecutor.await();
+      } catch (InterruptedException failure) {
+        Thread.currentThread().interrupt();
+      }
+    });
     assertTrue(executorBlocked.await(1, TimeUnit.SECONDS));
     try {
       var sse =
@@ -941,12 +940,12 @@ class BrokerEventsSseClientTest {
 
   private static String fillActivityJson() {
     return """
-        {"account_id":"123e4567-e89b-12d3-a456-426614174002","activity_type":"FILL",
-        "at":"2026-10-01T12:00:00Z","currency":"USD",
-        "event_id":"01K6G000000000000000000000","executed_at":"2026-10-01T12:00:00Z",
-        "ref_id":"123e4567-e89b-12d3-a456-426614174000","settle_date":"2026-10-02",
-        "status":"executed","details":{}}
-        """
+    {"account_id":"123e4567-e89b-12d3-a456-426614174002","activity_type":"FILL",
+    "at":"2026-10-01T12:00:00Z","currency":"USD",
+    "event_id":"01K6G000000000000000000000","executed_at":"2026-10-01T12:00:00Z",
+    "ref_id":"123e4567-e89b-12d3-a456-426614174000","settle_date":"2026-10-02",
+    "status":"executed","details":{}}
+    """
         .replace("\n", "");
   }
 }

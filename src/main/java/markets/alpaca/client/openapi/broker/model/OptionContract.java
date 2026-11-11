@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * OptionContract
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class OptionContract implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -122,7 +122,7 @@ public class OptionContract implements Serializable {
    * The status of the option contract.
    */
   @JsonAdapter(StatusEnum.Adapter.class)
-  public enum StatusEnum {
+  public enum StatusEnum implements Serializable {
     ACTIVE("active"),
     
     INACTIVE("inactive");
@@ -184,7 +184,7 @@ public class OptionContract implements Serializable {
    * The style of the option contract.
    */
   @JsonAdapter(StyleEnum.Adapter.class)
-  public enum StyleEnum {
+  public enum StyleEnum implements Serializable {
     AMERICAN("american"),
     
     EUROPEAN("european");
@@ -251,7 +251,7 @@ public class OptionContract implements Serializable {
    * The type of the option contract.
    */
   @JsonAdapter(TypeEnum.Adapter.class)
-  public enum TypeEnum {
+  public enum TypeEnum implements Serializable {
     CALL("call"),
     
     PUT("put");

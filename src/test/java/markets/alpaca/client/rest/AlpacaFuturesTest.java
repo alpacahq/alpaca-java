@@ -25,11 +25,10 @@ class AlpacaFuturesTest {
     var call = newCall();
 
     var future =
-        AlpacaFutures.data(
-            callback -> {
-              callback.onSuccess("ok", 200, java.util.Map.of());
-              return call;
-            });
+        AlpacaFutures.data(callback -> {
+          callback.onSuccess("ok", 200, java.util.Map.of());
+          return call;
+        });
 
     assertEquals("ok", future.join());
   }
@@ -41,11 +40,10 @@ class AlpacaFuturesTest {
     headers.put("x-test", headerValues);
 
     var future =
-        AlpacaFutures.dataResponse(
-            callback -> {
-              callback.onSuccess("ok", 202, headers);
-              return newCall();
-            });
+        AlpacaFutures.dataResponse(callback -> {
+          callback.onSuccess("ok", 202, headers);
+          return newCall();
+        });
     headerValues.add("mutated");
 
     var response = future.join();
@@ -60,11 +58,10 @@ class AlpacaFuturesTest {
   @Test
   void dataResponse_acceptsNullBodyAndNullHeaders() {
     var future =
-        AlpacaFutures.dataResponse(
-            callback -> {
-              callback.onSuccess(null, 204, null);
-              return newCall();
-            });
+        AlpacaFutures.dataResponse(callback -> {
+          callback.onSuccess(null, 204, null);
+          return newCall();
+        });
 
     var response = future.join();
     assertNull(response.body());
@@ -78,11 +75,10 @@ class AlpacaFuturesTest {
     var exception = new markets.alpaca.client.openapi.data.http.ApiException("boom");
 
     var future =
-        AlpacaFutures.data(
-            callback -> {
-              callback.onFailure(exception, 500, java.util.Map.of());
-              return newCall();
-            });
+        AlpacaFutures.data(callback -> {
+          callback.onFailure(exception, 500, java.util.Map.of());
+          return newCall();
+        });
 
     CompletionException thrown = assertThrows(CompletionException.class, future::join);
     assertSame(exception, thrown.getCause());
@@ -94,10 +90,9 @@ class AlpacaFuturesTest {
         new markets.alpaca.client.openapi.data.http.ApiException("missing required param");
 
     var future =
-        AlpacaFutures.data(
-            callback -> {
-              throw exception;
-            });
+        AlpacaFutures.data(callback -> {
+          throw exception;
+        });
 
     CompletionException thrown = assertThrows(CompletionException.class, future::join);
     assertSame(exception, thrown.getCause());
@@ -108,10 +103,9 @@ class AlpacaFuturesTest {
     var exception = new IllegalStateException("broken generated wrapper");
 
     var future =
-        AlpacaFutures.data(
-            callback -> {
-              throw exception;
-            });
+        AlpacaFutures.data(callback -> {
+          throw exception;
+        });
 
     CompletionException thrown = assertThrows(CompletionException.class, future::join);
     assertSame(exception, thrown.getCause());
@@ -122,12 +116,11 @@ class AlpacaFuturesTest {
     var callRef = new AtomicReference<Call>();
 
     var future =
-        AlpacaFutures.data(
-            callback -> {
-              Call call = newCall();
-              callRef.set(call);
-              return call;
-            });
+        AlpacaFutures.data(callback -> {
+          Call call = newCall();
+          callRef.set(call);
+          return call;
+        });
 
     assertTrue(future.cancel(true));
     assertTrue(callRef.get().isCanceled());
@@ -138,12 +131,11 @@ class AlpacaFuturesTest {
     var callRef = new AtomicReference<Call>();
 
     var future =
-        AlpacaFutures.dataResponse(
-            callback -> {
-              Call call = newCall();
-              callRef.set(call);
-              return call;
-            });
+        AlpacaFutures.dataResponse(callback -> {
+          Call call = newCall();
+          callRef.set(call);
+          return call;
+        });
 
     assertTrue(future.cancel(true));
     assertTrue(callRef.get().isCanceled());
@@ -155,11 +147,10 @@ class AlpacaFuturesTest {
         new AtomicReference<markets.alpaca.client.openapi.data.http.ApiCallback<String>>();
 
     var future =
-        AlpacaFutures.<String>data(
-            callback -> {
-              callbackRef.set(callback);
-              return newCall();
-            });
+        AlpacaFutures.<String>data(callback -> {
+          callbackRef.set(callback);
+          return newCall();
+        });
 
     assertTrue(future.cancel(true));
     callbackRef.get().onSuccess("too-late", 200, java.util.Map.of());
@@ -174,11 +165,10 @@ class AlpacaFuturesTest {
         new AtomicReference<markets.alpaca.client.openapi.data.http.ApiCallback<String>>();
 
     var future =
-        AlpacaFutures.<String>data(
-            callback -> {
-              callbackRef.set(callback);
-              return newCall();
-            });
+        AlpacaFutures.<String>data(callback -> {
+          callbackRef.set(callback);
+          return newCall();
+        });
 
     assertTrue(future.cancel(true));
     callbackRef
@@ -192,13 +182,12 @@ class AlpacaFuturesTest {
   @Test
   void dataResponse_progressCallbacksAreNoops() {
     var future =
-        AlpacaFutures.dataResponse(
-            callback -> {
-              callback.onUploadProgress(10, 20, false);
-              callback.onDownloadProgress(20, 20, true);
-              callback.onSuccess("ok", 200, java.util.Map.of());
-              return newCall();
-            });
+        AlpacaFutures.dataResponse(callback -> {
+          callback.onUploadProgress(10, 20, false);
+          callback.onDownloadProgress(20, 20, true);
+          callback.onSuccess("ok", 200, java.util.Map.of());
+          return newCall();
+        });
 
     assertEquals("ok", future.join().body());
   }
@@ -212,11 +201,10 @@ class AlpacaFuturesTest {
   @Test
   void broker_completesWithResponseBodyOnSuccess() {
     var future =
-        AlpacaFutures.broker(
-            callback -> {
-              callback.onSuccess("broker-ok", 200, java.util.Map.of());
-              return newCall();
-            });
+        AlpacaFutures.broker(callback -> {
+          callback.onSuccess("broker-ok", 200, java.util.Map.of());
+          return newCall();
+        });
 
     assertEquals("broker-ok", future.join());
   }
@@ -224,11 +212,10 @@ class AlpacaFuturesTest {
   @Test
   void brokerResponse_preservesStatusCodeAndHeaders() {
     var future =
-        AlpacaFutures.brokerResponse(
-            callback -> {
-              callback.onSuccess("broker-ok", 201, java.util.Map.of("x-broker", List.of("yes")));
-              return newCall();
-            });
+        AlpacaFutures.brokerResponse(callback -> {
+          callback.onSuccess("broker-ok", 201, java.util.Map.of("x-broker", List.of("yes")));
+          return newCall();
+        });
 
     var response = future.join();
     assertEquals("broker-ok", response.body());
@@ -241,11 +228,10 @@ class AlpacaFuturesTest {
     var exception = new markets.alpaca.client.openapi.broker.http.ApiException("broker-failed");
 
     var future =
-        AlpacaFutures.broker(
-            callback -> {
-              callback.onFailure(exception, 500, java.util.Map.of());
-              return newCall();
-            });
+        AlpacaFutures.broker(callback -> {
+          callback.onFailure(exception, 500, java.util.Map.of());
+          return newCall();
+        });
 
     CompletionException thrown = assertThrows(CompletionException.class, future::join);
     assertSame(exception, thrown.getCause());
@@ -257,10 +243,9 @@ class AlpacaFuturesTest {
         new markets.alpaca.client.openapi.broker.http.ApiException("missing required param");
 
     var future =
-        AlpacaFutures.broker(
-            callback -> {
-              throw exception;
-            });
+        AlpacaFutures.broker(callback -> {
+          throw exception;
+        });
 
     CompletionException thrown = assertThrows(CompletionException.class, future::join);
     assertSame(exception, thrown.getCause());
@@ -271,12 +256,11 @@ class AlpacaFuturesTest {
     var callRef = new AtomicReference<Call>();
 
     var future =
-        AlpacaFutures.broker(
-            callback -> {
-              Call call = newCall();
-              callRef.set(call);
-              return call;
-            });
+        AlpacaFutures.broker(callback -> {
+          Call call = newCall();
+          callRef.set(call);
+          return call;
+        });
 
     assertTrue(future.cancel(true));
     assertTrue(callRef.get().isCanceled());
@@ -291,11 +275,10 @@ class AlpacaFuturesTest {
   @Test
   void trading_completesWithResponseBodyOnSuccess() {
     var future =
-        AlpacaFutures.trading(
-            callback -> {
-              callback.onSuccess("trading-ok", 200, java.util.Map.of());
-              return newCall();
-            });
+        AlpacaFutures.trading(callback -> {
+          callback.onSuccess("trading-ok", 200, java.util.Map.of());
+          return newCall();
+        });
 
     assertEquals("trading-ok", future.join());
   }
@@ -303,11 +286,10 @@ class AlpacaFuturesTest {
   @Test
   void tradingResponse_preservesStatusCodeAndHeaders() {
     var future =
-        AlpacaFutures.tradingResponse(
-            callback -> {
-              callback.onSuccess("trading-ok", 202, java.util.Map.of("x-trading", List.of("yes")));
-              return newCall();
-            });
+        AlpacaFutures.tradingResponse(callback -> {
+          callback.onSuccess("trading-ok", 202, java.util.Map.of("x-trading", List.of("yes")));
+          return newCall();
+        });
 
     var response = future.join();
     assertEquals("trading-ok", response.body());
@@ -320,11 +302,10 @@ class AlpacaFuturesTest {
     var exception = new markets.alpaca.client.openapi.trading.http.ApiException("trading-failed");
 
     var future =
-        AlpacaFutures.trading(
-            callback -> {
-              callback.onFailure(exception, 500, java.util.Map.of());
-              return newCall();
-            });
+        AlpacaFutures.trading(callback -> {
+          callback.onFailure(exception, 500, java.util.Map.of());
+          return newCall();
+        });
 
     CompletionException thrown = assertThrows(CompletionException.class, future::join);
     assertSame(exception, thrown.getCause());
@@ -336,10 +317,9 @@ class AlpacaFuturesTest {
         new markets.alpaca.client.openapi.trading.http.ApiException("missing required param");
 
     var future =
-        AlpacaFutures.trading(
-            callback -> {
-              throw exception;
-            });
+        AlpacaFutures.trading(callback -> {
+          throw exception;
+        });
 
     CompletionException thrown = assertThrows(CompletionException.class, future::join);
     assertSame(exception, thrown.getCause());
@@ -350,12 +330,11 @@ class AlpacaFuturesTest {
     var callRef = new AtomicReference<Call>();
 
     var future =
-        AlpacaFutures.trading(
-            callback -> {
-              Call call = newCall();
-              callRef.set(call);
-              return call;
-            });
+        AlpacaFutures.trading(callback -> {
+          Call call = newCall();
+          callRef.set(call);
+          return call;
+        });
 
     assertTrue(future.cancel(true));
     assertTrue(callRef.get().isCanceled());

@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Full run snapshot sent on &#x60;run.created&#x60; and &#x60;run.status_changed&#x60;. Order lists are omitted; read them from &#x60;GET /v1/rebalancing/runs/{run_id}&#x60;.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class RebalancerEventRun implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -102,7 +102,7 @@ public class RebalancerEventRun implements Serializable {
    * Run status delivered on the rebalancer stream. &#x60;CANCELED_MID_RUN&#x60; is a REST portfolio-run status and is not sent on this stream.
    */
   @JsonAdapter(StatusEnum.Adapter.class)
-  public enum StatusEnum {
+  public enum StatusEnum implements Serializable {
     QUEUED("QUEUED"),
     
     IN_PROGRESS("IN_PROGRESS"),

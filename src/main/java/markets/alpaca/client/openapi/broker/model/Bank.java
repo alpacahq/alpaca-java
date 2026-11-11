@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Bank
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class Bank implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -76,7 +76,7 @@ public class Bank implements Serializable {
    * ABA (Domestic) or BIC (International)
    */
   @JsonAdapter(BankCodeTypeEnum.Adapter.class)
-  public enum BankCodeTypeEnum {
+  public enum BankCodeTypeEnum implements Serializable {
     ABA("ABA"),
     
     BIC("BIC");
@@ -173,7 +173,7 @@ public class Bank implements Serializable {
    * QUEUED, SENT_TO_CLEARING, APPROVED, REJECTED, CANCELED
    */
   @JsonAdapter(StatusEnum.Adapter.class)
-  public enum StatusEnum {
+  public enum StatusEnum implements Serializable {
     QUEUED("QUEUED"),
     
     SENT_TO_CLEARING("SENT_TO_CLEARING"),

@@ -458,18 +458,17 @@ class AlpacaTradingStreamTest {
             AlpacaStreamReconnectPolicy.disabled());
     stream
         .authenticationResultFuture()
-        .thenRun(
-            () -> {
-              resultFutureCopyCompleted.countDown();
-              try {
-                assertTrue(
-                    releaseResultFutureContinuation.await(TIMEOUT_S, TimeUnit.SECONDS),
-                    "Authentication result future continuation was not released in time");
-              } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new AssertionError(e);
-              }
-            });
+        .thenRun(() -> {
+          resultFutureCopyCompleted.countDown();
+          try {
+            assertTrue(
+                releaseResultFutureContinuation.await(TIMEOUT_S, TimeUnit.SECONDS),
+                "Authentication result future continuation was not released in time");
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError(e);
+          }
+        });
 
     try {
       var ss = new ServerSocket();

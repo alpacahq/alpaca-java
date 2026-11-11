@@ -1542,15 +1542,14 @@ class SseTransportTest {
       assertEquals(0, completionExecutor.getQueue().remainingCapacity());
 
       for (int index = 0; index < terminalExecutor.getMaximumPoolSize(); index++) {
-        terminalExecutor.execute(
-            () -> {
-              workersStarted.countDown();
-              try {
-                releaseWorkers.await();
-              } catch (InterruptedException failure) {
-                Thread.currentThread().interrupt();
-              }
-            });
+        terminalExecutor.execute(() -> {
+          workersStarted.countDown();
+          try {
+            releaseWorkers.await();
+          } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+          }
+        });
       }
       assertTrue(workersStarted.await(1, TimeUnit.SECONDS));
       int queueCapacity = terminalExecutor.getQueue().remainingCapacity();
@@ -1561,15 +1560,14 @@ class SseTransportTest {
       assertEquals(terminalExecutor.getMaximumPoolSize(), terminalExecutor.getLargestPoolSize());
 
       for (int index = 0; index < concurrentCompletions; index++) {
-        completionExecutor.execute(
-            () -> {
-              completionWorkersStarted.countDown();
-              try {
-                releaseCompletionWorkers.await();
-              } catch (InterruptedException failure) {
-                Thread.currentThread().interrupt();
-              }
-            });
+        completionExecutor.execute(() -> {
+          completionWorkersStarted.countDown();
+          try {
+            releaseCompletionWorkers.await();
+          } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+          }
+        });
       }
       assertTrue(completionWorkersStarted.await(1, TimeUnit.SECONDS));
       assertTrue(completionExecutor.getLargestPoolSize() >= concurrentCompletions);
@@ -1691,15 +1689,14 @@ class SseTransportTest {
     var openingWorkerStarted = new CountDownLatch(1);
     var releaseOpeningWorker = new CountDownLatch(1);
     var openedCallback = new AtomicBoolean();
-    openingExecutor.execute(
-        () -> {
-          openingWorkerStarted.countDown();
-          try {
-            releaseOpeningWorker.await();
-          } catch (InterruptedException failure) {
-            Thread.currentThread().interrupt();
-          }
-        });
+    openingExecutor.execute(() -> {
+      openingWorkerStarted.countDown();
+      try {
+        releaseOpeningWorker.await();
+      } catch (InterruptedException failure) {
+        Thread.currentThread().interrupt();
+      }
+    });
     assertTrue(openingWorkerStarted.await(1, TimeUnit.SECONDS));
 
     var subscription =
@@ -2064,17 +2061,16 @@ class SseTransportTest {
     var observedCompletion =
         subscription
             .opened()
-            .handle(
-                (connection, failure) -> {
-                  assertNotNull(failure);
-                  try {
-                    subscription.completion().join();
-                    fail("failed subscription completion must be exceptional");
-                  } catch (CompletionException expected) {
-                    // The important contract is that this synchronous continuation cannot block.
-                  }
-                  return subscription.completion().isDone();
-                });
+            .handle((connection, failure) -> {
+              assertNotNull(failure);
+              try {
+                subscription.completion().join();
+                fail("failed subscription completion must be exceptional");
+              } catch (CompletionException expected) {
+                // The important contract is that this synchronous continuation cannot block.
+              }
+              return subscription.completion().isDone();
+            });
 
     assertTrue(observedCompletion.get(2, TimeUnit.SECONDS));
     assertEquals(AlpacaSseState.FAILED, subscription.state());
@@ -2100,21 +2096,19 @@ class SseTransportTest {
             ExecutorService closers = Executors.newFixedThreadPool(2);
             try {
               var first =
-                  closers.submit(
-                      () -> {
-                        ready.countDown();
-                        start.await();
-                        subscription.close();
-                        return subscription.completion().isDone();
-                      });
+                  closers.submit(() -> {
+                    ready.countDown();
+                    start.await();
+                    subscription.close();
+                    return subscription.completion().isDone();
+                  });
               var second =
-                  closers.submit(
-                      () -> {
-                        ready.countDown();
-                        start.await();
-                        subscription.close();
-                        return subscription.completion().isDone();
-                      });
+                  closers.submit(() -> {
+                    ready.countDown();
+                    start.await();
+                    subscription.close();
+                    return subscription.completion().isDone();
+                  });
               assertTrue(ready.await(1, TimeUnit.SECONDS));
               start.countDown();
               assertTrue(first.get(1, TimeUnit.SECONDS));
@@ -2160,18 +2154,17 @@ class SseTransportTest {
 
     var accepted = subscription.opened();
     var closedFromOpened =
-        accepted.thenRun(
-            () -> {
-              subscription.close();
-              try {
-                assertTrue(
-                    closed.await(1, TimeUnit.SECONDS),
-                    "onClosed must run while the synchronous opened continuation is active");
-              } catch (InterruptedException failure) {
-                Thread.currentThread().interrupt();
-                throw new AssertionError("interrupted while waiting for onClosed", failure);
-              }
-            });
+        accepted.thenRun(() -> {
+          subscription.close();
+          try {
+            assertTrue(
+                closed.await(1, TimeUnit.SECONDS),
+                "onClosed must run while the synchronous opened continuation is active");
+          } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError("interrupted while waiting for onClosed", failure);
+          }
+        });
 
     closedFromOpened.get(2, TimeUnit.SECONDS);
     assertNotNull(accepted.get(1, TimeUnit.SECONDS));
@@ -2207,17 +2200,16 @@ class SseTransportTest {
     var continuation =
         subscription
             .completion()
-            .thenRun(
-                () -> {
-                  try {
-                    assertTrue(
-                        closed.await(3, TimeUnit.SECONDS),
-                        "onClosed must run while the synchronous completion continuation is active");
-                  } catch (InterruptedException failure) {
-                    Thread.currentThread().interrupt();
-                    throw new AssertionError("interrupted while waiting for onClosed", failure);
-                  }
-                });
+            .thenRun(() -> {
+              try {
+                assertTrue(
+                    closed.await(3, TimeUnit.SECONDS),
+                    "onClosed must run while the synchronous completion continuation is active");
+              } catch (InterruptedException failure) {
+                Thread.currentThread().interrupt();
+                throw new AssertionError("interrupted while waiting for onClosed", failure);
+              }
+            });
 
     var close = CompletableFuture.runAsync(subscription::close);
 
@@ -2254,15 +2246,14 @@ class SseTransportTest {
     firstReference.set(first);
     var second = subscription.completion();
     var secondContinuation =
-        second.thenRun(
-            () -> {
-              try {
-                assertTrue(closed.await(2, TimeUnit.SECONDS));
-              } catch (InterruptedException failure) {
-                Thread.currentThread().interrupt();
-                throw new AssertionError("interrupted while waiting for onClosed", failure);
-              }
-            });
+        second.thenRun(() -> {
+          try {
+            assertTrue(closed.await(2, TimeUnit.SECONDS));
+          } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError("interrupted while waiting for onClosed", failure);
+          }
+        });
 
     CompletableFuture.runAsync(subscription::close).get(2, TimeUnit.SECONDS);
 
@@ -2290,13 +2281,11 @@ class SseTransportTest {
     var continuation =
         subscription
             .completion()
-            .handle(
-                (result, failure) -> {
-                  assertNotNull(failure);
-                  assertNotNull(
-                      opened.handle((connection, openingFailure) -> openingFailure).join());
-                  return null;
-                });
+            .handle((result, failure) -> {
+              assertNotNull(failure);
+              assertNotNull(opened.handle((connection, openingFailure) -> openingFailure).join());
+              return null;
+            });
 
     continuation.get(2, TimeUnit.SECONDS);
     assertThrows(ExecutionException.class, () -> opened.get(1, TimeUnit.SECONDS));
@@ -2334,16 +2323,15 @@ class SseTransportTest {
       var secondCompletion =
           second
               .completion()
-              .thenRun(
-                  () -> {
-                    try {
-                      assertTrue(secondClosed.await(2, TimeUnit.SECONDS));
-                    } catch (InterruptedException failure) {
-                      Thread.currentThread().interrupt();
-                      throw new AssertionError(
-                          "interrupted while waiting for the second terminal callback", failure);
-                    }
-                  });
+              .thenRun(() -> {
+                try {
+                  assertTrue(secondClosed.await(2, TimeUnit.SECONDS));
+                } catch (InterruptedException failure) {
+                  Thread.currentThread().interrupt();
+                  throw new AssertionError(
+                      "interrupted while waiting for the second terminal callback", failure);
+                }
+              });
 
       server.enqueue(
           new MockResponse()
@@ -2416,17 +2404,16 @@ class SseTransportTest {
     var continuation =
         subscription
             .completion()
-            .thenRun(
-                () -> {
-                  try {
-                    assertTrue(
-                        closed.await(3, TimeUnit.SECONDS),
-                        "onClosed must run while the synchronous completion continuation is active");
-                  } catch (InterruptedException failure) {
-                    Thread.currentThread().interrupt();
-                    throw new AssertionError("interrupted while waiting for onClosed", failure);
-                  }
-                });
+            .thenRun(() -> {
+              try {
+                assertTrue(
+                    closed.await(3, TimeUnit.SECONDS),
+                    "onClosed must run while the synchronous completion continuation is active");
+              } catch (InterruptedException failure) {
+                Thread.currentThread().interrupt();
+                throw new AssertionError("interrupted while waiting for onClosed", failure);
+              }
+            });
     releaseEvent.countDown();
 
     assertTrue(eventReturned.await(2, TimeUnit.SECONDS));
@@ -2467,18 +2454,17 @@ class SseTransportTest {
         continuations[index] =
             parents[index]
                 .completion()
-                .thenRun(
-                    () -> {
-                      continuationsEntered.countDown();
-                      try {
-                        assertTrue(continuationsEntered.await(2, TimeUnit.SECONDS));
-                      } catch (InterruptedException failure) {
-                        Thread.currentThread().interrupt();
-                        throw new AssertionError(
-                            "interrupted while synchronizing completion workers", failure);
-                      }
-                      children[subscriptionIndex].close();
-                    });
+                .thenRun(() -> {
+                  continuationsEntered.countDown();
+                  try {
+                    assertTrue(continuationsEntered.await(2, TimeUnit.SECONDS));
+                  } catch (InterruptedException failure) {
+                    Thread.currentThread().interrupt();
+                    throw new AssertionError(
+                        "interrupted while synchronizing completion workers", failure);
+                  }
+                  children[subscriptionIndex].close();
+                });
       }
 
       for (var parent : parents) {
@@ -2524,19 +2510,17 @@ class SseTransportTest {
     var continuation =
         subscription
             .completion()
-            .handle(
-                (result, failure) -> {
-                  try {
-                    assertTrue(
-                        failed.await(3, TimeUnit.SECONDS),
-                        "onFailure must run while the synchronous completion continuation is active");
-                  } catch (InterruptedException interrupted) {
-                    Thread.currentThread().interrupt();
-                    throw new AssertionError(
-                        "interrupted while waiting for onFailure", interrupted);
-                  }
-                  return null;
-                });
+            .handle((result, failure) -> {
+              try {
+                assertTrue(
+                    failed.await(3, TimeUnit.SECONDS),
+                    "onFailure must run while the synchronous completion continuation is active");
+              } catch (InterruptedException interrupted) {
+                Thread.currentThread().interrupt();
+                throw new AssertionError("interrupted while waiting for onFailure", interrupted);
+              }
+              return null;
+            });
 
     continuation.get(4, TimeUnit.SECONDS);
     var failure =

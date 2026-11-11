@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents the fields used in creation of a new ACHRelationship.  You can create an ACHRelationship by passing the required fields here or if you have an account with Plaid you can use our integration with Plaid to create a relationship.  Please see the documentation [here](https://alpaca.markets/docs/api-references/broker-api/funding/ach/#plaid-integration-for-bank-transfers) for more info on using Plaid with Alpaca
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CreateACHRelationshipRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -68,7 +68,7 @@ public class CreateACHRelationshipRequest implements Serializable {
    * Must be &#x60;CHECKING&#x60; or &#x60;SAVINGS&#x60;
    */
   @JsonAdapter(BankAccountTypeEnum.Adapter.class)
-  public enum BankAccountTypeEnum {
+  public enum BankAccountTypeEnum implements Serializable {
     CHECKING("CHECKING"),
     
     SAVINGS("SAVINGS");

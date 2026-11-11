@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Beneficiary of an IRA account. The same shape is used on account create, account update, and account responses. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class Beneficiary implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -80,7 +80,7 @@ public class Beneficiary implements Serializable {
    * Relationship of the beneficiary to the account holder.
    */
   @JsonAdapter(RelationshipEnum.Adapter.class)
-  public enum RelationshipEnum {
+  public enum RelationshipEnum implements Serializable {
     SPOUSE("spouse"),
     
     OTHER("other");
@@ -147,7 +147,7 @@ public class Beneficiary implements Serializable {
    * Tax identifier type.
    */
   @JsonAdapter(TaxIdTypeEnum.Adapter.class)
-  public enum TaxIdTypeEnum {
+  public enum TaxIdTypeEnum implements Serializable {
     USA_SSN("USA_SSN");
 
     private String value;
@@ -202,7 +202,7 @@ public class Beneficiary implements Serializable {
    * Whether this beneficiary is primary or contingent. An account with beneficiaries needs at least one primary beneficiary. The &#x60;share_pct&#x60; values of all primary beneficiaries must add up to 100, and the &#x60;share_pct&#x60; values of all contingent beneficiaries, if any, must also add up to 100. 
    */
   @JsonAdapter(TypeEnum.Adapter.class)
-  public enum TypeEnum {
+  public enum TypeEnum implements Serializable {
     PRIMARY("primary"),
     
     CONTINGENT("contingent");

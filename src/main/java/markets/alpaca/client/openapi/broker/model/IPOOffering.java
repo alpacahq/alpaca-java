@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * An IPO (Initial Public Offering) offering exposed via the IPO discovery REST API. Returned by &#x60;GET /v1/ipos&#x60; and &#x60;GET /v1/ipos/{offering_reference}&#x60;.  Most IPO lifecycle changes (new offerings, prospectus availability, 60-minute mail, allocations, cancellations) are pushed in real time over the [IPO Events Stream](#operation/subscribeToIPOEventsSSE). 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class IPOOffering implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -67,7 +67,7 @@ public class IPOOffering implements Serializable {
    * Whether the offering is currently accepting orders. - &#x60;available&#x60; - accepting new orders. - &#x60;not_available&#x60; - not yet open for orders. - &#x60;closed&#x60; - no longer accepting orders.  Note: the IPO Events Stream uses a different casing for the analogous &#x60;payload.available_to_order&#x60; field on &#x60;Offering&#x60;/&#x60;OfferingUpdate&#x60; events (&#x60;Available&#x60;, &#x60;NotAvailable&#x60;, &#x60;Closed&#x60;). 
    */
   @JsonAdapter(AvailabilityEnum.Adapter.class)
-  public enum AvailabilityEnum {
+  public enum AvailabilityEnum implements Serializable {
     AVAILABLE("available"),
     
     NOT_AVAILABLE("not_available"),

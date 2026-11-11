@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * This feature is available in sandbox for beta partners only.  The account&#39;s dividend reinvestment (DRIP) setting. Omit &#x60;drip&#x60; to keep the current setting.  To turn DRIP on, the account must have a signed customer agreement at the revision that Alpaca requires. The agreement can already be on the account, or you can send it in &#x60;agreements&#x60; in the same request. Otherwise the request fails with HTTP 422, and the error message names the required revision.  DRIP enrollment must be available in the environment. While it is not, a request that turns DRIP on is accepted with HTTP 200 and does not enroll the account. The agreement is not checked, and the response has no &#x60;drip&#x60; object unless the account was enrolled before.  DRIP is not available for &#x60;donor_advised&#x60;, &#x60;trust&#x60;, &#x60;omnibus_sub&#x60;, and &#x60;omnibus_non_disclosed&#x60; accounts. A request that turns DRIP on for one of these accounts fails with HTTP 422, even while DRIP enrollment is unavailable. A request that turns DRIP off is accepted. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AccountDRIPRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 

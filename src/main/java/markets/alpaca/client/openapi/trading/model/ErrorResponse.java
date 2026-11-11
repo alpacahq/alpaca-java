@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * API error response.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class ErrorResponse implements Serializable {
   private static final long serialVersionUID = 1L;
 

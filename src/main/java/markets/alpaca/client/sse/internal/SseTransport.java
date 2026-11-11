@@ -71,12 +71,11 @@ public final class SseTransport {
       createTerminalCallbackExecutor();
   private static final ExecutorService COMPLETION_EXECUTOR = createCompletionExecutor();
   private static final ExecutorService LIFECYCLE_EXECUTOR =
-      Executors.newCachedThreadPool(
-          runnable -> {
-            Thread thread = new Thread(runnable, "alpaca-sse-lifecycle");
-            thread.setDaemon(true);
-            return thread;
-          });
+      Executors.newCachedThreadPool(runnable -> {
+        Thread thread = new Thread(runnable, "alpaca-sse-lifecycle");
+        thread.setDaemon(true);
+        return thread;
+      });
 
   private SseTransport() {}
 
@@ -89,13 +88,12 @@ public final class SseTransport {
 
   static Dispatcher createHttpDispatcher() {
     var executor =
-        Executors.newSingleThreadExecutor(
-            runnable -> {
-              Thread thread =
-                  new Thread(runnable, "alpaca-sse-http-" + HTTP_THREAD_SEQUENCE.incrementAndGet());
-              thread.setDaemon(true);
-              return thread;
-            });
+        Executors.newSingleThreadExecutor(runnable -> {
+          Thread thread =
+              new Thread(runnable, "alpaca-sse-http-" + HTTP_THREAD_SEQUENCE.incrementAndGet());
+          thread.setDaemon(true);
+          return thread;
+        });
     var dispatcher = new Dispatcher(executor);
     dispatcher.setMaxRequests(1);
     dispatcher.setMaxRequestsPerHost(1);
@@ -1189,11 +1187,9 @@ public final class SseTransport {
         idleTimeout =
             scheduler.schedule(
                 () ->
-                    lifecycleExecutor.execute(
-                        () ->
-                            failIdleTimeout(
-                                generation,
-                                new SocketTimeoutException("SSE idle timeout elapsed"))),
+                    lifecycleExecutor.execute(() ->
+                        failIdleTimeout(
+                            generation, new SocketTimeoutException("SSE idle timeout elapsed"))),
                 durationToNanos(options.idleTimeout()),
                 TimeUnit.NANOSECONDS);
       }
@@ -1264,11 +1260,10 @@ public final class SseTransport {
       Runnable dispatch =
           () -> {
             try {
-              callbackExecutor.execute(
-                  () -> {
-                    handoff.complete(null);
-                    callbackDispatcher.drain();
-                  });
+              callbackExecutor.execute(() -> {
+                handoff.complete(null);
+                callbackDispatcher.drain();
+              });
               handoff.complete(null);
             } catch (RuntimeException failure) {
               var rejected =

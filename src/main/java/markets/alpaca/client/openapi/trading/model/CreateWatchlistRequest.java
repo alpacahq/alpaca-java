@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Request format used for creating a new watchlist with a set of assets and name.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CreateWatchlistRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 

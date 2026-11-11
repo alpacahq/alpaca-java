@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Request to create a per-party agreement. Per-party agreements are signed at the party level and do not require an &#x60;account_id&#x60;. The &#x60;account_id&#x60; field is not allowed. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CreatePartyAgreementRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 

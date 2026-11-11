@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Locates API error response. Locate-specific 400 and create locate 422 errors include a machine-readable &#x60;code&#x60;.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class LocateError implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -58,7 +58,7 @@ public class LocateError implements Serializable {
    * Machine-readable error code. Present on locate-specific 400 and create locate 422 errors.
    */
   @JsonAdapter(CodeEnum.Adapter.class)
-  public enum CodeEnum {
+  public enum CodeEnum implements Serializable {
     INVALID_INPUT("invalid_input"),
     
     INVALID_REQUEST_BODY("invalid_request_body"),

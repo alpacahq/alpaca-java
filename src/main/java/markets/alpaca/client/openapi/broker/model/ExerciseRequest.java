@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Request to exercise an option contract for an account. This can be omitted or left empty, but it also allows for optionally charging a commission for exercising or specifying a specific quantity of contracts to exercise (rather than the full quantity of contracts held).
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class ExerciseRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -56,7 +56,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * A securities journal response with all shared Journal fields.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class JNLS implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -134,7 +134,7 @@ public class JNLS implements Serializable {
    * Securities journal discriminator value.
    */
   @JsonAdapter(EntryTypeEnum.Adapter.class)
-  public enum EntryTypeEnum {
+  public enum EntryTypeEnum implements Serializable {
     JNLS("JNLS");
 
     private String value;

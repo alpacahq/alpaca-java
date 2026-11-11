@@ -73,7 +73,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents an account with all data available. If your api response is missing some of these fields, there is a good chance you are using a route that returns &#x60;Account&#x60; instances instead of these.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AccountExtended implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -186,7 +186,7 @@ public class AccountExtended implements Serializable {
    * The user&#39;s investment objective. This field should be used instead of the deprecated &#x60;investment_objective&#x60; under identity. 
    */
   @JsonAdapter(InvestmentObjectiveEnum.Adapter.class)
-  public enum InvestmentObjectiveEnum {
+  public enum InvestmentObjectiveEnum implements Serializable {
     GENERATE_INCOME("generate_income"),
     
     PRESERVE_WEALTH("preserve_wealth"),
@@ -249,7 +249,7 @@ public class AccountExtended implements Serializable {
    * The expected period of time the user plan to invest to achieve his/her financial goal(s). This field should be used instead of the deprecated &#x60;investment_time_horizon&#x60; under identity. 
    */
   @JsonAdapter(InvestmentTimeHorizonEnum.Adapter.class)
-  public enum InvestmentTimeHorizonEnum {
+  public enum InvestmentTimeHorizonEnum implements Serializable {
     LESS_THAN_1_YEAR("less_than_1_year"),
     
     _1_TO_2_YEARS("1_to_2_years"),
@@ -322,7 +322,7 @@ public class AccountExtended implements Serializable {
    * The user&#39;s ability to quickly and easily convert to cash all or a portion of the investments in this account without experiencing significant loss in value. This field should be used instead of the deprecated &#x60;liquidity_needs&#x60; under identity. 
    */
   @JsonAdapter(LiquidityNeedsEnum.Adapter.class)
-  public enum LiquidityNeedsEnum {
+  public enum LiquidityNeedsEnum implements Serializable {
     VERY_IMPORTANT("very_important"),
     
     IMPORTANT("important"),
@@ -393,7 +393,7 @@ public class AccountExtended implements Serializable {
    * The user&#39;s investment risk tolerance. This field should be used instead of the deprecated &#x60;risk_tolerance&#x60; under identity. 
    */
   @JsonAdapter(RiskToleranceEnum.Adapter.class)
-  public enum RiskToleranceEnum {
+  public enum RiskToleranceEnum implements Serializable {
     CONSERVATIVE("conservative"),
     
     MODERATE("moderate"),

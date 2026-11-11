@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents a non-trade activity SSE event
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class NonTradeActivityEvent implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -127,7 +127,7 @@ public class NonTradeActivityEvent implements Serializable {
    * Status of the event. &#x60;pending&#x60; is an internal/preprocessing status for journal-type NTAs and is only emitted when the subscriber opts in with &#x60;include_preprocessing&#x3D;true&#x60;. 
    */
   @JsonAdapter(StatusEnum.Adapter.class)
-  public enum StatusEnum {
+  public enum StatusEnum implements Serializable {
     EXECUTED("executed"),
     
     CORRECT("correct"),

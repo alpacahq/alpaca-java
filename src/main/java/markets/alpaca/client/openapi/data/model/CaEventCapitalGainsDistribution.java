@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * Capital-gains distribution payload delivered when &#x60;event_type &#x3D;&#x3D; capital_gains_distribution_corporateaction_event&#x60;. Every decimal field is emitted as a JSON string to preserve precision on the wire. At least one of &#x60;long_term_rate&#x60; / &#x60;short_term_rate&#x60; is present; combined distributions carry both. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CaEventCapitalGainsDistribution implements Serializable {
   private static final long serialVersionUID = 1L;
 

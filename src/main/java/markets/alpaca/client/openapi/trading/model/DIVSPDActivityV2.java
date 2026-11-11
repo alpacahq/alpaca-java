@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Substitute payment in lieu of dividend
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class DIVSPDActivityV2 implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -115,7 +115,7 @@ public class DIVSPDActivityV2 implements Serializable {
    * Indicates if related to a non-US security. Serialized as the JSON strings &#x60;\&quot;true\&quot;&#x60; or &#x60;\&quot;false\&quot;&#x60;, not a JSON boolean.
    */
   @JsonAdapter(ForeignEnum.Adapter.class)
-  public enum ForeignEnum {
+  public enum ForeignEnum implements Serializable {
     TRUE("true"),
     
     FALSE("false");
@@ -192,7 +192,7 @@ public class DIVSPDActivityV2 implements Serializable {
    * Indicates if this is a special dividend. Serialized as the JSON strings &#x60;\&quot;true\&quot;&#x60; or &#x60;\&quot;false\&quot;&#x60;, not a JSON boolean.
    */
   @JsonAdapter(SpecialEnum.Adapter.class)
-  public enum SpecialEnum {
+  public enum SpecialEnum implements Serializable {
     TRUE("true"),
     
     FALSE("false");

@@ -279,14 +279,13 @@ public abstract class AbstractAlpacaStream implements AutoCloseable {
    */
   protected final void invokeCallback(String callbackName, Runnable callback) {
     try {
-      callbackExecutor.execute(
-          () -> {
-            try {
-              callback.run();
-            } catch (RuntimeException e) {
-              LOG.log(Level.WARNING, "WebSocket listener callback failed: " + callbackName, e);
-            }
-          });
+      callbackExecutor.execute(() -> {
+        try {
+          callback.run();
+        } catch (RuntimeException e) {
+          LOG.log(Level.WARNING, "WebSocket listener callback failed: " + callbackName, e);
+        }
+      });
     } catch (RuntimeException e) {
       LOG.log(Level.WARNING, "WebSocket listener callback executor failed: " + callbackName, e);
     }
@@ -341,18 +340,14 @@ public abstract class AbstractAlpacaStream implements AutoCloseable {
 
   private static ScheduledExecutorService newReconnectScheduler(String streamName) {
     String checkedStreamName = Objects.requireNonNull(streamName, "streamName must not be null");
-    return Executors.newSingleThreadScheduledExecutor(
-        r -> {
-          Thread t =
-              new Thread(
-                  r,
-                  "alpaca-ws-"
-                      + checkedStreamName
-                      + "-reconnect-"
-                      + SCHEDULER_IDS.incrementAndGet());
-          t.setDaemon(true);
-          return t;
-        });
+    return Executors.newSingleThreadScheduledExecutor(r -> {
+      Thread t =
+          new Thread(
+              r,
+              "alpaca-ws-" + checkedStreamName + "-reconnect-" + SCHEDULER_IDS.incrementAndGet());
+      t.setDaemon(true);
+      return t;
+    });
   }
 
   // -------------------------------------------------------------------------

@@ -57,7 +57,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Timeseries data for equity and profit loss information of the account.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class PortfolioHistory implements Serializable {
   private static final long serialVersionUID = 1L;
 

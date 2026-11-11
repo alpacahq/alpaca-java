@@ -1466,11 +1466,10 @@ class AlpacaStockStreamTest {
             client, CREDS, server.url("/v2/iex").toString(), new StockStreamListener() {});
     var ss = performHandshake(stream);
     // Calling close() twice must not throw
-    assertDoesNotThrow(
-        () -> {
-          stream.close();
-          stream.close();
-        });
+    assertDoesNotThrow(() -> {
+      stream.close();
+      stream.close();
+    });
   }
 
   @Test

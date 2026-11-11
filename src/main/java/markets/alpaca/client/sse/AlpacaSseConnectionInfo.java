@@ -15,11 +15,10 @@ public record AlpacaSseConnectionInfo(URI uri, int statusCode, Map<String, List<
     Objects.requireNonNull(uri, "uri must not be null");
     Objects.requireNonNull(headers, "headers must not be null");
     var copiedHeaders = new LinkedHashMap<String, List<String>>();
-    headers.forEach(
-        (name, values) ->
-            copiedHeaders.put(
-                Objects.requireNonNull(name, "header name must not be null"),
-                List.copyOf(Objects.requireNonNull(values, "header values must not be null"))));
+    headers.forEach((name, values) ->
+        copiedHeaders.put(
+            Objects.requireNonNull(name, "header name must not be null"),
+            List.copyOf(Objects.requireNonNull(values, "header values must not be null"))));
     headers = Collections.unmodifiableMap(copiedHeaders);
   }
 

@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class IssueOAuthTokenResponse implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -68,7 +68,7 @@ public class IssueOAuthTokenResponse implements Serializable {
    * Always &#x60;Bearer&#x60;
    */
   @JsonAdapter(TokenTypeEnum.Adapter.class)
-  public enum TokenTypeEnum {
+  public enum TokenTypeEnum implements Serializable {
     BEARER("Bearer");
 
     private String value;

@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Transfers allow you to transfer assets into your end customer&#39;s account (deposits) or out (withdrawal).
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CryptoTransfer implements Serializable {
   private static final long serialVersionUID = 1L;
 

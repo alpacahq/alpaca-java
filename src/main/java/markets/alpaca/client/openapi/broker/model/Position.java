@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Position
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class Position implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -127,7 +127,7 @@ public class Position implements Serializable {
    * Gets or Sets side
    */
   @JsonAdapter(SideEnum.Adapter.class)
-  public enum SideEnum {
+  public enum SideEnum implements Serializable {
     LONG("long"),
     
     SHORT("short");

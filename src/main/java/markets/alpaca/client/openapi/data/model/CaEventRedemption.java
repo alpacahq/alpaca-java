@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * Full redemption payload delivered when &#x60;event_type &#x3D;&#x3D; redemption_corporateaction_event&#x60;. Corresponds to &#x60;redemptions&#x60; on the REST [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions) response, but every decimal field is emitted as a JSON string to preserve precision on the wire. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CaEventRedemption implements Serializable {
   private static final long serialVersionUID = 1L;
 

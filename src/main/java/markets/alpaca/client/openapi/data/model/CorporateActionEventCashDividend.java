@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * &#x60;corporate_action_event&#x60; envelope specialized to &#x60;event_type &#x3D;&#x3D; cash_dividend_corporateaction_event&#x60;. Emitted through [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE). 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CorporateActionEventCashDividend implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -87,7 +87,7 @@ public class CorporateActionEventCashDividend implements Serializable {
    * Gets or Sets eventType
    */
   @JsonAdapter(EventTypeEnum.Adapter.class)
-  public enum EventTypeEnum {
+  public enum EventTypeEnum implements Serializable {
     CASH_DIVIDEND_CORPORATEACTION_EVENT("cash_dividend_corporateaction_event");
 
     private String value;

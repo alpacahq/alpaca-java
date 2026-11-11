@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Represents the result of asking the api to close a position.  When &#x60;status&#x60; is 200, &#x60;body&#x60; is the Order used to close out the position. For any other &#x60;status&#x60;, &#x60;body&#x60; is the error object describing why the close was rejected.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class PositionClosedResponse implements Serializable {
   private static final long serialVersionUID = 1L;
 

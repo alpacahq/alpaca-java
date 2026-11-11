@@ -43,11 +43,10 @@ public final class BrokerApiExample {
     var allAccounts = accounts.getAllAccounts(null, null, null, null, "desc", null);
     allAccounts.stream()
         .limit(5)
-        .forEach(
-            account ->
-                System.out.printf(
-                    "account=%s number=%s status=%s%n",
-                    account.getId(), account.getAccountNumber(), account.getStatus()));
+        .forEach(account ->
+            System.out.printf(
+                "account=%s number=%s status=%s%n",
+                account.getId(), account.getAccountNumber(), account.getStatus()));
 
     UUID accountId = configuredAccountId(allAccounts.isEmpty() ? null : allAccounts.get(0).getId());
     if (accountId != null) {
@@ -64,11 +63,10 @@ public final class BrokerApiExample {
       trading
           .getAllOrdersForAccount(
               accountId, "open", 50, null, null, null, "desc", true, null, null, null, null)
-          .forEach(
-              order ->
-                  System.out.printf(
-                      "order=%s symbol=%s status=%s%n",
-                      order.getId(), order.getSymbol(), order.getStatus()));
+          .forEach(order ->
+              System.out.printf(
+                  "order=%s symbol=%s status=%s%n",
+                  order.getId(), order.getSymbol(), order.getStatus()));
     }
 
     if (ExampleSupport.enabled("APCA_EXAMPLE_CREATE_BROKER_ACCOUNT")) {
@@ -202,60 +200,60 @@ public final class BrokerApiExample {
 
   private static final String SANDBOX_ACCOUNT_JSON =
       """
-            {
-              "contact": {
-                "email_address": "${EMAIL}",
-                "phone_number": "555-666-7788",
-                "street_address": ["20 N San Mateo Dr"],
-                "city": "San Mateo",
-                "state": "CA",
-                "postal_code": "94401",
-                "country": "USA"
-              },
-              "identity": {
-                "given_name": "Jane",
-                "family_name": "Alpaca",
-                "date_of_birth": "1990-01-01",
-                "tax_id": "666-55-4321",
-                "tax_id_type": "USA_SSN",
-                "country_of_citizenship": "USA",
-                "country_of_birth": "USA",
-                "country_of_tax_residence": "USA",
-                "funding_source": ["employment_income"],
-                "annual_income_min": "50000",
-                "annual_income_max": "100000",
-                "liquid_net_worth_min": "50000",
-                "liquid_net_worth_max": "100000",
-                "total_net_worth_min": "50000",
-                "total_net_worth_max": "100000",
-                "investment_objective": "growth",
-                "investment_experience_with_stocks": "over_5_years",
-                "risk_tolerance": "medium",
-                "liquidity_needs": "does_not_matter",
-                "investment_time_horizon": "more_than_10_years",
-                "marital_status": "single",
-                "number_of_dependents": 0
-              },
-              "disclosures": {
-                "is_control_person": false,
-                "is_affiliated_exchange_or_finra": false,
-                "is_politically_exposed": false,
-                "immediate_family_exposed": false,
-                "employment_status": "EMPLOYED",
-                "employment_position": "Software Engineer",
-                "employer_name": "Example Co",
-                "employer_address": "20 N San Mateo Dr, San Mateo, CA 94401",
-                "employment_sector": "technology"
-              },
-              "agreements": [
-                {
-                  "agreement": "customer_agreement",
-                  "signed_at": "${SIGNED_AT}",
-                  "ip_address": "127.0.0.1"
-                }
-              ],
-              "account_type": "trading",
-              "enabled_assets": ["us_equity"]
-            }
-            """;
+      {
+        "contact": {
+          "email_address": "${EMAIL}",
+          "phone_number": "555-666-7788",
+          "street_address": ["20 N San Mateo Dr"],
+          "city": "San Mateo",
+          "state": "CA",
+          "postal_code": "94401",
+          "country": "USA"
+        },
+        "identity": {
+          "given_name": "Jane",
+          "family_name": "Alpaca",
+          "date_of_birth": "1990-01-01",
+          "tax_id": "666-55-4321",
+          "tax_id_type": "USA_SSN",
+          "country_of_citizenship": "USA",
+          "country_of_birth": "USA",
+          "country_of_tax_residence": "USA",
+          "funding_source": ["employment_income"],
+          "annual_income_min": "50000",
+          "annual_income_max": "100000",
+          "liquid_net_worth_min": "50000",
+          "liquid_net_worth_max": "100000",
+          "total_net_worth_min": "50000",
+          "total_net_worth_max": "100000",
+          "investment_objective": "growth",
+          "investment_experience_with_stocks": "over_5_years",
+          "risk_tolerance": "medium",
+          "liquidity_needs": "does_not_matter",
+          "investment_time_horizon": "more_than_10_years",
+          "marital_status": "single",
+          "number_of_dependents": 0
+        },
+        "disclosures": {
+          "is_control_person": false,
+          "is_affiliated_exchange_or_finra": false,
+          "is_politically_exposed": false,
+          "immediate_family_exposed": false,
+          "employment_status": "EMPLOYED",
+          "employment_position": "Software Engineer",
+          "employer_name": "Example Co",
+          "employer_address": "20 N San Mateo Dr, San Mateo, CA 94401",
+          "employment_sector": "technology"
+        },
+        "agreements": [
+          {
+            "agreement": "customer_agreement",
+            "signed_at": "${SIGNED_AT}",
+            "ip_address": "127.0.0.1"
+          }
+        ],
+        "account_type": "trading",
+        "enabled_assets": ["us_equity"]
+      }
+      """;
 }
