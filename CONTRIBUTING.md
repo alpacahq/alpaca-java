@@ -63,37 +63,45 @@ Unless you explicitly state otherwise, a contribution intentionally submitted fo
 6. Run the relevant checks listed below.
 7. Open a focused pull request, explain why the change is needed, and respond to review feedback.
 
-Use clear, descriptive commit messages and pull request titles. Conventional Commits are not required, and contributors do not need to squash commits before opening a pull request. This repository uses merge commits.
+Use clear, descriptive commit messages and pull request titles. Conventional Commits are not required, and contributors do not need to squash commits before opening a pull request. Maintainers use GitHub's squash-merge workflow for the final merge.
 
 ## Prerequisites
 
 - Java 17 or newer.
 - The repository's Gradle Wrapper (`./gradlew`).
 - Node.js `>=22.23.4 <23` for Docusaurus documentation checks, matching CI.
+- Python 3 and Bash when using the `adoptOpenApi*` tasks.
 - `pre-commit` and `lychee` when running the optional local hooks.
 
 ## Setup and checks
 
-Run the standard checks from the repository root:
+Run the standard Java verification from the repository root:
 
 ```bash
-./gradlew check
 ./gradlew build
 ```
 
-`check` runs unit tests, quality checks, generated-source drift checks, and example compilation. `build` runs the complete verification gate.
+`build` includes `check`, which runs unit tests, quality checks, generated-source drift checks, and example compilation.
 
-Useful focused checks:
+Run additional checks when they apply to your change:
+
+```bash
+./gradlew checkApiCompatibility         # public SDK surface changes
+./gradlew integrationTest               # live API behavior; skips without credentials
+npm ci --prefix docs                    # install locked documentation dependencies
+npm run build --prefix docs             # Docusaurus or Javadoc changes
+pre-commit run markdown-links --all-files
+```
+
+`checkApiCompatibility` compares the public JAR with the released baseline. It reports source or binary incompatibilities as warnings and does not fail the build, so inspect its output and update migration guidance when needed.
+
+Useful focused code-quality checks are:
 
 ```bash
 ./gradlew spotlessCheck                 # formatting and import order
 ./gradlew checkstyleMain checkstyleTest # source style checks
 ./gradlew spotbugsMain                  # static bug analysis for handwritten classes
-./gradlew checkApiCompatibility         # compare the public JAR with the release baseline
 ./gradlew checkSseContracts             # verify pinned SSE coverage
-./gradlew integrationTest               # live read-only tests; skips without credentials
-npm run build --prefix docs             # validate Docusaurus documentation
-pre-commit run markdown-links --all-files
 ```
 
 Apply formatter fixes with `./gradlew spotlessApply`. Generated OpenAPI output under `src/main/java/markets/alpaca/client/openapi/` is excluded from formatting and static-analysis checks.
