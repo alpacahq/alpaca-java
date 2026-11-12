@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Rebalance condition on a &#x60;portfolio.status_changed&#x60; event. Empty &#x60;sub_type&#x60;, &#x60;percent&#x60;, and &#x60;day&#x60; are omitted.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class RebalancerEventRebalanceCondition implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -68,7 +68,7 @@ public class RebalancerEventRebalanceCondition implements Serializable {
    * Omitted when the producer sends no subtype.
    */
   @JsonAdapter(SubTypeEnum.Adapter.class)
-  public enum SubTypeEnum {
+  public enum SubTypeEnum implements Serializable {
     ABSOLUTE("absolute"),
     
     RELATIVE("relative"),
@@ -133,7 +133,7 @@ public class RebalancerEventRebalanceCondition implements Serializable {
    * Gets or Sets type
    */
   @JsonAdapter(TypeEnum.Adapter.class)
-  public enum TypeEnum {
+  public enum TypeEnum implements Serializable {
     DRIFT_BAND("drift_band"),
     
     CALENDAR("calendar"),

@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * The announcements endpoint contains public information on previous and upcoming dividends, mergers, spinoffs, and stock splits.  Announcement data is made available through the API as soon as it is ingested by Alpaca, which is typically the following trading day after the declaration date. This provides insight into future account stock position and cash balance changes that will take effect on an announcement&#39;s payable date. Additionally, viewing previous announcement details can improve bookkeeping and reconciling previous account cash and position changes.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class Announcement implements Serializable {
   private static final long serialVersionUID = 1L;
 

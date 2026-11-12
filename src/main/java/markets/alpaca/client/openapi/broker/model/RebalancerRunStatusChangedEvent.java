@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Emitted when a portfolio run status changes. &#x60;run&#x60; is the same full snapshot sent on &#x60;run.created&#x60;.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class RebalancerRunStatusChangedEvent implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -70,7 +70,7 @@ public class RebalancerRunStatusChangedEvent implements Serializable {
    * Gets or Sets eventType
    */
   @JsonAdapter(EventTypeEnum.Adapter.class)
-  public enum EventTypeEnum {
+  public enum EventTypeEnum implements Serializable {
     RUN_STATUS_CHANGED("run.status_changed");
 
     private String value;

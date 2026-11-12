@@ -58,7 +58,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * OptionContract
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class OptionContract implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -126,7 +126,7 @@ public class OptionContract implements Serializable {
    * The status of the option contract.
    */
   @JsonAdapter(StatusEnum.Adapter.class)
-  public enum StatusEnum {
+  public enum StatusEnum implements Serializable {
     ACTIVE("active"),
     
     INACTIVE("inactive");

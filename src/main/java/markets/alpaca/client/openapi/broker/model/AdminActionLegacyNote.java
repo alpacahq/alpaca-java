@@ -57,7 +57,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents structure of a LegacyNote type AdminAction
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AdminActionLegacyNote implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -127,7 +127,7 @@ public class AdminActionLegacyNote implements Serializable {
    * Admin note discriminator value. Sent as &#x60;note_admin_event&#x60;; &#x60;legacy_note_admin_event&#x60; is accepted for older events.
    */
   @JsonAdapter(TypeEnum.Adapter.class)
-  public enum TypeEnum {
+  public enum TypeEnum implements Serializable {
     NOTE_ADMIN_EVENT("note_admin_event"),
     
     LEGACY_NOTE_ADMIN_EVENT("legacy_note_admin_event");

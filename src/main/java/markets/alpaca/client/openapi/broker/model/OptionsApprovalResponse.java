@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * OptionsApprovalResponse
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class OptionsApprovalResponse implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -66,7 +66,7 @@ public class OptionsApprovalResponse implements Serializable {
    * The option trading level approved for this request. Only present once the request has completed processing. Note that a subsequent request may be approved for a different level. 0&#x3D;Disabled, 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles.\&quot; 
    */
   @JsonAdapter(ApprovedLevelEnum.Adapter.class)
-  public enum ApprovedLevelEnum {
+  public enum ApprovedLevelEnum implements Serializable {
     NUMBER_0(0),
     
     NUMBER_1(1),
@@ -137,7 +137,7 @@ public class OptionsApprovalResponse implements Serializable {
    * The request option trading level. 0&#x3D;Disabled, 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles.
    */
   @JsonAdapter(RequestedLevelEnum.Adapter.class)
-  public enum RequestedLevelEnum {
+  public enum RequestedLevelEnum implements Serializable {
     NUMBER_0(0),
     
     NUMBER_1(1),
@@ -198,7 +198,7 @@ public class OptionsApprovalResponse implements Serializable {
    * The requester of the options approval request.
    */
   @JsonAdapter(RequesterEnum.Adapter.class)
-  public enum RequesterEnum {
+  public enum RequesterEnum implements Serializable {
     CORRESPONDENT("CORRESPONDENT"),
     
     ALPACA_ADMIN("ALPACA_ADMIN");

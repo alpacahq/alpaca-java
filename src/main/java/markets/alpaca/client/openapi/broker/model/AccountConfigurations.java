@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents additional configuration settings for an account
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AccountConfigurations implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -73,7 +73,7 @@ public class AccountConfigurations implements Serializable {
    * The desired maximum options trading level. 0&#x3D;disabled, 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles.
    */
   @JsonAdapter(MaxOptionsTradingLevelEnum.Adapter.class)
-  public enum MaxOptionsTradingLevelEnum {
+  public enum MaxOptionsTradingLevelEnum implements Serializable {
     NUMBER_0(0),
     
     NUMBER_1(1),
@@ -149,7 +149,7 @@ public class AccountConfigurations implements Serializable {
    * all or none. If none, emails for order fills are not sent.
    */
   @JsonAdapter(TradeConfirmEmailEnum.Adapter.class)
-  public enum TradeConfirmEmailEnum {
+  public enum TradeConfirmEmailEnum implements Serializable {
     ALL("all"),
     
     NONE("none");

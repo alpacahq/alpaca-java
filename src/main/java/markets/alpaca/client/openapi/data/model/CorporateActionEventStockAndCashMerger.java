@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * &#x60;corporate_action_event&#x60; envelope specialized to &#x60;event_type &#x3D;&#x3D; stock_and_cash_merger_corporateaction_event&#x60;. Emitted through [Corporate Actions Events Stream](#operation/SubscribeToCorporateActionsEventsSSE). 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CorporateActionEventStockAndCashMerger implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -87,7 +87,7 @@ public class CorporateActionEventStockAndCashMerger implements Serializable {
    * Gets or Sets eventType
    */
   @JsonAdapter(EventTypeEnum.Adapter.class)
-  public enum EventTypeEnum {
+  public enum EventTypeEnum implements Serializable {
     STOCK_AND_CASH_MERGER_CORPORATEACTION_EVENT("stock_and_cash_merger_corporateaction_event");
 
     private String value;

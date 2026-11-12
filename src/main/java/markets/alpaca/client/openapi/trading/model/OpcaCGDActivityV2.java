@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Options corporate action of capital gains distributions. Used for both Long-Term (&#x60;CGD.LTCG&#x60;) and Short-Term (&#x60;CGD.STCG&#x60;) sub-types; &#x60;CGD.STCG&#x60; is emitted only when the distribution has no long-term leg. &#x60;rate&#x60; is the combined (LTCG + STCG) per-share rate; &#x60;long_term_rate&#x60; and &#x60;short_term_rate&#x60; carry the individual legs when present.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class OpcaCGDActivityV2 implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -68,7 +68,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Fields accepted when creating an account. Requirements vary by account type, enabled assets, existing holder agreements, and correspondent configuration. The server enforces conditional requirements that are not represented statically in this schema.  Account-specific requirements: - Trading accounts require inline &#x60;identity&#x60; plus &#x60;contact&#x60;, or an existing holder through &#x60;primary_account_holder_id&#x60;. Individual US equity accounts created with inline identity also require &#x60;disclosures&#x60;. - Custodial accounts require &#x60;identity&#x60; and &#x60;minor_identity&#x60;. US equity accounts also require &#x60;disclosures&#x60;. - IRA accounts require &#x60;account_sub_type&#x60;, US equity, and either inline &#x60;identity&#x60; or an existing holder through &#x60;primary_account_holder_id&#x60;; they do not support crypto. IRA accounts created with inline identity also require &#x60;disclosures&#x60;. - Donor-advised accounts require &#x60;entity_id&#x60;. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AccountCreationRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -146,7 +146,7 @@ public class AccountCreationRequest implements Serializable {
    * The user&#39;s investment objective. This field should be used instead of the deprecated &#x60;investment_objective&#x60; under identity. 
    */
   @JsonAdapter(InvestmentObjectiveEnum.Adapter.class)
-  public enum InvestmentObjectiveEnum {
+  public enum InvestmentObjectiveEnum implements Serializable {
     GENERATE_INCOME("generate_income"),
     
     PRESERVE_WEALTH("preserve_wealth"),
@@ -209,7 +209,7 @@ public class AccountCreationRequest implements Serializable {
    * The expected period of time the user plan to invest to achieve his/her financial goal(s). This field should be used instead of the deprecated &#x60;investment_time_horizon&#x60; under identity. 
    */
   @JsonAdapter(InvestmentTimeHorizonEnum.Adapter.class)
-  public enum InvestmentTimeHorizonEnum {
+  public enum InvestmentTimeHorizonEnum implements Serializable {
     LESS_THAN_1_YEAR("less_than_1_year"),
     
     _1_TO_2_YEARS("1_to_2_years"),
@@ -272,7 +272,7 @@ public class AccountCreationRequest implements Serializable {
    * The user&#39;s ability to quickly and easily convert to cash all or a portion of the investments in this account without experiencing significant loss in value. This field should be used instead of the deprecated &#x60;liquidity_needs&#x60; under identity. 
    */
   @JsonAdapter(LiquidityNeedsEnum.Adapter.class)
-  public enum LiquidityNeedsEnum {
+  public enum LiquidityNeedsEnum implements Serializable {
     VERY_IMPORTANT("very_important"),
     
     IMPORTANT("important"),
@@ -343,7 +343,7 @@ public class AccountCreationRequest implements Serializable {
    * The user&#39;s investment risk tolerance. This field should be used instead of the deprecated &#x60;risk_tolerance&#x60; under identity. 
    */
   @JsonAdapter(RiskToleranceEnum.Adapter.class)
-  public enum RiskToleranceEnum {
+  public enum RiskToleranceEnum implements Serializable {
     CONSERVATIVE("conservative"),
     
     MODERATE("moderate"),

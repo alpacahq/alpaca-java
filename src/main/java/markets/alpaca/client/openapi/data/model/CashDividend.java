@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * Cash dividend.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CashDividend implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -125,7 +125,7 @@ public class CashDividend implements Serializable {
    * Sub-type of the cash dividend.
    */
   @JsonAdapter(SubTypeEnum.Adapter.class)
-  public enum SubTypeEnum {
+  public enum SubTypeEnum implements Serializable {
     INTEREST("interest"),
     
     RETURN_OF_CAPITAL("return_of_capital");

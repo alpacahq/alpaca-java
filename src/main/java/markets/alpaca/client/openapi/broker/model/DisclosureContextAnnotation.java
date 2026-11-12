@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * DisclosureContextAnnotation
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class DisclosureContextAnnotation implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -88,7 +88,7 @@ public class DisclosureContextAnnotation implements Serializable {
    * Specifies the type of disclosure annotation. Valid types are FINRA affiliations, for users affiliated with or employed by a FINRA member firm, a Stock Exchange Member, FINRA, Registered Investment Advisor, or a Municipal Securities Broker/Dealer; Company control relationships, for senior executives, and 10% or greater shareholders, of a publicly traded company; and immediate family members of politically exposed individuals.
    */
   @JsonAdapter(ContextTypeEnum.Adapter.class)
-  public enum ContextTypeEnum {
+  public enum ContextTypeEnum implements Serializable {
     CONTROLLED_FIRM("CONTROLLED_FIRM"),
     
     IMMEDIATE_FAMILY_EXPOSED("IMMEDIATE_FAMILY_EXPOSED"),

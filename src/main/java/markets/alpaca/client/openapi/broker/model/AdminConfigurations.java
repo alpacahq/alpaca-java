@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * These configurations show account properties that are overridden either by Alpaca Broker Operations or an automated process.  These values cannot be modified by the Broker Partners.  This schema represents the current, effective value of each configuration (e.g. as returned by the get trading account endpoint). For the shape of the payloads broadcast by the **events** streaming API when these values change, see [AdminConfigurationsEvent](#/components/schemas/AdminConfigurationsEvent).
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AdminConfigurations implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -110,7 +110,7 @@ public class AdminConfigurations implements Serializable {
    * The max options trading level set by admin for this account. 0&#x3D;disabled, 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles. 
    */
   @JsonAdapter(MaxOptionsTradingLevelEnum.Adapter.class)
-  public enum MaxOptionsTradingLevelEnum {
+  public enum MaxOptionsTradingLevelEnum implements Serializable {
     NUMBER_0(0),
     
     NUMBER_1(1),

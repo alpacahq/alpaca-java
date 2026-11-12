@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Cash balance
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AcatsCashBalance implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -64,7 +64,7 @@ public class AcatsCashBalance implements Serializable {
    * Currency of the cash balance. Only &#x60;USD&#x60; is currently supported; any other value is rejected with HTTP 400. Each currency may appear at most once in the &#x60;cash&#x60; array.
    */
   @JsonAdapter(CurrencyEnum.Adapter.class)
-  public enum CurrencyEnum {
+  public enum CurrencyEnum implements Serializable {
     USD("USD");
 
     private String value;

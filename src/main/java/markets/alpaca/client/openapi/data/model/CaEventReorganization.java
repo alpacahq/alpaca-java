@@ -55,7 +55,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * General-purpose corporate restructuring (e.g. Chapter 11 emergence) where existing holders receive a mix of cash and/or one or more replacement securities. Each entry in &#x60;stock_movements&#x60; describes a separate share-class distribution. Delivered when &#x60;event_type &#x3D;&#x3D; reorganization_corporateaction_event&#x60;. Corresponds to &#x60;reorganizations&#x60; on the REST [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions) response, but every decimal field is emitted as a JSON string to preserve precision on the wire. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CaEventReorganization implements Serializable {
   private static final long serialVersionUID = 1L;
 

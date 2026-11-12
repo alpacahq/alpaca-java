@@ -55,7 +55,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * This is an extended version of the Account model found [in the trading api](https://alpaca.markets/docs/api-references/trading-api/account/#account-entity).  Extra data has been added that would be useful for brokers.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class TradeAccount implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -223,7 +223,7 @@ public class TradeAccount implements Serializable {
    * The options trading level that was approved for this account. 0&#x3D;disabled, 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles. 
    */
   @JsonAdapter(OptionsApprovedLevelEnum.Adapter.class)
-  public enum OptionsApprovedLevelEnum {
+  public enum OptionsApprovedLevelEnum implements Serializable {
     NUMBER_0(0),
     
     NUMBER_1(1),
@@ -289,7 +289,7 @@ public class TradeAccount implements Serializable {
    * The effective options trading level of the account. This is the minimum between account options_approved_level and account configurations max_options_trading_level. 0&#x3D;disabled, 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles. 
    */
   @JsonAdapter(OptionsTradingLevelEnum.Adapter.class)
-  public enum OptionsTradingLevelEnum {
+  public enum OptionsTradingLevelEnum implements Serializable {
     NUMBER_0(0),
     
     NUMBER_1(1),

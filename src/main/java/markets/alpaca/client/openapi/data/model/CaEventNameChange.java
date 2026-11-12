@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * Name/ticker change payload delivered when &#x60;event_type &#x3D;&#x3D; name_change_corporateaction_event&#x60;. Corresponds to &#x60;name_changes&#x60; on the REST [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions) response. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CaEventNameChange implements Serializable {
   private static final long serialVersionUID = 1L;
 

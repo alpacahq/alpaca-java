@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Error response returned by party, agreement, document, and verification endpoints.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class PartyErrorResponse implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -61,7 +61,7 @@ public class PartyErrorResponse implements Serializable {
    * Machine-readable error code
    */
   @JsonAdapter(ErrorEnum.Adapter.class)
-  public enum ErrorEnum {
+  public enum ErrorEnum implements Serializable {
     INVALID_REQUEST("invalid_request"),
     
     NOT_FOUND("not_found"),

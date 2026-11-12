@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * OptionDeliverable
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class OptionDeliverable implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -79,7 +79,7 @@ public class OptionDeliverable implements Serializable {
    * Indicates the settlement method that will be used: - **BTOB**: Broker to Broker - **CADF**: Cash Difference - **CAFX**: Cash Fixed - **CCC**: Correspondent Clearing Corp 
    */
   @JsonAdapter(SettlementMethodEnum.Adapter.class)
-  public enum SettlementMethodEnum {
+  public enum SettlementMethodEnum implements Serializable {
     BTOB("BTOB"),
     
     CADF("CADF"),
@@ -140,7 +140,7 @@ public class OptionDeliverable implements Serializable {
    * Indicates when the deliverable will be settled if the contract is exercised/assigned. 
    */
   @JsonAdapter(SettlementTypeEnum.Adapter.class)
-  public enum SettlementTypeEnum {
+  public enum SettlementTypeEnum implements Serializable {
     T_0("T+0"),
     
     T_1("T+1"),
@@ -210,7 +210,7 @@ public class OptionDeliverable implements Serializable {
    * Type of deliverable, indicating whether it&#39;s cash or equity. For standard contracts, it is always \&quot;equity\&quot;. 
    */
   @JsonAdapter(TypeEnum.Adapter.class)
-  public enum TypeEnum {
+  public enum TypeEnum implements Serializable {
     CASH("cash"),
     
     EQUITY("equity");

@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Error returned for a symbol that could not be quoted.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class LocateQuoteError implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -58,7 +58,7 @@ public class LocateQuoteError implements Serializable {
    * Error code.
    */
   @JsonAdapter(CodeEnum.Adapter.class)
-  public enum CodeEnum {
+  public enum CodeEnum implements Serializable {
     SYMBOL_NOT_FOUND("symbol_not_found"),
     
     EASY_TO_BORROW("easy_to_borrow"),

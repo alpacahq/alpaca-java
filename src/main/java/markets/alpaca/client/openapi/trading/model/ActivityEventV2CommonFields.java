@@ -55,7 +55,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Represents the common fields for all Activity V2 Events
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class ActivityEventV2CommonFields implements Serializable {
   private static final long serialVersionUID = 1L;
 

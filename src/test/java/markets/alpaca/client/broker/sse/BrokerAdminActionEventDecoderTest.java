@@ -112,25 +112,25 @@ class BrokerAdminActionEventDecoderTest {
 
   static String adminActionJson(String type, String context) {
     return """
-        {
-          "at":"2026-10-01T12:00:00Z",
-          "belongs_to":{"kind":"account","id_reference":"account-1"},
-          "belongs_to_id_reference":"account-1",
-          "belongs_to_kind":"account",
-          "category":"other",
-          "context":%s,
-          "correspondent":"LPCA",
-          "created_by":{"kind":"admin","id_reference":"admin-1"},
-          "created_by_id_reference":"admin-1",
-          "created_by_kind":"admin",
-          "event_id":"01K6G000000000000000000000",
-          "note":"reviewed action",
-          "type":"%s",
-          "visibility":"internal",
-          "future_text":"future",
-          "future_nested":{"enabled":true}
-        }
-        """
+    {
+      "at":"2026-10-01T12:00:00Z",
+      "belongs_to":{"kind":"account","id_reference":"account-1"},
+      "belongs_to_id_reference":"account-1",
+      "belongs_to_kind":"account",
+      "category":"other",
+      "context":%s,
+      "correspondent":"LPCA",
+      "created_by":{"kind":"admin","id_reference":"admin-1"},
+      "created_by_id_reference":"admin-1",
+      "created_by_kind":"admin",
+      "event_id":"01K6G000000000000000000000",
+      "note":"reviewed action",
+      "type":"%s",
+      "visibility":"internal",
+      "future_text":"future",
+      "future_nested":{"enabled":true}
+    }
+    """
         .formatted(context, type)
         .replace("\n", "");
   }

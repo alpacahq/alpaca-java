@@ -57,7 +57,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * The assets API serves as the master list of assets available for trade and data consumption from Alpaca. Assets are sorted by asset class, exchange and symbol. Some assets are only available for data consumption via Polygon, and are not tradable with Alpaca. These assets will be marked with the flag tradable&#x3D;false. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class Assets implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -70,7 +70,7 @@ public class Assets implements Serializable {
    * Borrow status for US equity assets. This field is omitted for non-US-equity assets.
    */
   @JsonAdapter(BorrowStatusEnum.Adapter.class)
-  public enum BorrowStatusEnum {
+  public enum BorrowStatusEnum implements Serializable {
     EASY_TO_BORROW("easy_to_borrow"),
     
     HARD_TO_BORROW("hard_to_borrow");
@@ -198,7 +198,7 @@ public class Assets implements Serializable {
    * active or inactive
    */
   @JsonAdapter(StatusEnum.Adapter.class)
-  public enum StatusEnum {
+  public enum StatusEnum implements Serializable {
     ACTIVE("active"),
     
     INACTIVE("inactive");

@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * NonTradeActivities
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class NonTradeActivities implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -64,7 +64,7 @@ public class NonTradeActivities implements Serializable {
    * Gets or Sets activityType
    */
   @JsonAdapter(ActivityTypeEnum.Adapter.class)
-  public enum ActivityTypeEnum {
+  public enum ActivityTypeEnum implements Serializable {
     ACATC("ACATC"),
     
     ACATS("ACATS"),
@@ -280,7 +280,7 @@ public class NonTradeActivities implements Serializable {
    * The activity status.
    */
   @JsonAdapter(StatusEnum.Adapter.class)
-  public enum StatusEnum {
+  public enum StatusEnum implements Serializable {
     EXECUTED("executed"),
     
     CORRECT("correct"),

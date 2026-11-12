@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Activity details for a fill or partial_fill event
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class ActivityV2DetailTRD implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -85,7 +85,7 @@ public class ActivityV2DetailTRD implements Serializable {
    * The execution type
    */
   @JsonAdapter(ExecutionTypeEnum.Adapter.class)
-  public enum ExecutionTypeEnum {
+  public enum ExecutionTypeEnum implements Serializable {
     FILL("fill"),
     
     PARTIAL_FILL("partial_fill"),
@@ -166,7 +166,7 @@ public class ActivityV2DetailTRD implements Serializable {
    * Represents what side of the transaction an order was on
    */
   @JsonAdapter(SideEnum.Adapter.class)
-  public enum SideEnum {
+  public enum SideEnum implements Serializable {
     BUY("buy"),
     
     SELL("sell");

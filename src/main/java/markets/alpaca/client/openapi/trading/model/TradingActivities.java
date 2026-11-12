@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * TradingActivities
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class TradingActivities implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -61,7 +61,7 @@ public class TradingActivities implements Serializable {
    * Gets or Sets activityType
    */
   @JsonAdapter(ActivityTypeEnum.Adapter.class)
-  public enum ActivityTypeEnum {
+  public enum ActivityTypeEnum implements Serializable {
     FILL("FILL");
 
     private String value;
@@ -166,7 +166,7 @@ public class TradingActivities implements Serializable {
    * fill or partial_fill
    */
   @JsonAdapter(TypeEnum.Adapter.class)
-  public enum TypeEnum {
+  public enum TypeEnum implements Serializable {
     FILL("fill"),
     
     PARTIAL_FILL("partial_fill");

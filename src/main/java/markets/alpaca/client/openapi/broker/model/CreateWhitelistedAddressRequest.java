@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * CreateWhitelistedAddressRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CreateWhitelistedAddressRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -69,7 +69,7 @@ public class CreateWhitelistedAddressRequest implements Serializable {
    * Optional chain identifier. Use when the underlying asset for the whitelisted address is a multi-chain crypto asset.
    */
   @JsonAdapter(ChainEnum.Adapter.class)
-  public enum ChainEnum {
+  public enum ChainEnum implements Serializable {
     SOL("SOL"),
     
     ETH("ETH"),

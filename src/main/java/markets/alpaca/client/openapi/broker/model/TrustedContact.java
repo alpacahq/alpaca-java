@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * This model input is optional. However, the client should make a reasonable effort to obtain the trusted contact information. See [FINRA Notice 17-11](https://www.finra.org/sites/default/files/Regulatory-Notice-17-11.pdf) for more details.  At least one of the following is required: - &#x60;email_address&#x60; - &#x60;phone_number&#x60; - &#x60;street_address&#x60; 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class TrustedContact implements Serializable {
   private static final long serialVersionUID = 1L;
 

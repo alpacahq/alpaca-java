@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * A stock that is most active by either volume or trade count.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class MostActive implements Serializable {
   private static final long serialVersionUID = 1L;
 

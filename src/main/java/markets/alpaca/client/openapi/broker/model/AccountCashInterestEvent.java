@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * This property is included when the account&#39;s cash interest program had changed due to an enrollment, APR tier change, or unenrollment. The from and to status or APR tier name will be included in the event, depending on the change. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AccountCashInterestEvent implements Serializable {
   private static final long serialVersionUID = 1L;
 

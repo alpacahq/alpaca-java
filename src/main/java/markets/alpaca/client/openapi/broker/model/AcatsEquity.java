@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Equity asset requested in a partial transfer. Identify the security with either &#x60;cusip&#x60; or &#x60;symbol&#x60; -- provide one, not both. Prefer &#x60;cusip&#x60; when you have it: it is a stable, unambiguous identifier. Use &#x60;symbol&#x60; only when a CUSIP is not available, as ticker symbols can change or be reused over time.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AcatsEquity implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -64,7 +64,7 @@ public class AcatsEquity implements Serializable {
    * Position type. Only &#x60;LONG&#x60; and &#x60;SHORT&#x60; are accepted for equities -- &#x60;CREDIT&#x60; and &#x60;DEBIT&#x60; apply to cash positions and are rejected with HTTP 400 here.
    */
   @JsonAdapter(PositionEnum.Adapter.class)
-  public enum PositionEnum {
+  public enum PositionEnum implements Serializable {
     LONG("LONG"),
     
     SHORT("SHORT");

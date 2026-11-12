@@ -510,11 +510,11 @@ class TradingEventsSseClientTest {
 
   private static String fillJson() {
     return """
-        {"activity_type":"FILL","at":"2026-10-01T12:00:00Z","currency":"USD",
-        "event_id":"01K6G000000000000000000000","executed_at":"2026-10-01T12:00:00Z",
-        "ref_id":"123e4567-e89b-12d3-a456-426614174000","settle_date":"2026-10-02",
-        "status":"executed","details":{}}
-        """
+    {"activity_type":"FILL","at":"2026-10-01T12:00:00Z","currency":"USD",
+    "event_id":"01K6G000000000000000000000","executed_at":"2026-10-01T12:00:00Z",
+    "ref_id":"123e4567-e89b-12d3-a456-426614174000","settle_date":"2026-10-02",
+    "status":"executed","details":{}}
+    """
         .replace("\n", "");
   }
 }

@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * This feature is available in sandbox for beta partners only.  The account&#39;s dividend reinvestment (DRIP) setting. This field is returned only when DRIP was turned on for the account at least once. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AccountDRIPResponse implements Serializable {
   private static final long serialVersionUID = 1L;
 

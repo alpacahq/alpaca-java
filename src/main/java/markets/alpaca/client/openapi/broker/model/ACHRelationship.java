@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * ACHRelationship
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class ACHRelationship implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -75,7 +75,7 @@ public class ACHRelationship implements Serializable {
    * Must be CHECKING or SAVINGS
    */
   @JsonAdapter(BankAccountTypeEnum.Adapter.class)
-  public enum BankAccountTypeEnum {
+  public enum BankAccountTypeEnum implements Serializable {
     CHECKING("CHECKING"),
     
     SAVINGS("SAVINGS");
@@ -152,7 +152,7 @@ public class ACHRelationship implements Serializable {
    * Gets or Sets status
    */
   @JsonAdapter(StatusEnum.Adapter.class)
-  public enum StatusEnum {
+  public enum StatusEnum implements Serializable {
     QUEUED("QUEUED"),
     
     APPROVED("APPROVED"),
