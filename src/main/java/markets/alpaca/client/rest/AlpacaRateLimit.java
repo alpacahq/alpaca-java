@@ -70,8 +70,11 @@ public final class AlpacaRateLimit {
     return headers.entrySet().stream()
         .filter(entry -> entry.getKey() != null)
         .filter(entry -> entry.getKey().toLowerCase(Locale.ROOT).equals(normalizedName))
-        .flatMap(entry ->
-            entry.getValue() == null ? java.util.stream.Stream.empty() : entry.getValue().stream())
+        .flatMap(
+            entry ->
+                entry.getValue() == null
+                    ? java.util.stream.Stream.empty()
+                    : entry.getValue().stream())
         .filter(value -> value != null && !value.isBlank())
         .findFirst();
   }

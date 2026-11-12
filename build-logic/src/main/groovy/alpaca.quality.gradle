@@ -99,7 +99,7 @@ spotless {
         targetExclude 'src/main/java/markets/alpaca/client/openapi/**/*.java'
         importOrder()
         removeUnusedImports()
-        googleJavaFormat()
+        googleJavaFormat('1.28.0')
         formatAnnotations()
     }
 

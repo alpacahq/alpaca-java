@@ -47,173 +47,182 @@ class SseDomainContractTest {
 
   @TestFactory
   Stream<DynamicTest> subscriptionsOpenResumeAndCancelConsistently() {
-    return dynamicTests(domain -> {
-      try (var server = new MockWebServer()) {
-        server.start();
-        server.enqueue(
-            new MockResponse()
-                .setHeader("Content-Type", "text/event-stream")
-                .setBody(":\n\n".repeat(1_000))
-                .throttleBody(1, 1, TimeUnit.SECONDS));
-        var options = AlpacaSseOptions.builder().initialLastEventId(SINCE_ID).build();
-        var subscription = domain.open(server, options, false, event -> {});
-        try {
-          assertEquals(200, subscription.opened().get(3, TimeUnit.SECONDS).statusCode());
-          var request = server.takeRequest(3, TimeUnit.SECONDS);
-          assertNotNull(request);
-          assertEquals(SINCE_ID, request.getHeader("Last-Event-ID"));
-          if (domain.resumeWithQueryParameter()) {
-            assertEquals(SINCE_ID, request.getRequestUrl().queryParameter("since_id"));
+    return dynamicTests(
+        domain -> {
+          try (var server = new MockWebServer()) {
+            server.start();
+            server.enqueue(
+                new MockResponse()
+                    .setHeader("Content-Type", "text/event-stream")
+                    .setBody(":\n\n".repeat(1_000))
+                    .throttleBody(1, 1, TimeUnit.SECONDS));
+            var options = AlpacaSseOptions.builder().initialLastEventId(SINCE_ID).build();
+            var subscription = domain.open(server, options, false, event -> {});
+            try {
+              assertEquals(200, subscription.opened().get(3, TimeUnit.SECONDS).statusCode());
+              var request = server.takeRequest(3, TimeUnit.SECONDS);
+              assertNotNull(request);
+              assertEquals(SINCE_ID, request.getHeader("Last-Event-ID"));
+              if (domain.resumeWithQueryParameter()) {
+                assertEquals(SINCE_ID, request.getRequestUrl().queryParameter("since_id"));
+              }
+            } finally {
+              subscription.close();
+            }
+            assertEquals(
+                AlpacaSseCloseResult.Reason.USER_CLOSED,
+                subscription.completion().get(3, TimeUnit.SECONDS).reason());
           }
-        } finally {
-          subscription.close();
-        }
-        assertEquals(
-            AlpacaSseCloseResult.Reason.USER_CLOSED,
-            subscription.completion().get(3, TimeUnit.SECONDS).reason());
-      }
-    });
+        });
   }
 
   @TestFactory
   Stream<DynamicTest> eventEnvelopesRemainOrderedAcrossDomains() {
-    return dynamicTests(domain -> {
-      try (var server = new MockWebServer()) {
-        server.start();
-        server.enqueue(
-            new MockResponse()
-                .setHeader("Content-Type", "text/event-stream")
-                .setBody(
-                    "id: first\ndata: "
-                        + domain.payload()
-                        + "\n\nid: second\ndata: "
-                        + domain.payload()
-                        + "\n\n"));
-        var eventIds = new CopyOnWriteArrayList<String>();
-        var subscription =
-            domain.open(
-                server,
-                AlpacaSseOptions.reconnectDisabled(),
-                false,
-                event -> eventIds.add(event.id()));
-        try {
-          subscription.completion().get(3, TimeUnit.SECONDS);
-        } finally {
-          subscription.close();
-        }
-        assertEquals(List.of("first", "second"), eventIds);
-        assertEquals("second", subscription.lastEventId().orElseThrow());
-      }
-    });
+    return dynamicTests(
+        domain -> {
+          try (var server = new MockWebServer()) {
+            server.start();
+            server.enqueue(
+                new MockResponse()
+                    .setHeader("Content-Type", "text/event-stream")
+                    .setBody(
+                        "id: first\ndata: "
+                            + domain.payload()
+                            + "\n\nid: second\ndata: "
+                            + domain.payload()
+                            + "\n\n"));
+            var eventIds = new CopyOnWriteArrayList<String>();
+            var subscription =
+                domain.open(
+                    server,
+                    AlpacaSseOptions.reconnectDisabled(),
+                    false,
+                    event -> eventIds.add(event.id()));
+            try {
+              subscription.completion().get(3, TimeUnit.SECONDS);
+            } finally {
+              subscription.close();
+            }
+            assertEquals(List.of("first", "second"), eventIds);
+            assertEquals("second", subscription.lastEventId().orElseThrow());
+          }
+        });
   }
 
   @TestFactory
   Stream<DynamicTest> boundedRequestsCompleteAtEofAcrossDomains() {
-    return dynamicTests(domain -> {
-      try (var server = new MockWebServer()) {
-        server.start();
-        server.enqueue(
-            new MockResponse().setHeader("Content-Type", "text/event-stream").setBody(""));
-        var subscription = domain.open(server, AlpacaSseOptions.defaults(), true, event -> {});
-        assertEquals(200, subscription.opened().get(3, TimeUnit.SECONDS).statusCode());
-        assertEquals(
-            AlpacaSseCloseResult.Reason.BOUNDED_END,
-            subscription.completion().get(3, TimeUnit.SECONDS).reason());
-      }
-    });
+    return dynamicTests(
+        domain -> {
+          try (var server = new MockWebServer()) {
+            server.start();
+            server.enqueue(
+                new MockResponse().setHeader("Content-Type", "text/event-stream").setBody(""));
+            var subscription = domain.open(server, AlpacaSseOptions.defaults(), true, event -> {});
+            assertEquals(200, subscription.opened().get(3, TimeUnit.SECONDS).statusCode());
+            assertEquals(
+                AlpacaSseCloseResult.Reason.BOUNDED_END,
+                subscription.completion().get(3, TimeUnit.SECONDS).reason());
+          }
+        });
   }
 
   @TestFactory
   Stream<DynamicTest> reconnectsSendTheDeliveredEventIdAcrossDomains() {
-    return dynamicTests(domain -> {
-      try (var server = new MockWebServer()) {
-        server.start();
-        server.enqueue(
-            new MockResponse()
-                .setHeader("Content-Type", "text/event-stream")
-                .setBody("id: delivered\ndata: " + domain.payload() + "\n\n"));
-        server.enqueue(
-            new MockResponse()
-                .setHeader("Content-Type", "text/event-stream")
-                .setBodyDelay(5, TimeUnit.SECONDS)
-                .setBody(":\n\n"));
-        var policy =
-            AlpacaSseReconnectPolicy.builder()
-                .initialAttempts(0)
-                .establishedAttempts(1)
-                .initialBackoff(Duration.ofMillis(1))
-                .maxBackoff(Duration.ofMillis(1))
-                .jitterRatio(0)
-                .build();
-        var subscription =
-            domain.open(
-                server,
-                AlpacaSseOptions.builder().reconnectPolicy(policy).build(),
-                false,
-                event -> {});
-        try {
-          assertNotNull(server.takeRequest(3, TimeUnit.SECONDS));
-          var reconnect = server.takeRequest(3, TimeUnit.SECONDS);
-          assertNotNull(reconnect);
-          assertEquals("delivered", reconnect.getHeader("Last-Event-ID"));
-          if (domain.resumeWithQueryParameter()) {
-            assertEquals("delivered", reconnect.getRequestUrl().queryParameter("since_id"));
+    return dynamicTests(
+        domain -> {
+          try (var server = new MockWebServer()) {
+            server.start();
+            server.enqueue(
+                new MockResponse()
+                    .setHeader("Content-Type", "text/event-stream")
+                    .setBody("id: delivered\ndata: " + domain.payload() + "\n\n"));
+            server.enqueue(
+                new MockResponse()
+                    .setHeader("Content-Type", "text/event-stream")
+                    .setBodyDelay(5, TimeUnit.SECONDS)
+                    .setBody(":\n\n"));
+            var policy =
+                AlpacaSseReconnectPolicy.builder()
+                    .initialAttempts(0)
+                    .establishedAttempts(1)
+                    .initialBackoff(Duration.ofMillis(1))
+                    .maxBackoff(Duration.ofMillis(1))
+                    .jitterRatio(0)
+                    .build();
+            var subscription =
+                domain.open(
+                    server,
+                    AlpacaSseOptions.builder().reconnectPolicy(policy).build(),
+                    false,
+                    event -> {});
+            try {
+              assertNotNull(server.takeRequest(3, TimeUnit.SECONDS));
+              var reconnect = server.takeRequest(3, TimeUnit.SECONDS);
+              assertNotNull(reconnect);
+              assertEquals("delivered", reconnect.getHeader("Last-Event-ID"));
+              if (domain.resumeWithQueryParameter()) {
+                assertEquals("delivered", reconnect.getRequestUrl().queryParameter("since_id"));
+              }
+            } finally {
+              subscription.close();
+            }
           }
-        } finally {
-          subscription.close();
-        }
-      }
-    });
+        });
   }
 
   @TestFactory
   Stream<DynamicTest> retryExhaustionFailsAcrossDomains() {
-    return dynamicTests(domain -> {
-      try (var server = new MockWebServer()) {
-        server.start();
-        server.enqueue(new MockResponse().setResponseCode(503).setBody("unavailable"));
-        server.enqueue(new MockResponse().setResponseCode(503).setBody("unavailable"));
-        var policy =
-            AlpacaSseReconnectPolicy.builder()
-                .initialAttempts(1)
-                .establishedAttempts(0)
-                .initialBackoff(Duration.ofMillis(1))
-                .maxBackoff(Duration.ofMillis(1))
-                .jitterRatio(0)
-                .build();
-        var subscription =
-            domain.open(
-                server,
-                AlpacaSseOptions.builder().reconnectPolicy(policy).build(),
-                false,
-                event -> {});
-        var failure =
-            assertThrows(
-                ExecutionException.class, () -> subscription.completion().get(3, TimeUnit.SECONDS));
-        assertInstanceOf(AlpacaSseHttpException.class, failure.getCause());
-        assertEquals(2, server.getRequestCount());
-      }
-    });
+    return dynamicTests(
+        domain -> {
+          try (var server = new MockWebServer()) {
+            server.start();
+            server.enqueue(new MockResponse().setResponseCode(503).setBody("unavailable"));
+            server.enqueue(new MockResponse().setResponseCode(503).setBody("unavailable"));
+            var policy =
+                AlpacaSseReconnectPolicy.builder()
+                    .initialAttempts(1)
+                    .establishedAttempts(0)
+                    .initialBackoff(Duration.ofMillis(1))
+                    .maxBackoff(Duration.ofMillis(1))
+                    .jitterRatio(0)
+                    .build();
+            var subscription =
+                domain.open(
+                    server,
+                    AlpacaSseOptions.builder().reconnectPolicy(policy).build(),
+                    false,
+                    event -> {});
+            var failure =
+                assertThrows(
+                    ExecutionException.class,
+                    () -> subscription.completion().get(3, TimeUnit.SECONDS));
+            assertInstanceOf(AlpacaSseHttpException.class, failure.getCause());
+            assertEquals(2, server.getRequestCount());
+          }
+        });
   }
 
   @TestFactory
   Stream<DynamicTest> resourceLimitsFailAcrossDomains() {
-    return dynamicTests(domain -> {
-      try (var server = new MockWebServer()) {
-        server.start();
-        server.enqueue(
-            new MockResponse()
-                .setHeader("Content-Type", "text/event-stream")
-                .setBody("data: " + domain.payload() + "\n\n"));
-        var options = AlpacaSseOptions.reconnectDisabled().toBuilder().maxEventBytes(16).build();
-        var subscription = domain.open(server, options, false, event -> {});
-        var failure =
-            assertThrows(
-                ExecutionException.class, () -> subscription.completion().get(3, TimeUnit.SECONDS));
-        assertInstanceOf(AlpacaSseProtocolException.class, failure.getCause());
-        assertEquals(AlpacaSseState.FAILED, subscription.state());
-      }
-    });
+    return dynamicTests(
+        domain -> {
+          try (var server = new MockWebServer()) {
+            server.start();
+            server.enqueue(
+                new MockResponse()
+                    .setHeader("Content-Type", "text/event-stream")
+                    .setBody("data: " + domain.payload() + "\n\n"));
+            var options =
+                AlpacaSseOptions.reconnectDisabled().toBuilder().maxEventBytes(16).build();
+            var subscription = domain.open(server, options, false, event -> {});
+            var failure =
+                assertThrows(
+                    ExecutionException.class,
+                    () -> subscription.completion().get(3, TimeUnit.SECONDS));
+            assertInstanceOf(AlpacaSseProtocolException.class, failure.getCause());
+            assertEquals(AlpacaSseState.FAILED, subscription.state());
+          }
+        });
   }
 
   private static Stream<DynamicTest> dynamicTests(DomainAssertion assertion) {

@@ -71,12 +71,13 @@ final class CorporateActionEventDecoder {
       throw new ExceptionInInitializerError(
           "Corporate-action decoder registry does not match generated event types");
     }
-    SCHEMAS.forEach((eventType, schemaName) -> {
-      if (CorporateActionEvent.schemas.get(schemaName) == null) {
-        throw new ExceptionInInitializerError(
-            "Corporate-action decoder schema is missing for " + eventType + ": " + schemaName);
-      }
-    });
+    SCHEMAS.forEach(
+        (eventType, schemaName) -> {
+          if (CorporateActionEvent.schemas.get(schemaName) == null) {
+            throw new ExceptionInInitializerError(
+                "Corporate-action decoder schema is missing for " + eventType + ": " + schemaName);
+          }
+        });
   }
 
   CorporateActionEvent decode(String data) throws IOException {

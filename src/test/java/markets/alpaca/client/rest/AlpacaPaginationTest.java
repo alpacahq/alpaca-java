@@ -183,11 +183,12 @@ class AlpacaPaginationTest {
         assertThrows(
             IllegalStateException.class,
             () ->
-                AlpacaPagination.collectPages(pageToken -> {
-                  requestedTokens.add(pageToken);
-                  return new AlpacaPage<>(
-                      new TestBody("repeat", List.of()), 200, Map.of(), "repeat");
-                }));
+                AlpacaPagination.collectPages(
+                    pageToken -> {
+                      requestedTokens.add(pageToken);
+                      return new AlpacaPage<>(
+                          new TestBody("repeat", List.of()), 200, Map.of(), "repeat");
+                    }));
 
     assertEquals(Arrays.asList(null, "repeat"), requestedTokens);
     assertTrue(thrown.getMessage().contains("repeated next_page_token"));
@@ -298,9 +299,10 @@ class AlpacaPaginationTest {
         assertThrows(
             TestException.class,
             () ->
-                AlpacaPagination.collectPages(pageToken -> {
-                  throw thrown;
-                }));
+                AlpacaPagination.collectPages(
+                    pageToken -> {
+                      throw thrown;
+                    }));
 
     assertSame(thrown, actual);
   }

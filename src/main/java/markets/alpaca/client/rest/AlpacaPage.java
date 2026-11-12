@@ -52,11 +52,12 @@ public final class AlpacaPage<T> {
 
     String normalizedName = name.toLowerCase(Locale.ROOT);
     List<String> values = new ArrayList<>();
-    headers.forEach((headerName, headerValues) -> {
-      if (headerName != null && headerName.toLowerCase(Locale.ROOT).equals(normalizedName)) {
-        values.addAll(headerValues);
-      }
-    });
+    headers.forEach(
+        (headerName, headerValues) -> {
+          if (headerName != null && headerName.toLowerCase(Locale.ROOT).equals(normalizedName)) {
+            values.addAll(headerValues);
+          }
+        });
     return Collections.unmodifiableList(values);
   }
 
@@ -88,10 +89,11 @@ public final class AlpacaPage<T> {
     if (headers == null || headers.isEmpty()) return Map.of();
 
     Map<String, List<String>> copy = new LinkedHashMap<>();
-    headers.forEach((name, values) -> {
-      List<String> valueCopy = values == null ? List.of() : List.copyOf(values);
-      copy.put(name, valueCopy);
-    });
+    headers.forEach(
+        (name, values) -> {
+          List<String> valueCopy = values == null ? List.of() : List.copyOf(values);
+          copy.put(name, valueCopy);
+        });
     return Collections.unmodifiableMap(copy);
   }
 }

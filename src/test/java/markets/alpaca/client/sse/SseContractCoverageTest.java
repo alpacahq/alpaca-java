@@ -45,9 +45,10 @@ class SseContractCoverageTest {
   private static void assertPublicMethods(Class<?> type, Set<String> expected) {
     Set<String> actual =
         Arrays.stream(type.getMethods()).map(Method::getName).collect(Collectors.toSet());
-    expected.forEach(method ->
-        assertTrue(
-            actual.contains(method),
-            () -> type.getName() + " is missing public SSE binding " + method));
+    expected.forEach(
+        method ->
+            assertTrue(
+                actual.contains(method),
+                () -> type.getName() + " is missing public SSE binding " + method));
   }
 }

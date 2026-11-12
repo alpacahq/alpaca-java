@@ -55,9 +55,10 @@ public final class AlpacaFutures {
     Objects.requireNonNull(asyncCall, "asyncCall must not be null");
     var future = new CompletableFuture<AlpacaApiResponse<T>>();
     var callRef = new AtomicReference<Call>();
-    future.whenComplete((ignored, error) -> {
-      if (future.isCancelled()) cancel(callRef.get());
-    });
+    future.whenComplete(
+        (ignored, error) -> {
+          if (future.isCancelled()) cancel(callRef.get());
+        });
 
     try {
       Call call =
@@ -102,9 +103,10 @@ public final class AlpacaFutures {
     Objects.requireNonNull(asyncCall, "asyncCall must not be null");
     var future = new CompletableFuture<AlpacaApiResponse<T>>();
     var callRef = new AtomicReference<Call>();
-    future.whenComplete((ignored, error) -> {
-      if (future.isCancelled()) cancel(callRef.get());
-    });
+    future.whenComplete(
+        (ignored, error) -> {
+          if (future.isCancelled()) cancel(callRef.get());
+        });
 
     try {
       Call call =
@@ -149,9 +151,10 @@ public final class AlpacaFutures {
     Objects.requireNonNull(asyncCall, "asyncCall must not be null");
     var future = new CompletableFuture<AlpacaApiResponse<T>>();
     var callRef = new AtomicReference<Call>();
-    future.whenComplete((ignored, error) -> {
-      if (future.isCancelled()) cancel(callRef.get());
-    });
+    future.whenComplete(
+        (ignored, error) -> {
+          if (future.isCancelled()) cancel(callRef.get());
+        });
 
     try {
       Call call =
@@ -192,9 +195,10 @@ public final class AlpacaFutures {
   private static <T> CompletableFuture<T> bodyFuture(
       CompletableFuture<AlpacaApiResponse<T>> responseFuture) {
     CompletableFuture<T> bodyFuture = responseFuture.thenApply(AlpacaApiResponse::body);
-    bodyFuture.whenComplete((ignored, error) -> {
-      if (bodyFuture.isCancelled()) responseFuture.cancel(true);
-    });
+    bodyFuture.whenComplete(
+        (ignored, error) -> {
+          if (bodyFuture.isCancelled()) responseFuture.cancel(true);
+        });
     return bodyFuture;
   }
 }

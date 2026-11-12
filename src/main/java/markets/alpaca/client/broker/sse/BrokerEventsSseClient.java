@@ -528,24 +528,27 @@ public final class BrokerEventsSseClient {
     if (result.isDone()) opened.close();
     opened
         .completion()
-        .whenComplete((closeResult, failure) -> {
-          if (!outcomeClaimed.compareAndSet(false, true)) return;
-          SseTransport.executeLifecycle(() -> {
-            if (failure != null) {
-              result.completeExceptionally(failure);
-            } else {
-              result.completeExceptionally(
-                  new AlpacaSseProtocolException(
-                      "Single-activity SSE response ended without an event"));
-            }
-          });
+        .whenComplete(
+            (closeResult, failure) -> {
+              if (!outcomeClaimed.compareAndSet(false, true)) return;
+              SseTransport.executeLifecycle(
+                  () -> {
+                    if (failure != null) {
+                      result.completeExceptionally(failure);
+                    } else {
+                      result.completeExceptionally(
+                          new AlpacaSseProtocolException(
+                              "Single-activity SSE response ended without an event"));
+                    }
+                  });
+            });
+    result.whenComplete(
+        (ignored, failure) -> {
+          if (result.isCancelled()) {
+            outcomeClaimed.compareAndSet(false, true);
+            opened.close();
+          }
         });
-    result.whenComplete((ignored, failure) -> {
-      if (result.isCancelled()) {
-        outcomeClaimed.compareAndSet(false, true);
-        opened.close();
-      }
-    });
     return result;
   }
 

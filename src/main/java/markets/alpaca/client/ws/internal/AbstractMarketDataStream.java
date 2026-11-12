@@ -255,11 +255,12 @@ public abstract class AbstractMarketDataStream extends AbstractAlpacaStream {
     if (subs.isEmpty()) return;
 
     Map<String, Set<String>> payload = new LinkedHashMap<>();
-    subs.forEach((channel, symbols) -> {
-      // Skip server-managed channels that are implicit (corrections, cancelErrors)
-      if ("corrections".equals(channel) || "cancelErrors".equals(channel)) return;
-      if (!symbols.isEmpty()) payload.put(channel, symbols);
-    });
+    subs.forEach(
+        (channel, symbols) -> {
+          // Skip server-managed channels that are implicit (corrections, cancelErrors)
+          if ("corrections".equals(channel) || "cancelErrors".equals(channel)) return;
+          if (!symbols.isEmpty()) payload.put(channel, symbols);
+        });
     if (!payload.isEmpty()) sendSubscriptionMessage("subscribe", payload);
   }
 
@@ -300,11 +301,12 @@ public abstract class AbstractMarketDataStream extends AbstractAlpacaStream {
       pending = List.copyOf(pendingSubscriptionMessages);
       pendingSubscriptionMessages.clear();
     }
-    pending.forEach(msg -> {
-      if (!send(buildSubscriptionMessage(msg.action(), msg.payload()))) {
-        bufferSubscriptionMessage(msg.action(), msg.payload());
-      }
-    });
+    pending.forEach(
+        msg -> {
+          if (!send(buildSubscriptionMessage(msg.action(), msg.payload()))) {
+            bufferSubscriptionMessage(msg.action(), msg.payload());
+          }
+        });
   }
 
   private synchronized void bufferSubscriptionMessage(
@@ -314,24 +316,26 @@ public abstract class AbstractMarketDataStream extends AbstractAlpacaStream {
 
   private static Map<String, Set<String>> copyPayload(Map<String, Set<String>> payload) {
     Map<String, Set<String>> copy = new LinkedHashMap<>();
-    payload.forEach((channel, symbols) -> {
-      if (!symbols.isEmpty())
-        copy.put(channel, Collections.unmodifiableSet(new LinkedHashSet<>(symbols)));
-    });
+    payload.forEach(
+        (channel, symbols) -> {
+          if (!symbols.isEmpty())
+            copy.put(channel, Collections.unmodifiableSet(new LinkedHashSet<>(symbols)));
+        });
     return Collections.unmodifiableMap(copy);
   }
 
   private static String buildSubscriptionMessage(String action, Map<String, Set<String>> payload) {
     JsonObject root = new JsonObject();
     root.addProperty("action", action);
-    payload.forEach((channel, symbols) -> {
-      if (symbols.isEmpty()) return;
-      JsonArray values = new JsonArray();
-      for (String s : symbols) {
-        values.add(s);
-      }
-      root.add(channel, values);
-    });
+    payload.forEach(
+        (channel, symbols) -> {
+          if (symbols.isEmpty()) return;
+          JsonArray values = new JsonArray();
+          for (String s : symbols) {
+            values.add(s);
+          }
+          root.add(channel, values);
+        });
     return GSON.toJson(root);
   }
 

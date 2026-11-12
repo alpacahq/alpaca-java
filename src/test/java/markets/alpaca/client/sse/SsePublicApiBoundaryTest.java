@@ -49,14 +49,16 @@ class SsePublicApiBoundaryTest {
 
   @Test
   void supportedPublicSignaturesDoNotExposeInternalSseTypes() {
-    SUPPORTED_TYPES.forEach(type -> {
-      Stream.concat(Stream.of(type.getDeclaredConstructors()), Stream.of(type.getDeclaredMethods()))
-          .filter(member -> Modifier.isPublic(member.getModifiers()))
-          .forEach(member -> assertExecutableBoundary(type, member));
-      Stream.of(type.getDeclaredFields())
-          .filter(field -> Modifier.isPublic(field.getModifiers()))
-          .forEach(field -> assertSupportedType(type, field.toString(), field.getType()));
-    });
+    SUPPORTED_TYPES.forEach(
+        type -> {
+          Stream.concat(
+                  Stream.of(type.getDeclaredConstructors()), Stream.of(type.getDeclaredMethods()))
+              .filter(member -> Modifier.isPublic(member.getModifiers()))
+              .forEach(member -> assertExecutableBoundary(type, member));
+          Stream.of(type.getDeclaredFields())
+              .filter(field -> Modifier.isPublic(field.getModifiers()))
+              .forEach(field -> assertSupportedType(type, field.toString(), field.getType()));
+        });
   }
 
   @Test

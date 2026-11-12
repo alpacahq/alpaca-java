@@ -147,8 +147,9 @@ public final class AlpacaRetryPolicy {
       }
       this.retryableMethods =
           retryableMethods.stream()
-              .map(method ->
-                  Objects.requireNonNull(method, "retryableMethods must not contain null"))
+              .map(
+                  method ->
+                      Objects.requireNonNull(method, "retryableMethods must not contain null"))
               .map(method -> method.toUpperCase(Locale.ROOT))
               .collect(java.util.stream.Collectors.toUnmodifiableSet());
       return this;
@@ -162,8 +163,9 @@ public final class AlpacaRetryPolicy {
       }
       this.retryableStatusCodes =
           retryableStatusCodes.stream()
-              .map(code ->
-                  Objects.requireNonNull(code, "retryableStatusCodes must not contain null"))
+              .map(
+                  code ->
+                      Objects.requireNonNull(code, "retryableStatusCodes must not contain null"))
               .collect(java.util.stream.Collectors.toUnmodifiableSet());
       return this;
     }

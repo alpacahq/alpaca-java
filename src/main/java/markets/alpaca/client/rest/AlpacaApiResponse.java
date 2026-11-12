@@ -28,10 +28,11 @@ public record AlpacaApiResponse<T>(T body, int statusCode, Map<String, List<Stri
     if (headers == null || headers.isEmpty()) return Map.of();
 
     Map<String, List<String>> copy = new LinkedHashMap<>();
-    headers.forEach((name, values) -> {
-      List<String> valueCopy = values == null ? List.of() : List.copyOf(values);
-      copy.put(name, valueCopy);
-    });
+    headers.forEach(
+        (name, values) -> {
+          List<String> valueCopy = values == null ? List.of() : List.copyOf(values);
+          copy.put(name, valueCopy);
+        });
     return Collections.unmodifiableMap(copy);
   }
 }

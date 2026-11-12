@@ -64,18 +64,24 @@ public final class TradingApiExample {
                 .symbols(symbol)
                 .assetClasses(AssetClass.US_EQUITY)
                 .build());
-    openOrders.forEach(order ->
-        System.out.printf(
-            "order=%s symbol=%s side=%s qty=%s status=%s%n",
-            order.getId(), order.getSymbol(), order.getSide(), order.getQty(), order.getStatus()));
+    openOrders.forEach(
+        order ->
+            System.out.printf(
+                "order=%s symbol=%s side=%s qty=%s status=%s%n",
+                order.getId(),
+                order.getSymbol(),
+                order.getSide(),
+                order.getQty(),
+                order.getStatus()));
 
     ExampleSupport.printSection("Positions");
     positions
         .getAllOpenPositions()
-        .forEach(position ->
-            System.out.printf(
-                "position=%s qty=%s marketValue=%s%n",
-                position.getSymbol(), position.getQty(), position.getMarketValue()));
+        .forEach(
+            position ->
+                System.out.printf(
+                    "position=%s qty=%s marketValue=%s%n",
+                    position.getSymbol(), position.getQty(), position.getMarketValue()));
 
     ExampleSupport.printSection("Portfolio History");
     var history =

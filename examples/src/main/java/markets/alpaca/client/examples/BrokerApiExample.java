@@ -43,10 +43,11 @@ public final class BrokerApiExample {
     var allAccounts = accounts.getAllAccounts(null, null, null, null, "desc", null);
     allAccounts.stream()
         .limit(5)
-        .forEach(account ->
-            System.out.printf(
-                "account=%s number=%s status=%s%n",
-                account.getId(), account.getAccountNumber(), account.getStatus()));
+        .forEach(
+            account ->
+                System.out.printf(
+                    "account=%s number=%s status=%s%n",
+                    account.getId(), account.getAccountNumber(), account.getStatus()));
 
     UUID accountId = configuredAccountId(allAccounts.isEmpty() ? null : allAccounts.get(0).getId());
     if (accountId != null) {
@@ -63,10 +64,11 @@ public final class BrokerApiExample {
       trading
           .getAllOrdersForAccount(
               accountId, "open", 50, null, null, null, "desc", true, null, null, null, null)
-          .forEach(order ->
-              System.out.printf(
-                  "order=%s symbol=%s status=%s%n",
-                  order.getId(), order.getSymbol(), order.getStatus()));
+          .forEach(
+              order ->
+                  System.out.printf(
+                      "order=%s symbol=%s status=%s%n",
+                      order.getId(), order.getSymbol(), order.getStatus()));
     }
 
     if (ExampleSupport.enabled("APCA_EXAMPLE_CREATE_BROKER_ACCOUNT")) {

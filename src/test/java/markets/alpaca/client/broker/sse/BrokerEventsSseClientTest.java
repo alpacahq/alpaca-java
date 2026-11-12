@@ -790,14 +790,15 @@ class BrokerEventsSseClientTest {
     ExecutorService callbackExecutor = Executors.newSingleThreadExecutor();
     var releaseExecutor = new CountDownLatch(1);
     var executorBlocked = new CountDownLatch(1);
-    callbackExecutor.execute(() -> {
-      executorBlocked.countDown();
-      try {
-        releaseExecutor.await();
-      } catch (InterruptedException failure) {
-        Thread.currentThread().interrupt();
-      }
-    });
+    callbackExecutor.execute(
+        () -> {
+          executorBlocked.countDown();
+          try {
+            releaseExecutor.await();
+          } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt();
+          }
+        });
     assertTrue(executorBlocked.await(1, TimeUnit.SECONDS));
     try {
       var sse =
