@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents the info for a country.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CountryInfo implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -60,7 +60,7 @@ public class CountryInfo implements Serializable {
    * crypto risk rating of the country
    */
   @JsonAdapter(CryptoRiskRatingEnum.Adapter.class)
-  public enum CryptoRiskRatingEnum {
+  public enum CryptoRiskRatingEnum implements Serializable {
     LOW("low"),
     
     MEDIUM("medium"),
@@ -133,7 +133,7 @@ public class CountryInfo implements Serializable {
    * the securities risk rating of the country
    */
   @JsonAdapter(SecuritiesRiskRatingEnum.Adapter.class)
-  public enum SecuritiesRiskRatingEnum {
+  public enum SecuritiesRiskRatingEnum implements Serializable {
     LOW("low"),
     
     MEDIUM("medium"),

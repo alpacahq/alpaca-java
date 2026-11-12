@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * CryptoLatestQuotesResp
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CryptoLatestQuotesResp implements Serializable {
   private static final long serialVersionUID = 1L;
 

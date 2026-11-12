@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * Capital gains distribution paid by a fund. A single event may carry a long-term leg (&#x60;long_term_rate&#x60;), a short-term leg (&#x60;short_term_rate&#x60;), or both when combined. At least one of the two rates is always present. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CapitalGainsDistribution implements Serializable {
   private static final long serialVersionUID = 1L;
 

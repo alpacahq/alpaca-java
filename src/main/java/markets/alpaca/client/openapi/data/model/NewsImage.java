@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * A model representing images for a news article. Simply a URL to the image along with a size parameter suggesting the display size of the image.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class NewsImage implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -59,7 +59,7 @@ public class NewsImage implements Serializable {
    * Possible values for size are thumb, small and large.
    */
   @JsonAdapter(SizeEnum.Adapter.class)
-  public enum SizeEnum {
+  public enum SizeEnum implements Serializable {
     THUMB("thumb"),
     
     SMALL("small"),

@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * The per-position error reported inside a close-all-positions 207 response when a position&#39;s &#x60;status&#x60; is not 200. Other rejection-specific string fields may appear.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class ClosePositionError implements Serializable {
   private static final long serialVersionUID = 1L;
 

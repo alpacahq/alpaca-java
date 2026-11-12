@@ -61,7 +61,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Represents a request to create an order.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CreateOrderRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Request to create a new settlement. All transfers included must use the same source account, and the total amount received must be in the same currency as the base currency of the source account. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CreateJITSettlementRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 

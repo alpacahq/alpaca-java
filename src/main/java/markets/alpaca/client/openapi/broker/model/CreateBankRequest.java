@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents the possible fields to send when creating a new associated Bank resource for an account
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CreateBankRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -69,7 +69,7 @@ public class CreateBankRequest implements Serializable {
    * ABA (Domestic) or BIC (International)
    */
   @JsonAdapter(BankCodeTypeEnum.Adapter.class)
-  public enum BankCodeTypeEnum {
+  public enum BankCodeTypeEnum implements Serializable {
     ABA("ABA"),
     
     BIC("BIC");

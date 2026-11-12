@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * ReverseBatchJournalRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class ReverseBatchJournalRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -66,7 +66,7 @@ public class ReverseBatchJournalRequest implements Serializable {
    * Only supports &#x60;JNLC&#x60; for now
    */
   @JsonAdapter(EntryTypeEnum.Adapter.class)
-  public enum EntryTypeEnum {
+  public enum EntryTypeEnum implements Serializable {
     JNLC("JNLC");
 
     private String value;

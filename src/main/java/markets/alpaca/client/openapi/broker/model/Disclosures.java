@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Disclosures fields denote if the account owner falls under each category defined by FINRA rule. The client has to ask questions for the end user and the values should reflect their answers. If one of the answers is true (yes), the account goes into ACTION_REQUIRED status. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class Disclosures implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -81,7 +81,7 @@ public class Disclosures implements Serializable {
    * The industry sector of employment. If the &#x60;employment_status&#x60; is &#x60;unemployed&#x60; or &#x60;student&#x60;, set this property to &#x60;not_employed&#x60;. If the &#x60;employment_status&#x60; is &#x60;retired&#x60;, set this to &#x60;self_employed&#x60;. 
    */
   @JsonAdapter(EmploymentSectorEnum.Adapter.class)
-  public enum EmploymentSectorEnum {
+  public enum EmploymentSectorEnum implements Serializable {
     AGRICULTURE("agriculture"),
     
     BUSINESS_MANAGEMENT("business_management"),
@@ -168,7 +168,7 @@ public class Disclosures implements Serializable {
    * One of the following: &#x60;employed&#x60;, &#x60;unemployed&#x60;, &#x60;retired&#x60;, or &#x60;student&#x60;.
    */
   @JsonAdapter(EmploymentStatusEnum.Adapter.class)
-  public enum EmploymentStatusEnum {
+  public enum EmploymentStatusEnum implements Serializable {
     UNEMPLOYED("unemployed"),
     
     EMPLOYED("employed"),

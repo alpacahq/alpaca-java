@@ -55,7 +55,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Identity is the model to provide account owner&#39;s identity information. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class Identity implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -103,7 +103,7 @@ public class Identity implements Serializable {
    * Gets or Sets fundingSource
    */
   @JsonAdapter(FundingSourceEnum.Adapter.class)
-  public enum FundingSourceEnum {
+  public enum FundingSourceEnum implements Serializable {
     EMPLOYMENT_INCOME("employment_income"),
     
     INVESTMENTS("investments"),
@@ -173,7 +173,7 @@ public class Identity implements Serializable {
    * The user&#39;s level of expertise and familiarity with investing in Options. 
    */
   @JsonAdapter(InvestmentExperienceWithOptionsEnum.Adapter.class)
-  public enum InvestmentExperienceWithOptionsEnum {
+  public enum InvestmentExperienceWithOptionsEnum implements Serializable {
     NONE("none"),
     
     _1_TO_5_YEARS("1_to_5_years"),
@@ -232,7 +232,7 @@ public class Identity implements Serializable {
    * The user&#39;s level of expertise and familiarity with investing in US Equities. 
    */
   @JsonAdapter(InvestmentExperienceWithStocksEnum.Adapter.class)
-  public enum InvestmentExperienceWithStocksEnum {
+  public enum InvestmentExperienceWithStocksEnum implements Serializable {
     NONE("none"),
     
     _1_TO_5_YEARS("1_to_5_years"),
@@ -291,7 +291,7 @@ public class Identity implements Serializable {
    * The user&#39;s investment objective. This field is deprecated. Please use the top level &#x60;investment_objective&#x60; field. 
    */
   @JsonAdapter(InvestmentObjectiveEnum.Adapter.class)
-  public enum InvestmentObjectiveEnum {
+  public enum InvestmentObjectiveEnum implements Serializable {
     GENERATE_INCOME("generate_income"),
     
     PRESERVE_WEALTH("preserve_wealth"),
@@ -355,7 +355,7 @@ public class Identity implements Serializable {
    * The expected period of time the user plan to invest to achieve his/her financial goal(s). This field is deprecated. Please use the top level &#x60;investment_time_horizon&#x60; field. 
    */
   @JsonAdapter(InvestmentTimeHorizonEnum.Adapter.class)
-  public enum InvestmentTimeHorizonEnum {
+  public enum InvestmentTimeHorizonEnum implements Serializable {
     LESS_THAN_1_YEAR("less_than_1_year"),
     
     _1_TO_2_YEARS("1_to_2_years"),
@@ -429,7 +429,7 @@ public class Identity implements Serializable {
    * The user&#39;s ability to quickly and easily convert all or part of their investments in this account to cash without significant loss in value. This field is deprecated. Please use the top level &#x60;liquidity_needs&#x60; field. 
    */
   @JsonAdapter(LiquidityNeedsEnum.Adapter.class)
-  public enum LiquidityNeedsEnum {
+  public enum LiquidityNeedsEnum implements Serializable {
     VERY_IMPORTANT("very_important"),
     
     IMPORTANT("important"),
@@ -491,7 +491,7 @@ public class Identity implements Serializable {
    * The marital status of the user. 
    */
   @JsonAdapter(MaritalStatusEnum.Adapter.class)
-  public enum MaritalStatusEnum {
+  public enum MaritalStatusEnum implements Serializable {
     SINGLE("SINGLE"),
     
     MARRIED("MARRIED"),
@@ -567,7 +567,7 @@ public class Identity implements Serializable {
    * The user&#39;s investment risk tolerance. This field is deprecated. Please use the top level &#x60;risk_tolerance&#x60; field. 
    */
   @JsonAdapter(RiskToleranceEnum.Adapter.class)
-  public enum RiskToleranceEnum {
+  public enum RiskToleranceEnum implements Serializable {
     CONSERVATIVE("conservative"),
     
     MODERATE("moderate"),

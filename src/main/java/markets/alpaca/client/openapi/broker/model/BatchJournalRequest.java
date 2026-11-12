@@ -54,7 +54,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Journals API allows you to move cash or securities from one account to another.  This model represents the fields you can specify when creating a request of many Journals out of one account to many others at once.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class BatchJournalRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -72,7 +72,7 @@ public class BatchJournalRequest implements Serializable {
    * Only supports &#x60;JNLC&#x60; for now
    */
   @JsonAdapter(EntryTypeEnum.Adapter.class)
-  public enum EntryTypeEnum {
+  public enum EntryTypeEnum implements Serializable {
     JNLC("JNLC");
 
     private String value;

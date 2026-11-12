@@ -58,7 +58,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents structure of a TransactionCancel type AdminAction
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AdminActionTransactionCancel implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -128,7 +128,7 @@ public class AdminActionTransactionCancel implements Serializable {
    * Transaction cancel discriminator value.
    */
   @JsonAdapter(TypeEnum.Adapter.class)
-  public enum TypeEnum {
+  public enum TypeEnum implements Serializable {
     TRANSACTION_CANCEL_ADMIN_EVENT("transaction_cancel_admin_event");
 
     private String value;

@@ -56,7 +56,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Assets are sorted by asset class, exchange and symbol. Some assets are not tradable with Alpaca. These assets will be marked with the flag tradable&#x3D;false
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class Asset implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -64,7 +64,7 @@ public class Asset implements Serializable {
    * Gets or Sets attributes
    */
   @JsonAdapter(AttributesEnum.Adapter.class)
-  public enum AttributesEnum {
+  public enum AttributesEnum implements Serializable {
     PTP_NO_EXCEPTION("ptp_no_exception"),
     
     PTP_WITH_EXCEPTION("ptp_with_exception"),
@@ -133,7 +133,7 @@ public class Asset implements Serializable {
    * Borrow status for US equity assets. This field is omitted for non-US-equity assets.
    */
   @JsonAdapter(BorrowStatusEnum.Adapter.class)
-  public enum BorrowStatusEnum {
+  public enum BorrowStatusEnum implements Serializable {
     EASY_TO_BORROW("easy_to_borrow"),
     
     HARD_TO_BORROW("hard_to_borrow");
@@ -256,7 +256,7 @@ public class Asset implements Serializable {
    * active or inactive
    */
   @JsonAdapter(StatusEnum.Adapter.class)
-  public enum StatusEnum {
+  public enum StatusEnum implements Serializable {
     ACTIVE("active"),
     
     INACTIVE("inactive");

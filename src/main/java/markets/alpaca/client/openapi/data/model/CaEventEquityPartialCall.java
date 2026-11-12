@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * Partial redemption of an equity issue where the issuer calls back only a fraction of outstanding shares -- typically allocated to holders via a lottery. Delivered when &#x60;event_type &#x3D;&#x3D; equity_partial_call_corporateaction_event&#x60;. Corresponds to &#x60;partial_calls&#x60; on the REST [&#x60;GET /v1/corporate-actions&#x60;](#operation/CorporateActions) response, but every decimal field is emitted as a JSON string to preserve precision on the wire. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CaEventEquityPartialCall implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -95,7 +95,7 @@ public class CaEventEquityPartialCall implements Serializable {
    * How called shares were allocated among holders.
    */
   @JsonAdapter(LotteryTypeEnum.Adapter.class)
-  public enum LotteryTypeEnum {
+  public enum LotteryTypeEnum implements Serializable {
     ORIGINAL("original"),
     
     SUPPLEMENTAL("supplemental");

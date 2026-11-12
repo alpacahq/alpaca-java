@@ -282,23 +282,23 @@ class SseDomainContractTest {
 
   private static String tradingPayload() {
     return """
-        {"activity_type":"FILL","at":"2026-10-01T12:00:00Z","currency":"USD",
-        "event_id":"01K6G000000000000000000000","executed_at":"2026-10-01T12:00:00Z",
-        "ref_id":"123e4567-e89b-12d3-a456-426614174000","settle_date":"2026-10-02",
-        "status":"executed","details":{}}
-        """
+    {"activity_type":"FILL","at":"2026-10-01T12:00:00Z","currency":"USD",
+    "event_id":"01K6G000000000000000000000","executed_at":"2026-10-01T12:00:00Z",
+    "ref_id":"123e4567-e89b-12d3-a456-426614174000","settle_date":"2026-10-02",
+    "status":"executed","details":{}}
+    """
         .replace("\n", "");
   }
 
   private static String corporateActionPayload() {
     return """
-        {"action":"insert","at":"2026-10-01T12:00:00Z",
-        "event_id":"01K6G000000000000000000000","region":"us",
-        "event_type":"cash_dividend_corporateaction_event",
-        "ca":{"id":"123e4567-e89b-12d3-a456-426614174000",
-        "process_date":"2026-10-01","cusip":"037833100","ex_date":"2026-10-02",
-        "foreign":false,"rate":0.25,"special":false,"symbol":"AAPL"}}
-        """
+    {"action":"insert","at":"2026-10-01T12:00:00Z",
+    "event_id":"01K6G000000000000000000000","region":"us",
+    "event_type":"cash_dividend_corporateaction_event",
+    "ca":{"id":"123e4567-e89b-12d3-a456-426614174000",
+    "process_date":"2026-10-01","cusip":"037833100","ex_date":"2026-10-02",
+    "foreign":false,"rate":0.25,"special":false,"symbol":"AAPL"}}
+    """
         .replace("\n", "");
   }
 

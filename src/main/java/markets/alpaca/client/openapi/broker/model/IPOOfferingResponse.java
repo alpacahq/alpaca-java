@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Wrapper response returned by &#x60;GET /v1/ipos/{offering_reference}&#x60;.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class IPOOfferingResponse implements Serializable {
   private static final long serialVersionUID = 1L;
 

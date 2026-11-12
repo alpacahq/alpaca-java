@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Emitted when a portfolio status changes. &#x60;at&#x60; is the business time of the transition.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class RebalancerPortfolioStatusChangedEvent implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -70,7 +70,7 @@ public class RebalancerPortfolioStatusChangedEvent implements Serializable {
    * Gets or Sets eventType
    */
   @JsonAdapter(EventTypeEnum.Adapter.class)
-  public enum EventTypeEnum {
+  public enum EventTypeEnum implements Serializable {
     PORTFOLIO_STATUS_CHANGED("portfolio.status_changed");
 
     private String value;

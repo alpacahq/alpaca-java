@@ -53,7 +53,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * The account API serves important information related to an account, including account status, funds available for trade, funds available for withdrawal, and various flags relevant to an account&#39;s ability to trade. An account maybe be blocked for just for trades (trades_blocked flag) or for both trades and transfers (account_blocked flag) if Alpaca identifies the account to engaging in any suspicious activity. Please note that cryptocurrencies are not eligible assets to be used as collateral for margin accounts and will require the asset be traded using cash only. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class Account implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -156,7 +156,7 @@ public class Account implements Serializable {
    * The options trading level that was approved for this account. 0&#x3D;disabled, 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles. 
    */
   @JsonAdapter(OptionsApprovedLevelEnum.Adapter.class)
-  public enum OptionsApprovedLevelEnum {
+  public enum OptionsApprovedLevelEnum implements Serializable {
     NUMBER_0(0),
     
     NUMBER_1(1),
@@ -222,7 +222,7 @@ public class Account implements Serializable {
    * The effective options trading level of the account. This is the minimum between account options_approved_level and account configurations max_options_trading_level. 0&#x3D;disabled, 1&#x3D;Covered Call/Cash-Secured Put, 2&#x3D;Long Call/Put, 3&#x3D;Spreads/Straddles. 
    */
   @JsonAdapter(OptionsTradingLevelEnum.Adapter.class)
-  public enum OptionsTradingLevelEnum {
+  public enum OptionsTradingLevelEnum implements Serializable {
     NUMBER_0(0),
     
     NUMBER_1(1),

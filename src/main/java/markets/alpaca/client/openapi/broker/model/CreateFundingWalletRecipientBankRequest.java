@@ -50,7 +50,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * CreateFundingWalletRecipientBankRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CreateFundingWalletRecipientBankRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -63,7 +63,7 @@ public class CreateFundingWalletRecipientBankRequest implements Serializable {
    * Bank account type.
    */
   @JsonAdapter(AccountTypeEnum.Adapter.class)
-  public enum AccountTypeEnum {
+  public enum AccountTypeEnum implements Serializable {
     CHECKING("checking"),
     
     SAVINGS("savings");
@@ -165,7 +165,7 @@ public class CreateFundingWalletRecipientBankRequest implements Serializable {
    * Local payment routing system. If supplied, routing_code should also be supplied.
    */
   @JsonAdapter(RoutingCodeTypeEnum.Adapter.class)
-  public enum RoutingCodeTypeEnum {
+  public enum RoutingCodeTypeEnum implements Serializable {
     SORT_CODE("sort_code"),
     
     ABA("aba"),

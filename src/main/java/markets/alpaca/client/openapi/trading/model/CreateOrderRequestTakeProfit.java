@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Takes in a string/number value for limit_price
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CreateOrderRequestTakeProfit implements Serializable {
   private static final long serialVersionUID = 1L;
 

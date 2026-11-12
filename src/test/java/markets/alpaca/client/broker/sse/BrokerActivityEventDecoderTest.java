@@ -185,9 +185,9 @@ class BrokerActivityEventDecoderTest {
 
   private static String dividendDetails(boolean flags) {
     return """
-        {"system_date":"2026-10-01","position_date":"2026-09-30","cash_payout":"1.25",
-        "cusip":"037833100","entitled_qty":"10","rate":"0.125","symbol":"AAPL"%s}
-        """
+    {"system_date":"2026-10-01","position_date":"2026-09-30","cash_payout":"1.25",
+    "cusip":"037833100","entitled_qty":"10","rate":"0.125","symbol":"AAPL"%s}
+    """
         .formatted(flags ? ",\"foreign\":\"false\",\"special\":\"false\"" : "")
         .replace("\n", "");
   }
@@ -200,21 +200,21 @@ class BrokerActivityEventDecoderTest {
       String type, String subtype, String details, String additionalFields) {
     String subtypeField = subtype == null ? "" : "\"activity_subtype\":\"" + subtype + "\",";
     return """
-        {
-          %s
-          %s
-          "account_id":"123e4567-e89b-12d3-a456-426614174002",
-          "activity_type":"%s",
-          "at":"2026-10-01T12:00:00Z",
-          "currency":"USD",
-          "event_id":"01K6G000000000000000000000",
-          "executed_at":"2026-10-01T12:00:00Z",
-          "ref_id":"123e4567-e89b-12d3-a456-426614174000",
-          "settle_date":"2026-10-02",
-          "status":"executed",
-          "details":%s
-        }
-        """
+    {
+      %s
+      %s
+      "account_id":"123e4567-e89b-12d3-a456-426614174002",
+      "activity_type":"%s",
+      "at":"2026-10-01T12:00:00Z",
+      "currency":"USD",
+      "event_id":"01K6G000000000000000000000",
+      "executed_at":"2026-10-01T12:00:00Z",
+      "ref_id":"123e4567-e89b-12d3-a456-426614174000",
+      "settle_date":"2026-10-02",
+      "status":"executed",
+      "details":%s
+    }
+    """
         .formatted(subtypeField, additionalFields, type, details);
   }
 }

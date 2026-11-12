@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * An asset included in an ACATS transfer.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AcatsAsset implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -65,7 +65,7 @@ public class AcatsAsset implements Serializable {
    * Asset type
    */
   @JsonAdapter(AssetClassEnum.Adapter.class)
-  public enum AssetClassEnum {
+  public enum AssetClassEnum implements Serializable {
     EQUITY("EQUITY"),
     
     CASH("CASH"),
@@ -162,7 +162,7 @@ public class AcatsAsset implements Serializable {
    * Status
    */
   @JsonAdapter(StatusEnum.Adapter.class)
-  public enum StatusEnum {
+  public enum StatusEnum implements Serializable {
     NOT_VALIDATED("NOT_VALIDATED"),
     
     REQUESTED("REQUESTED"),

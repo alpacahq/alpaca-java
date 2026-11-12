@@ -56,7 +56,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Portfolio snapshot carried on &#x60;portfolio.status_changed&#x60;, including weights and rebalance conditions.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class RebalancerEventPortfolio implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -94,7 +94,7 @@ public class RebalancerEventPortfolio implements Serializable {
    * Gets or Sets status
    */
   @JsonAdapter(StatusEnum.Adapter.class)
-  public enum StatusEnum {
+  public enum StatusEnum implements Serializable {
     ACTIVE("active"),
     
     INACTIVE("inactive"),

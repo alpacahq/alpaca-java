@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Represents that system event had occurred and sent over the events streaming api. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class SystemEventV2 implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -80,7 +80,7 @@ public class SystemEventV2 implements Serializable {
    * the machine readable type of the system event
    */
   @JsonAdapter(TypeEnum.Adapter.class)
-  public enum TypeEnum {
+  public enum TypeEnum implements Serializable {
     EOD_BALANCES_READY("eod_balances_ready"),
     
     EOD_POSITIONS_READY("eod_positions_ready");

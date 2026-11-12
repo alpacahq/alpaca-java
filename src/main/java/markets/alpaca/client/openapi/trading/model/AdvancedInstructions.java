@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.trading.http.JSON;
 /**
  * Advanced instructions for Elite Smart Router: https://docs.alpaca.markets/docs/alpaca-elite-smart-router
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class AdvancedInstructions implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -60,7 +60,7 @@ public class AdvancedInstructions implements Serializable {
    * The advanced routing algorithm to use for the order
    */
   @JsonAdapter(AlgorithmEnum.Adapter.class)
-  public enum AlgorithmEnum {
+  public enum AlgorithmEnum implements Serializable {
     DMA("DMA"),
     
     TWAP("TWAP"),
@@ -119,7 +119,7 @@ public class AdvancedInstructions implements Serializable {
    * Target exchange for order execution
    */
   @JsonAdapter(DestinationEnum.Adapter.class)
-  public enum DestinationEnum {
+  public enum DestinationEnum implements Serializable {
     NYSE("NYSE"),
     
     NASDAQ("NASDAQ"),

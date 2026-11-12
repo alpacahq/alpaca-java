@@ -51,7 +51,7 @@ import markets.alpaca.client.openapi.broker.http.JSON;
 /**
  * Use this property (instead of the content property) to upload W-8 BEN data in JSON format.
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class W8benDocument implements Serializable {
   private static final long serialVersionUID = 1L;
 

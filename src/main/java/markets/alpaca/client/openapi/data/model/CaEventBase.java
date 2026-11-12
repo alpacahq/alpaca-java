@@ -52,7 +52,7 @@ import markets.alpaca.client.openapi.data.http.JSON;
 /**
  * Common fields present on every &#x60;ca&#x60; payload regardless of &#x60;event_type&#x60;. Not meant to be referenced directly by clients -- it exists so each per-type payload schema (&#x60;ca_event_cash_dividend&#x60;, &#x60;ca_event_forward_split&#x60;, ...) can &#x60;allOf&#x60;-compose it instead of restating &#x60;id&#x60; and &#x60;process_date&#x60;. This makes the \&quot;always present\&quot; invariant structural (guaranteed by the schema) rather than emergent from repetition, and matches the \&quot;Common &#x60;ca&#x60; fields\&quot; section of the event-streaming Corporate Actions SSE design doc. 
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class CaEventBase implements Serializable {
   private static final long serialVersionUID = 1L;
 
