@@ -14,6 +14,65 @@ REST clients are generated at build time from Alpaca OpenAPI specs. WebSocket cl
 Trading, Broker, and Market Data corporate-actions SSE clients are handwritten and committed in
 `src/main/java/markets/alpaca/client/`.
 
+## Requirements
+
+- Java 17 or newer
+- Maven or Gradle for your application project
+
+## Installation
+
+The library artifact coordinates are:
+
+```text
+markets.alpaca:alpaca-java:VERSION
+```
+
+### Gradle
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("markets.alpaca:alpaca-java:VERSION")
+}
+```
+
+### Maven
+
+```xml
+<dependency>
+  <groupId>markets.alpaca</groupId>
+  <artifactId>alpaca-java</artifactId>
+  <version>VERSION</version>
+</dependency>
+```
+
+## Quick start
+
+Set Trading API credentials in your environment:
+
+```bash
+export APCA_TRADING_KEY_ID=PK...
+export APCA_TRADING_SECRET_KEY=...
+```
+
+Then create a paper-trading client:
+
+```java
+import markets.alpaca.client.AlpacaClient;
+import markets.alpaca.client.AlpacaCredentials;
+import markets.alpaca.client.TradingApiEnvironment;
+
+var credentials = AlpacaCredentials.fromTradingApiEnvironmentVariables();
+var client = AlpacaClient.builder(credentials)
+    .tradingEnvironment(TradingApiEnvironment.PAPER)
+    .build();
+```
+
+Use `AlpacaClient` for common Trading and Market Data workflows. Use `AlpacaClientFactory` when you need a specific generated REST client, WebSocket stream, or Trading, Market Data, or Broker SSE client.
+
 ## Documentation
 
 - [Getting started](https://alpacahq.github.io/alpaca-java/getting-started) — installation, credentials, and examples
@@ -26,10 +85,7 @@ Trading, Broker, and Market Data corporate-actions SSE clients are handwritten a
 
 ## Build from source
 
-Java 17+ is required. Normal builds use the committed OpenAPI pins under `specs/`
-(no live fetch). Generated REST sources are committed under
-`src/main/java/markets/alpaca/client/openapi/`
-(see [`GENERATION.md`](GENERATION.md)).
+Normal builds use the committed OpenAPI pins under `specs/` with no live fetch. Generated REST sources are committed under `src/main/java/markets/alpaca/client/openapi/`. See [`GENERATION.md`](GENERATION.md).
 
 ```bash
 ./gradlew build                  # generate, compile, and test
@@ -67,7 +123,8 @@ For release consumption, use Maven Central as shown in the
 
 ## Support
 
-- **Library / SDK issues:** Bugs, feature requests, or questions specific to this Java library → [GitHub Issues](https://github.com/alpacahq/alpaca-java/issues/new/choose).
+- **Library / SDK issues:** Bugs, feature requests, or questions specific to this SDK → [GitHub Issues](https://github.com/alpacahq/alpaca-java/issues/new/choose).
+- **Security vulnerabilities:** Do not report them publicly. Follow the private reporting process in our [Security Policy](SECURITY.md).
 - **Alpaca API bugs:** Bugs in the Alpaca API itself, its OpenAPI specs, or its documentation → [alpacahq/alpaca-api](https://github.com/alpacahq/alpaca-api/issues/new/choose).
 - **Community:** API feature requests, general questions, and dashboard bugs → [Alpaca Community Forum](https://forum.alpaca.markets/) or [Slack](https://alpaca.markets/slack).
 - **Account help:** Questions about your account, funding, or orders → [Support request](https://alpaca.markets/support/request).
@@ -75,6 +132,4 @@ For release consumption, use Maven Central as shown in the
 
 ## Contributing
 
-Read the [contributing guide](CONTRIBUTING.md) for the pull-request workflow. Before changing the
-SDK, also read [`AGENTS.md`](AGENTS.md) for generated-code boundaries, local OpenAPI spec
-configuration, testing, and publishing safeguards.
+Read the [contributing guide](CONTRIBUTING.md) for the pull-request workflow, Code of Conduct, security reporting, and contribution policy. Before changing the SDK, also read [`AGENTS.md`](AGENTS.md) for generated-code boundaries, local OpenAPI spec configuration, testing, and publishing safeguards.
