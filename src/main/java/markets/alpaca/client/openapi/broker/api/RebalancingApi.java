@@ -2028,7 +2028,7 @@ public class RebalancingApi {
 
     /**
      * Create Subscription
-     * Creates a subscription between an account and a portfolio.
+     * Creates a subscription between an account and a portfolio.  &#x60;trade_marker&#x60; is optional. Omitting it means &#x60;discretionary&#x60;. A discretionary subscription is rejected with 422 unless the correspondent&#39;s advisor is marked discretionary. Send &#x60;unsolicited&#x60; to create the subscription without that advisor flag. Existing subscriptions created before trade markers return &#x60;trade_marker: null&#x60; and their orders stay unmarked.
      * @param postV1RebalancingSubscriptionsRequest  (optional)
      * @return PortfolioSubscription
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -2053,7 +2053,7 @@ public class RebalancingApi {
 
     /**
      * Create Subscription
-     * Creates a subscription between an account and a portfolio.
+     * Creates a subscription between an account and a portfolio.  &#x60;trade_marker&#x60; is optional. Omitting it means &#x60;discretionary&#x60;. A discretionary subscription is rejected with 422 unless the correspondent&#39;s advisor is marked discretionary. Send &#x60;unsolicited&#x60; to create the subscription without that advisor flag. Existing subscriptions created before trade markers return &#x60;trade_marker: null&#x60; and their orders stay unmarked.
      * @param postV1RebalancingSubscriptionsRequest  (optional)
      * @return ApiResponse&lt;PortfolioSubscription&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -2079,7 +2079,7 @@ public class RebalancingApi {
 
     /**
      * Create Subscription (asynchronously)
-     * Creates a subscription between an account and a portfolio.
+     * Creates a subscription between an account and a portfolio.  &#x60;trade_marker&#x60; is optional. Omitting it means &#x60;discretionary&#x60;. A discretionary subscription is rejected with 422 unless the correspondent&#39;s advisor is marked discretionary. Send &#x60;unsolicited&#x60; to create the subscription without that advisor flag. Existing subscriptions created before trade markers return &#x60;trade_marker: null&#x60; and their orders stay unmarked.
      * @param postV1RebalancingSubscriptionsRequest  (optional)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call

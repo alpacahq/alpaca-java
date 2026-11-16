@@ -315,7 +315,7 @@ public class OptionApi {
     /**
      * Build call for optionChain
      * @param underlyingSymbol The financial instrument on which an option contract is based or derived. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @param limit Number of maximum snapshots to return in a response. The limit applies to the total number of data points, not the number per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of responses.  (optional, default to 100)
      * @param updatedSince Filter to snapshots that were updated since this timestamp, meaning that the timestamp of the trade or the quote is greater than or equal to this value. Format: RFC-3339 or YYYY-MM-DD. If missing, all values are returned.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
@@ -445,7 +445,7 @@ public class OptionApi {
      * Option chain
      * The option chain endpoint provides the latest trade, latest quote, and greeks for each contract symbol of the underlying symbol. 
      * @param underlyingSymbol The financial instrument on which an option contract is based or derived. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @param limit Number of maximum snapshots to return in a response. The limit applies to the total number of data points, not the number per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of responses.  (optional, default to 100)
      * @param updatedSince Filter to snapshots that were updated since this timestamp, meaning that the timestamp of the trade or the quote is greater than or equal to this value. Format: RFC-3339 or YYYY-MM-DD. If missing, all values are returned.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
@@ -479,7 +479,7 @@ public class OptionApi {
      * Option chain
      * The option chain endpoint provides the latest trade, latest quote, and greeks for each contract symbol of the underlying symbol. 
      * @param underlyingSymbol The financial instrument on which an option contract is based or derived. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @param limit Number of maximum snapshots to return in a response. The limit applies to the total number of data points, not the number per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of responses.  (optional, default to 100)
      * @param updatedSince Filter to snapshots that were updated since this timestamp, meaning that the timestamp of the trade or the quote is greater than or equal to this value. Format: RFC-3339 or YYYY-MM-DD. If missing, all values are returned.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
@@ -514,7 +514,7 @@ public class OptionApi {
      * Option chain (asynchronously)
      * The option chain endpoint provides the latest trade, latest quote, and greeks for each contract symbol of the underlying symbol. 
      * @param underlyingSymbol The financial instrument on which an option contract is based or derived. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @param limit Number of maximum snapshots to return in a response. The limit applies to the total number of data points, not the number per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of responses.  (optional, default to 100)
      * @param updatedSince Filter to snapshots that were updated since this timestamp, meaning that the timestamp of the trade or the quote is greater than or equal to this value. Format: RFC-3339 or YYYY-MM-DD. If missing, all values are returned.  (optional)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
@@ -550,7 +550,7 @@ public class OptionApi {
     /**
      * Build call for optionLatestQuotes
      * @param symbols A comma-separated list of contract symbols with a limit of 100. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -633,7 +633,7 @@ public class OptionApi {
      * Latest quotes
      * The latest multi-quotes endpoint provides the latest bid and ask prices for each given contract symbol. 
      * @param symbols A comma-separated list of contract symbols with a limit of 100. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @return OptionLatestQuotesResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -657,7 +657,7 @@ public class OptionApi {
      * Latest quotes
      * The latest multi-quotes endpoint provides the latest bid and ask prices for each given contract symbol. 
      * @param symbols A comma-separated list of contract symbols with a limit of 100. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @return ApiResponse&lt;OptionLatestQuotesResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -682,7 +682,7 @@ public class OptionApi {
      * Latest quotes (asynchronously)
      * The latest multi-quotes endpoint provides the latest bid and ask prices for each given contract symbol. 
      * @param symbols A comma-separated list of contract symbols with a limit of 100. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -708,7 +708,7 @@ public class OptionApi {
     /**
      * Build call for optionLatestTrades
      * @param symbols A comma-separated list of contract symbols with a limit of 100. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @param _callback Callback for upload/download progress
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
@@ -791,7 +791,7 @@ public class OptionApi {
      * Latest trades
      * The latest multi-trades endpoint provides the latest historical trade data for multiple given contract symbols. 
      * @param symbols A comma-separated list of contract symbols with a limit of 100. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @return OptionLatestTradesResp
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -815,7 +815,7 @@ public class OptionApi {
      * Latest trades
      * The latest multi-trades endpoint provides the latest historical trade data for multiple given contract symbols. 
      * @param symbols A comma-separated list of contract symbols with a limit of 100. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @return ApiResponse&lt;OptionLatestTradesResp&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -840,7 +840,7 @@ public class OptionApi {
      * Latest trades (asynchronously)
      * The latest multi-trades endpoint provides the latest historical trade data for multiple given contract symbols. 
      * @param symbols A comma-separated list of contract symbols with a limit of 100. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
@@ -1150,7 +1150,7 @@ public class OptionApi {
     /**
      * Build call for optionSnapshots
      * @param symbols A comma-separated list of contract symbols with a limit of 100. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @param updatedSince Filter to snapshots that were updated since this timestamp, meaning that the timestamp of the trade or the quote is greater than or equal to this value. Format: RFC-3339 or YYYY-MM-DD. If missing, all values are returned.  (optional)
      * @param limit Number of maximum snapshots to return in a response. The limit applies to the total number of data points, not the number per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of responses.  (optional, default to 100)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
@@ -1248,7 +1248,7 @@ public class OptionApi {
      * Snapshots
      * The snapshots endpoint provides the latest trade, latest quote and greeks for each given contract symbol. 
      * @param symbols A comma-separated list of contract symbols with a limit of 100. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @param updatedSince Filter to snapshots that were updated since this timestamp, meaning that the timestamp of the trade or the quote is greater than or equal to this value. Format: RFC-3339 or YYYY-MM-DD. If missing, all values are returned.  (optional)
      * @param limit Number of maximum snapshots to return in a response. The limit applies to the total number of data points, not the number per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of responses.  (optional, default to 100)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
@@ -1275,7 +1275,7 @@ public class OptionApi {
      * Snapshots
      * The snapshots endpoint provides the latest trade, latest quote and greeks for each given contract symbol. 
      * @param symbols A comma-separated list of contract symbols with a limit of 100. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @param updatedSince Filter to snapshots that were updated since this timestamp, meaning that the timestamp of the trade or the quote is greater than or equal to this value. Format: RFC-3339 or YYYY-MM-DD. If missing, all values are returned.  (optional)
      * @param limit Number of maximum snapshots to return in a response. The limit applies to the total number of data points, not the number per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of responses.  (optional, default to 100)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)
@@ -1303,7 +1303,7 @@ public class OptionApi {
      * Snapshots (asynchronously)
      * The snapshots endpoint provides the latest trade, latest quote and greeks for each given contract symbol. 
      * @param symbols A comma-separated list of contract symbols with a limit of 100. (required)
-     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the user has a subscription, otherwise &#x60;indicative&#x60;.  (optional, default to opra)
+     * @param feed The source feed of the data. &#x60;opra&#x60; is the official OPRA feed, &#x60;indicative&#x60; is a free indicative feed where trades are delayed and quotes are modified. Default: &#x60;opra&#x60; if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise &#x60;indicative&#x60;.  (optional, default to opra)
      * @param updatedSince Filter to snapshots that were updated since this timestamp, meaning that the timestamp of the trade or the quote is greater than or equal to this value. Format: RFC-3339 or YYYY-MM-DD. If missing, all values are returned.  (optional)
      * @param limit Number of maximum snapshots to return in a response. The limit applies to the total number of data points, not the number per symbol! Use &#x60;next_page_token&#x60; to fetch the next set of responses.  (optional, default to 100)
      * @param pageToken The pagination token from which to continue. The value to pass here is returned in specific requests when more data is available, usually because of a response result limit.  (optional)

@@ -59,7 +59,7 @@ import java.util.Map;
  * 
  *   <li><b>{@code createJournal}</b>: Create a Journal</li>
  * 
- *   <li><b>{@code deleteJournalById}</b>: Cancel a Pending Journal</li>
+ *   <li><b>{@code deleteJournalById}</b>: Cancel a Journal</li>
  * 
  *   <li><b>{@code getAllJournals}</b>: Retrieve a List Journals</li>
  * 
@@ -410,7 +410,7 @@ public class JournalsApi {
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> The cancel request succeeded. (No-content)  </td><td>  -  </td></tr>
         <tr><td> 404 </td><td> The journal is not found.  </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> The journal is not in the pending status.  </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The journal is not pending or queued.  </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call deleteJournalByIdCall(@javax.annotation.Nonnull UUID journalId, final ApiCallback _callback) throws ApiException {
@@ -469,8 +469,8 @@ public class JournalsApi {
     }
 
     /**
-     * Cancel a Pending Journal
-     * You can only delete a journal if the journal is still in a pending state, if a journal is executed you will not be able to delete. The alternative is to create a mirror journal entry to reverse the flow of funds.
+     * Cancel a Journal
+     * You can delete a journal only while it is &#x60;pending&#x60; or &#x60;queued&#x60;. A journal that has moved past those statuses, including one that has been executed, cannot be deleted. To reverse an executed journal, create a mirror journal entry.
      * @param journalId  (required)
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      * @http.response.details
@@ -479,7 +479,7 @@ public class JournalsApi {
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> The cancel request succeeded. (No-content)  </td><td>  -  </td></tr>
         <tr><td> 404 </td><td> The journal is not found.  </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> The journal is not in the pending status.  </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The journal is not pending or queued.  </td><td>  -  </td></tr>
      </table>
      */
     public void deleteJournalById(@javax.annotation.Nonnull UUID journalId) throws ApiException {
@@ -487,8 +487,8 @@ public class JournalsApi {
     }
 
     /**
-     * Cancel a Pending Journal
-     * You can only delete a journal if the journal is still in a pending state, if a journal is executed you will not be able to delete. The alternative is to create a mirror journal entry to reverse the flow of funds.
+     * Cancel a Journal
+     * You can delete a journal only while it is &#x60;pending&#x60; or &#x60;queued&#x60;. A journal that has moved past those statuses, including one that has been executed, cannot be deleted. To reverse an executed journal, create a mirror journal entry.
      * @param journalId  (required)
      * @return ApiResponse&lt;Void&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -498,7 +498,7 @@ public class JournalsApi {
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> The cancel request succeeded. (No-content)  </td><td>  -  </td></tr>
         <tr><td> 404 </td><td> The journal is not found.  </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> The journal is not in the pending status.  </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The journal is not pending or queued.  </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<Void> deleteJournalByIdWithHttpInfo(@javax.annotation.Nonnull UUID journalId) throws ApiException {
@@ -507,8 +507,8 @@ public class JournalsApi {
     }
 
     /**
-     * Cancel a Pending Journal (asynchronously)
-     * You can only delete a journal if the journal is still in a pending state, if a journal is executed you will not be able to delete. The alternative is to create a mirror journal entry to reverse the flow of funds.
+     * Cancel a Journal (asynchronously)
+     * You can delete a journal only while it is &#x60;pending&#x60; or &#x60;queued&#x60;. A journal that has moved past those statuses, including one that has been executed, cannot be deleted. To reverse an executed journal, create a mirror journal entry.
      * @param journalId  (required)
      * @param _callback The callback to be executed when the API call finishes
      * @return The request call
@@ -519,7 +519,7 @@ public class JournalsApi {
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 204 </td><td> The cancel request succeeded. (No-content)  </td><td>  -  </td></tr>
         <tr><td> 404 </td><td> The journal is not found.  </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> The journal is not in the pending status.  </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The journal is not pending or queued.  </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call deleteJournalByIdAsync(@javax.annotation.Nonnull UUID journalId, final ApiCallback<Void> _callback) throws ApiException {

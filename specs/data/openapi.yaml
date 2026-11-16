@@ -337,7 +337,7 @@ components:
         type: string
     option_feed:
       description: |
-        The source feed of the data. `opra` is the official OPRA feed, `indicative` is a free indicative feed where trades are delayed and quotes are modified. Default: `opra` if the user has a subscription, otherwise `indicative`.
+        The source feed of the data. `opra` is the official OPRA feed, `indicative` is a free indicative feed where trades are delayed and quotes are modified. Default: `opra` if the request uses broker partner API credentials and the partner has an OPRA subscription, or if the account has a real-time subscription and has signed the OPRA agreement; otherwise `indicative`.
       in: query
       name: feed
       schema:
