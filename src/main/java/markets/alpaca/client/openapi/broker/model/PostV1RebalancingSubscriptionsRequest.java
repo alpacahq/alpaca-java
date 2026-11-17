@@ -21,6 +21,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import markets.alpaca.client.openapi.broker.model.TradeMarker;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -64,6 +65,11 @@ public class PostV1RebalancingSubscriptionsRequest implements Serializable {
   @javax.annotation.Nullable
   private String portfolioId;
 
+  public static final String SERIALIZED_NAME_TRADE_MARKER = "trade_marker";
+  @SerializedName(SERIALIZED_NAME_TRADE_MARKER)
+  @javax.annotation.Nullable
+  private TradeMarker tradeMarker = TradeMarker.DISCRETIONARY;
+
   public PostV1RebalancingSubscriptionsRequest() {
   }
 
@@ -102,6 +108,25 @@ public class PostV1RebalancingSubscriptionsRequest implements Serializable {
 
   public void setPortfolioId(@javax.annotation.Nullable String portfolioId) {
     this.portfolioId = portfolioId;
+  }
+
+
+  public PostV1RebalancingSubscriptionsRequest tradeMarker(@javax.annotation.Nullable TradeMarker tradeMarker) {
+    this.tradeMarker = tradeMarker;
+    return this;
+  }
+
+  /**
+   * How trades for this subscription are marked. Omitted means discretionary. Discretionary requires the correspondent&#39;s advisor to be marked discretionary. Send unsolicited when that flag is not set.
+   * @return tradeMarker
+   */
+  @javax.annotation.Nullable
+  public TradeMarker getTradeMarker() {
+    return tradeMarker;
+  }
+
+  public void setTradeMarker(@javax.annotation.Nullable TradeMarker tradeMarker) {
+    this.tradeMarker = tradeMarker;
   }
 
   /**
@@ -160,13 +185,14 @@ public class PostV1RebalancingSubscriptionsRequest implements Serializable {
     }
     PostV1RebalancingSubscriptionsRequest postV1RebalancingSubscriptionsRequest = (PostV1RebalancingSubscriptionsRequest) o;
     return Objects.equals(this.accountId, postV1RebalancingSubscriptionsRequest.accountId) &&
-        Objects.equals(this.portfolioId, postV1RebalancingSubscriptionsRequest.portfolioId)&&
+        Objects.equals(this.portfolioId, postV1RebalancingSubscriptionsRequest.portfolioId) &&
+        Objects.equals(this.tradeMarker, postV1RebalancingSubscriptionsRequest.tradeMarker)&&
         Objects.equals(this.additionalProperties, postV1RebalancingSubscriptionsRequest.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(accountId, portfolioId, additionalProperties);
+    return Objects.hash(accountId, portfolioId, tradeMarker, additionalProperties);
   }
 
   @Override
@@ -175,6 +201,7 @@ public class PostV1RebalancingSubscriptionsRequest implements Serializable {
     sb.append("class PostV1RebalancingSubscriptionsRequest {\n");
     sb.append("    accountId: ").append(toIndentedString(accountId)).append("\n");
     sb.append("    portfolioId: ").append(toIndentedString(portfolioId)).append("\n");
+    sb.append("    tradeMarker: ").append(toIndentedString(tradeMarker)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -194,7 +221,7 @@ public class PostV1RebalancingSubscriptionsRequest implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("account_id", "portfolio_id"));
+    openapiFields = new HashSet<String>(Arrays.asList("account_id", "portfolio_id", "trade_marker"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -218,6 +245,10 @@ public class PostV1RebalancingSubscriptionsRequest implements Serializable {
       }
       if ((jsonObj.get("portfolio_id") != null && !jsonObj.get("portfolio_id").isJsonNull()) && !jsonObj.get("portfolio_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `portfolio_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("portfolio_id").toString()));
+      }
+      // validate the optional field `trade_marker`
+      if (jsonObj.get("trade_marker") != null && !jsonObj.get("trade_marker").isJsonNull()) {
+        TradeMarker.validateJsonElement(jsonObj.get("trade_marker"));
       }
   }
 

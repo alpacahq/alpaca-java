@@ -927,6 +927,12 @@ components:
       value:
         code: 40010001
         message: cannot create portfolio subscription when you have active position(s) in crypto
+    rebalancing_discretion_not_authorized:
+      description: A missing `trade_marker` means `discretionary`. That requires the correspondent's advisor to be marked discretionary. Send `unsolicited` to create the subscription without that flag.
+      summary: Discretionary rebalancing is not allowed for this correspondent
+      value:
+        code: 42210000
+        message: discretionary rebalancing is not allowed for this correspondent
     rebalancing_drift_percent_not_decimal:
       description: 'Send a numeric percent and try again. Message template: drift_band conditions percent must be a decimal: {parse_error}'
       summary: A drift band percent is not a valid decimal number
@@ -1035,6 +1041,12 @@ components:
       value:
         code: 40010001
         message: invalid subscription_id
+    rebalancing_invalid_trade_marker:
+      description: The request is rejected by request validation before the handler runs, so the message is the generic invalid-parameters message. Send `discretionary` or `unsolicited`, or omit the field.
+      summary: trade_marker is not discretionary or unsolicited
+      value:
+        code: 40010001
+        message: request parameters are invalid
     rebalancing_jit_correspondent:
       description: Contact support if this correspondent needs rebalancing.
       summary: This correspondent uses just-in-time buying power, so rebalancing is not permitted
@@ -6882,6 +6894,39 @@ components:
       required:
         - transfers
       type: object
+    CreateSimulatedIncomingWireRequest:
+      description: |-
+        Request body for simulating an incoming wire transfer in the sandbox environment.
+
+        `currency` defaults to `USD` when omitted and must match the base currency of the destination account. Supported currencies are `AUD`, `CAD`, `CHF`, `EUR`, `GBP`, `JPY`, `NZD`, `SGD`, `TRY`, and `USD`. Other currencies are rejected with `422`.
+      properties:
+        amount:
+          description: Amount of the incoming wire. Must be greater than 0.
+          example: '1000.00'
+          format: decimal
+          type: string
+        currency:
+          $ref: '#/components/schemas/Currency'
+        delay_until:
+          description: Accepted and returned in the response, but not currently used. The wire is processed on the next worker run regardless of this value.
+          example: '2026-11-10T14:00:00Z'
+          format: date-time
+          type:
+            - string
+            - 'null'
+        wire_instructions:
+          description: |-
+            Must contain an FFC (For Further Credit) string identifying the destination account, in the form `FFC <correspondent>-<account_number>`. The hyphen can also be a space or omitted. Text before or after the FFC string is ignored.
+
+            `<correspondent>` must be your 4-character correspondent code, and `<account_number>` must be the 9-character account number of one of your accounts. Only the first 9 characters after the correspondent code are read as the account number.
+          example: FFC TEST-123456789
+          pattern: FFC [0-9A-Za-z]{4}[-\s]?[0-9A-Za-z]{9}
+          type: string
+      required:
+        - amount
+        - wire_instructions
+      title: CreateSimulatedIncomingWireRequest
+      type: object
     CreateTransferRequest:
       description: '[See main docs here](https://alpaca.markets/docs/api-references/broker-api/funding/transfers/#creating-a-transfer-entity)'
       properties:
@@ -7017,6 +7062,7 @@ components:
         "NZD" // New Zealand Dollar
         "NOK" // Norwegian Krone
         "PLN" // Poland Złoty
+      example: USD
       title: Currency
       type: string
     CustodialAccountMinorIdentity:
@@ -11104,6 +11150,17 @@ components:
         portfolio_id:
           description: Portfolio ID for subscription
           type: string
+        trade_marker:
+          description: How trades for this subscription are marked. `null` on subscriptions created before trade markers.
+          oneOf:
+            - $ref: '#/components/schemas/TradeMarker'
+            - type: 'null'
+      required:
+        - id
+        - account_id
+        - portfolio_id
+        - created_at
+        - trade_marker
       title: PortfolioSubscription
       type: object
     PortfolioWeightAssetEntry:
@@ -12048,6 +12105,68 @@ components:
       example: certifications_and_resolutions_statement
       title: SignedAgreementType
       type: string
+    SimulatedIncomingWire:
+      description: |-
+        A simulated incoming wire transfer created with `POST /v1/testing/incoming_wires`.
+
+        Available in the sandbox environment only.
+      properties:
+        account_number:
+          description: Account number of the destination account.
+          example: '123456789'
+          type: string
+        amount:
+          description: Amount of the incoming wire.
+          example: '1000'
+          format: decimal
+          type: string
+        batch_processed_at:
+          description: Not currently populated. Always returns the zero time `0001-01-01T00:00:00Z`.
+          example: '0001-01-01T00:00:00Z'
+          format: date-time
+          type: string
+        correspondent:
+          description: Your 4-character correspondent code.
+          example: TEST
+          type: string
+        create_at:
+          description: Timestamp when the incoming wire was created.
+          example: '2026-11-09T17:45:12.123456Z'
+          format: date-time
+          type: string
+        currency:
+          $ref: '#/components/schemas/Currency'
+        delay_until:
+          description: The `delay_until` value from the request, or `null` if none was sent. Not used to delay processing.
+          example: null
+          format: date-time
+          type:
+            - string
+            - 'null'
+        id:
+          description: The incoming wire ID.
+          example: 0b6c4a9e-2f4d-4b8a-9c1e-7f3d2a1b5c6d
+          format: uuid
+          type: string
+        status:
+          $ref: '#/components/schemas/TransferStatus'
+        wire_instructions:
+          description: The `wire_instructions` value from the request.
+          example: FFC TEST-123456789
+          type: string
+      required:
+        - id
+        - amount
+        - create_at
+        - batch_processed_at
+        - wire_instructions
+        - status
+        - delay_until
+        - account_number
+        - correspondent
+        - currency
+      title: SimulatedIncomingWire
+      type: object
     SkippedOrder:
       description: Skipped orders model contains information for such orders that the rebalancing engine didn't send to our order system due to some validation issues.
       properties:
@@ -13241,6 +13360,13 @@ components:
         - sell_short
       example: buy
       title: TradeActivitySide
+      type: string
+    TradeMarker:
+      description: How trades for a rebalancing subscription are marked. `discretionary` sends those orders as discretion exercised. `unsolicited` leaves them unmarked.
+      enum:
+        - discretionary
+        - unsolicited
+      title: TradeMarker
       type: string
     TradeUpdateEventType:
       description: |
@@ -17400,7 +17526,7 @@ paths:
         - **`ach`** — supports both `INCOMING` (deposit) and `OUTGOING` (withdrawal) directions. A `relationship_id` from a previously created [ACH Relationship](https://docs.alpaca.markets/reference/createachrelationshipforaccount) is required.
         - **`wire`** — supports the `OUTGOING` (withdrawal) direction only. Incoming wires cannot be initiated through this endpoint; they are pushed in by the sending bank and recorded automatically. A `bank_id` from a previously created [Bank Relationship](https://docs.alpaca.markets/reference/createrecipientbank) is required, and the bank must be in `APPROVED` status before the transfer will progress past `QUEUED`.
 
-        In the sandbox environment, ACH deposits and withdrawals settle instantly against virtual funds. Outgoing wire withdrawals are accepted and simulated end-to-end — no funds are transmitted to a bank, but the transfer progresses to `COMPLETE` and the account is debited against virtual funds. Sandbox wire withdrawals are asynchronous (not instant) and auto-complete on weekdays only; transfers submitted on a weekend will not progress until Monday. For more on funding accounts in sandbox, see [this tutorial](https://alpaca.markets/learn/fund-broker-api/).
+        In the sandbox environment, ACH deposits and withdrawals settle instantly against virtual funds. Outgoing wire withdrawals are accepted and simulated end-to-end — no funds are transmitted to a bank, but the transfer progresses to `COMPLETE` and the account is debited against virtual funds. Sandbox wire withdrawals are asynchronous (not instant) and auto-complete on weekdays only; transfers submitted on a weekend will not progress until Monday. To fund an account with an incoming wire in sandbox, use [Simulate an Incoming Wire Transfer](https://docs.alpaca.markets/reference/createincomingwire) (`POST /v1/testing/incoming_wires`). For more on funding accounts in sandbox, see [this tutorial](https://alpaca.markets/learn/fund-broker-api/).
       operationId: createTransferForAccount
       parameters:
         - $ref: '#/components/parameters/AccountID'
@@ -19892,8 +20018,8 @@ paths:
         - Journals
   /v1/journals/{journal_id}:
     delete:
-      description: You can only delete a journal if the journal is still in a pending state, if a journal is executed you will not be able to delete. The alternative is to create a mirror journal entry
-        to reverse the flow of funds.
+      description: You can delete a journal only while it is `pending` or `queued`. A journal that has moved past those statuses, including one that has been executed, cannot be deleted. To reverse an executed
+        journal, create a mirror journal entry.
       operationId: deleteJournalById
       responses:
         '204':
@@ -19904,8 +20030,8 @@ paths:
             The journal is not found.
         '422':
           description: |
-            The journal is not in the pending status.
-      summary: Cancel a Pending Journal
+            The journal is not pending or queued.
+      summary: Cancel a Journal
       tags:
         - Journals
       parameters:
@@ -21425,7 +21551,10 @@ paths:
       tags:
         - Rebalancing
     post:
-      description: Creates a subscription between an account and a portfolio.
+      description: |-
+        Creates a subscription between an account and a portfolio.
+
+        `trade_marker` is optional. Omitting it means `discretionary`. A discretionary subscription is rejected with 422 unless the correspondent's advisor is marked discretionary. Send `unsolicited` to create the subscription without that advisor flag. Existing subscriptions created before trade markers return `trade_marker: null` and their orders stay unmarked.
       operationId: post-v1-rebalancing-subscriptions
       requestBody:
         content:
@@ -21438,6 +21567,12 @@ paths:
                 portfolio_id:
                   description: Portfolio ID. Portfolio must be active
                   type: string
+                trade_marker:
+                  allOf:
+                    - $ref: '#/components/schemas/TradeMarker'
+                  default: discretionary
+                  description: How trades for this subscription are marked. Omitted means discretionary. Discretionary requires the correspondent's advisor to be marked discretionary. Send unsolicited when
+                    that flag is not set.
               type: object
         description: ''
       responses:
@@ -21504,8 +21639,12 @@ paths:
                   $ref: '#/components/examples/rebalancing_active_run_exists'
                 crypto_position:
                   $ref: '#/components/examples/rebalancing_crypto_position'
+                discretion_not_authorized:
+                  $ref: '#/components/examples/rebalancing_discretion_not_authorized'
                 invalid_request:
                   $ref: '#/components/examples/rebalancing_invalid_request'
+                invalid_trade_marker:
+                  $ref: '#/components/examples/rebalancing_invalid_trade_marker'
                 open_orders:
                   $ref: '#/components/examples/rebalancing_open_orders'
                 pattern_day_trader:
@@ -21854,6 +21993,130 @@ paths:
       summary: Retrieve EOD Positions
       tags:
         - Reporting
+  /v1/testing/incoming_wires:
+    post:
+      description: |-
+        Simulate an incoming wire transfer to fund one of your accounts, without a real sending bank.
+
+        This endpoint is **only available in the sandbox environment**. Calling it in production returns `403`. In production, incoming wires are sent by the customer's bank and cannot be created through the API.
+
+        Identify the destination account by including an FFC (For Further Credit) string `FFC <correspondent>-<account_number>` in `wire_instructions`, where `<correspondent>` is your 4-character correspondent code and `<account_number>` is the account's 9-character account number.
+
+        `currency` defaults to `USD` and must match the account's base currency. Supported currencies are `AUD`, `CAD`, `CHF`, `EUR`, `GBP`, `JPY`, `NZD`, `SGD`, `TRY`, and `USD`.
+
+        The wire is created with status `QUEUED` and processed asynchronously on the next worker run.
+      operationId: createIncomingWire
+      requestBody:
+        content:
+          application/json:
+            examples:
+              eur:
+                summary: EUR incoming wire to a EUR account
+                value:
+                  amount: '250.50'
+                  currency: EUR
+                  wire_instructions: FFC TEST-987654321
+              usd:
+                summary: USD incoming wire
+                value:
+                  amount: '1000.00'
+                  wire_instructions: FFC TEST-123456789
+            schema:
+              $ref: '#/components/schemas/CreateSimulatedIncomingWireRequest'
+        description: The amount, currency, and destination account of the simulated incoming wire.
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                queued:
+                  summary: Newly created incoming wire
+                  value:
+                    account_number: '123456789'
+                    amount: '1000'
+                    batch_processed_at: '0001-01-01T00:00:00Z'
+                    correspondent: TEST
+                    create_at: '2026-11-09T17:45:12.123456Z'
+                    currency: USD
+                    delay_until: null
+                    id: 0b6c4a9e-2f4d-4b8a-9c1e-7f3d2a1b5c6d
+                    status: QUEUED
+                    wire_instructions: FFC TEST-123456789
+              schema:
+                $ref: '#/components/schemas/SimulatedIncomingWire'
+          description: The simulated incoming wire was created.
+        '400':
+          content:
+            application/json:
+              examples:
+                malformedBody:
+                  summary: Malformed request body
+                  value:
+                    code: 40010000
+                    message: request body format is invalid
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The request body is malformed, for example invalid JSON.
+        '403':
+          content:
+            application/json:
+              examples:
+                production:
+                  summary: Called in production
+                  value:
+                    code: 40310000
+                    message: testing incoming wires is only available to sandbox environments
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The endpoint was called in production. It is only available in the sandbox environment.
+        '404':
+          content:
+            application/json:
+              examples:
+                accountNotFound:
+                  summary: Unknown account number
+                  value:
+                    code: 40410000
+                    message: account number 123456789 does not exist
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: No account with the account number in `wire_instructions` exists for your correspondent.
+        '422':
+          content:
+            application/json:
+              examples:
+                invalidWireInstructions:
+                  summary: Wire instructions without an FFC string
+                  value:
+                    code: 40010001
+                    message: 'invalid wire instructions: must be in format FFC TEST-987654321'
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: |
+            The request was rejected by validation. Common reasons include:
+
+            - `invalid wire instructions: must be in format FFC TEST-987654321`: `wire_instructions` does not contain an FFC string.
+            - `invalid correspondent used in wire instructions`: the correspondent in `wire_instructions` is not yours.
+            - `currency does not match account's base currency`: `currency`, or the `USD` default, differs from the account's base currency.
+            - `please contact support. currency is not supported for incoming_wire: <currency>`: `currency` is not a supported incoming wire currency.
+            - `currency is not a valid currency`: `currency` is not a recognized currency code.
+            - `amount should be greater than or equal to zero`: `amount` is 0 or negative. The amount must be greater than 0.
+        default:
+          content:
+            application/json:
+              examples:
+                internalError:
+                  summary: Internal server error
+                  value:
+                    code: 50010000
+                    message: internal server error occurred
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+      summary: Simulate an Incoming Wire Transfer
+      tags:
+        - Funding
   /v1/trading/accounts/{account_id}/account:
     get:
       description: |-

@@ -32,6 +32,7 @@ import markets.alpaca.client.openapi.broker.model.Bank;
 import markets.alpaca.client.openapi.broker.model.CreateACHRelationshipRequest;
 import markets.alpaca.client.openapi.broker.model.CreateBankRequest;
 import markets.alpaca.client.openapi.broker.model.CreateJITSettlementRequest;
+import markets.alpaca.client.openapi.broker.model.CreateSimulatedIncomingWireRequest;
 import markets.alpaca.client.openapi.broker.model.CreateTransferRequest;
 import markets.alpaca.client.openapi.broker.model.DailyTradingLimit;
 import markets.alpaca.client.openapi.broker.model.Error;
@@ -43,6 +44,7 @@ import markets.alpaca.client.openapi.broker.model.JITReportType;
 import java.time.LocalDate;
 import markets.alpaca.client.openapi.broker.model.SettlementResponse;
 import markets.alpaca.client.openapi.broker.model.SettlementsResponse;
+import markets.alpaca.client.openapi.broker.model.SimulatedIncomingWire;
 import markets.alpaca.client.openapi.broker.model.Transfer;
 import java.util.UUID;
 
@@ -64,6 +66,8 @@ import java.util.Map;
  * <ul>
  * 
  *   <li><b>{@code createACHRelationshipForAccount}</b>: Create an ACH Relationship</li>
+ * 
+ *   <li><b>{@code createIncomingWire}</b>: Simulate an Incoming Wire Transfer</li>
  * 
  *   <li><b>{@code createRecipientBank}</b>: Create a Bank Relationship for an Account</li>
  * 
@@ -280,6 +284,153 @@ public class FundingApi {
 
         okhttp3.Call localVarCall = createACHRelationshipForAccountValidateBeforeCall(accountId, createACHRelationshipRequest, _callback);
         Type localVarReturnType = new TypeToken<ACHRelationship>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+    /**
+     * Build call for createIncomingWire
+     * @param createSimulatedIncomingWireRequest The amount, currency, and destination account of the simulated incoming wire. (required)
+     * @param _callback Callback for upload/download progress
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> The simulated incoming wire was created. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is malformed, for example invalid JSON. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The endpoint was called in production. It is only available in the sandbox environment. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No account with the account number in &#x60;wire_instructions&#x60; exists for your correspondent. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request was rejected by validation. Common reasons include:  - &#x60;invalid wire instructions: must be in format FFC TEST-987654321&#x60;: &#x60;wire_instructions&#x60; does not contain an FFC string. - &#x60;invalid correspondent used in wire instructions&#x60;: the correspondent in &#x60;wire_instructions&#x60; is not yours. - &#x60;currency does not match account&#39;s base currency&#x60;: &#x60;currency&#x60;, or the &#x60;USD&#x60; default, differs from the account&#39;s base currency. - &#x60;please contact support. currency is not supported for incoming_wire: &lt;currency&gt;&#x60;: &#x60;currency&#x60; is not a supported incoming wire currency. - &#x60;currency is not a valid currency&#x60;: &#x60;currency&#x60; is not a recognized currency code. - &#x60;amount should be greater than or equal to zero&#x60;: &#x60;amount&#x60; is 0 or negative. The amount must be greater than 0.  </td><td>  -  </td></tr>
+        <tr><td> 0 </td><td> Unexpected error. </td><td>  -  </td></tr>
+     </table>
+     */
+    public okhttp3.Call createIncomingWireCall(@javax.annotation.Nonnull CreateSimulatedIncomingWireRequest createSimulatedIncomingWireRequest, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = createSimulatedIncomingWireRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/testing/incoming_wires";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "BasicAuth" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call createIncomingWireValidateBeforeCall(@javax.annotation.Nonnull CreateSimulatedIncomingWireRequest createSimulatedIncomingWireRequest, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'createSimulatedIncomingWireRequest' is set
+        if (createSimulatedIncomingWireRequest == null) {
+            throw new ApiException("Missing the required parameter 'createSimulatedIncomingWireRequest' when calling createIncomingWire(Async)");
+        }
+
+        return createIncomingWireCall(createSimulatedIncomingWireRequest, _callback);
+
+    }
+
+    /**
+     * Simulate an Incoming Wire Transfer
+     * Simulate an incoming wire transfer to fund one of your accounts, without a real sending bank.  This endpoint is **only available in the sandbox environment**. Calling it in production returns &#x60;403&#x60;. In production, incoming wires are sent by the customer&#39;s bank and cannot be created through the API.  Identify the destination account by including an FFC (For Further Credit) string &#x60;FFC &lt;correspondent&gt;-&lt;account_number&gt;&#x60; in &#x60;wire_instructions&#x60;, where &#x60;&lt;correspondent&gt;&#x60; is your 4-character correspondent code and &#x60;&lt;account_number&gt;&#x60; is the account&#39;s 9-character account number.  &#x60;currency&#x60; defaults to &#x60;USD&#x60; and must match the account&#39;s base currency. Supported currencies are &#x60;AUD&#x60;, &#x60;CAD&#x60;, &#x60;CHF&#x60;, &#x60;EUR&#x60;, &#x60;GBP&#x60;, &#x60;JPY&#x60;, &#x60;NZD&#x60;, &#x60;SGD&#x60;, &#x60;TRY&#x60;, and &#x60;USD&#x60;.  The wire is created with status &#x60;QUEUED&#x60; and processed asynchronously on the next worker run.
+     * @param createSimulatedIncomingWireRequest The amount, currency, and destination account of the simulated incoming wire. (required)
+     * @return SimulatedIncomingWire
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> The simulated incoming wire was created. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is malformed, for example invalid JSON. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The endpoint was called in production. It is only available in the sandbox environment. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No account with the account number in &#x60;wire_instructions&#x60; exists for your correspondent. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request was rejected by validation. Common reasons include:  - &#x60;invalid wire instructions: must be in format FFC TEST-987654321&#x60;: &#x60;wire_instructions&#x60; does not contain an FFC string. - &#x60;invalid correspondent used in wire instructions&#x60;: the correspondent in &#x60;wire_instructions&#x60; is not yours. - &#x60;currency does not match account&#39;s base currency&#x60;: &#x60;currency&#x60;, or the &#x60;USD&#x60; default, differs from the account&#39;s base currency. - &#x60;please contact support. currency is not supported for incoming_wire: &lt;currency&gt;&#x60;: &#x60;currency&#x60; is not a supported incoming wire currency. - &#x60;currency is not a valid currency&#x60;: &#x60;currency&#x60; is not a recognized currency code. - &#x60;amount should be greater than or equal to zero&#x60;: &#x60;amount&#x60; is 0 or negative. The amount must be greater than 0.  </td><td>  -  </td></tr>
+        <tr><td> 0 </td><td> Unexpected error. </td><td>  -  </td></tr>
+     </table>
+     */
+    public SimulatedIncomingWire createIncomingWire(@javax.annotation.Nonnull CreateSimulatedIncomingWireRequest createSimulatedIncomingWireRequest) throws ApiException {
+        ApiResponse<SimulatedIncomingWire> localVarResp = createIncomingWireWithHttpInfo(createSimulatedIncomingWireRequest);
+        return localVarResp.getData();
+    }
+
+    /**
+     * Simulate an Incoming Wire Transfer
+     * Simulate an incoming wire transfer to fund one of your accounts, without a real sending bank.  This endpoint is **only available in the sandbox environment**. Calling it in production returns &#x60;403&#x60;. In production, incoming wires are sent by the customer&#39;s bank and cannot be created through the API.  Identify the destination account by including an FFC (For Further Credit) string &#x60;FFC &lt;correspondent&gt;-&lt;account_number&gt;&#x60; in &#x60;wire_instructions&#x60;, where &#x60;&lt;correspondent&gt;&#x60; is your 4-character correspondent code and &#x60;&lt;account_number&gt;&#x60; is the account&#39;s 9-character account number.  &#x60;currency&#x60; defaults to &#x60;USD&#x60; and must match the account&#39;s base currency. Supported currencies are &#x60;AUD&#x60;, &#x60;CAD&#x60;, &#x60;CHF&#x60;, &#x60;EUR&#x60;, &#x60;GBP&#x60;, &#x60;JPY&#x60;, &#x60;NZD&#x60;, &#x60;SGD&#x60;, &#x60;TRY&#x60;, and &#x60;USD&#x60;.  The wire is created with status &#x60;QUEUED&#x60; and processed asynchronously on the next worker run.
+     * @param createSimulatedIncomingWireRequest The amount, currency, and destination account of the simulated incoming wire. (required)
+     * @return ApiResponse&lt;SimulatedIncomingWire&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> The simulated incoming wire was created. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is malformed, for example invalid JSON. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The endpoint was called in production. It is only available in the sandbox environment. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No account with the account number in &#x60;wire_instructions&#x60; exists for your correspondent. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request was rejected by validation. Common reasons include:  - &#x60;invalid wire instructions: must be in format FFC TEST-987654321&#x60;: &#x60;wire_instructions&#x60; does not contain an FFC string. - &#x60;invalid correspondent used in wire instructions&#x60;: the correspondent in &#x60;wire_instructions&#x60; is not yours. - &#x60;currency does not match account&#39;s base currency&#x60;: &#x60;currency&#x60;, or the &#x60;USD&#x60; default, differs from the account&#39;s base currency. - &#x60;please contact support. currency is not supported for incoming_wire: &lt;currency&gt;&#x60;: &#x60;currency&#x60; is not a supported incoming wire currency. - &#x60;currency is not a valid currency&#x60;: &#x60;currency&#x60; is not a recognized currency code. - &#x60;amount should be greater than or equal to zero&#x60;: &#x60;amount&#x60; is 0 or negative. The amount must be greater than 0.  </td><td>  -  </td></tr>
+        <tr><td> 0 </td><td> Unexpected error. </td><td>  -  </td></tr>
+     </table>
+     */
+    public ApiResponse<SimulatedIncomingWire> createIncomingWireWithHttpInfo(@javax.annotation.Nonnull CreateSimulatedIncomingWireRequest createSimulatedIncomingWireRequest) throws ApiException {
+        okhttp3.Call localVarCall = createIncomingWireValidateBeforeCall(createSimulatedIncomingWireRequest, null);
+        Type localVarReturnType = new TypeToken<SimulatedIncomingWire>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    /**
+     * Simulate an Incoming Wire Transfer (asynchronously)
+     * Simulate an incoming wire transfer to fund one of your accounts, without a real sending bank.  This endpoint is **only available in the sandbox environment**. Calling it in production returns &#x60;403&#x60;. In production, incoming wires are sent by the customer&#39;s bank and cannot be created through the API.  Identify the destination account by including an FFC (For Further Credit) string &#x60;FFC &lt;correspondent&gt;-&lt;account_number&gt;&#x60; in &#x60;wire_instructions&#x60;, where &#x60;&lt;correspondent&gt;&#x60; is your 4-character correspondent code and &#x60;&lt;account_number&gt;&#x60; is the account&#39;s 9-character account number.  &#x60;currency&#x60; defaults to &#x60;USD&#x60; and must match the account&#39;s base currency. Supported currencies are &#x60;AUD&#x60;, &#x60;CAD&#x60;, &#x60;CHF&#x60;, &#x60;EUR&#x60;, &#x60;GBP&#x60;, &#x60;JPY&#x60;, &#x60;NZD&#x60;, &#x60;SGD&#x60;, &#x60;TRY&#x60;, and &#x60;USD&#x60;.  The wire is created with status &#x60;QUEUED&#x60; and processed asynchronously on the next worker run.
+     * @param createSimulatedIncomingWireRequest The amount, currency, and destination account of the simulated incoming wire. (required)
+     * @param _callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> The simulated incoming wire was created. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> The request body is malformed, for example invalid JSON. </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The endpoint was called in production. It is only available in the sandbox environment. </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> No account with the account number in &#x60;wire_instructions&#x60; exists for your correspondent. </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> The request was rejected by validation. Common reasons include:  - &#x60;invalid wire instructions: must be in format FFC TEST-987654321&#x60;: &#x60;wire_instructions&#x60; does not contain an FFC string. - &#x60;invalid correspondent used in wire instructions&#x60;: the correspondent in &#x60;wire_instructions&#x60; is not yours. - &#x60;currency does not match account&#39;s base currency&#x60;: &#x60;currency&#x60;, or the &#x60;USD&#x60; default, differs from the account&#39;s base currency. - &#x60;please contact support. currency is not supported for incoming_wire: &lt;currency&gt;&#x60;: &#x60;currency&#x60; is not a supported incoming wire currency. - &#x60;currency is not a valid currency&#x60;: &#x60;currency&#x60; is not a recognized currency code. - &#x60;amount should be greater than or equal to zero&#x60;: &#x60;amount&#x60; is 0 or negative. The amount must be greater than 0.  </td><td>  -  </td></tr>
+        <tr><td> 0 </td><td> Unexpected error. </td><td>  -  </td></tr>
+     </table>
+     */
+    public okhttp3.Call createIncomingWireAsync(@javax.annotation.Nonnull CreateSimulatedIncomingWireRequest createSimulatedIncomingWireRequest, final ApiCallback<SimulatedIncomingWire> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = createIncomingWireValidateBeforeCall(createSimulatedIncomingWireRequest, _callback);
+        Type localVarReturnType = new TypeToken<SimulatedIncomingWire>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
     }
@@ -509,7 +660,7 @@ public class FundingApi {
 
     /**
      * Request a New Transfer
-     * Create a new transfer to deposit money into or withdraw money from an account.  Two &#x60;transfer_type&#x60; values are accepted, and both are available in sandbox and production:  - **&#x60;ach&#x60;** — supports both &#x60;INCOMING&#x60; (deposit) and &#x60;OUTGOING&#x60; (withdrawal) directions. A &#x60;relationship_id&#x60; from a previously created [ACH Relationship](https://docs.alpaca.markets/reference/createachrelationshipforaccount) is required. - **&#x60;wire&#x60;** — supports the &#x60;OUTGOING&#x60; (withdrawal) direction only. Incoming wires cannot be initiated through this endpoint; they are pushed in by the sending bank and recorded automatically. A &#x60;bank_id&#x60; from a previously created [Bank Relationship](https://docs.alpaca.markets/reference/createrecipientbank) is required, and the bank must be in &#x60;APPROVED&#x60; status before the transfer will progress past &#x60;QUEUED&#x60;.  In the sandbox environment, ACH deposits and withdrawals settle instantly against virtual funds. Outgoing wire withdrawals are accepted and simulated end-to-end — no funds are transmitted to a bank, but the transfer progresses to &#x60;COMPLETE&#x60; and the account is debited against virtual funds. Sandbox wire withdrawals are asynchronous (not instant) and auto-complete on weekdays only; transfers submitted on a weekend will not progress until Monday. For more on funding accounts in sandbox, see [this tutorial](https://alpaca.markets/learn/fund-broker-api/).
+     * Create a new transfer to deposit money into or withdraw money from an account.  Two &#x60;transfer_type&#x60; values are accepted, and both are available in sandbox and production:  - **&#x60;ach&#x60;** — supports both &#x60;INCOMING&#x60; (deposit) and &#x60;OUTGOING&#x60; (withdrawal) directions. A &#x60;relationship_id&#x60; from a previously created [ACH Relationship](https://docs.alpaca.markets/reference/createachrelationshipforaccount) is required. - **&#x60;wire&#x60;** — supports the &#x60;OUTGOING&#x60; (withdrawal) direction only. Incoming wires cannot be initiated through this endpoint; they are pushed in by the sending bank and recorded automatically. A &#x60;bank_id&#x60; from a previously created [Bank Relationship](https://docs.alpaca.markets/reference/createrecipientbank) is required, and the bank must be in &#x60;APPROVED&#x60; status before the transfer will progress past &#x60;QUEUED&#x60;.  In the sandbox environment, ACH deposits and withdrawals settle instantly against virtual funds. Outgoing wire withdrawals are accepted and simulated end-to-end — no funds are transmitted to a bank, but the transfer progresses to &#x60;COMPLETE&#x60; and the account is debited against virtual funds. Sandbox wire withdrawals are asynchronous (not instant) and auto-complete on weekdays only; transfers submitted on a weekend will not progress until Monday. To fund an account with an incoming wire in sandbox, use [Simulate an Incoming Wire Transfer](https://docs.alpaca.markets/reference/createincomingwire) (&#x60;POST /v1/testing/incoming_wires&#x60;). For more on funding accounts in sandbox, see [this tutorial](https://alpaca.markets/learn/fund-broker-api/).
      * @param accountId Account identifier. (required)
      * @param createTransferRequest  (required)
      * @return Transfer
@@ -531,7 +682,7 @@ public class FundingApi {
 
     /**
      * Request a New Transfer
-     * Create a new transfer to deposit money into or withdraw money from an account.  Two &#x60;transfer_type&#x60; values are accepted, and both are available in sandbox and production:  - **&#x60;ach&#x60;** — supports both &#x60;INCOMING&#x60; (deposit) and &#x60;OUTGOING&#x60; (withdrawal) directions. A &#x60;relationship_id&#x60; from a previously created [ACH Relationship](https://docs.alpaca.markets/reference/createachrelationshipforaccount) is required. - **&#x60;wire&#x60;** — supports the &#x60;OUTGOING&#x60; (withdrawal) direction only. Incoming wires cannot be initiated through this endpoint; they are pushed in by the sending bank and recorded automatically. A &#x60;bank_id&#x60; from a previously created [Bank Relationship](https://docs.alpaca.markets/reference/createrecipientbank) is required, and the bank must be in &#x60;APPROVED&#x60; status before the transfer will progress past &#x60;QUEUED&#x60;.  In the sandbox environment, ACH deposits and withdrawals settle instantly against virtual funds. Outgoing wire withdrawals are accepted and simulated end-to-end — no funds are transmitted to a bank, but the transfer progresses to &#x60;COMPLETE&#x60; and the account is debited against virtual funds. Sandbox wire withdrawals are asynchronous (not instant) and auto-complete on weekdays only; transfers submitted on a weekend will not progress until Monday. For more on funding accounts in sandbox, see [this tutorial](https://alpaca.markets/learn/fund-broker-api/).
+     * Create a new transfer to deposit money into or withdraw money from an account.  Two &#x60;transfer_type&#x60; values are accepted, and both are available in sandbox and production:  - **&#x60;ach&#x60;** — supports both &#x60;INCOMING&#x60; (deposit) and &#x60;OUTGOING&#x60; (withdrawal) directions. A &#x60;relationship_id&#x60; from a previously created [ACH Relationship](https://docs.alpaca.markets/reference/createachrelationshipforaccount) is required. - **&#x60;wire&#x60;** — supports the &#x60;OUTGOING&#x60; (withdrawal) direction only. Incoming wires cannot be initiated through this endpoint; they are pushed in by the sending bank and recorded automatically. A &#x60;bank_id&#x60; from a previously created [Bank Relationship](https://docs.alpaca.markets/reference/createrecipientbank) is required, and the bank must be in &#x60;APPROVED&#x60; status before the transfer will progress past &#x60;QUEUED&#x60;.  In the sandbox environment, ACH deposits and withdrawals settle instantly against virtual funds. Outgoing wire withdrawals are accepted and simulated end-to-end — no funds are transmitted to a bank, but the transfer progresses to &#x60;COMPLETE&#x60; and the account is debited against virtual funds. Sandbox wire withdrawals are asynchronous (not instant) and auto-complete on weekdays only; transfers submitted on a weekend will not progress until Monday. To fund an account with an incoming wire in sandbox, use [Simulate an Incoming Wire Transfer](https://docs.alpaca.markets/reference/createincomingwire) (&#x60;POST /v1/testing/incoming_wires&#x60;). For more on funding accounts in sandbox, see [this tutorial](https://alpaca.markets/learn/fund-broker-api/).
      * @param accountId Account identifier. (required)
      * @param createTransferRequest  (required)
      * @return ApiResponse&lt;Transfer&gt;
@@ -554,7 +705,7 @@ public class FundingApi {
 
     /**
      * Request a New Transfer (asynchronously)
-     * Create a new transfer to deposit money into or withdraw money from an account.  Two &#x60;transfer_type&#x60; values are accepted, and both are available in sandbox and production:  - **&#x60;ach&#x60;** — supports both &#x60;INCOMING&#x60; (deposit) and &#x60;OUTGOING&#x60; (withdrawal) directions. A &#x60;relationship_id&#x60; from a previously created [ACH Relationship](https://docs.alpaca.markets/reference/createachrelationshipforaccount) is required. - **&#x60;wire&#x60;** — supports the &#x60;OUTGOING&#x60; (withdrawal) direction only. Incoming wires cannot be initiated through this endpoint; they are pushed in by the sending bank and recorded automatically. A &#x60;bank_id&#x60; from a previously created [Bank Relationship](https://docs.alpaca.markets/reference/createrecipientbank) is required, and the bank must be in &#x60;APPROVED&#x60; status before the transfer will progress past &#x60;QUEUED&#x60;.  In the sandbox environment, ACH deposits and withdrawals settle instantly against virtual funds. Outgoing wire withdrawals are accepted and simulated end-to-end — no funds are transmitted to a bank, but the transfer progresses to &#x60;COMPLETE&#x60; and the account is debited against virtual funds. Sandbox wire withdrawals are asynchronous (not instant) and auto-complete on weekdays only; transfers submitted on a weekend will not progress until Monday. For more on funding accounts in sandbox, see [this tutorial](https://alpaca.markets/learn/fund-broker-api/).
+     * Create a new transfer to deposit money into or withdraw money from an account.  Two &#x60;transfer_type&#x60; values are accepted, and both are available in sandbox and production:  - **&#x60;ach&#x60;** — supports both &#x60;INCOMING&#x60; (deposit) and &#x60;OUTGOING&#x60; (withdrawal) directions. A &#x60;relationship_id&#x60; from a previously created [ACH Relationship](https://docs.alpaca.markets/reference/createachrelationshipforaccount) is required. - **&#x60;wire&#x60;** — supports the &#x60;OUTGOING&#x60; (withdrawal) direction only. Incoming wires cannot be initiated through this endpoint; they are pushed in by the sending bank and recorded automatically. A &#x60;bank_id&#x60; from a previously created [Bank Relationship](https://docs.alpaca.markets/reference/createrecipientbank) is required, and the bank must be in &#x60;APPROVED&#x60; status before the transfer will progress past &#x60;QUEUED&#x60;.  In the sandbox environment, ACH deposits and withdrawals settle instantly against virtual funds. Outgoing wire withdrawals are accepted and simulated end-to-end — no funds are transmitted to a bank, but the transfer progresses to &#x60;COMPLETE&#x60; and the account is debited against virtual funds. Sandbox wire withdrawals are asynchronous (not instant) and auto-complete on weekdays only; transfers submitted on a weekend will not progress until Monday. To fund an account with an incoming wire in sandbox, use [Simulate an Incoming Wire Transfer](https://docs.alpaca.markets/reference/createincomingwire) (&#x60;POST /v1/testing/incoming_wires&#x60;). For more on funding accounts in sandbox, see [this tutorial](https://alpaca.markets/learn/fund-broker-api/).
      * @param accountId Account identifier. (required)
      * @param createTransferRequest  (required)
      * @param _callback The callback to be executed when the API call finishes

@@ -22,6 +22,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
+import markets.alpaca.client.openapi.broker.model.TradeMarker;
 import java.io.Serializable;
 
 import com.google.gson.Gson;
@@ -57,17 +58,17 @@ public class PortfolioSubscription implements Serializable {
 
   public static final String SERIALIZED_NAME_ACCOUNT_ID = "account_id";
   @SerializedName(SERIALIZED_NAME_ACCOUNT_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String accountId;
 
   public static final String SERIALIZED_NAME_CREATED_AT = "created_at";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private OffsetDateTime createdAt;
 
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String id;
 
   public static final String SERIALIZED_NAME_LAST_REBALANCED_AT = "last_rebalanced_at";
@@ -77,13 +78,18 @@ public class PortfolioSubscription implements Serializable {
 
   public static final String SERIALIZED_NAME_PORTFOLIO_ID = "portfolio_id";
   @SerializedName(SERIALIZED_NAME_PORTFOLIO_ID)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private String portfolioId;
+
+  public static final String SERIALIZED_NAME_TRADE_MARKER = "trade_marker";
+  @SerializedName(SERIALIZED_NAME_TRADE_MARKER)
+  @javax.annotation.Nullable
+  private TradeMarker tradeMarker;
 
   public PortfolioSubscription() {
   }
 
-  public PortfolioSubscription accountId(@javax.annotation.Nullable String accountId) {
+  public PortfolioSubscription accountId(@javax.annotation.Nonnull String accountId) {
     this.accountId = accountId;
     return this;
   }
@@ -92,17 +98,17 @@ public class PortfolioSubscription implements Serializable {
    * Account ID subscribing to portfolio
    * @return accountId
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getAccountId() {
     return accountId;
   }
 
-  public void setAccountId(@javax.annotation.Nullable String accountId) {
+  public void setAccountId(@javax.annotation.Nonnull String accountId) {
     this.accountId = accountId;
   }
 
 
-  public PortfolioSubscription createdAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public PortfolioSubscription createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -111,17 +117,17 @@ public class PortfolioSubscription implements Serializable {
    * Subscription creation timestamp
    * @return createdAt
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public OffsetDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(@javax.annotation.Nullable OffsetDateTime createdAt) {
+  public void setCreatedAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
   }
 
 
-  public PortfolioSubscription id(@javax.annotation.Nullable String id) {
+  public PortfolioSubscription id(@javax.annotation.Nonnull String id) {
     this.id = id;
     return this;
   }
@@ -130,12 +136,12 @@ public class PortfolioSubscription implements Serializable {
    * Subscription ID
    * @return id
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getId() {
     return id;
   }
 
-  public void setId(@javax.annotation.Nullable String id) {
+  public void setId(@javax.annotation.Nonnull String id) {
     this.id = id;
   }
 
@@ -159,7 +165,7 @@ public class PortfolioSubscription implements Serializable {
   }
 
 
-  public PortfolioSubscription portfolioId(@javax.annotation.Nullable String portfolioId) {
+  public PortfolioSubscription portfolioId(@javax.annotation.Nonnull String portfolioId) {
     this.portfolioId = portfolioId;
     return this;
   }
@@ -168,13 +174,32 @@ public class PortfolioSubscription implements Serializable {
    * Portfolio ID for subscription
    * @return portfolioId
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public String getPortfolioId() {
     return portfolioId;
   }
 
-  public void setPortfolioId(@javax.annotation.Nullable String portfolioId) {
+  public void setPortfolioId(@javax.annotation.Nonnull String portfolioId) {
     this.portfolioId = portfolioId;
+  }
+
+
+  public PortfolioSubscription tradeMarker(@javax.annotation.Nullable TradeMarker tradeMarker) {
+    this.tradeMarker = tradeMarker;
+    return this;
+  }
+
+  /**
+   * How trades for this subscription are marked. &#x60;null&#x60; on subscriptions created before trade markers.
+   * @return tradeMarker
+   */
+  @javax.annotation.Nullable
+  public TradeMarker getTradeMarker() {
+    return tradeMarker;
+  }
+
+  public void setTradeMarker(@javax.annotation.Nullable TradeMarker tradeMarker) {
+    this.tradeMarker = tradeMarker;
   }
 
   /**
@@ -236,13 +261,14 @@ public class PortfolioSubscription implements Serializable {
         Objects.equals(this.createdAt, portfolioSubscription.createdAt) &&
         Objects.equals(this.id, portfolioSubscription.id) &&
         Objects.equals(this.lastRebalancedAt, portfolioSubscription.lastRebalancedAt) &&
-        Objects.equals(this.portfolioId, portfolioSubscription.portfolioId)&&
+        Objects.equals(this.portfolioId, portfolioSubscription.portfolioId) &&
+        Objects.equals(this.tradeMarker, portfolioSubscription.tradeMarker)&&
         Objects.equals(this.additionalProperties, portfolioSubscription.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(accountId, createdAt, id, lastRebalancedAt, portfolioId, additionalProperties);
+    return Objects.hash(accountId, createdAt, id, lastRebalancedAt, portfolioId, tradeMarker, additionalProperties);
   }
 
   @Override
@@ -254,6 +280,7 @@ public class PortfolioSubscription implements Serializable {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastRebalancedAt: ").append(toIndentedString(lastRebalancedAt)).append("\n");
     sb.append("    portfolioId: ").append(toIndentedString(portfolioId)).append("\n");
+    sb.append("    tradeMarker: ").append(toIndentedString(tradeMarker)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -273,10 +300,10 @@ public class PortfolioSubscription implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("account_id", "created_at", "id", "last_rebalanced_at", "portfolio_id"));
+    openapiFields = new HashSet<String>(Arrays.asList("account_id", "created_at", "id", "last_rebalanced_at", "portfolio_id", "trade_marker"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(0);
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("account_id", "created_at", "id", "portfolio_id", "trade_marker"));
   }
 
   /**
@@ -291,18 +318,29 @@ public class PortfolioSubscription implements Serializable {
           throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field(s) %s in PortfolioSubscription is not found in the empty JSON string", PortfolioSubscription.openapiRequiredFields.toString()));
         }
       }
+
+      // check to make sure all required properties/fields are present in the JSON string
+      for (String requiredField : PortfolioSubscription.openapiRequiredFields) {
+        if (jsonElement.getAsJsonObject().get(requiredField) == null) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "The required field `%s` is not found in the JSON string: %s", requiredField, jsonElement.toString()));
+        }
+      }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
-      if ((jsonObj.get("account_id") != null && !jsonObj.get("account_id").isJsonNull()) && !jsonObj.get("account_id").isJsonPrimitive()) {
+      if (!jsonObj.get("account_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `account_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("account_id").toString()));
       }
-      if ((jsonObj.get("id") != null && !jsonObj.get("id").isJsonNull()) && !jsonObj.get("id").isJsonPrimitive()) {
+      if (!jsonObj.get("id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("id").toString()));
       }
       if ((jsonObj.get("last_rebalanced_at") != null && !jsonObj.get("last_rebalanced_at").isJsonNull()) && !jsonObj.get("last_rebalanced_at").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `last_rebalanced_at` to be a primitive type in the JSON string but got `%s`", jsonObj.get("last_rebalanced_at").toString()));
       }
-      if ((jsonObj.get("portfolio_id") != null && !jsonObj.get("portfolio_id").isJsonNull()) && !jsonObj.get("portfolio_id").isJsonPrimitive()) {
+      if (!jsonObj.get("portfolio_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `portfolio_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("portfolio_id").toString()));
+      }
+      if (jsonObj.get("trade_marker") != null && !jsonObj.get("trade_marker").isJsonNull()) {
+      // validate the required field `trade_marker`
+      TradeMarker.validateJsonElement(jsonObj.get("trade_marker"));
       }
   }
 
