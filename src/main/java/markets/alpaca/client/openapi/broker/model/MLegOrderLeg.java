@@ -50,7 +50,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * Represents an individual leg of a multileg options order.
+ * Represents an individual leg of a multileg options order.  &#x60;commission&#x60;, &#x60;commission_type&#x60;, and &#x60;commission_bps&#x60; are ignored on a leg and have no effect. Set &#x60;commission&#x60; and &#x60;commission_type&#x60; on the parent order.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class MLegOrderLeg implements Serializable {

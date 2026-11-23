@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import markets.alpaca.client.openapi.broker.model.Identification;
 import markets.alpaca.client.openapi.broker.model.TaxIdType;
 import java.io.Serializable;
 
@@ -168,6 +169,11 @@ public class Identity implements Serializable {
   @SerializedName(SERIALIZED_NAME_GIVEN_NAME)
   @javax.annotation.Nonnull
   private String givenName;
+
+  public static final String SERIALIZED_NAME_IDENTIFICATIONS = "identifications";
+  @SerializedName(SERIALIZED_NAME_IDENTIFICATIONS)
+  @javax.annotation.Nullable
+  private List<Identification> identifications = new ArrayList<>();
 
   /**
    * The user&#39;s level of expertise and familiarity with investing in Options. 
@@ -854,6 +860,33 @@ public class Identity implements Serializable {
   }
 
 
+  public Identity identifications(@javax.annotation.Nullable List<Identification> identifications) {
+    this.identifications = identifications;
+    return this;
+  }
+
+  public Identity addIdentificationsItem(Identification identificationsItem) {
+    if (this.identifications == null) {
+      this.identifications = new ArrayList<>();
+    }
+    this.identifications.add(identificationsItem);
+    return this;
+  }
+
+  /**
+   * Identity documents and identifiers other than the tax ID, such as a passport or an LEI. On update, the array replaces every stored identification except the tax ID, which only &#x60;tax_id&#x60; and &#x60;tax_id_type&#x60; change.  Account responses include this field only for natural persons, and each entry has only &#x60;type&#x60;. Responses also list the tax ID as an entry typed with its tax ID type, for example &#x60;USA_SSN&#x60;, or &#x60;NOT_SPECIFIED&#x60; when the type is unknown. Omit that entry on update. 
+   * @return identifications
+   */
+  @javax.annotation.Nullable
+  public List<Identification> getIdentifications() {
+    return identifications;
+  }
+
+  public void setIdentifications(@javax.annotation.Nullable List<Identification> identifications) {
+    this.identifications = identifications;
+  }
+
+
   public Identity investmentExperienceWithOptions(@javax.annotation.Nullable InvestmentExperienceWithOptionsEnum investmentExperienceWithOptions) {
     this.investmentExperienceWithOptions = investmentExperienceWithOptions;
     return this;
@@ -1123,7 +1156,7 @@ public class Identity implements Serializable {
   }
 
   /**
-   * Required on write when &#x60;tax_id&#x60; is set. May be &#x60;null&#x60; on read when unset or for sparse identity on OmniSub / omnibus-non-disclosed accounts.
+   * Required on write when &#x60;tax_id&#x60; is set. May be &#x60;null&#x60; on read when unset or for sparse identity on OmniSub / omnibus-non-disclosed accounts.  An LEI is not a tax ID: a request with &#x60;tax_id_type&#x60; set to &#x60;LEI&#x60;, in any case, fails with 422. Send the LEI in &#x60;identifications&#x60; and the national tax ID in &#x60;tax_id&#x60;. 
    * @return taxIdType
    */
   @javax.annotation.Nullable
@@ -1276,6 +1309,7 @@ public class Identity implements Serializable {
         Objects.equals(this.familyName, identity.familyName) &&
         Objects.equals(this.fundingSource, identity.fundingSource) &&
         Objects.equals(this.givenName, identity.givenName) &&
+        Objects.equals(this.identifications, identity.identifications) &&
         Objects.equals(this.investmentExperienceWithOptions, identity.investmentExperienceWithOptions) &&
         Objects.equals(this.investmentExperienceWithStocks, identity.investmentExperienceWithStocks) &&
         Objects.equals(this.investmentObjective, identity.investmentObjective) &&
@@ -1299,7 +1333,7 @@ public class Identity implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(annualIncomeMax, annualIncomeMin, countryOfBirth, countryOfCitizenship, countryOfTaxResidence, dateOfBirth, dateOfDepartureFromUsa, familyName, fundingSource, givenName, investmentExperienceWithOptions, investmentExperienceWithStocks, investmentObjective, investmentTimeHorizon, liquidNetWorthMax, liquidNetWorthMin, liquidityNeeds, maritalStatus, middleName, numberOfDependents, permanentResident, riskTolerance, taxId, taxIdType, totalNetWorthMax, totalNetWorthMin, visaExpirationDate, visaType, additionalProperties);
+    return Objects.hash(annualIncomeMax, annualIncomeMin, countryOfBirth, countryOfCitizenship, countryOfTaxResidence, dateOfBirth, dateOfDepartureFromUsa, familyName, fundingSource, givenName, identifications, investmentExperienceWithOptions, investmentExperienceWithStocks, investmentObjective, investmentTimeHorizon, liquidNetWorthMax, liquidNetWorthMin, liquidityNeeds, maritalStatus, middleName, numberOfDependents, permanentResident, riskTolerance, taxId, taxIdType, totalNetWorthMax, totalNetWorthMin, visaExpirationDate, visaType, additionalProperties);
   }
 
   @Override
@@ -1316,6 +1350,7 @@ public class Identity implements Serializable {
     sb.append("    familyName: ").append(toIndentedString(familyName)).append("\n");
     sb.append("    fundingSource: ").append(toIndentedString(fundingSource)).append("\n");
     sb.append("    givenName: ").append(toIndentedString(givenName)).append("\n");
+    sb.append("    identifications: ").append(toIndentedString(identifications)).append("\n");
     sb.append("    investmentExperienceWithOptions: ").append(toIndentedString(investmentExperienceWithOptions)).append("\n");
     sb.append("    investmentExperienceWithStocks: ").append(toIndentedString(investmentExperienceWithStocks)).append("\n");
     sb.append("    investmentObjective: ").append(toIndentedString(investmentObjective)).append("\n");
@@ -1353,7 +1388,7 @@ public class Identity implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("annual_income_max", "annual_income_min", "country_of_birth", "country_of_citizenship", "country_of_tax_residence", "date_of_birth", "date_of_departure_from_usa", "family_name", "funding_source", "given_name", "investment_experience_with_options", "investment_experience_with_stocks", "investment_objective", "investment_time_horizon", "liquid_net_worth_max", "liquid_net_worth_min", "liquidity_needs", "marital_status", "middle_name", "number_of_dependents", "permanent_resident", "risk_tolerance", "tax_id", "tax_id_type", "total_net_worth_max", "total_net_worth_min", "visa_expiration_date", "visa_type"));
+    openapiFields = new HashSet<String>(Arrays.asList("annual_income_max", "annual_income_min", "country_of_birth", "country_of_citizenship", "country_of_tax_residence", "date_of_birth", "date_of_departure_from_usa", "family_name", "funding_source", "given_name", "identifications", "investment_experience_with_options", "investment_experience_with_stocks", "investment_objective", "investment_time_horizon", "liquid_net_worth_max", "liquid_net_worth_min", "liquidity_needs", "marital_status", "middle_name", "number_of_dependents", "permanent_resident", "risk_tolerance", "tax_id", "tax_id_type", "total_net_worth_max", "total_net_worth_min", "visa_expiration_date", "visa_type"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("country_of_tax_residence", "date_of_birth", "family_name", "funding_source", "given_name"));
@@ -1405,6 +1440,20 @@ public class Identity implements Serializable {
       }
       if (!jsonObj.get("given_name").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `given_name` to be a primitive type in the JSON string but got `%s`", jsonObj.get("given_name").toString()));
+      }
+      if (jsonObj.get("identifications") != null && !jsonObj.get("identifications").isJsonNull()) {
+        JsonArray jsonArrayidentifications = jsonObj.getAsJsonArray("identifications");
+        if (jsonArrayidentifications != null) {
+          // ensure the json data is an array
+          if (!jsonObj.get("identifications").isJsonArray()) {
+            throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `identifications` to be an array in the JSON string but got `%s`", jsonObj.get("identifications").toString()));
+          }
+
+          // validate the optional field `identifications` (array)
+          for (int i = 0; i < jsonArrayidentifications.size(); i++) {
+            Identification.validateJsonElement(jsonArrayidentifications.get(i));
+          };
+        }
       }
       if ((jsonObj.get("investment_experience_with_options") != null && !jsonObj.get("investment_experience_with_options").isJsonNull()) && !jsonObj.get("investment_experience_with_options").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `investment_experience_with_options` to be a primitive type in the JSON string but got `%s`", jsonObj.get("investment_experience_with_options").toString()));

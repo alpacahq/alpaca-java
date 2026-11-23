@@ -25,7 +25,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * - margin_agreement: Alpaca Margin Agreement - account_agreement: Alpaca Account Agreement - customer_agreement: Alpaca Customer Agreement - crypto_agreement: Alpaca Crypto agreement - options_agreement: Alpaca Option agreement - custodial_customer_agreement: Alpaca Custodial Customer agreement 
+ * The type of agreement the customer signed.
  */
 @JsonAdapter(AgreementType.Adapter.class)
 public enum AgreementType implements Serializable {
@@ -38,7 +38,19 @@ public enum AgreementType implements Serializable {
   
   CRYPTO_AGREEMENT("crypto_agreement"),
   
-  OPTIONS_AGREEMENT("options_agreement");
+  OPTIONS_AGREEMENT("options_agreement"),
+  
+  CUSTODIAN_CUSTOMER_AGREEMENT("custodian_customer_agreement"),
+  
+  TRUSTED_CONTACT_CONSENT("trusted_contact_consent"),
+  
+  MASTER_SECURITIES_LENDING_AGREEMENT("master_securities_lending_agreement"),
+  
+  CERTIFICATIONS_AND_RESOLUTIONS_STATEMENT("certifications_and_resolutions_statement"),
+  
+  JOINT_ACCOUNT_AGREEMENT("joint_account_agreement"),
+  
+  FOREIGN_MARKETS_ADDENDUM("foreign_markets_addendum");
 
   private String value;
 

@@ -260,7 +260,7 @@ public class CreateOrderRequest implements Serializable {
   }
 
   /**
-   * **deprecated**: Please use the commission_type &#x3D; bps instead and set the desired bps value in the &#x60;commission&#x60; field. The percent commission you want to charge the end user on the order (expressed in bps). Alpaca will convert the order to a notional amount for purposes of calculating commission. 
+   * **deprecated**: Please use the commission_type &#x3D; bps instead and set the desired bps value in the &#x60;commission&#x60; field. The percent commission you want to charge the end user on the order (expressed in bps). Alpaca will convert the order to a notional amount for purposes of calculating commission. Not supported for &#x60;mleg&#x60; orders. 
    * @return commissionBps
    * @deprecated
    */

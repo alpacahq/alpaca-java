@@ -517,6 +517,120 @@ components:
       required: true
       schema:
         type: string
+    stock_v3_end:
+      description: |
+        The inclusive end of the interval. A data point is returned when `start <= t <= end`. Format: RFC-3339 or YYYY-MM-DD.
+        A date means the end of that day in the market's time zone.
+        Defaults to the current time if not specified.
+      examples:
+        RFC-3339 nanosecond:
+          summary: RFC-3339 date-time with nanosecond accuracy
+          value: '2026-09-24T01:02:03.123456789Z'
+        RFC-3339 second:
+          summary: RFC-3339 date-time with second accuracy
+          value: '2026-09-24T00:00:00Z'
+        RFC-3339 with timezone:
+          summary: RFC-3339 date-time with time zone
+          value: '2026-09-24T09:30:00-04:00'
+        date:
+          summary: Date
+          value: '2026-09-24'
+      in: query
+      name: end
+      required: false
+      schema:
+        anyOf:
+          - format: date-time
+            type: string
+          - format: date
+            type: string
+    stock_v3_historical_feed:
+      description: |
+        The source feed of the data. All feeds require a subscription.
+         - `euroctp`: EuroCTP, the official EU consolidated tape, covering trades from all EU trading venues
+         - `xetr`: Xetra, the electronic trading venue of the Frankfurt Stock Exchange (Deutsche Börse)
+         - `xhkg`: Hong Kong Stock Exchange (HKEX)
+         - `xlon`: London Stock Exchange (LSE)
+         - `xsau`: Saudi Exchange (Tadawul)
+      example: xetr
+      in: path
+      name: feed
+      required: true
+      schema:
+        $ref: '#/components/schemas/stock_v3_historical_feed'
+    stock_v3_latest_feed:
+      description: |
+        The source feed of the data. All feeds require a subscription.
+         - `euroctp`: EuroCTP, the official EU consolidated tape, covering trades from all EU trading venues
+         - `xetr`: Xetra, the electronic trading venue of the Frankfurt Stock Exchange (Deutsche Börse)
+         - `xhkg`: Hong Kong Stock Exchange (HKEX)
+         - `xlon`: London Stock Exchange (LSE)
+         - `xsau`: Saudi Exchange (Tadawul)
+      example: xetr
+      in: path
+      name: feed
+      required: true
+      schema:
+        $ref: '#/components/schemas/stock_v3_latest_feed'
+    stock_v3_page_size:
+      description: |
+        The maximum number of data points to return in the response page.
+        The page_size applies to the total number of data points across all symbols, not per symbol.
+        The API may return fewer, even if more data points exist in the requested interval.
+        Always check `next_page_token` for more pages.
+      in: query
+      name: page_size
+      required: false
+      schema:
+        default: 1000
+        maximum: 10000
+        minimum: 1
+        type: integer
+    stock_v3_sort:
+      description: Sort the data points of each symbol by timestamp in ascending or descending order.
+      in: query
+      name: sort
+      schema:
+        allOf:
+          - $ref: '#/components/schemas/sort'
+          - type: string
+    stock_v3_start:
+      description: |
+        The inclusive start of the interval. Format: RFC-3339 or YYYY-MM-DD.
+        A date means the start of that day in the market's time zone.
+      examples:
+        RFC-3339 nanosecond:
+          summary: RFC-3339 date-time with nanosecond accuracy
+          value: '2026-09-23T01:02:03.123456789Z'
+        RFC-3339 second:
+          summary: RFC-3339 date-time with second accuracy
+          value: '2026-09-23T00:00:00Z'
+        RFC-3339 with timezone:
+          summary: RFC-3339 date-time with time zone
+          value: '2026-09-23T09:30:00-04:00'
+        date:
+          summary: Date
+          value: '2026-09-23'
+      in: query
+      name: start
+      required: true
+      schema:
+        anyOf:
+          - format: date-time
+            type: string
+          - format: date
+            type: string
+    stock_v3_symbols:
+      description: |
+        A comma-separated list of symbols with a limit of 1000.
+        Each symbol must be in `TICKER:MIC` format, where MIC is the ISO 10383 defined code of the symbol's primary market.
+        The market must be one the feed covers, e.g. `XETR` on `xetr`; `euroctp` accepts any market.
+      example: BMW:XETR,SAP:XETR
+      in: query
+      name: symbols
+      required: true
+      schema:
+        type: string
     symbol:
       description: A unique series of letters assigned to a security for trading purposes.
       example: AAPL
@@ -565,7 +679,10 @@ components:
         Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.
     '403':
       description: |
-        The requested resource is forbidden.
+        The requested resource is forbidden, for example because the subscription does not cover the requested data.
+    '404':
+      description: |
+        The requested resource was not found, for example because the requested feed does not exist.
     '429':
       description: |
         Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you're under the rate limit.
@@ -4074,6 +4191,251 @@ components:
         - next_page_token
         - symbol
       type: object
+    stock_v3_bar:
+      description: |
+        OHLC aggregate of trades in an interval.
+        Bars are not adjusted after splits or dividends. Symbol mapping is also not supported: in case of a name change the symbol active at the time must be used.
+        Bars may include prints that were later corrected or cancelled. Corrections and cancel/error events are not applied.
+      examples:
+        - c: '57.88'
+          h: '60.08'
+          l: '57.88'
+          n: '14950'
+          o: '59.92'
+          t: '2026-09-22T22:00:00Z'
+          v: '2540940'
+          vw: '58.365'
+      properties:
+        c:
+          description: Price of the last trade in the bar, in the native quotation currency.
+          format: decimal
+          type: string
+        h:
+          description: Highest trade price in the bar, in the native quotation currency.
+          format: decimal
+          type: string
+        l:
+          description: Lowest trade price in the bar, in the native quotation currency.
+          format: decimal
+          type: string
+        n:
+          description: Number of trades in the bar.
+          format: int64
+          type: string
+        o:
+          description: Price of the first trade in the bar, in the native quotation currency.
+          format: decimal
+          type: string
+        t:
+          $ref: '#/components/schemas/timestamp'
+        v:
+          description: Number of shares traded in the bar.
+          format: decimal
+          type: string
+        vw:
+          description: Volume-weighted average price of the trades in the bar, in the native quotation currency.
+          format: decimal
+          type: string
+      required:
+        - t
+        - o
+        - h
+        - l
+        - c
+        - v
+        - n
+        - vw
+      type: object
+    stock_v3_bars_resp:
+      properties:
+        bars:
+          additionalProperties:
+            items:
+              $ref: '#/components/schemas/stock_v3_bar'
+            type: array
+          description: Bars keyed by symbol (`TICKER:MIC`).
+          type: object
+        next_page_token:
+          $ref: '#/components/schemas/next_page_token'
+      required:
+        - bars
+        - next_page_token
+      type: object
+    stock_v3_historical_feed:
+      enum:
+        - euroctp
+        - xetr
+        - xhkg
+        - xlon
+        - xsau
+      type: string
+    stock_v3_latest_bars_resp:
+      properties:
+        bars:
+          additionalProperties:
+            $ref: '#/components/schemas/stock_v3_bar'
+          description: The latest minute bars keyed by symbol (`TICKER:MIC`).
+          type: object
+      required:
+        - bars
+      type: object
+    stock_v3_latest_feed:
+      enum:
+        - euroctp
+        - xetr
+        - xhkg
+        - xlon
+        - xsau
+      type: string
+    stock_v3_latest_quotes_resp:
+      properties:
+        quotes:
+          additionalProperties:
+            $ref: '#/components/schemas/stock_v3_quote'
+          description: The latest quotes keyed by symbol (`TICKER:MIC`).
+          type: object
+      required:
+        - quotes
+      type: object
+    stock_v3_latest_trades_resp:
+      properties:
+        trades:
+          additionalProperties:
+            $ref: '#/components/schemas/stock_v3_trade'
+          description: The latest trades keyed by symbol (`TICKER:MIC`).
+          type: object
+      required:
+        - trades
+      type: object
+    stock_v3_quote:
+      description: |
+        The best bid and offer (BBO) for the symbol.
+      examples:
+        - ap: '57.84'
+          as: '260'
+          bp: '57.82'
+          bs: '520'
+          t: '2026-09-24T13:30:00.041325568Z'
+      properties:
+        ap:
+          description: Best ask price, in the native quotation currency.
+          format: decimal
+          type: string
+        as:
+          description: Number of shares available at the best ask price.
+          format: decimal
+          type: string
+        bp:
+          description: Best bid price, in the native quotation currency.
+          format: decimal
+          type: string
+        bs:
+          description: Number of shares available at the best bid price.
+          format: decimal
+          type: string
+        t:
+          $ref: '#/components/schemas/timestamp'
+      required:
+        - t
+        - bp
+        - bs
+        - ap
+        - as
+      type: object
+    stock_v3_quotes_resp:
+      properties:
+        next_page_token:
+          $ref: '#/components/schemas/next_page_token'
+        quotes:
+          additionalProperties:
+            items:
+              $ref: '#/components/schemas/stock_v3_quote'
+            type: array
+          description: Quotes keyed by symbol (`TICKER:MIC`).
+          type: object
+      required:
+        - quotes
+        - next_page_token
+      type: object
+    stock_v3_snapshot:
+      description: |
+        The latest trade, latest quote, minute bar, current daily bar, and previous daily bar for one symbol.
+        Bars are not adjusted after splits or dividends. Symbol mapping is also not supported: in case of a name change the symbol active at the time must be used.
+        Trades and bars may include prints that were later corrected or cancelled. Corrections and cancel/error events are not applied.
+      properties:
+        daily_bar:
+          $ref: '#/components/schemas/stock_v3_bar'
+        latest_quote:
+          $ref: '#/components/schemas/stock_v3_quote'
+        latest_trade:
+          $ref: '#/components/schemas/stock_v3_trade'
+        minute_bar:
+          $ref: '#/components/schemas/stock_v3_bar'
+        prev_daily_bar:
+          $ref: '#/components/schemas/stock_v3_bar'
+      type: object
+    stock_v3_snapshots_resp:
+      properties:
+        snapshots:
+          additionalProperties:
+            $ref: '#/components/schemas/stock_v3_snapshot'
+          description: Snapshots keyed by symbol (`TICKER:MIC`).
+          type: object
+      required:
+        - snapshots
+      type: object
+    stock_v3_trade:
+      description: |
+        A trade print published by an execution venue.
+        Trades may include prints that were later corrected or cancelled. Corrections and cancel/error events are not applied.
+      examples:
+        - i: '1'
+          m: XETR
+          p: '57.84'
+          s: '120'
+          t: '2026-09-24T13:30:00.086175744Z'
+        - m: CEUX
+          p: '57.84'
+          s: '45'
+          t: '2026-09-24T13:30:01.244839680Z'
+      properties:
+        i:
+          description: Trade ID. Omitted when the venue does not publish one.
+          type: string
+        m:
+          description: MIC of the execution venue that published the print. It can differ from the listing MIC in the symbol.
+          type: string
+        p:
+          description: Trade price, in the native quotation currency.
+          format: decimal
+          type: string
+        s:
+          description: Number of shares traded.
+          format: decimal
+          type: string
+        t:
+          $ref: '#/components/schemas/timestamp'
+      required:
+        - t
+        - m
+        - p
+        - s
+      type: object
+    stock_v3_trades_resp:
+      properties:
+        next_page_token:
+          $ref: '#/components/schemas/next_page_token'
+        trades:
+          additionalProperties:
+            items:
+              $ref: '#/components/schemas/stock_v3_trade'
+            type: array
+          description: Trades keyed by symbol (`TICKER:MIC`).
+          type: object
+      required:
+        - trades
+        - next_page_token
+      type: object
     timestamp:
       description: Timestamp in RFC-3339 format with nanosecond precision.
       format: date-time
@@ -7316,6 +7678,474 @@ paths:
       summary: Latest trades
       tags:
         - Stock
+  /v3/stocks/{feed}/bars:
+    get:
+      description: |
+        The historical bars API provides aggregates for a list of symbols between the specified times.
+
+        Bars are not adjusted after splits or dividends. Symbol mapping is also not supported: in case of a name change the symbol active at the time must be used. Bars may include prints that were later corrected or cancelled. Corrections and cancel/error events are not applied.
+
+        Daily, weekly and monthly bars start at midnight in the market's time zone. Weekly bars start on the market's first trading day of the week.
+
+        The bars of each symbol are sorted by timestamp. The order of symbols is not guaranteed. Continue with `next_page_token`.
+      operationId: StockV3Bars
+      parameters:
+        - $ref: '#/components/parameters/stock_v3_historical_feed'
+        - $ref: '#/components/parameters/stock_v3_symbols'
+        - $ref: '#/components/parameters/timeframe'
+        - $ref: '#/components/parameters/stock_v3_start'
+        - $ref: '#/components/parameters/stock_v3_end'
+        - $ref: '#/components/parameters/stock_v3_sort'
+        - $ref: '#/components/parameters/stock_v3_page_size'
+        - $ref: '#/components/parameters/page_token'
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                xlon:
+                  summary: VOD:XLON daily bars on the xlon feed, two per page
+                  value:
+                    bars:
+                      VOD:XLON:
+                        - c: '116.95'
+                          h: '117.506'
+                          l: '115.6'
+                          n: '4274'
+                          o: '116.1'
+                          t: '2026-11-09T00:00:00Z'
+                          v: '41294069'
+                          vw: '116.842699'
+                        - c: '116.6281'
+                          h: '119.05'
+                          l: '114.3'
+                          n: '7210'
+                          o: '117.05'
+                          t: '2026-11-10T00:00:00Z'
+                          v: '98346873'
+                          vw: '116.519345'
+                    next_page_token: MURheXxWT0Q6WExPTnxEfDE3OTQzNTUyMDAwMDAwMDAwMDA=
+              schema:
+                $ref: '#/components/schemas/stock_v3_bars_resp'
+          description: OK
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/ratelimit_limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/ratelimit_remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/ratelimit_reset'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
+      summary: Historical bars
+      tags:
+        - Stock v3
+  /v3/stocks/{feed}/latest/bars:
+    get:
+      description: |
+        The latest bars endpoint provides the latest minute bar for the given symbols.
+
+        Bars are not adjusted after splits or dividends. Symbol mapping is also not supported: in case of a name change the symbol active at the time must be used. Latest bars may include prints that were later corrected or cancelled. Corrections and cancel/error events are not applied.
+      operationId: StockV3LatestBars
+      parameters:
+        - $ref: '#/components/parameters/stock_v3_latest_feed'
+        - $ref: '#/components/parameters/stock_v3_symbols'
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                euroctp:
+                  summary: BMW:XETR on the euroctp feed after the close of 2026-11-13
+                  value:
+                    bars:
+                      BMW:XETR:
+                        c: '57.92'
+                        h: '57.92'
+                        l: '57.92'
+                        n: '1'
+                        o: '57.92'
+                        t: '2026-11-13T21:58:00Z'
+                        v: '87'
+                        vw: '57.92'
+              schema:
+                $ref: '#/components/schemas/stock_v3_latest_bars_resp'
+          description: OK
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/ratelimit_limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/ratelimit_remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/ratelimit_reset'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
+      summary: Latest bars
+      tags:
+        - Stock v3
+  /v3/stocks/{feed}/latest/quotes:
+    get:
+      description: |
+        The latest quotes endpoint provides the latest best bid and ask prices for the given symbols.
+      operationId: StockV3LatestQuotes
+      parameters:
+        - $ref: '#/components/parameters/stock_v3_latest_feed'
+        - $ref: '#/components/parameters/stock_v3_symbols'
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                xlon:
+                  summary: VOD:XLON on the xlon feed after the close of 2026-11-13
+                  value:
+                    quotes:
+                      VOD:XLON:
+                        ap: '120'
+                        as: '55563'
+                        bp: '114.2'
+                        bs: '4000'
+                        t: '2026-11-13T17:30:00.12296Z'
+              schema:
+                $ref: '#/components/schemas/stock_v3_latest_quotes_resp'
+          description: OK
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/ratelimit_limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/ratelimit_remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/ratelimit_reset'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
+      summary: Latest quotes
+      tags:
+        - Stock v3
+  /v3/stocks/{feed}/latest/trades:
+    get:
+      description: |
+        The latest trades endpoint provides the latest trade for the given symbols.
+      operationId: StockV3LatestTrades
+      parameters:
+        - $ref: '#/components/parameters/stock_v3_latest_feed'
+        - $ref: '#/components/parameters/stock_v3_symbols'
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                euroctp:
+                  summary: BMW:XETR on the euroctp feed after the close of 2026-11-13
+                  value:
+                    trades:
+                      BMW:XETR:
+                        m: SINT
+                        p: '57.92'
+                        s: '87'
+                        t: '2026-11-13T21:58:07.933045226Z'
+              schema:
+                $ref: '#/components/schemas/stock_v3_latest_trades_resp'
+          description: OK
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/ratelimit_limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/ratelimit_remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/ratelimit_reset'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
+      summary: Latest trades
+      tags:
+        - Stock v3
+  /v3/stocks/{feed}/quotes:
+    get:
+      description: |
+        The historical quotes API provides quote data for a list of symbols between the specified times.
+
+        The quotes of each symbol are sorted by timestamp. The order of symbols is not guaranteed. Continue with `next_page_token`.
+      operationId: StockV3Quotes
+      parameters:
+        - $ref: '#/components/parameters/stock_v3_historical_feed'
+        - $ref: '#/components/parameters/stock_v3_symbols'
+        - $ref: '#/components/parameters/stock_v3_start'
+        - $ref: '#/components/parameters/stock_v3_end'
+        - $ref: '#/components/parameters/stock_v3_sort'
+        - $ref: '#/components/parameters/stock_v3_page_size'
+        - $ref: '#/components/parameters/page_token'
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                euroctp:
+                  summary: ENI:XMIL best bid and offer on the euroctp feed, three per page
+                  value:
+                    next_page_token: cXVvdGVzfEVOSTpYTUlMfDE3OTQ0OTAyMDMwOTM4NDAwMDB8WFhYWHwyNS42MjV8NTI0fDI1LjYzfDc3Nw==
+                    quotes:
+                      ENI:XMIL:
+                        - ap: '25.63'
+                          as: '777'
+                          bp: '25.62'
+                          bs: '2045'
+                          t: '2026-11-12T13:30:00.52471Z'
+                        - ap: '25.63'
+                          as: '777'
+                          bp: '25.62'
+                          bs: '2033'
+                          t: '2026-11-12T13:30:01.79933Z'
+                        - ap: '25.63'
+                          as: '777'
+                          bp: '25.62'
+                          bs: '4343'
+                          t: '2026-11-12T13:30:02.87255Z'
+              schema:
+                $ref: '#/components/schemas/stock_v3_quotes_resp'
+          description: OK
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/ratelimit_limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/ratelimit_remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/ratelimit_reset'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
+      summary: Historical quotes
+      tags:
+        - Stock v3
+  /v3/stocks/{feed}/snapshots:
+    get:
+      description: |
+        The snapshot endpoint provides the latest trade, latest quote, minute bar, daily bar, and previous daily bar for each requested symbol.
+
+        Bars are not adjusted after splits or dividends. Symbol mapping is also not supported: in case of a name change the symbol active at the time must be used. Trades, bars, and snapshots may include prints that were later corrected or cancelled. Corrections and cancel/error events are not applied.
+      operationId: StockV3Snapshots
+      parameters:
+        - $ref: '#/components/parameters/stock_v3_latest_feed'
+        - $ref: '#/components/parameters/stock_v3_symbols'
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                euroctp:
+                  summary: BMW:XETR on the euroctp feed after the close of 2026-11-13
+                  value:
+                    snapshots:
+                      BMW:XETR:
+                        daily_bar:
+                          c: '57.92'
+                          h: '57.98'
+                          l: '56.7'
+                          n: '12829'
+                          o: '57.08'
+                          t: '2026-11-12T23:00:00Z'
+                          v: '2044549'
+                          vw: '57.541271'
+                        latest_quote:
+                          ap: '59.2'
+                          as: '150'
+                          bp: '55.84'
+                          bs: '300'
+                          t: '2026-11-13T18:48:19.89115Z'
+                        latest_trade:
+                          m: SINT
+                          p: '57.92'
+                          s: '87'
+                          t: '2026-11-13T21:58:07.933045226Z'
+                        minute_bar:
+                          c: '57.92'
+                          h: '57.92'
+                          l: '57.92'
+                          n: '1'
+                          o: '57.92'
+                          t: '2026-11-13T21:58:00Z'
+                          v: '87'
+                          vw: '57.92'
+                        prev_daily_bar:
+                          c: '56.76'
+                          h: '58.8'
+                          l: '56.76'
+                          n: '15403'
+                          o: '58.32'
+                          t: '2026-11-11T23:00:00Z'
+                          v: '4858215'
+                          vw: '57.939011'
+              schema:
+                $ref: '#/components/schemas/stock_v3_snapshots_resp'
+          description: OK
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/ratelimit_limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/ratelimit_remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/ratelimit_reset'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
+      summary: Snapshots
+      tags:
+        - Stock v3
+  /v3/stocks/{feed}/trades:
+    get:
+      description: |
+        The historical trades API provides trade data for a list of symbols between the specified times.
+
+        The trades of each symbol are sorted by timestamp. The order of symbols is not guaranteed. A page can contain one symbol when that symbol fills `page_size`. Continue with `next_page_token`.
+      operationId: StockV3Trades
+      parameters:
+        - $ref: '#/components/parameters/stock_v3_historical_feed'
+        - $ref: '#/components/parameters/stock_v3_symbols'
+        - $ref: '#/components/parameters/stock_v3_start'
+        - $ref: '#/components/parameters/stock_v3_end'
+        - $ref: '#/components/parameters/stock_v3_sort'
+        - $ref: '#/components/parameters/stock_v3_page_size'
+        - $ref: '#/components/parameters/page_token'
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                euroctp:
+                  summary: BMW:XETR trades from several venues on the euroctp feed
+                  value:
+                    next_page_token: dHJhZGVzfEJNVzpYRVRSfDE3OTQ0OTAyNDgxNjYwNDg4MzJ8RVJGUXww
+                    trades:
+                      BMW:XETR:
+                        - m: XGAT
+                          p: '57.14'
+                          s: '400'
+                          t: '2026-11-12T13:30:41.54608138Z'
+                        - m: CEUX
+                          p: '57.14'
+                          s: '10'
+                          t: '2026-11-12T13:30:43.05075Z'
+                        - m: CEUX
+                          p: '57.14'
+                          s: '11'
+                          t: '2026-11-12T13:30:43.05077Z'
+                        - m: TQEX
+                          p: '57.16'
+                          s: '287'
+                          t: '2026-11-12T13:30:44.37277Z'
+                        - m: XETA
+                          p: '57.16'
+                          s: '449'
+                          t: '2026-11-12T13:30:48.16554Z'
+              schema:
+                $ref: '#/components/schemas/stock_v3_trades_resp'
+          description: OK
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/ratelimit_limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/ratelimit_remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/ratelimit_reset'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - apiKey: []
+          apiSecret: []
+        - BasicAuth: []
+      summary: Historical trades
+      tags:
+        - Stock v3
 servers:
   - description: Production
     url: https://data.alpaca.markets
@@ -7324,6 +8154,8 @@ servers:
 tags:
   - description: Endpoints for stocks.
     name: Stock
+  - description: Endpoints for global stocks.
+    name: Stock v3
   - description: Endpoints for option data.
     name: Option
   - description: Endpoints for cryptocurrencies.
@@ -7338,3 +8170,7 @@ tags:
     name: News
   - description: Corporate actions (splits, dividends, etc.).
     name: Corporate actions
+x-readme:
+  explorer-enabled: true
+  proxy-enabled: false
+  apply-tag-changes: true

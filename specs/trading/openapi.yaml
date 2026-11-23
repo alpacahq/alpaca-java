@@ -5026,8 +5026,10 @@ components:
       description: The tokenized asset's issuer
       enum:
         - binance
+        - bitget
         - coinbase
         - ondo
+        - robinhood
         - st0x
         - xstocks
       example: xstocks
@@ -7377,7 +7379,7 @@ paths:
           $ref: '#/components/responses/500'
       summary: Get US Market Clock
       tags:
-        - Clock
+        - Calendar
   /v2/corporate_actions/announcements:
     get:
       deprecated: true
@@ -9257,7 +9259,7 @@ paths:
           $ref: '#/components/responses/500'
       summary: Get Market Clock
       tags:
-        - Clock
+        - Calendar
 security:
   - API_Key: []
     API_Secret: []
@@ -9277,7 +9279,6 @@ tags:
   - name: Account Configurations
   - name: Account Activities
   - name: Calendar
-  - name: Clock
   - name: Crypto Funding
   - description: Request minting of tokenized assets and list tokenization requests on the Instant Tokenization Network (ITN).
     name: Tokenization
@@ -9287,3 +9288,4 @@ tags:
 x-readme:
   explorer-enabled: true
   proxy-enabled: false
+  apply-tag-changes: true

@@ -254,7 +254,7 @@ public class TradeUpdateEventV2 implements Serializable {
   }
 
   /**
-   * Only present when event is for &#x60;MultilegOptions&#x60;. Represents filled qty/price of legs. 
+   * Only present when event is for &#x60;MultilegOptions&#x60;. Represents filled qty/price and commission of legs. 
    * @return legs
    */
   @javax.annotation.Nullable

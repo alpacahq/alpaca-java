@@ -128,7 +128,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -240,7 +240,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -269,7 +269,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -300,7 +300,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -336,7 +336,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -465,7 +465,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -499,7 +499,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -535,7 +535,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -561,7 +561,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -643,7 +643,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -667,7 +667,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -693,7 +693,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -719,7 +719,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -801,7 +801,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -825,7 +825,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -851,7 +851,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -876,7 +876,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -950,7 +950,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -973,7 +973,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -998,7 +998,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -1022,7 +1022,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -1089,7 +1089,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -1111,7 +1111,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -1135,7 +1135,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -1164,7 +1164,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -1261,7 +1261,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -1288,7 +1288,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -1317,7 +1317,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -1347,7 +1347,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -1449,7 +1449,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -1477,7 +1477,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
@@ -1507,7 +1507,7 @@ public class OptionApi {
         <tr><td> 200 </td><td> OK </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 400 </td><td> One of the request parameters is invalid. See the returned message for details.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 401 </td><td> Authentication headers are missing or invalid. Make sure you authenticate your request with a valid API key.  </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> The requested resource is forbidden.  </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> The requested resource is forbidden, for example because the subscription does not cover the requested data.  </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> Too many requests. You hit the rate limit. Use the X-RateLimit-... response headers to make sure you&#39;re under the rate limit.  </td><td>  * X-RateLimit-Limit -  <br>  * X-RateLimit-Remaining -  <br>  * X-RateLimit-Reset -  <br>  </td></tr>
         <tr><td> 500 </td><td> Internal server error. We recommend retrying these later. If the issue persists, please contact us on [Slack](https://alpaca.markets/slack) or on the [Community Forum](https://forum.alpaca.markets/).  </td><td>  -  </td></tr>
      </table>
