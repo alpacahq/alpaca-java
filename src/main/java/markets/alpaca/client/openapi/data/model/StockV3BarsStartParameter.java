@@ -102,7 +102,7 @@ public class StockV3BarsStartParameter extends AbstractOpenApiSchema implements 
                     // deserialize OffsetDateTime
                     try {
                         // validate the JSON object to see if any exception is thrown
-                        OffsetDateTime.validateJsonElement(jsonElement);
+                        OffsetDateTime.parse(jsonElement.getAsString());
                         actualAdapter = adapterOffsetDateTime;
                         StockV3BarsStartParameter ret = new StockV3BarsStartParameter();
                         ret.setActualInstance(actualAdapter.fromJsonTree(jsonElement));
@@ -115,7 +115,7 @@ public class StockV3BarsStartParameter extends AbstractOpenApiSchema implements 
                     // deserialize LocalDate
                     try {
                         // validate the JSON object to see if any exception is thrown
-                        LocalDate.validateJsonElement(jsonElement);
+                        LocalDate.parse(jsonElement.getAsString());
                         actualAdapter = adapterLocalDate;
                         StockV3BarsStartParameter ret = new StockV3BarsStartParameter();
                         ret.setActualInstance(actualAdapter.fromJsonTree(jsonElement));
@@ -200,6 +200,25 @@ public class StockV3BarsStartParameter extends AbstractOpenApiSchema implements 
     }
 
     /**
+     * Query parameters are rendered with {@code toString()}. Date values must use the same
+     * JSON date adapter as a bare {@code OffsetDateTime} or {@code LocalDate} parameter.
+     */
+    @Override
+    public String toString() {
+        Object actual = getActualInstance();
+        if (actual instanceof java.time.OffsetDateTime
+            || actual instanceof java.time.LocalDate
+            || actual instanceof java.time.LocalDateTime) {
+            String json = JSON.serialize(actual);
+            if (json.length() >= 2 && json.charAt(0) == '"' && json.charAt(json.length() - 1) == '"') {
+                return json.substring(1, json.length() - 1);
+            }
+            return json;
+        }
+        return actual == null ? "null" : actual.toString();
+    }
+
+    /**
      * Get the actual instance of `LocalDate`. If the actual instance is not `LocalDate`,
      * the ClassCastException will be thrown.
      *
@@ -221,7 +240,7 @@ public class StockV3BarsStartParameter extends AbstractOpenApiSchema implements 
         ArrayList<String> errorMessages = new ArrayList<>();
         // validate the json string with OffsetDateTime
         try {
-            OffsetDateTime.validateJsonElement(jsonElement);
+            OffsetDateTime.parse(jsonElement.getAsString());
             return;
         } catch (Exception e) {
             errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for OffsetDateTime failed with `%s`.", e.getMessage()));
@@ -229,7 +248,7 @@ public class StockV3BarsStartParameter extends AbstractOpenApiSchema implements 
         }
         // validate the json string with LocalDate
         try {
-            LocalDate.validateJsonElement(jsonElement);
+            LocalDate.parse(jsonElement.getAsString());
             return;
         } catch (Exception e) {
             errorMessages.add(String.format(java.util.Locale.ROOT, "Deserialization for LocalDate failed with `%s`.", e.getMessage()));
