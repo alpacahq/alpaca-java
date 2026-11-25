@@ -25,86 +25,468 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * An Enum of the various kinds of Tax ID formats Alpaca supports.  Possible Values are:   - **USA_SSN** USA Social Security Number  - **USA_ITIN** USA Individual Taxpayer Identification Number  - **ARG_AR_CUIT** Argentina CUIT  - **AUS_TFN** Australian Tax File Number  - **AUS_ABN** Australian Business Number  - **BOL_NIT** Bolivia NIT  - **BRA_CPF** Brazil CPF  - **CHL_RUT** Chile RUT  - **COL_NIT** Colombia NIT  - **CRI_NITE** Costa Rica NITE  - **DEU_TAX_ID** Germany Tax ID (Identifikationsnummer)  - **DOM_RNC** Dominican Republic RNC  - **ECU_RUC** Ecuador RUC  - **FRA_SPI** France SPI (Reference Tax Number)  - **GBR_UTR** UK UTR (Unique Taxpayer Reference)  - **GBR_NINO** UK NINO (National Insurance Number)  - **GTM_NIT** Guatemala NIT  - **HND_RTN** Honduras RTN  - **HUN_TIN** Hungary TIN Number  - **IDN_KTP** Indonesia KTP  - **IND_PAN** India PAN Number  - **ISR_TAX_ID** Israel Tax ID (Teudat Zehut)  - **ITA_TAX_ID** Italy Tax ID (Codice Fiscale)  - **JPN_TAX_ID** Japan Tax ID (Kojin Bango)  - **MEX_RFC** Mexico RFC  - **NIC_RUC** Nicaragua RUC  - **NLD_TIN** Netherlands TIN Number  - **PAN_RUC** Panama RUC  - **PER_RUC** Peru RUC  - **PRY_RUC** Paraguay RUC  - **SGP_NRIC** Singapore NRIC  - **SGP_FIN** Singapore FIN  - **SGP_ASGD** Singapore ASGD  - **SGP_ITR** Singapore ITR  - **SLV_NIT** El Salvador NIT  - **SWE_TAX_ID** Sweden Tax ID (Personnummer)  - **URY_RUT** Uruguay RUT  - **VEN_RIF** Venezuela RIF  - **NATIONAL_ID** National ID number, if a tax ID number is not available  - **PASSPORT** Passport number, if a tax ID number is not available  - **PERMANENT_RESIDENT** Permanent resident number, if a tax ID number is not available  - **DRIVER_LICENSE** Driver&#39;s license number, if a tax ID number is not available  - **OTHER_GOV_ID** Other government issued identifier, if a tax ID number is not available  - **NOT_SPECIFIED** Other Tax IDs
+ * The type of the tax ID or other government-issued identification number.  Each country-specific type is meant for accounts whose &#x60;country_of_tax_residence&#x60; is the country it is named after, and some are also meant for that country&#39;s associated jurisdictions, such as its territories. For correspondents with strict tax ID validation, the type must match &#x60;country_of_tax_residence&#x60; and be supported in the account&#39;s booking center, so a listed type can still be rejected when the account is validated. The \&quot;for individuals\&quot; and \&quot;for entities\&quot; notes describe who each type is typically issued to, and aren&#39;t checked when the account is validated.  Possible values are:  - **USA_SSN**: USA SSN (Social Security Number), for individuals - **USA_EIN**: USA EIN (Employer Identification Number), for entities - **USA_ITIN**: USA ITIN (Individual Taxpayer Identification Number), for individuals - **USA_TIN**: USA TIN (Taxpayer Identification Number), for entities - **ABW_PN**: Aruba Persoonsnummer (Aruba TIN), for individuals and entities - **AGO_NIF**: Angola NIF (Número de Identificação Fiscal), for individuals and entities - **ALB_NIPT**: Albania NIPT (Numri i Identifikimit të Personit të Tatueshëm), for individuals and entities - **AND_NRT**: Andorra NRT (Número de Registre Tributari), for individuals and entities - **ARE_EID**: UAE Emirates ID, for individuals - **ARE_TRN**: UAE TRN (Tax Registration Number), for entities - **ARG_AG_CUIT**: Legacy value for an Argentina CUIT. Use &#x60;ARG_AR_CUIT&#x60; instead. - **ARG_AR_CUIT**: Argentina CUIT (Clave Única de Identificación Tributaria), for individuals and entities - **ARM_SSN**: Armenia SSN (Social Security Number), for individuals - **ARM_TIN**: Armenia TIN (Tax Identification Number), for entities - **AUS_ABN**: Australia ABN (Australian business number), for entities - **AUS_TFN**: Australia TFN (Tax File Number), for individuals and entities - **AUT_UID**: Austria UID-Nummer (VAT Identification Number), for entities - **AUT_VNR**: Austria Versicherungsnummer (Social Insurance Number), for individuals - **AZE_FIN**: Azerbaijan FIN (Fərdi İdentifikasiya Nömrəsi), for individuals - **AZE_VOEN**: Azerbaijan VÖEN (Tax Identification Number), for entities - **BEL_BCE**: Belgium BCE/KBO (Enterprise Number), for entities - **BEL_NN**: Belgium NN (Numéro National / Rijksregisternummer), for individuals - **BEN_IFU**: Benin IFU (Identifiant Fiscal Unique), for individuals and entities - **BFA_IFU**: Burkina Faso IFU (Identifiant Financier Unique), for individuals and entities - **BGD_TIN**: Bangladesh TIN (Tax Identification Number), for individuals and entities - **BGR_EGN**: Bulgaria EGN (Edinen Grazhdanski Nomer), for individuals - **BGR_EIK**: Bulgaria EIK/BULSTAT (Entity Identification Code), for entities - **BHR_CPR**: Bahrain CPR (Central Population Registry), for individuals - **BIH_JMBG**: Bosnia and Herzegovina JMBG (Jedinstveni Matični Broj Građana), for individuals - **BLR_ID**: Belarus Personal Identification Number, for individuals - **BLR_UNP**: Belarus UNP (Uchyotny Nomer Platelshchika), for entities - **BLZ_TIN**: Belize TIN (Tax Identification Number), for individuals and entities - **BOL_NIT**: Bolivia NIT (Número de Identificación Tributaria), for individuals and entities - **BRA_CNPJ**: Brazil CNPJ (Cadastro Nacional da Pessoa Jurídica), for entities - **BRA_CPF**: Brazil CPF (Cadastro de Pessoas Físicas), for individuals - **BRB_TIN**: Barbados TIN (Tax Identification Number), for individuals and entities - **BTN_TPN**: Bhutan TPN (Taxpayer Number), for individuals and entities - **BWA_TIN**: Botswana TIN (Tax Identification Number), for individuals and entities - **CAN_BN**: Canada BN (Business Number), for entities - **CAN_SIN**: Canada SIN (Social Insurance Number), for individuals - **CHE_AHV**: Switzerland AHV/AVS (Social Insurance Number), for individuals - **CHE_UID**: Switzerland UID (Unternehmens-Identifikationsnummer), for entities - **CHL_RUT**: Chile RUT (Rol Único Tributario), for individuals and entities - **CHN_RID**: China Resident Identity Card Number (居民身份证号码), for individuals - **CHN_USCC**: China USCC (Unified Social Credit Code / 统一社会信用代码), for entities - **CIV_NCC**: Côte d&#39;Ivoire NCC (Numéro de Compte Contribuable), for individuals and entities - **CMR_NIU**: Cameroon NIU (Numéro d&#39;Identifiant Unique), for individuals and entities - **COK_RMD**: Cook Islands RMD Number (Revenue Management Division), for individuals and entities - **COL_CC**: Colombia CC (Cédula de Ciudadanía), for individuals - **COL_CE**: Colombia CE (Cédula de Extranjería), for individuals - **COL_NIT**: Colombia NIT (Número de Identificación Tributaria), for individuals and entities - **COL_NUIP**: Colombia NUIP (Número Único de Identificación Personal), for individuals - **COL_PPT**: Colombia PPT (Permiso por Protección Temporal), for individuals - **CPV_NIF**: Cabo Verde NIF (Número de Identificação Fiscal), for individuals and entities - **CRI_CJ**: Costa Rica Cédula Jurídica (Legal Entity ID), for entities - **CRI_DIMEX**: Costa Rica DIMEX (Documento de Identificación Migratorio para Extranjeros), for individuals - **CRI_NITE**: Costa Rica NITE (Número de Identificación Tributaria Especial), for individuals and entities - **CRI_PIN**: Costa Rica Personal Identification Number (PIN), for individuals - **CUW_CRIB**: Curaçao CRIB (Centraal Registratie Informatie Belastingplichtige), for individuals and entities - **CYP_TIC**: Cyprus TIC (Tax Identification Code), for individuals and entities - **CZE_TIN**: Czech Republic TIN (Tax Identification Number), for individuals and entities - **DEU_TAX_ID**: Germany Tax ID (Identifikationsnummer), for individuals - **DEU_UST_ID**: Germany USt-IdNr (Umsatzsteuer-Identifikationsnummer), for entities - **DNK_CPR**: Denmark CPR-nummer (Det Centrale Personregister), for individuals - **DNK_CVR**: Denmark CVR-nummer (Det Centrale Virksomhedsregister), for entities - **DOM_CED**: Dominican Republic Cédula de Identidad y Electoral, for individuals - **DOM_RNC**: Dominican Republic RNC (Registro Nacional del Contribuyente), for entities - **DZA_NIF**: Algeria NIF (Numéro d&#39;Identification Fiscale), for individuals and entities - **ECU_RUC**: Ecuador RUC (Registro Unico de Contribuyentes), for individuals and entities - **EGY_NID**: Egypt National ID Number, for individuals - **EGY_TRN**: Egypt Tax Registration Number, for entities - **ESP_DNI**: Spain DNI (Documento Nacional de Identidad), for individuals - **ESP_NIE**: Spain NIE (Número de Identidad de Extranjero), for individuals - **ESP_NIF**: Spain NIF (Número de Identificación Fiscal), for individuals and entities - **EST_IK**: Estonia Isikukood (Personal Identification Code), for individuals - **EST_RC**: Estonia Registrikood (Registry Code), for entities - **ETH_TIN**: Ethiopia TIN (Tax Identification Number), for individuals and entities - **FIN_HETU**: Finland HETU (Henkilötunnus), for individuals - **FIN_YTU**: Finland Y-tunnus (Business ID), for entities - **FJI_TIN**: Fiji TIN (Tax Identification Number), for individuals and entities - **FRA_SIREN**: France SIREN (Business tax ID), for entities - **FRA_SPI**: France SPI (Reference tax number), for individuals - **GAB_NIF**: Gabon NIF (Numéro d&#39;Identification Fiscale), for individuals and entities - **GBR_CRN**: UK CRN (Companies House Registration Number), for entities - **GBR_NINO**: UK NINO (National Insurance Number), for individuals - **GBR_UTR**: UK UTR (Unique Taxpayer Reference), for individuals and entities - **GEO_PID**: Georgia Personal Identification Number, for individuals - **GEO_TIN**: Georgia TIN (Tax Identification Number), for entities - **GHA_TIN**: Ghana TIN (Tax Identification Number), for individuals and entities - **GRC_AFM**: Greece AFM (Arithmos Forologikou Mitroou), for individuals and entities - **GTM_NIT**: Guatemala NIT (Número de Identificación Tributaria), for individuals and entities - **HKG_BRN**: Hong Kong BRN (Business Registration Number), for entities - **HKG_HKID**: Hong Kong HKID (Hong Kong Identity Card), for individuals - **HND_RTN**: Honduras RTN (Registro Tributario Nacional), for individuals and entities - **HRV_OIB**: Croatia OIB (Osobni Identifikacijski Broj), for individuals - **HTI_NIF**: Haiti NIF (Numéro d&#39;Identification Fiscale), for individuals and entities - **HUN_ENT**: Hungary Adószám (Entity Tax Number), for entities - **HUN_TIN**: Hungary TIN (Tax Identification Number), for individuals - **IDN_KTP**: Indonesia KTP (Indonesian Identity Card), for individuals - **IDN_NWPW**: Indonesia NPWP (Nomor Pokok Wajib Pajak), for individuals and entities. The code is spelled &#x60;IDN_NWPW&#x60;, not &#x60;IDN_NPWP&#x60;. - **IND_GSTIN**: India GSTIN (Goods and Services Tax Identification Number), for entities - **IND_PAN**: India PAN (Permanent Account Number), for individuals - **IRL_CRO**: Ireland CRO (Companies Registration Office Number), for entities - **IRL_PPS**: Ireland PPS (Personal Public Service Number), for individuals - **IRN_NID**: Iran National ID (Kode Melli), for individuals - **ISL_KT**: Iceland Kennitala (National Identification Number), for individuals - **ISR_CORP**: Israel Company Number (Mispar Chevra), for entities - **ISR_TAX_ID**: Israel Tax ID (Teudat Zehut), for individuals - **ITA_PIVA**: Italy Partita IVA (VAT Number), for entities - **ITA_TAX_ID**: Italy Tax ID (Codice fiscale), for individuals - **JAM_TRN**: Jamaica TRN (Taxpayer Registration Number), for individuals and entities - **JOR_NID**: Jordan National ID Number, for individuals - **JPN_CORP**: Japan Corporate Number (法人番号), for entities - **JPN_TAX_ID**: Japan Tax ID (kojin bango), for individuals - **KAZ_BIN**: Kazakhstan BIN (Business Identification Number), for entities - **KAZ_IIN**: Kazakhstan IIN (Individual Identification Number), for individuals - **KEN_KRA_PIN**: Kenya KRA PIN (Kenya Revenue Authority PIN), for individuals and entities - **KGZ_INN**: Kyrgyzstan INN (Individual Tax Number), for individuals - **KHM_NID**: Cambodia National ID Number, for individuals - **KOR_BRN**: South Korea BRN (Business Registration Number), for entities - **KOR_RRN**: South Korea RRN (Resident Registration Number), for individuals - **KWT_CID**: Kuwait Civil ID Number, for individuals - **LBN_TIN**: Lebanon TIN (Tax Identification Number), for individuals and entities - **LKA_NIC**: Sri Lanka NIC (National Identity Card), for individuals - **LKA_TIN**: Sri Lanka TIN (Tax Identification Number), for entities - **LTU_AK**: Lithuania Asmens Kodas (Personal Code), for individuals - **LTU_JAK**: Lithuania Juridinio Asmens Kodas (Legal Entity Code), for entities - **LUX_NIN**: Luxembourg Matricule (National Identification Number), for individuals - **LUX_TVA**: Luxembourg Numéro TVA (VAT Number), for entities - **LVA_PK**: Latvia Personas Kods (Personal Code), for individuals - **LVA_REG**: Latvia Reģistrācijas Numurs (Registration Number), for entities - **MAC_TIN**: Macao Taxpayer Number, for individuals and entities - **MAR_CIN**: Morocco CIN (Carte d&#39;Identité Nationale), for individuals - **MAR_ICE**: Morocco ICE (Identifiant Commun de l&#39;Entreprise), for entities - **MDA_IDNO**: Moldova IDNO (State Identification Number of Entity), for entities - **MDA_IDNP**: Moldova IDNP (Personal Identification Number), for individuals - **MEX_CURP**: Mexico CURP (Clave Única de Registro de Población), for individuals - **MEX_RFC**: Mexico RFC (Registro Federal de Contribuyentes), for individuals and entities - **MKD_EDB**: North Macedonia EDB (Unique Tax Number), for entities - **MKD_EMBG**: North Macedonia EMBG (Unique Master Citizen Number), for individuals - **MLI_NIF**: Mali NIF (Numéro d&#39;Identification Fiscale), for individuals and entities - **MLT_ID**: Malta Identity Card Number, for individuals - **MLT_VAT**: Malta VAT Number, for entities - **MNE_JMBG**: Montenegro Unique Master Citizen Number, for individuals - **MNE_PIB**: Montenegro PIB (Tax Identification Number), for entities - **MNG_RD**: Mongolia Register Number, for individuals - **MOZ_NUIT**: Mozambique NUIT (Tax Identification Number), for individuals and entities - **MUS_NID**: Mauritius National Identity Card Number, for individuals - **MUS_TAN_ENT**: Mauritius TAN (Entity Tax Account Number), for entities - **MUS_TAN_IND**: Mauritius TAN (Individual Tax Account Number), for individuals - **MWI_TPIN**: Malawi TPIN (Taxpayer Identification Number), for individuals and entities - **MYS_MYKAD**: Malaysia MyKad (National Registration Identity Card), for individuals - **MYS_ROC**: Malaysia ROC (Companies Commission Registration Number), for entities - **NAM_TIN**: Namibia TIN (Tax Identification Number), for individuals and entities - **NGA_NIN**: Nigeria NIN (National Identification Number), for individuals - **NGA_TIN**: Nigeria TIN (Tax Identification Number), for entities - **NIC_RUC**: Nicaragua RUC (Registro Unico de Contribuyentes), for individuals and entities - **NLD_BTW**: Netherlands Btw-identificatienummer (btw-id), for entities - **NLD_KVK**: Netherlands KVK (Kamer van Koophandel), for entities - **NLD_OBN**: Netherlands Omzetbelastingnummer (ob-nummer), for entities - **NLD_TIN**: Netherlands BSN (Burgerservicenummer), for individuals - **NOR_FNR**: Norway Fødselsnummer (National Identity Number), for individuals - **NOR_ORG**: Norway Organisasjonsnummer (Organisation Number), for entities - **NPL_PAN**: Nepal PAN (Permanent Account Number), for individuals and entities - **NZL_IRD**: New Zealand IRD Number (Inland Revenue Department), for individuals and entities - **NZL_NZBN**: New Zealand NZBN (New Zealand Business Number), for entities - **OMN_CID**: Oman Civil ID Number, for individuals - **PAK_NIC**: Pakistan NIC (National Identity Card), for individuals - **PAK_NTN**: Pakistan NTN (National Tax Number), for individuals and entities - **PAN_RUC**: Panama RUC (Registro Unico de Contribuyentes), for individuals and entities - **PER_RUC**: Peru RUC (Registro Unico de Contribuyentes), for individuals and entities - **PHL_TIN**: Philippines TIN (Tax Identification Number), for individuals and entities - **POL_NIP**: Poland NIP (Numer Identyfikacji Podatkowej), for entities - **POL_PESEL**: Poland PESEL (Polish National Identification Number), for individuals - **PRT_NIF**: Portugal NIF (Número de Identificação Fiscal), for individuals and entities - **PRY_RUC**: Paraguay RUC (Registro Unico de Contribuyentes), for individuals and entities - **QAT_QID**: Qatar QID (Qatar Identity Number), for individuals - **ROU_CNP**: Romania CNP (Cod Numeric Personal), for individuals - **ROU_CUI**: Romania CUI (Cod Unic de Înregistrare), for entities - **RUS_INN_ENT**: Russia INN (Entity Tax Number), for entities - **RUS_INN_IND**: Russia INN (Individual Tax Number), for individuals - **RWA_TIN**: Rwanda TIN (Tax Identification Number), for individuals and entities - **SAU_TIN**: Saudi Arabia TIN (Tax Identification Number), for individuals and entities - **SAU_VAT**: Saudi Arabia VAT Registration Number, for entities - **SEN_NINEA**: Senegal NINEA (Numéro d&#39;Identification Nationale des Entreprises), for entities - **SGP_ASGD**: Singapore ASGD, for individuals - **SGP_FIN**: Singapore FIN, for individuals - **SGP_ITR**: Singapore ITR, for individuals and entities - **SGP_NRIC**: Singapore NRIC, for individuals - **SGP_UEN**: Singapore UEN (Unique Entity Number), for entities - **SLV_NIT**: El Salvador NIT (Número de Identificación Tributaria), for individuals and entities - **SRB_JMBG**: Serbia JMBG (Unique Master Citizen Number), for individuals - **SRB_PIB**: Serbia PIB (Tax Identification Number), for entities - **SVK_ICO**: Slovakia IČO (Identification Number of Organisation), for entities - **SVK_TIN**: Slovakia TIN (Tax Identification Number), for individuals - **SVN_DAS**: Slovenia Davčna Številka (Tax Number), for individuals and entities - **SVN_MS**: Slovenia Matična Številka (Registration Number), for entities - **SWE_ORG**: Sweden Organisationsnummer (Organisation Number), for entities - **SWE_TAX_ID**: Sweden Tax ID (Personnummer), for individuals - **SWZ_TIN**: Eswatini TIN (Tax Identification Number), for individuals and entities - **SXM_CRIB**: Sint Maarten CRIB (Centraal Registratie Informatie Belastingplichtige), for individuals and entities - **SYR_TIN**: Syria TIN (Tax Identification Number), for individuals and entities - **THA_NID**: Thailand National ID Card Number (เลขประจำตัวประชาชน), for individuals - **THA_TIN**: Thailand Tax ID (เลขประจำตัวผู้เสียภาษี), for entities - **TJK_TIN**: Tajikistan TIN (Tax Identification Number), for individuals and entities - **TTO_BIR**: Trinidad and Tobago BIR (Board of Inland Revenue File Number), for individuals and entities - **TUN_CIN**: Tunisia CIN (Carte d&#39;Identité Nationale), for individuals - **TUN_MF**: Tunisia Matricule Fiscal (Tax Identification Number), for entities - **TUR_TIN**: Turkey TIN (Tax Identification Number), for individuals and entities - **TWN_GUI**: Taiwan GUI (Unified Business Number / 統一編號), for entities - **TWN_NID**: Taiwan National ID Number (身分證字號), for individuals - **TZA_TIN**: Tanzania TIN (Tax Identification Number), for individuals and entities - **UGA_TIN**: Uganda TIN (Tax Identification Number), for individuals and entities - **UKR_EDRPOU**: Ukraine EDRPOU (Entity Identification Code), for entities - **UKR_RNTRC**: Ukraine RNTRC (Individual Tax Number), for individuals - **URY_CI**: Uruguay CI (Cédula de Identidad), for individuals - **URY_RUT**: Uruguay RUT (Rol Único Tributario), for entities - **UZB_INN**: Uzbekistan INN (Entity Tax Number), for entities - **UZB_PINFL**: Uzbekistan PINFL (Personal Identification Number), for individuals - **VEN_RIF**: Venezuela RIF (Registro de Información Fiscal), for individuals and entities - **VNM_MST_BRN**: Vietnam MST Branch (Mã số thuế đơn vị phụ thuộc), for entities - **VNM_MST_CORP**: Vietnam MST Enterprise (Mã số thuế doanh nghiệp), for individuals and entities - **VNM_MST_PIN**: Vietnam PIN (Personal identification number / Số định danh cá nhân), for individuals - **WSM_TIN**: Samoa TIN (Tax Identification Number), for individuals and entities - **XXK_PID**: Kosovo Personal Identification Number, for individuals - **ZAF_CRN**: South Africa Company Registration Number, for entities - **ZAF_ID**: South African ID Number, for individuals - **ZMB_TPIN**: Zambia TPIN (Taxpayer Identification Number), for individuals and entities - **ZWE_TIN**: Zimbabwe TIN (Tax Identification Number), for individuals and entities - **NATIONAL_ID**: National ID number, if a tax ID number is not available - **PASSPORT**: Passport number, if a tax ID number is not available - **PERMANENT_RESIDENT**: Permanent resident number, if a tax ID number is not available - **DRIVER_LICENSE**: Driver&#39;s license number, if a tax ID number is not available - **OTHER_GOV_ID**: Other government issued identifier, if a tax ID number is not available - **NOT_SPECIFIED**: Other Tax IDs
  */
 @JsonAdapter(TaxIdType.Adapter.class)
 public enum TaxIdType implements Serializable {
   
   USA_SSN("USA_SSN"),
   
+  USA_EIN("USA_EIN"),
+  
   USA_ITIN("USA_ITIN"),
+  
+  USA_TIN("USA_TIN"),
+  
+  ABW_PN("ABW_PN"),
+  
+  AGO_NIF("AGO_NIF"),
+  
+  ALB_NIPT("ALB_NIPT"),
+  
+  AND_NRT("AND_NRT"),
+  
+  ARE_EID("ARE_EID"),
+  
+  ARE_TRN("ARE_TRN"),
   
   ARG_AG_CUIT("ARG_AG_CUIT"),
   
-  AUS_TFN("AUS_TFN"),
+  ARG_AR_CUIT("ARG_AR_CUIT"),
+  
+  ARM_SSN("ARM_SSN"),
+  
+  ARM_TIN("ARM_TIN"),
   
   AUS_ABN("AUS_ABN"),
   
+  AUS_TFN("AUS_TFN"),
+  
+  AUT_UID("AUT_UID"),
+  
+  AUT_VNR("AUT_VNR"),
+  
+  AZE_FIN("AZE_FIN"),
+  
+  AZE_VOEN("AZE_VOEN"),
+  
+  BEL_BCE("BEL_BCE"),
+  
+  BEL_NN("BEL_NN"),
+  
+  BEN_IFU("BEN_IFU"),
+  
+  BFA_IFU("BFA_IFU"),
+  
+  BGD_TIN("BGD_TIN"),
+  
+  BGR_EGN("BGR_EGN"),
+  
+  BGR_EIK("BGR_EIK"),
+  
+  BHR_CPR("BHR_CPR"),
+  
+  BIH_JMBG("BIH_JMBG"),
+  
+  BLR_ID("BLR_ID"),
+  
+  BLR_UNP("BLR_UNP"),
+  
+  BLZ_TIN("BLZ_TIN"),
+  
   BOL_NIT("BOL_NIT"),
+  
+  BRA_CNPJ("BRA_CNPJ"),
   
   BRA_CPF("BRA_CPF"),
   
+  BRB_TIN("BRB_TIN"),
+  
+  BTN_TPN("BTN_TPN"),
+  
+  BWA_TIN("BWA_TIN"),
+  
+  CAN_BN("CAN_BN"),
+  
+  CAN_SIN("CAN_SIN"),
+  
+  CHE_AHV("CHE_AHV"),
+  
+  CHE_UID("CHE_UID"),
+  
   CHL_RUT("CHL_RUT"),
+  
+  CHN_RID("CHN_RID"),
+  
+  CHN_USCC("CHN_USCC"),
+  
+  CIV_NCC("CIV_NCC"),
+  
+  CMR_NIU("CMR_NIU"),
+  
+  COK_RMD("COK_RMD"),
+  
+  COL_CC("COL_CC"),
+  
+  COL_CE("COL_CE"),
   
   COL_NIT("COL_NIT"),
   
+  COL_NUIP("COL_NUIP"),
+  
+  COL_PPT("COL_PPT"),
+  
+  CPV_NIF("CPV_NIF"),
+  
+  CRI_CJ("CRI_CJ"),
+  
+  CRI_DIMEX("CRI_DIMEX"),
+  
   CRI_NITE("CRI_NITE"),
+  
+  CRI_PIN("CRI_PIN"),
+  
+  CUW_CRIB("CUW_CRIB"),
+  
+  CYP_TIC("CYP_TIC"),
+  
+  CZE_TIN("CZE_TIN"),
   
   DEU_TAX_ID("DEU_TAX_ID"),
   
+  DEU_UST_ID("DEU_UST_ID"),
+  
+  DNK_CPR("DNK_CPR"),
+  
+  DNK_CVR("DNK_CVR"),
+  
+  DOM_CED("DOM_CED"),
+  
   DOM_RNC("DOM_RNC"),
+  
+  DZA_NIF("DZA_NIF"),
   
   ECU_RUC("ECU_RUC"),
   
+  EGY_NID("EGY_NID"),
+  
+  EGY_TRN("EGY_TRN"),
+  
+  ESP_DNI("ESP_DNI"),
+  
+  ESP_NIE("ESP_NIE"),
+  
+  ESP_NIF("ESP_NIF"),
+  
+  EST_IK("EST_IK"),
+  
+  EST_RC("EST_RC"),
+  
+  ETH_TIN("ETH_TIN"),
+  
+  FIN_HETU("FIN_HETU"),
+  
+  FIN_YTU("FIN_YTU"),
+  
+  FJI_TIN("FJI_TIN"),
+  
+  FRA_SIREN("FRA_SIREN"),
+  
   FRA_SPI("FRA_SPI"),
   
-  GBR_UTR("GBR_UTR"),
+  GAB_NIF("GAB_NIF"),
+  
+  GBR_CRN("GBR_CRN"),
   
   GBR_NINO("GBR_NINO"),
   
+  GBR_UTR("GBR_UTR"),
+  
+  GEO_PID("GEO_PID"),
+  
+  GEO_TIN("GEO_TIN"),
+  
+  GHA_TIN("GHA_TIN"),
+  
+  GRC_AFM("GRC_AFM"),
+  
   GTM_NIT("GTM_NIT"),
   
+  HKG_BRN("HKG_BRN"),
+  
+  HKG_HKID("HKG_HKID"),
+  
   HND_RTN("HND_RTN"),
+  
+  HRV_OIB("HRV_OIB"),
+  
+  HTI_NIF("HTI_NIF"),
+  
+  HUN_ENT("HUN_ENT"),
   
   HUN_TIN("HUN_TIN"),
   
   IDN_KTP("IDN_KTP"),
   
+  IDN_NWPW("IDN_NWPW"),
+  
+  IND_GSTIN("IND_GSTIN"),
+  
   IND_PAN("IND_PAN"),
+  
+  IRL_CRO("IRL_CRO"),
+  
+  IRL_PPS("IRL_PPS"),
+  
+  IRN_NID("IRN_NID"),
+  
+  ISL_KT("ISL_KT"),
+  
+  ISR_CORP("ISR_CORP"),
   
   ISR_TAX_ID("ISR_TAX_ID"),
   
+  ITA_PIVA("ITA_PIVA"),
+  
   ITA_TAX_ID("ITA_TAX_ID"),
+  
+  JAM_TRN("JAM_TRN"),
+  
+  JOR_NID("JOR_NID"),
+  
+  JPN_CORP("JPN_CORP"),
   
   JPN_TAX_ID("JPN_TAX_ID"),
   
+  KAZ_BIN("KAZ_BIN"),
+  
+  KAZ_IIN("KAZ_IIN"),
+  
+  KEN_KRA_PIN("KEN_KRA_PIN"),
+  
+  KGZ_INN("KGZ_INN"),
+  
+  KHM_NID("KHM_NID"),
+  
+  KOR_BRN("KOR_BRN"),
+  
+  KOR_RRN("KOR_RRN"),
+  
+  KWT_CID("KWT_CID"),
+  
+  LBN_TIN("LBN_TIN"),
+  
+  LKA_NIC("LKA_NIC"),
+  
+  LKA_TIN("LKA_TIN"),
+  
+  LTU_AK("LTU_AK"),
+  
+  LTU_JAK("LTU_JAK"),
+  
+  LUX_NIN("LUX_NIN"),
+  
+  LUX_TVA("LUX_TVA"),
+  
+  LVA_PK("LVA_PK"),
+  
+  LVA_REG("LVA_REG"),
+  
+  MAC_TIN("MAC_TIN"),
+  
+  MAR_CIN("MAR_CIN"),
+  
+  MAR_ICE("MAR_ICE"),
+  
+  MDA_IDNO("MDA_IDNO"),
+  
+  MDA_IDNP("MDA_IDNP"),
+  
+  MEX_CURP("MEX_CURP"),
+  
   MEX_RFC("MEX_RFC"),
+  
+  MKD_EDB("MKD_EDB"),
+  
+  MKD_EMBG("MKD_EMBG"),
+  
+  MLI_NIF("MLI_NIF"),
+  
+  MLT_ID("MLT_ID"),
+  
+  MLT_VAT("MLT_VAT"),
+  
+  MNE_JMBG("MNE_JMBG"),
+  
+  MNE_PIB("MNE_PIB"),
+  
+  MNG_RD("MNG_RD"),
+  
+  MOZ_NUIT("MOZ_NUIT"),
+  
+  MUS_NID("MUS_NID"),
+  
+  MUS_TAN_ENT("MUS_TAN_ENT"),
+  
+  MUS_TAN_IND("MUS_TAN_IND"),
+  
+  MWI_TPIN("MWI_TPIN"),
+  
+  MYS_MYKAD("MYS_MYKAD"),
+  
+  MYS_ROC("MYS_ROC"),
+  
+  NAM_TIN("NAM_TIN"),
+  
+  NGA_NIN("NGA_NIN"),
+  
+  NGA_TIN("NGA_TIN"),
   
   NIC_RUC("NIC_RUC"),
   
+  NLD_BTW("NLD_BTW"),
+  
+  NLD_KVK("NLD_KVK"),
+  
+  NLD_OBN("NLD_OBN"),
+  
   NLD_TIN("NLD_TIN"),
+  
+  NOR_FNR("NOR_FNR"),
+  
+  NOR_ORG("NOR_ORG"),
+  
+  NPL_PAN("NPL_PAN"),
+  
+  NZL_IRD("NZL_IRD"),
+  
+  NZL_NZBN("NZL_NZBN"),
+  
+  OMN_CID("OMN_CID"),
+  
+  PAK_NIC("PAK_NIC"),
+  
+  PAK_NTN("PAK_NTN"),
   
   PAN_RUC("PAN_RUC"),
   
   PER_RUC("PER_RUC"),
   
+  PHL_TIN("PHL_TIN"),
+  
+  POL_NIP("POL_NIP"),
+  
+  POL_PESEL("POL_PESEL"),
+  
+  PRT_NIF("PRT_NIF"),
+  
   PRY_RUC("PRY_RUC"),
   
-  SGP_NRIC("SGP_NRIC"),
+  QAT_QID("QAT_QID"),
   
-  SGP_FIN("SGP_FIN"),
+  ROU_CNP("ROU_CNP"),
+  
+  ROU_CUI("ROU_CUI"),
+  
+  RUS_INN_ENT("RUS_INN_ENT"),
+  
+  RUS_INN_IND("RUS_INN_IND"),
+  
+  RWA_TIN("RWA_TIN"),
+  
+  SAU_TIN("SAU_TIN"),
+  
+  SAU_VAT("SAU_VAT"),
+  
+  SEN_NINEA("SEN_NINEA"),
   
   SGP_ASGD("SGP_ASGD"),
   
+  SGP_FIN("SGP_FIN"),
+  
   SGP_ITR("SGP_ITR"),
+  
+  SGP_NRIC("SGP_NRIC"),
+  
+  SGP_UEN("SGP_UEN"),
   
   SLV_NIT("SLV_NIT"),
   
+  SRB_JMBG("SRB_JMBG"),
+  
+  SRB_PIB("SRB_PIB"),
+  
+  SVK_ICO("SVK_ICO"),
+  
+  SVK_TIN("SVK_TIN"),
+  
+  SVN_DAS("SVN_DAS"),
+  
+  SVN_MS("SVN_MS"),
+  
+  SWE_ORG("SWE_ORG"),
+  
   SWE_TAX_ID("SWE_TAX_ID"),
+  
+  SWZ_TIN("SWZ_TIN"),
+  
+  SXM_CRIB("SXM_CRIB"),
+  
+  SYR_TIN("SYR_TIN"),
+  
+  THA_NID("THA_NID"),
+  
+  THA_TIN("THA_TIN"),
+  
+  TJK_TIN("TJK_TIN"),
+  
+  TTO_BIR("TTO_BIR"),
+  
+  TUN_CIN("TUN_CIN"),
+  
+  TUN_MF("TUN_MF"),
+  
+  TUR_TIN("TUR_TIN"),
+  
+  TWN_GUI("TWN_GUI"),
+  
+  TWN_NID("TWN_NID"),
+  
+  TZA_TIN("TZA_TIN"),
+  
+  UGA_TIN("UGA_TIN"),
+  
+  UKR_EDRPOU("UKR_EDRPOU"),
+  
+  UKR_RNTRC("UKR_RNTRC"),
+  
+  URY_CI("URY_CI"),
   
   URY_RUT("URY_RUT"),
   
+  UZB_INN("UZB_INN"),
+  
+  UZB_PINFL("UZB_PINFL"),
+  
   VEN_RIF("VEN_RIF"),
+  
+  VNM_MST_BRN("VNM_MST_BRN"),
+  
+  VNM_MST_CORP("VNM_MST_CORP"),
+  
+  VNM_MST_PIN("VNM_MST_PIN"),
+  
+  WSM_TIN("WSM_TIN"),
+  
+  XXK_PID("XXK_PID"),
+  
+  ZAF_CRN("ZAF_CRN"),
+  
+  ZAF_ID("ZAF_ID"),
+  
+  ZMB_TPIN("ZMB_TPIN"),
+  
+  ZWE_TIN("ZWE_TIN"),
   
   NATIONAL_ID("NATIONAL_ID"),
   

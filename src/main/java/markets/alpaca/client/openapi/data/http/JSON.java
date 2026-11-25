@@ -234,6 +234,18 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockTrade.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockTradesResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockTradesRespSingle.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockV3Bar.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockV3BarsResp.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockV3BarsStartParameter.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockV3LatestBarsResp.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockV3LatestQuotesResp.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockV3LatestTradesResp.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockV3Quote.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockV3QuotesResp.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockV3Snapshot.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockV3SnapshotsResp.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockV3Trade.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.StockV3TradesResp.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.UnitSplit.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.data.model.WorthlessRemoval.CustomTypeAdapterFactory());
         gson = gsonBuilder.create();

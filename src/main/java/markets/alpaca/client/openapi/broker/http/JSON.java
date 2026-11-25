@@ -352,6 +352,7 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.IPOOffering.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.IPOOfferingListResponse.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.IPOOfferingResponse.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.Identification.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.Identity.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.InstantFunding.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new markets.alpaca.client.openapi.broker.model.Interest.CustomTypeAdapterFactory());

@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.UUID;
@@ -50,11 +51,16 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * Represents filled qty/price of legs.
+ * Represents filled qty/price and commission of legs.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class TradeUpdateEventV2Leg implements Serializable {
   private static final long serialVersionUID = 1L;
+
+  public static final String SERIALIZED_NAME_COMMISSION = "commission";
+  @SerializedName(SERIALIZED_NAME_COMMISSION)
+  @javax.annotation.Nullable
+  private BigDecimal commission;
 
   public static final String SERIALIZED_NAME_EXECUTION_ID = "execution_id";
   @SerializedName(SERIALIZED_NAME_EXECUTION_ID)
@@ -88,6 +94,25 @@ public class TradeUpdateEventV2Leg implements Serializable {
 
   public TradeUpdateEventV2Leg() {
   }
+
+  public TradeUpdateEventV2Leg commission(@javax.annotation.Nullable BigDecimal commission) {
+    this.commission = commission;
+    return this;
+  }
+
+  /**
+   * The commission charged on this leg&#39;s execution. On a &#x60;trade_bust&#x60; event it is negative, refunding the busted execution&#39;s commission.  Omitted when the execution carries no commission, such as on an equity leg. A zero commission is sent as &#x60;\&quot;0\&quot;&#x60;.  A later event can list the same execution again, so key commissions by &#x60;execution_id&#x60; instead of adding up every event.
+   * @return commission
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getCommission() {
+    return commission;
+  }
+
+  public void setCommission(@javax.annotation.Nullable BigDecimal commission) {
+    this.commission = commission;
+  }
+
 
   public TradeUpdateEventV2Leg executionId(@javax.annotation.Nullable UUID executionId) {
     this.executionId = executionId;
@@ -257,7 +282,8 @@ public class TradeUpdateEventV2Leg implements Serializable {
       return false;
     }
     TradeUpdateEventV2Leg tradeUpdateEventV2Leg = (TradeUpdateEventV2Leg) o;
-    return Objects.equals(this.executionId, tradeUpdateEventV2Leg.executionId) &&
+    return Objects.equals(this.commission, tradeUpdateEventV2Leg.commission) &&
+        Objects.equals(this.executionId, tradeUpdateEventV2Leg.executionId) &&
         Objects.equals(this.orderId, tradeUpdateEventV2Leg.orderId) &&
         Objects.equals(this.price, tradeUpdateEventV2Leg.price) &&
         Objects.equals(this.qty, tradeUpdateEventV2Leg.qty) &&
@@ -268,13 +294,14 @@ public class TradeUpdateEventV2Leg implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(executionId, orderId, price, qty, symbol, timestamp, additionalProperties);
+    return Objects.hash(commission, executionId, orderId, price, qty, symbol, timestamp, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TradeUpdateEventV2Leg {\n");
+    sb.append("    commission: ").append(toIndentedString(commission)).append("\n");
     sb.append("    executionId: ").append(toIndentedString(executionId)).append("\n");
     sb.append("    orderId: ").append(toIndentedString(orderId)).append("\n");
     sb.append("    price: ").append(toIndentedString(price)).append("\n");
@@ -300,7 +327,7 @@ public class TradeUpdateEventV2Leg implements Serializable {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("execution_id", "order_id", "price", "qty", "symbol", "timestamp"));
+    openapiFields = new HashSet<String>(Arrays.asList("commission", "execution_id", "order_id", "price", "qty", "symbol", "timestamp"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -319,6 +346,9 @@ public class TradeUpdateEventV2Leg implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if ((jsonObj.get("commission") != null && !jsonObj.get("commission").isJsonNull()) && !jsonObj.get("commission").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `commission` to be a primitive type in the JSON string but got `%s`", jsonObj.get("commission").toString()));
+      }
       if ((jsonObj.get("execution_id") != null && !jsonObj.get("execution_id").isJsonNull()) && !jsonObj.get("execution_id").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `execution_id` to be a primitive type in the JSON string but got `%s`", jsonObj.get("execution_id").toString()));
       }

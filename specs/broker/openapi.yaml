@@ -459,6 +459,117 @@ components:
         trail_price: null
         type: limit
         updated_at: '2024-12-10T16:15:53.725139688Z'
+    MultilegOptionsWithCommissionOrderResponse:
+      summary: Multi-leg order with a per-contract commission
+      value:
+        asset_class: ''
+        asset_id: ''
+        canceled_at: null
+        client_order_id: 9e4a7c21-3b5d-4f8a-a6e2-1d0c9b8f7e65
+        commission: '1.5'
+        commission_type: qty
+        created_at: '2026-11-12T15:02:11.204518Z'
+        expired_at: null
+        extended_hours: false
+        failed_at: null
+        filled_at: null
+        filled_avg_price: null
+        filled_qty: '0'
+        hwm: null
+        id: 1b6f2c8e-4d3a-4f7e-9a51-6c2e8d0b7f34
+        legs:
+          - asset_class: us_option
+            asset_id: f0ea14b2-8a49-4e9b-89d1-894c6e518a76
+            canceled_at: null
+            client_order_id: c3f8a1d6-7e2b-4a9c-8d5f-2b1e0c6a9d47
+            created_at: '2026-11-12T15:02:11.204518Z'
+            expired_at: null
+            extended_hours: false
+            failed_at: null
+            filled_at: null
+            filled_avg_price: null
+            filled_qty: '0'
+            hwm: null
+            id: 5a2d9e7c-8f1b-4c6a-b3e4-0d7f2a9c1e58
+            legs: null
+            limit_price: null
+            notional: null
+            order_class: mleg
+            order_type: ''
+            position_intent: buy_to_open
+            qty: '1'
+            ratio_qty: '1'
+            replaced_at: null
+            replaced_by: null
+            replaces: null
+            side: buy
+            source: null
+            status: accepted
+            stop_price: null
+            submitted_at: '2026-11-12T15:02:11.193402Z'
+            subtag: null
+            symbol: AAPL250620C00100000
+            time_in_force: day
+            trail_percent: null
+            trail_price: null
+            type: ''
+            updated_at: '2026-11-12T15:02:11.204518Z'
+          - asset_class: us_option
+            asset_id: f89940db-eeb1-46e6-8f9b-bb1f27a0b395
+            canceled_at: null
+            client_order_id: 6d2b9f4e-1a8c-4d7b-9e3f-5c0a8b7d2e16
+            created_at: '2026-11-12T15:02:11.204518Z'
+            expired_at: null
+            extended_hours: false
+            failed_at: null
+            filled_at: null
+            filled_avg_price: null
+            filled_qty: '0'
+            hwm: null
+            id: 8e1c4b7a-2d9f-4e3c-a5b8-7f6d0e2c1a93
+            legs: null
+            limit_price: null
+            notional: null
+            order_class: mleg
+            order_type: ''
+            position_intent: sell_to_open
+            qty: '1'
+            ratio_qty: '1'
+            replaced_at: null
+            replaced_by: null
+            replaces: null
+            side: sell
+            source: null
+            status: accepted
+            stop_price: null
+            submitted_at: '2026-11-12T15:02:11.193402Z'
+            subtag: null
+            symbol: AAPL250620C00105000
+            time_in_force: day
+            trail_percent: null
+            trail_price: null
+            type: ''
+            updated_at: '2026-11-12T15:02:11.204518Z'
+        limit_price: '2.5'
+        notional: null
+        order_class: mleg
+        order_type: limit
+        qty: '1'
+        replaced_at: null
+        replaced_by: null
+        replaces: null
+        side: ''
+        source: null
+        status: accepted
+        stop_price: null
+        submitted_at: '2026-11-12T15:02:11.193402Z'
+        subtag: null
+        symbol: ''
+        time_in_force: day
+        trail_percent: null
+        trail_price: null
+        type: limit
+        updated_at: '2026-11-12T15:02:11.204518Z'
     OptionOrderResponse:
       value:
         asset_class: us_option
@@ -832,11 +943,11 @@ components:
         code: 40010001
         message: there is already an active run. Please cancel previous run or wait until the run is completed
     rebalancing_amount_not_decimal:
-      description: 'Send a numeric amount and try again. Message template: amount must be a decimal: {parse_error}'
+      description: 'Send a numeric amount and try again. Message template: amount must be a decimal: {parse_error} (`invalid value` or `value is empty`)'
       summary: The amount is not a valid decimal number
       value:
         code: 40010001
-        message: 'amount must be a decimal: can''t convert not-a-number to decimal'
+        message: 'amount must be a decimal: invalid value'
     rebalancing_asset_not_found:
       description: 'Check the symbol in the message and try again. Message template: could not find asset {symbol}'
       summary: A symbol in the weights is not a known asset
@@ -856,17 +967,17 @@ components:
         code: 40010001
         message: asset symbol must be specified with type asset
     rebalancing_calendar_day_not_mmdd:
-      description: 'Use that format and try again. Message template: calendar conditions day must be in MM-DD format: {time_parse_error}'
+      description: 'Use that format and try again. Message template: calendar conditions day must be in MM-DD format: {parse_error} (`invalid value` or `value is empty`)'
       summary: An annual calendar condition has a day that is not in MM-DD format
       value:
         code: 40010001
-        message: 'calendar conditions day must be in MM-DD format: parsing time "13-40" as "01-02": month out of range'
+        message: 'calendar conditions day must be in MM-DD format: invalid value'
     rebalancing_calendar_day_not_number:
-      description: 'Use a day from 1 to 31 and try again. Message template: calendar conditions day must be a number: {parse_error}'
+      description: 'Use a day from 1 to 31 and try again. Message template: calendar conditions day must be a number: {parse_error} (`invalid value` or `value is empty`)'
       summary: A monthly or quarterly calendar condition has a day that is not a number
       value:
         code: 40010001
-        message: 'calendar conditions day must be a number: strconv.Atoi: parsing "abc": invalid syntax'
+        message: 'calendar conditions day must be a number: invalid value'
     rebalancing_calendar_day_out_of_range:
       description: Use a day in that range and try again.
       summary: A monthly or quarterly calendar condition has a day outside 1 to 31
@@ -892,17 +1003,17 @@ components:
         code: 40010001
         message: 'calendar conditions must have day: [monday tuesday wednesday thursday friday]'
     rebalancing_cash_weight_percent_empty:
-      description: 'Set a numeric percent and try again. Message template: weights[{index}].percent: {parse_error}'
+      description: 'Set a numeric percent and try again. Message template: weights[{index}].percent: value is empty'
       summary: A cash weight has an empty percent
       value:
         code: 40010001
-        message: 'weights[0].percent: can''t convert  to decimal'
+        message: 'weights[0].percent: value is empty'
     rebalancing_condition_percent_not_decimal:
-      description: 'Send a numeric percent and try again. Message template: rebalance_conditions[{index}].percent: {parse_error}'
+      description: 'Send a numeric percent and try again. Message template: rebalance_conditions[{index}].percent: {parse_error} (`invalid value` or `value is empty`)'
       summary: The percent on the rebalance condition named in the message is not a valid decimal
       value:
         code: 40010001
-        message: 'rebalance_conditions[0].percent: can''t convert not-a-number to decimal'
+        message: 'rebalance_conditions[0].percent: invalid value'
     rebalancing_cooldown_days_invalid:
       description: Set `cooldown_days` to 1 or greater and try again.
       summary: The cooldown is missing or less than one day
@@ -934,11 +1045,11 @@ components:
         code: 42210000
         message: discretionary rebalancing is not allowed for this correspondent
     rebalancing_drift_percent_not_decimal:
-      description: 'Send a numeric percent and try again. Message template: drift_band conditions percent must be a decimal: {parse_error}'
+      description: 'Send a numeric percent and try again. Message template: drift_band conditions percent must be a decimal: {parse_error} (`invalid value` or `value is empty`)'
       summary: A drift band percent is not a valid decimal number
       value:
         code: 40010001
-        message: 'drift_band conditions percent must be a decimal: can''t convert not-a-number to decimal'
+        message: 'drift_band conditions percent must be a decimal: invalid value'
     rebalancing_drift_percent_not_positive:
       description: Use a percent greater than zero and try again.
       summary: A drift band condition has a negative percent
@@ -1064,7 +1175,7 @@ components:
       summary: This portfolio includes a nested portfolio weight, which cannot be updated or deleted through this API
       value:
         code: 40010001
-        message: 'publishing portfolio status changed: portfolio contains nested portfolio weights that cannot be represented in a rebalancer event'
+        message: portfolio contains nested portfolio weights and cannot be updated or deleted through this API
     rebalancing_non_usd_account:
       description: This account uses another currency, so the request was rejected.
       summary: Rebalancing is only available for USD accounts
@@ -1198,11 +1309,11 @@ components:
         code: 41510000
         message: unsupported media type
     rebalancing_weight_percent_not_decimal:
-      description: 'Send a numeric percent and try again. Message template: percent must be a decimal: {parse_error}'
+      description: 'Send a numeric percent and try again. Message template: percent must be a decimal: {parse_error} (`invalid value` or `value is empty`)'
       summary: A weight percent is not a valid decimal number
       value:
         code: 40010001
-        message: 'percent must be a decimal: can''t convert not-a-number to decimal'
+        message: 'percent must be a decimal: invalid value'
     rebalancing_weight_percent_not_positive:
       description: Increase it and try again.
       summary: A weight percent must be greater than zero
@@ -4536,22 +4647,34 @@ components:
         - ip_address
       type: object
     AgreementType:
-      description: |
-        - margin_agreement: Alpaca Margin Agreement
-        - account_agreement: Alpaca Account Agreement
-        - customer_agreement: Alpaca Customer Agreement
-        - crypto_agreement: Alpaca Crypto agreement
-        - options_agreement: Alpaca Option agreement
-        - custodial_customer_agreement: Alpaca Custodial Customer agreement
+      description: The type of agreement the customer signed.
       enum:
         - margin_agreement
         - account_agreement
         - customer_agreement
         - crypto_agreement
         - options_agreement
+        - custodian_customer_agreement
+        - trusted_contact_consent
+        - master_securities_lending_agreement
+        - certifications_and_resolutions_statement
+        - joint_account_agreement
+        - foreign_markets_addendum
       example: customer_agreement
       title: AgreementType
       type: string
+      x-enumDescriptions:
+        account_agreement: Alpaca Account Agreement
+        certifications_and_resolutions_statement: Alpaca Certifications and Resolutions Statement
+        crypto_agreement: Alpaca Crypto Agreement
+        custodian_customer_agreement: Alpaca Custodial Customer Agreement (deprecated; use customer_agreement)
+        customer_agreement: Alpaca Customer Agreement
+        foreign_markets_addendum: Alpaca Foreign Markets / Global Equities Addendum
+        joint_account_agreement: Alpaca Joint Account Agreement
+        margin_agreement: Alpaca Margin Agreement
+        master_securities_lending_agreement: Alpaca Master Securities Lending Agreement
+        options_agreement: Alpaca Options Agreement
+        trusted_contact_consent: Alpaca Trusted Contact Consent
     Announcement:
       description: |-
         The announcements endpoint contains public information on previous and upcoming dividends, mergers, spinoffs, and stock splits.
@@ -5788,14 +5911,17 @@ components:
         An enum to select how to interpret the value provided in the commission field.
 
         - notional:
-        Charge commission on a per order basis. (When the `commission_type` field is omitted from the order request, this is used as the default).
+        Charge commission on a per order basis. (When the `commission_type` field is omitted from the order request, this is used as the default, except for `mleg` orders.)
+        Not supported for `mleg` orders.
 
         - qty:
         Charge commission on a per qty/contract basis, pro rated.
+        For `mleg` orders, this is the only supported type and is required whenever `commission` is non-zero. Omitting `commission`, or sending `0`, is accepted as no commission. The rate is charged per option contract in the strategy.
 
         - bps:
         The percent commission you want to charge the end user on the order (expressed in bps). Alpaca will convert the order to a notional amount for purposes of calculating commission.
         Commission value in bps can have up to two decimal places.
+        Not supported for `mleg` orders.
       enum:
         - notional
         - qty
@@ -6732,6 +6858,7 @@ components:
           description: |
             **deprecated**: Please use the commission_type = bps instead and set the desired bps value in the `commission` field.
             The percent commission you want to charge the end user on the order (expressed in bps). Alpaca will convert the order to a notional amount for purposes of calculating commission.
+            Not supported for `mleg` orders.
           example: '10'
           format: decimal
           type: string
@@ -7639,7 +7766,14 @@ components:
           format: int64
           type: integer
         interest:
-          $ref: '#/components/schemas/FPSLInterest'
+          allOf:
+            - $ref: '#/components/schemas/FPSLInterest'
+          description: |
+            The accumulated interest totals for all loans in the date range.
+            Totals may be adjusted retroactively at any time until interests are finalized for the month.
+          example:
+            customer: '8.61'
+            partner: '11.55'
         total_lending_activities:
           description: The total number of FPSL lending activities for the account within the specified date range.
           example: 7
@@ -7647,6 +7781,7 @@ components:
           type: integer
       required:
         - account_number
+        - interest
         - total_lending_activities
         - in_progress_lending_activities
       type: object
@@ -7659,21 +7794,19 @@ components:
       type: object
     FPSLInterest:
       description: |
-        The interest's details.
-        Please note that the object might not be set if interest has not yet been calculated for the loan.
-        Additionally, interest details may be adjusted retroactively at any time until interests are finalized for the month.
-        The loan's changed `updated_at` field can indicate such an adjustment.
+        FPSL interest split between the customer and the partner.
+        Interest may be adjusted retroactively at any time until interests are finalized for the month.
       properties:
         customer:
-          description: The interest accrued by the customer for this loan.
-          example: 1.23
-          format: double
-          type: number
+          description: The interest accrued by the customer.
+          example: '1.23'
+          format: decimal
+          type: string
         partner:
-          description: The interest accrued by the partner for this loan.
-          example: 1.65
-          format: double
-          type: number
+          description: The interest accrued by the partner.
+          example: '1.65'
+          format: decimal
+          type: string
       required:
         - customer
         - partner
@@ -7691,24 +7824,30 @@ components:
           type: string
         collateral:
           description: The collateral posted for the loan.
-          example: 1161.015
-          format: double
-          type: number
+          example: '1161.015'
+          format: decimal
+          type: string
         correspondent:
           description: Account's correspondent
           example: LPCA
           type: string
         date:
-          example: '2006-01-02'
+          example: '2025-03-21'
           format: date
           type: string
         interest:
-          $ref: '#/components/schemas/FPSLInterest'
+          allOf:
+            - $ref: '#/components/schemas/FPSLInterest'
+          description: |
+            The loan's interest details.
+            Please note that the object might not be set if interest has not yet been calculated for the loan.
+            Additionally, interest details may be adjusted retroactively at any time until interests are finalized for the month.
+            The loan's changed `updated_at` field can indicate such an adjustment.
         market_value:
           description: The total market value of the shares on loan.
-          example: 1138.25
-          format: double
-          type: number
+          example: '1138.25'
+          format: decimal
+          type: string
         quantity:
           description: The number of shares in the loan. This may be less than the total number of eligible shares held by the account.
           example: 5
@@ -8408,6 +8547,44 @@ components:
         - data
       title: IPOOfferingResponse
       type: object
+    Identification:
+      description: An identity document or identifier of the account owner. Responses return only `type`.
+      example:
+        issued_country: GBR
+        number: 5493001KJTIIGC8Y1R12
+        type: LEI
+      properties:
+        expiry_date:
+          description: The expiry date in "YYYY-MM-DD" format. It must be later than today (UTC) and no earlier than `issued_date`.
+          example: '2030-01-01'
+          format: date
+          type: string
+          writeOnly: true
+        issued_country:
+          description: |
+            Required on write. [ISO 3166-1 alpha-3](https://www.iso.org/iso-3166-country-codes.html) code of the issuing country.
+          example: GBR
+          type: string
+          writeOnly: true
+        issued_date:
+          description: The issue date in "YYYY-MM-DD" format. It can't be later than today (UTC).
+          example: '2020-01-01'
+          format: date
+          type: string
+          writeOnly: true
+        number:
+          description: |
+            Required on write. The identification number. An `LEI` number is 20 characters long and must pass the ISO 17442 check digits, or the request fails with 422. Lowercase letters are accepted and stored in uppercase.
+          example: 5493001KJTIIGC8Y1R12
+          type: string
+          writeOnly: true
+        type:
+          description: The identification type, for example `passport`, `national_id` or `LEI`. `LEI` is uppercase.
+          example: LEI
+          type: string
+      required:
+        - type
+      type: object
     Identity:
       description: |
         Identity is the model to provide account owner's identity information.
@@ -8477,6 +8654,14 @@ components:
           description: The first/given name of the user.
           example: John
           type: string
+        identifications:
+          description: |
+            Identity documents and identifiers other than the tax ID, such as a passport or an LEI. On update, the array replaces every stored identification except the tax ID, which only `tax_id` and `tax_id_type` change.
+
+            Account responses include this field only for natural persons, and each entry has only `type`. Responses also list the tax ID as an entry typed with its tax ID type, for example `USA_SSN`, or `NOT_SPECIFIED` when the type is unknown. Omit that entry on update.
+          items:
+            $ref: '#/components/schemas/Identification'
+          type: array
         investment_experience_with_options:
           description: |
             The user's level of expertise and familiarity with investing in Options.
@@ -8568,7 +8753,10 @@ components:
           example: 666-55-4321
           type: string
         tax_id_type:
-          description: Required on write when `tax_id` is set. May be `null` on read when unset or for sparse identity on OmniSub / omnibus-non-disclosed accounts.
+          description: |
+            Required on write when `tax_id` is set. May be `null` on read when unset or for sparse identity on OmniSub / omnibus-non-disclosed accounts.
+
+            An LEI is not a tax ID: a request with `tax_id_type` set to `LEI`, in any case, fails with 422. Send the LEI in `identifications` and the national tax ID in `tax_id`.
           oneOf:
             - $ref: '#/components/schemas/TaxIdType'
             - type: 'null'
@@ -9284,6 +9472,21 @@ components:
     ListFPSLLoansResponse:
       description: |
         Response to a successful request for a list of FPSL loans.
+      example:
+        loans:
+          - account_id: 06d83e79-5bea-4ce9-a362-a25251a700ec
+            account_number: '286873545'
+            collateral: '1161.015'
+            correspondent: LPCA
+            date: '2025-03-21'
+            interest:
+              customer: '1.23'
+              partner: '1.65'
+            market_value: '1138.25'
+            quantity: 5
+            symbol: AAPL
+            updated_at: '2025-03-21T15:54:19.857034+01:00'
+        next_page_token: null
       properties:
         loans:
           description: All FPSL loans matching the filter criteria
@@ -9356,7 +9559,10 @@ components:
       description: Instant funding memopost
       type: object
     MLegOrderLeg:
-      description: Represents an individual leg of a multileg options order.
+      description: |-
+        Represents an individual leg of a multileg options order.
+
+        `commission`, `commission_type`, and `commission_bps` are ignored on a leg and have no effect. Set `commission` and `commission_type` on the parent order.
       properties:
         position_intent:
           $ref: '#/components/schemas/PositionIntent'
@@ -12393,181 +12599,477 @@ components:
       type: object
     TaxIdType:
       description: |-
-        An Enum of the various kinds of Tax ID formats Alpaca supports.
+        The type of the tax ID or other government-issued identification number.
 
-        Possible Values are:
+        Each country-specific type is meant for accounts whose `country_of_tax_residence` is the country it is named after, and some are also meant for that country's associated jurisdictions, such as its territories. For correspondents with strict tax ID validation, the type must match `country_of_tax_residence` and be supported in the account's booking center, so a listed type can still be rejected when the account is validated. The "for individuals" and "for entities" notes describe who each type is typically issued to, and aren't checked when the account is validated.
 
+        Possible values are:
 
-        - **USA_SSN**
-        USA Social Security Number
-
-        - **USA_ITIN**
-        USA Individual Taxpayer Identification Number
-
-        - **ARG_AR_CUIT**
-        Argentina CUIT
-
-        - **AUS_TFN**
-        Australian Tax File Number
-
-        - **AUS_ABN**
-        Australian Business Number
-
-        - **BOL_NIT**
-        Bolivia NIT
-
-        - **BRA_CPF**
-        Brazil CPF
-
-        - **CHL_RUT**
-        Chile RUT
-
-        - **COL_NIT**
-        Colombia NIT
-
-        - **CRI_NITE**
-        Costa Rica NITE
-
-        - **DEU_TAX_ID**
-        Germany Tax ID (Identifikationsnummer)
-
-        - **DOM_RNC**
-        Dominican Republic RNC
-
-        - **ECU_RUC**
-        Ecuador RUC
-
-        - **FRA_SPI**
-        France SPI (Reference Tax Number)
-
-        - **GBR_UTR**
-        UK UTR (Unique Taxpayer Reference)
-
-        - **GBR_NINO**
-        UK NINO (National Insurance Number)
-
-        - **GTM_NIT**
-        Guatemala NIT
-
-        - **HND_RTN**
-        Honduras RTN
-
-        - **HUN_TIN**
-        Hungary TIN Number
-
-        - **IDN_KTP**
-        Indonesia KTP
-
-        - **IND_PAN**
-        India PAN Number
-
-        - **ISR_TAX_ID**
-        Israel Tax ID (Teudat Zehut)
-
-        - **ITA_TAX_ID**
-        Italy Tax ID (Codice Fiscale)
-
-        - **JPN_TAX_ID**
-        Japan Tax ID (Kojin Bango)
-
-        - **MEX_RFC**
-        Mexico RFC
-
-        - **NIC_RUC**
-        Nicaragua RUC
-
-        - **NLD_TIN**
-        Netherlands TIN Number
-
-        - **PAN_RUC**
-        Panama RUC
-
-        - **PER_RUC**
-        Peru RUC
-
-        - **PRY_RUC**
-        Paraguay RUC
-
-        - **SGP_NRIC**
-        Singapore NRIC
-
-        - **SGP_FIN**
-        Singapore FIN
-
-        - **SGP_ASGD**
-        Singapore ASGD
-
-        - **SGP_ITR**
-        Singapore ITR
-
-        - **SLV_NIT**
-        El Salvador NIT
-
-        - **SWE_TAX_ID**
-        Sweden Tax ID (Personnummer)
-
-        - **URY_RUT**
-        Uruguay RUT
-
-        - **VEN_RIF**
-        Venezuela RIF
-
-        - **NATIONAL_ID**
-        National ID number, if a tax ID number is not available
-
-        - **PASSPORT**
-        Passport number, if a tax ID number is not available
-
-        - **PERMANENT_RESIDENT**
-        Permanent resident number, if a tax ID number is not available
-
-        - **DRIVER_LICENSE**
-        Driver's license number, if a tax ID number is not available
-
-        - **OTHER_GOV_ID**
-        Other government issued identifier, if a tax ID number is not available
-
-        - **NOT_SPECIFIED**
-        Other Tax IDs
+        - **USA_SSN**: USA SSN (Social Security Number), for individuals
+        - **USA_EIN**: USA EIN (Employer Identification Number), for entities
+        - **USA_ITIN**: USA ITIN (Individual Taxpayer Identification Number), for individuals
+        - **USA_TIN**: USA TIN (Taxpayer Identification Number), for entities
+        - **ABW_PN**: Aruba Persoonsnummer (Aruba TIN), for individuals and entities
+        - **AGO_NIF**: Angola NIF (Número de Identificação Fiscal), for individuals and entities
+        - **ALB_NIPT**: Albania NIPT (Numri i Identifikimit të Personit të Tatueshëm), for individuals and entities
+        - **AND_NRT**: Andorra NRT (Número de Registre Tributari), for individuals and entities
+        - **ARE_EID**: UAE Emirates ID, for individuals
+        - **ARE_TRN**: UAE TRN (Tax Registration Number), for entities
+        - **ARG_AG_CUIT**: Legacy value for an Argentina CUIT. Use `ARG_AR_CUIT` instead.
+        - **ARG_AR_CUIT**: Argentina CUIT (Clave Única de Identificación Tributaria), for individuals and entities
+        - **ARM_SSN**: Armenia SSN (Social Security Number), for individuals
+        - **ARM_TIN**: Armenia TIN (Tax Identification Number), for entities
+        - **AUS_ABN**: Australia ABN (Australian business number), for entities
+        - **AUS_TFN**: Australia TFN (Tax File Number), for individuals and entities
+        - **AUT_UID**: Austria UID-Nummer (VAT Identification Number), for entities
+        - **AUT_VNR**: Austria Versicherungsnummer (Social Insurance Number), for individuals
+        - **AZE_FIN**: Azerbaijan FIN (Fərdi İdentifikasiya Nömrəsi), for individuals
+        - **AZE_VOEN**: Azerbaijan VÖEN (Tax Identification Number), for entities
+        - **BEL_BCE**: Belgium BCE/KBO (Enterprise Number), for entities
+        - **BEL_NN**: Belgium NN (Numéro National / Rijksregisternummer), for individuals
+        - **BEN_IFU**: Benin IFU (Identifiant Fiscal Unique), for individuals and entities
+        - **BFA_IFU**: Burkina Faso IFU (Identifiant Financier Unique), for individuals and entities
+        - **BGD_TIN**: Bangladesh TIN (Tax Identification Number), for individuals and entities
+        - **BGR_EGN**: Bulgaria EGN (Edinen Grazhdanski Nomer), for individuals
+        - **BGR_EIK**: Bulgaria EIK/BULSTAT (Entity Identification Code), for entities
+        - **BHR_CPR**: Bahrain CPR (Central Population Registry), for individuals
+        - **BIH_JMBG**: Bosnia and Herzegovina JMBG (Jedinstveni Matični Broj Građana), for individuals
+        - **BLR_ID**: Belarus Personal Identification Number, for individuals
+        - **BLR_UNP**: Belarus UNP (Uchyotny Nomer Platelshchika), for entities
+        - **BLZ_TIN**: Belize TIN (Tax Identification Number), for individuals and entities
+        - **BOL_NIT**: Bolivia NIT (Número de Identificación Tributaria), for individuals and entities
+        - **BRA_CNPJ**: Brazil CNPJ (Cadastro Nacional da Pessoa Jurídica), for entities
+        - **BRA_CPF**: Brazil CPF (Cadastro de Pessoas Físicas), for individuals
+        - **BRB_TIN**: Barbados TIN (Tax Identification Number), for individuals and entities
+        - **BTN_TPN**: Bhutan TPN (Taxpayer Number), for individuals and entities
+        - **BWA_TIN**: Botswana TIN (Tax Identification Number), for individuals and entities
+        - **CAN_BN**: Canada BN (Business Number), for entities
+        - **CAN_SIN**: Canada SIN (Social Insurance Number), for individuals
+        - **CHE_AHV**: Switzerland AHV/AVS (Social Insurance Number), for individuals
+        - **CHE_UID**: Switzerland UID (Unternehmens-Identifikationsnummer), for entities
+        - **CHL_RUT**: Chile RUT (Rol Único Tributario), for individuals and entities
+        - **CHN_RID**: China Resident Identity Card Number (居民身份证号码), for individuals
+        - **CHN_USCC**: China USCC (Unified Social Credit Code / 统一社会信用代码), for entities
+        - **CIV_NCC**: Côte d'Ivoire NCC (Numéro de Compte Contribuable), for individuals and entities
+        - **CMR_NIU**: Cameroon NIU (Numéro d'Identifiant Unique), for individuals and entities
+        - **COK_RMD**: Cook Islands RMD Number (Revenue Management Division), for individuals and entities
+        - **COL_CC**: Colombia CC (Cédula de Ciudadanía), for individuals
+        - **COL_CE**: Colombia CE (Cédula de Extranjería), for individuals
+        - **COL_NIT**: Colombia NIT (Número de Identificación Tributaria), for individuals and entities
+        - **COL_NUIP**: Colombia NUIP (Número Único de Identificación Personal), for individuals
+        - **COL_PPT**: Colombia PPT (Permiso por Protección Temporal), for individuals
+        - **CPV_NIF**: Cabo Verde NIF (Número de Identificação Fiscal), for individuals and entities
+        - **CRI_CJ**: Costa Rica Cédula Jurídica (Legal Entity ID), for entities
+        - **CRI_DIMEX**: Costa Rica DIMEX (Documento de Identificación Migratorio para Extranjeros), for individuals
+        - **CRI_NITE**: Costa Rica NITE (Número de Identificación Tributaria Especial), for individuals and entities
+        - **CRI_PIN**: Costa Rica Personal Identification Number (PIN), for individuals
+        - **CUW_CRIB**: Curaçao CRIB (Centraal Registratie Informatie Belastingplichtige), for individuals and entities
+        - **CYP_TIC**: Cyprus TIC (Tax Identification Code), for individuals and entities
+        - **CZE_TIN**: Czech Republic TIN (Tax Identification Number), for individuals and entities
+        - **DEU_TAX_ID**: Germany Tax ID (Identifikationsnummer), for individuals
+        - **DEU_UST_ID**: Germany USt-IdNr (Umsatzsteuer-Identifikationsnummer), for entities
+        - **DNK_CPR**: Denmark CPR-nummer (Det Centrale Personregister), for individuals
+        - **DNK_CVR**: Denmark CVR-nummer (Det Centrale Virksomhedsregister), for entities
+        - **DOM_CED**: Dominican Republic Cédula de Identidad y Electoral, for individuals
+        - **DOM_RNC**: Dominican Republic RNC (Registro Nacional del Contribuyente), for entities
+        - **DZA_NIF**: Algeria NIF (Numéro d'Identification Fiscale), for individuals and entities
+        - **ECU_RUC**: Ecuador RUC (Registro Unico de Contribuyentes), for individuals and entities
+        - **EGY_NID**: Egypt National ID Number, for individuals
+        - **EGY_TRN**: Egypt Tax Registration Number, for entities
+        - **ESP_DNI**: Spain DNI (Documento Nacional de Identidad), for individuals
+        - **ESP_NIE**: Spain NIE (Número de Identidad de Extranjero), for individuals
+        - **ESP_NIF**: Spain NIF (Número de Identificación Fiscal), for individuals and entities
+        - **EST_IK**: Estonia Isikukood (Personal Identification Code), for individuals
+        - **EST_RC**: Estonia Registrikood (Registry Code), for entities
+        - **ETH_TIN**: Ethiopia TIN (Tax Identification Number), for individuals and entities
+        - **FIN_HETU**: Finland HETU (Henkilötunnus), for individuals
+        - **FIN_YTU**: Finland Y-tunnus (Business ID), for entities
+        - **FJI_TIN**: Fiji TIN (Tax Identification Number), for individuals and entities
+        - **FRA_SIREN**: France SIREN (Business tax ID), for entities
+        - **FRA_SPI**: France SPI (Reference tax number), for individuals
+        - **GAB_NIF**: Gabon NIF (Numéro d'Identification Fiscale), for individuals and entities
+        - **GBR_CRN**: UK CRN (Companies House Registration Number), for entities
+        - **GBR_NINO**: UK NINO (National Insurance Number), for individuals
+        - **GBR_UTR**: UK UTR (Unique Taxpayer Reference), for individuals and entities
+        - **GEO_PID**: Georgia Personal Identification Number, for individuals
+        - **GEO_TIN**: Georgia TIN (Tax Identification Number), for entities
+        - **GHA_TIN**: Ghana TIN (Tax Identification Number), for individuals and entities
+        - **GRC_AFM**: Greece AFM (Arithmos Forologikou Mitroou), for individuals and entities
+        - **GTM_NIT**: Guatemala NIT (Número de Identificación Tributaria), for individuals and entities
+        - **HKG_BRN**: Hong Kong BRN (Business Registration Number), for entities
+        - **HKG_HKID**: Hong Kong HKID (Hong Kong Identity Card), for individuals
+        - **HND_RTN**: Honduras RTN (Registro Tributario Nacional), for individuals and entities
+        - **HRV_OIB**: Croatia OIB (Osobni Identifikacijski Broj), for individuals
+        - **HTI_NIF**: Haiti NIF (Numéro d'Identification Fiscale), for individuals and entities
+        - **HUN_ENT**: Hungary Adószám (Entity Tax Number), for entities
+        - **HUN_TIN**: Hungary TIN (Tax Identification Number), for individuals
+        - **IDN_KTP**: Indonesia KTP (Indonesian Identity Card), for individuals
+        - **IDN_NWPW**: Indonesia NPWP (Nomor Pokok Wajib Pajak), for individuals and entities. The code is spelled `IDN_NWPW`, not `IDN_NPWP`.
+        - **IND_GSTIN**: India GSTIN (Goods and Services Tax Identification Number), for entities
+        - **IND_PAN**: India PAN (Permanent Account Number), for individuals
+        - **IRL_CRO**: Ireland CRO (Companies Registration Office Number), for entities
+        - **IRL_PPS**: Ireland PPS (Personal Public Service Number), for individuals
+        - **IRN_NID**: Iran National ID (Kode Melli), for individuals
+        - **ISL_KT**: Iceland Kennitala (National Identification Number), for individuals
+        - **ISR_CORP**: Israel Company Number (Mispar Chevra), for entities
+        - **ISR_TAX_ID**: Israel Tax ID (Teudat Zehut), for individuals
+        - **ITA_PIVA**: Italy Partita IVA (VAT Number), for entities
+        - **ITA_TAX_ID**: Italy Tax ID (Codice fiscale), for individuals
+        - **JAM_TRN**: Jamaica TRN (Taxpayer Registration Number), for individuals and entities
+        - **JOR_NID**: Jordan National ID Number, for individuals
+        - **JPN_CORP**: Japan Corporate Number (法人番号), for entities
+        - **JPN_TAX_ID**: Japan Tax ID (kojin bango), for individuals
+        - **KAZ_BIN**: Kazakhstan BIN (Business Identification Number), for entities
+        - **KAZ_IIN**: Kazakhstan IIN (Individual Identification Number), for individuals
+        - **KEN_KRA_PIN**: Kenya KRA PIN (Kenya Revenue Authority PIN), for individuals and entities
+        - **KGZ_INN**: Kyrgyzstan INN (Individual Tax Number), for individuals
+        - **KHM_NID**: Cambodia National ID Number, for individuals
+        - **KOR_BRN**: South Korea BRN (Business Registration Number), for entities
+        - **KOR_RRN**: South Korea RRN (Resident Registration Number), for individuals
+        - **KWT_CID**: Kuwait Civil ID Number, for individuals
+        - **LBN_TIN**: Lebanon TIN (Tax Identification Number), for individuals and entities
+        - **LKA_NIC**: Sri Lanka NIC (National Identity Card), for individuals
+        - **LKA_TIN**: Sri Lanka TIN (Tax Identification Number), for entities
+        - **LTU_AK**: Lithuania Asmens Kodas (Personal Code), for individuals
+        - **LTU_JAK**: Lithuania Juridinio Asmens Kodas (Legal Entity Code), for entities
+        - **LUX_NIN**: Luxembourg Matricule (National Identification Number), for individuals
+        - **LUX_TVA**: Luxembourg Numéro TVA (VAT Number), for entities
+        - **LVA_PK**: Latvia Personas Kods (Personal Code), for individuals
+        - **LVA_REG**: Latvia Reģistrācijas Numurs (Registration Number), for entities
+        - **MAC_TIN**: Macao Taxpayer Number, for individuals and entities
+        - **MAR_CIN**: Morocco CIN (Carte d'Identité Nationale), for individuals
+        - **MAR_ICE**: Morocco ICE (Identifiant Commun de l'Entreprise), for entities
+        - **MDA_IDNO**: Moldova IDNO (State Identification Number of Entity), for entities
+        - **MDA_IDNP**: Moldova IDNP (Personal Identification Number), for individuals
+        - **MEX_CURP**: Mexico CURP (Clave Única de Registro de Población), for individuals
+        - **MEX_RFC**: Mexico RFC (Registro Federal de Contribuyentes), for individuals and entities
+        - **MKD_EDB**: North Macedonia EDB (Unique Tax Number), for entities
+        - **MKD_EMBG**: North Macedonia EMBG (Unique Master Citizen Number), for individuals
+        - **MLI_NIF**: Mali NIF (Numéro d'Identification Fiscale), for individuals and entities
+        - **MLT_ID**: Malta Identity Card Number, for individuals
+        - **MLT_VAT**: Malta VAT Number, for entities
+        - **MNE_JMBG**: Montenegro Unique Master Citizen Number, for individuals
+        - **MNE_PIB**: Montenegro PIB (Tax Identification Number), for entities
+        - **MNG_RD**: Mongolia Register Number, for individuals
+        - **MOZ_NUIT**: Mozambique NUIT (Tax Identification Number), for individuals and entities
+        - **MUS_NID**: Mauritius National Identity Card Number, for individuals
+        - **MUS_TAN_ENT**: Mauritius TAN (Entity Tax Account Number), for entities
+        - **MUS_TAN_IND**: Mauritius TAN (Individual Tax Account Number), for individuals
+        - **MWI_TPIN**: Malawi TPIN (Taxpayer Identification Number), for individuals and entities
+        - **MYS_MYKAD**: Malaysia MyKad (National Registration Identity Card), for individuals
+        - **MYS_ROC**: Malaysia ROC (Companies Commission Registration Number), for entities
+        - **NAM_TIN**: Namibia TIN (Tax Identification Number), for individuals and entities
+        - **NGA_NIN**: Nigeria NIN (National Identification Number), for individuals
+        - **NGA_TIN**: Nigeria TIN (Tax Identification Number), for entities
+        - **NIC_RUC**: Nicaragua RUC (Registro Unico de Contribuyentes), for individuals and entities
+        - **NLD_BTW**: Netherlands Btw-identificatienummer (btw-id), for entities
+        - **NLD_KVK**: Netherlands KVK (Kamer van Koophandel), for entities
+        - **NLD_OBN**: Netherlands Omzetbelastingnummer (ob-nummer), for entities
+        - **NLD_TIN**: Netherlands BSN (Burgerservicenummer), for individuals
+        - **NOR_FNR**: Norway Fødselsnummer (National Identity Number), for individuals
+        - **NOR_ORG**: Norway Organisasjonsnummer (Organisation Number), for entities
+        - **NPL_PAN**: Nepal PAN (Permanent Account Number), for individuals and entities
+        - **NZL_IRD**: New Zealand IRD Number (Inland Revenue Department), for individuals and entities
+        - **NZL_NZBN**: New Zealand NZBN (New Zealand Business Number), for entities
+        - **OMN_CID**: Oman Civil ID Number, for individuals
+        - **PAK_NIC**: Pakistan NIC (National Identity Card), for individuals
+        - **PAK_NTN**: Pakistan NTN (National Tax Number), for individuals and entities
+        - **PAN_RUC**: Panama RUC (Registro Unico de Contribuyentes), for individuals and entities
+        - **PER_RUC**: Peru RUC (Registro Unico de Contribuyentes), for individuals and entities
+        - **PHL_TIN**: Philippines TIN (Tax Identification Number), for individuals and entities
+        - **POL_NIP**: Poland NIP (Numer Identyfikacji Podatkowej), for entities
+        - **POL_PESEL**: Poland PESEL (Polish National Identification Number), for individuals
+        - **PRT_NIF**: Portugal NIF (Número de Identificação Fiscal), for individuals and entities
+        - **PRY_RUC**: Paraguay RUC (Registro Unico de Contribuyentes), for individuals and entities
+        - **QAT_QID**: Qatar QID (Qatar Identity Number), for individuals
+        - **ROU_CNP**: Romania CNP (Cod Numeric Personal), for individuals
+        - **ROU_CUI**: Romania CUI (Cod Unic de Înregistrare), for entities
+        - **RUS_INN_ENT**: Russia INN (Entity Tax Number), for entities
+        - **RUS_INN_IND**: Russia INN (Individual Tax Number), for individuals
+        - **RWA_TIN**: Rwanda TIN (Tax Identification Number), for individuals and entities
+        - **SAU_TIN**: Saudi Arabia TIN (Tax Identification Number), for individuals and entities
+        - **SAU_VAT**: Saudi Arabia VAT Registration Number, for entities
+        - **SEN_NINEA**: Senegal NINEA (Numéro d'Identification Nationale des Entreprises), for entities
+        - **SGP_ASGD**: Singapore ASGD, for individuals
+        - **SGP_FIN**: Singapore FIN, for individuals
+        - **SGP_ITR**: Singapore ITR, for individuals and entities
+        - **SGP_NRIC**: Singapore NRIC, for individuals
+        - **SGP_UEN**: Singapore UEN (Unique Entity Number), for entities
+        - **SLV_NIT**: El Salvador NIT (Número de Identificación Tributaria), for individuals and entities
+        - **SRB_JMBG**: Serbia JMBG (Unique Master Citizen Number), for individuals
+        - **SRB_PIB**: Serbia PIB (Tax Identification Number), for entities
+        - **SVK_ICO**: Slovakia IČO (Identification Number of Organisation), for entities
+        - **SVK_TIN**: Slovakia TIN (Tax Identification Number), for individuals
+        - **SVN_DAS**: Slovenia Davčna Številka (Tax Number), for individuals and entities
+        - **SVN_MS**: Slovenia Matična Številka (Registration Number), for entities
+        - **SWE_ORG**: Sweden Organisationsnummer (Organisation Number), for entities
+        - **SWE_TAX_ID**: Sweden Tax ID (Personnummer), for individuals
+        - **SWZ_TIN**: Eswatini TIN (Tax Identification Number), for individuals and entities
+        - **SXM_CRIB**: Sint Maarten CRIB (Centraal Registratie Informatie Belastingplichtige), for individuals and entities
+        - **SYR_TIN**: Syria TIN (Tax Identification Number), for individuals and entities
+        - **THA_NID**: Thailand National ID Card Number (เลขประจำตัวประชาชน), for individuals
+        - **THA_TIN**: Thailand Tax ID (เลขประจำตัวผู้เสียภาษี), for entities
+        - **TJK_TIN**: Tajikistan TIN (Tax Identification Number), for individuals and entities
+        - **TTO_BIR**: Trinidad and Tobago BIR (Board of Inland Revenue File Number), for individuals and entities
+        - **TUN_CIN**: Tunisia CIN (Carte d'Identité Nationale), for individuals
+        - **TUN_MF**: Tunisia Matricule Fiscal (Tax Identification Number), for entities
+        - **TUR_TIN**: Turkey TIN (Tax Identification Number), for individuals and entities
+        - **TWN_GUI**: Taiwan GUI (Unified Business Number / 統一編號), for entities
+        - **TWN_NID**: Taiwan National ID Number (身分證字號), for individuals
+        - **TZA_TIN**: Tanzania TIN (Tax Identification Number), for individuals and entities
+        - **UGA_TIN**: Uganda TIN (Tax Identification Number), for individuals and entities
+        - **UKR_EDRPOU**: Ukraine EDRPOU (Entity Identification Code), for entities
+        - **UKR_RNTRC**: Ukraine RNTRC (Individual Tax Number), for individuals
+        - **URY_CI**: Uruguay CI (Cédula de Identidad), for individuals
+        - **URY_RUT**: Uruguay RUT (Rol Único Tributario), for entities
+        - **UZB_INN**: Uzbekistan INN (Entity Tax Number), for entities
+        - **UZB_PINFL**: Uzbekistan PINFL (Personal Identification Number), for individuals
+        - **VEN_RIF**: Venezuela RIF (Registro de Información Fiscal), for individuals and entities
+        - **VNM_MST_BRN**: Vietnam MST Branch (Mã số thuế đơn vị phụ thuộc), for entities
+        - **VNM_MST_CORP**: Vietnam MST Enterprise (Mã số thuế doanh nghiệp), for individuals and entities
+        - **VNM_MST_PIN**: Vietnam PIN (Personal identification number / Số định danh cá nhân), for individuals
+        - **WSM_TIN**: Samoa TIN (Tax Identification Number), for individuals and entities
+        - **XXK_PID**: Kosovo Personal Identification Number, for individuals
+        - **ZAF_CRN**: South Africa Company Registration Number, for entities
+        - **ZAF_ID**: South African ID Number, for individuals
+        - **ZMB_TPIN**: Zambia TPIN (Taxpayer Identification Number), for individuals and entities
+        - **ZWE_TIN**: Zimbabwe TIN (Tax Identification Number), for individuals and entities
+        - **NATIONAL_ID**: National ID number, if a tax ID number is not available
+        - **PASSPORT**: Passport number, if a tax ID number is not available
+        - **PERMANENT_RESIDENT**: Permanent resident number, if a tax ID number is not available
+        - **DRIVER_LICENSE**: Driver's license number, if a tax ID number is not available
+        - **OTHER_GOV_ID**: Other government issued identifier, if a tax ID number is not available
+        - **NOT_SPECIFIED**: Other Tax IDs
       enum:
         - USA_SSN
+        - USA_EIN
         - USA_ITIN
+        - USA_TIN
+        - ABW_PN
+        - AGO_NIF
+        - ALB_NIPT
+        - AND_NRT
+        - ARE_EID
+        - ARE_TRN
         - ARG_AG_CUIT
-        - AUS_TFN
+        - ARG_AR_CUIT
+        - ARM_SSN
+        - ARM_TIN
         - AUS_ABN
+        - AUS_TFN
+        - AUT_UID
+        - AUT_VNR
+        - AZE_FIN
+        - AZE_VOEN
+        - BEL_BCE
+        - BEL_NN
+        - BEN_IFU
+        - BFA_IFU
+        - BGD_TIN
+        - BGR_EGN
+        - BGR_EIK
+        - BHR_CPR
+        - BIH_JMBG
+        - BLR_ID
+        - BLR_UNP
+        - BLZ_TIN
         - BOL_NIT
+        - BRA_CNPJ
         - BRA_CPF
+        - BRB_TIN
+        - BTN_TPN
+        - BWA_TIN
+        - CAN_BN
+        - CAN_SIN
+        - CHE_AHV
+        - CHE_UID
         - CHL_RUT
+        - CHN_RID
+        - CHN_USCC
+        - CIV_NCC
+        - CMR_NIU
+        - COK_RMD
+        - COL_CC
+        - COL_CE
         - COL_NIT
+        - COL_NUIP
+        - COL_PPT
+        - CPV_NIF
+        - CRI_CJ
+        - CRI_DIMEX
         - CRI_NITE
+        - CRI_PIN
+        - CUW_CRIB
+        - CYP_TIC
+        - CZE_TIN
         - DEU_TAX_ID
+        - DEU_UST_ID
+        - DNK_CPR
+        - DNK_CVR
+        - DOM_CED
         - DOM_RNC
+        - DZA_NIF
         - ECU_RUC
+        - EGY_NID
+        - EGY_TRN
+        - ESP_DNI
+        - ESP_NIE
+        - ESP_NIF
+        - EST_IK
+        - EST_RC
+        - ETH_TIN
+        - FIN_HETU
+        - FIN_YTU
+        - FJI_TIN
+        - FRA_SIREN
         - FRA_SPI
-        - GBR_UTR
+        - GAB_NIF
+        - GBR_CRN
         - GBR_NINO
+        - GBR_UTR
+        - GEO_PID
+        - GEO_TIN
+        - GHA_TIN
+        - GRC_AFM
         - GTM_NIT
+        - HKG_BRN
+        - HKG_HKID
         - HND_RTN
+        - HRV_OIB
+        - HTI_NIF
+        - HUN_ENT
         - HUN_TIN
         - IDN_KTP
+        - IDN_NWPW
+        - IND_GSTIN
         - IND_PAN
+        - IRL_CRO
+        - IRL_PPS
+        - IRN_NID
+        - ISL_KT
+        - ISR_CORP
         - ISR_TAX_ID
+        - ITA_PIVA
         - ITA_TAX_ID
+        - JAM_TRN
+        - JOR_NID
+        - JPN_CORP
         - JPN_TAX_ID
+        - KAZ_BIN
+        - KAZ_IIN
+        - KEN_KRA_PIN
+        - KGZ_INN
+        - KHM_NID
+        - KOR_BRN
+        - KOR_RRN
+        - KWT_CID
+        - LBN_TIN
+        - LKA_NIC
+        - LKA_TIN
+        - LTU_AK
+        - LTU_JAK
+        - LUX_NIN
+        - LUX_TVA
+        - LVA_PK
+        - LVA_REG
+        - MAC_TIN
+        - MAR_CIN
+        - MAR_ICE
+        - MDA_IDNO
+        - MDA_IDNP
+        - MEX_CURP
         - MEX_RFC
+        - MKD_EDB
+        - MKD_EMBG
+        - MLI_NIF
+        - MLT_ID
+        - MLT_VAT
+        - MNE_JMBG
+        - MNE_PIB
+        - MNG_RD
+        - MOZ_NUIT
+        - MUS_NID
+        - MUS_TAN_ENT
+        - MUS_TAN_IND
+        - MWI_TPIN
+        - MYS_MYKAD
+        - MYS_ROC
+        - NAM_TIN
+        - NGA_NIN
+        - NGA_TIN
         - NIC_RUC
+        - NLD_BTW
+        - NLD_KVK
+        - NLD_OBN
         - NLD_TIN
+        - NOR_FNR
+        - NOR_ORG
+        - NPL_PAN
+        - NZL_IRD
+        - NZL_NZBN
+        - OMN_CID
+        - PAK_NIC
+        - PAK_NTN
         - PAN_RUC
         - PER_RUC
+        - PHL_TIN
+        - POL_NIP
+        - POL_PESEL
+        - PRT_NIF
         - PRY_RUC
-        - SGP_NRIC
-        - SGP_FIN
+        - QAT_QID
+        - ROU_CNP
+        - ROU_CUI
+        - RUS_INN_ENT
+        - RUS_INN_IND
+        - RWA_TIN
+        - SAU_TIN
+        - SAU_VAT
+        - SEN_NINEA
         - SGP_ASGD
+        - SGP_FIN
         - SGP_ITR
+        - SGP_NRIC
+        - SGP_UEN
         - SLV_NIT
+        - SRB_JMBG
+        - SRB_PIB
+        - SVK_ICO
+        - SVK_TIN
+        - SVN_DAS
+        - SVN_MS
+        - SWE_ORG
         - SWE_TAX_ID
+        - SWZ_TIN
+        - SXM_CRIB
+        - SYR_TIN
+        - THA_NID
+        - THA_TIN
+        - TJK_TIN
+        - TTO_BIR
+        - TUN_CIN
+        - TUN_MF
+        - TUR_TIN
+        - TWN_GUI
+        - TWN_NID
+        - TZA_TIN
+        - UGA_TIN
+        - UKR_EDRPOU
+        - UKR_RNTRC
+        - URY_CI
         - URY_RUT
+        - UZB_INN
+        - UZB_PINFL
         - VEN_RIF
+        - VNM_MST_BRN
+        - VNM_MST_CORP
+        - VNM_MST_PIN
+        - WSM_TIN
+        - XXK_PID
+        - ZAF_CRN
+        - ZAF_ID
+        - ZMB_TPIN
+        - ZWE_TIN
         - NATIONAL_ID
         - PASSPORT
         - PERMANENT_RESIDENT
@@ -12621,8 +13123,10 @@ components:
       description: The tokenized asset's issuer
       enum:
         - binance
+        - bitget
         - coinbase
         - ondo
+        - robinhood
         - st0x
         - xstocks
       example: xstocks
@@ -13456,7 +13960,7 @@ components:
           type: string
         legs:
           description: |
-            Only present when event is for `MultilegOptions`. Represents filled qty/price of legs.
+            Only present when event is for `MultilegOptions`. Represents filled qty/price and commission of legs.
           items:
             $ref: '#/components/schemas/TradeUpdateEventV2Leg'
           type: array
@@ -13515,8 +14019,18 @@ components:
       title: TradeUpdateEvent
       type: object
     TradeUpdateEventV2Leg:
-      description: Represents filled qty/price of legs.
+      description: Represents filled qty/price and commission of legs.
       properties:
+        commission:
+          description: |-
+            The commission charged on this leg's execution. On a `trade_bust` event it is negative, refunding the busted execution's commission.
+
+            Omitted when the execution carries no commission, such as on an equity leg. A zero commission is sent as `"0"`.
+
+            A later event can list the same execution again, so key commissions by `execution_id` instead of adding up every event.
+          example: '0.65'
+          format: decimal
+          type: string
         execution_id:
           description: Corresponding execution of an order. If an order gets filled over two executions (a partial_fill for example), you will receive two events with different IDs.
           format: uuid
@@ -14280,6 +14794,8 @@ components:
         Represents the fields that are editable in an order replace/update call.
 
         Note: client_order_id is currently not editable on its own, one of the other fields must be changed at the same time to effectively replace the order.
+
+        Note: `commission`, `commission_type`, and `commission_bps` are not editable. They are ignored on a replace request and have no effect.
 
         Note: `qty` and `notional` are mutually exclusive on a single replace request. `notional` is only valid for IPO indications of interest (`asset_class: "ipo"`); non-IPO notional orders cannot be replaced at all.
       properties:
@@ -22758,6 +23274,7 @@ paths:
         - Note that when submitting crypto orders, `market`, `limit` and `stop_limit` orders are supported while the supported `time_in_force` values are `gtc`, and `ioc`.
         - For equities and crypto we accept fractional orders as well with either `notional` or `qty` provided.
         - Note that submitting an options order is only available for partners who have been enabled for Options BETA.
+        - For multi-leg options orders (`order_class: mleg`), `commission` is a per-contract rate charged on the option contracts in the strategy, and `commission_type: qty` is required whenever `commission` is non-zero. Omitting `commission`, or sending `0`, is accepted as no commission.
         - In case of Fixed Income, only `market` and `limit` order types with `day` `time_in_force` are supported, and order replacement is not supported.
         Note that submitting Fixed Income orders is only available for partners who have been enabled for Fixed Income.
         - Note that submitting DMA orders (using `advanced_instructions` with `algorithm: DMA`) is only available for partners/correspondents who have been enabled for DMA.
@@ -22802,6 +23319,26 @@ paths:
                   symbol: FI111225
                   time_in_force: gtc
                   type: market
+              MultilegOptionsWithCommission:
+                description: Charges 1.50 per option contract, so 1.50 × 1 × (1 + 1) = 3.00 on a full fill.
+                summary: Buy a call vertical spread with a per-contract commission
+                value:
+                  commission: '1.50'
+                  commission_type: qty
+                  legs:
+                    - position_intent: buy_to_open
+                      ratio_qty: '1'
+                      side: buy
+                      symbol: AAPL250620C00100000
+                    - position_intent: sell_to_open
+                      ratio_qty: '1'
+                      side: sell
+                      symbol: AAPL250620C00105000
+                  limit_price: '2.50'
+                  order_class: mleg
+                  qty: '1'
+                  time_in_force: day
+                  type: limit
               Options:
                 summary: Buy an option contract (BETA)
                 value:
@@ -22829,6 +23366,8 @@ paths:
                   $ref: '#/components/examples/IPOOrderResponse'
                 MultilegOptions:
                   $ref: '#/components/examples/MultilegOptionsOrderResponse'
+                MultilegOptionsWithCommission:
+                  $ref: '#/components/examples/MultilegOptionsWithCommissionOrderResponse'
                 Options:
                   $ref: '#/components/examples/OptionOrderResponse'
               schema:
@@ -24670,3 +25209,4 @@ tags:
 x-readme:
   explorer-enabled: true
   proxy-enabled: false
+  apply-tag-changes: true

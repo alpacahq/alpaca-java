@@ -32,9 +32,13 @@ public enum TokenizationIssuer implements Serializable {
   
   BINANCE("binance"),
   
+  BITGET("bitget"),
+  
   COINBASE("coinbase"),
   
   ONDO("ondo"),
+  
+  ROBINHOOD("robinhood"),
   
   ST0X("st0x"),
   

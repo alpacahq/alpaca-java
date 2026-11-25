@@ -25,7 +25,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * An enum to select how to interpret the value provided in the commission field.  - notional: Charge commission on a per order basis. (When the &#x60;commission_type&#x60; field is omitted from the order request, this is used as the default).  - qty: Charge commission on a per qty/contract basis, pro rated.  - bps: The percent commission you want to charge the end user on the order (expressed in bps). Alpaca will convert the order to a notional amount for purposes of calculating commission. Commission value in bps can have up to two decimal places.
+ * An enum to select how to interpret the value provided in the commission field.  - notional: Charge commission on a per order basis. (When the &#x60;commission_type&#x60; field is omitted from the order request, this is used as the default, except for &#x60;mleg&#x60; orders.) Not supported for &#x60;mleg&#x60; orders.  - qty: Charge commission on a per qty/contract basis, pro rated. For &#x60;mleg&#x60; orders, this is the only supported type and is required whenever &#x60;commission&#x60; is non-zero. Omitting &#x60;commission&#x60;, or sending &#x60;0&#x60;, is accepted as no commission. The rate is charged per option contract in the strategy.  - bps: The percent commission you want to charge the end user on the order (expressed in bps). Alpaca will convert the order to a notional amount for purposes of calculating commission. Commission value in bps can have up to two decimal places. Not supported for &#x60;mleg&#x60; orders.
  */
 @JsonAdapter(CommissionType.Adapter.class)
 public enum CommissionType implements Serializable {

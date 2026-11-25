@@ -51,7 +51,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * Represents the fields that are editable in an order replace/update call.  Note: client_order_id is currently not editable on its own, one of the other fields must be changed at the same time to effectively replace the order.  Note: &#x60;qty&#x60; and &#x60;notional&#x60; are mutually exclusive on a single replace request. &#x60;notional&#x60; is only valid for IPO indications of interest (&#x60;asset_class: \&quot;ipo\&quot;&#x60;); non-IPO notional orders cannot be replaced at all.
+ * Represents the fields that are editable in an order replace/update call.  Note: client_order_id is currently not editable on its own, one of the other fields must be changed at the same time to effectively replace the order.  Note: &#x60;commission&#x60;, &#x60;commission_type&#x60;, and &#x60;commission_bps&#x60; are not editable. They are ignored on a replace request and have no effect.  Note: &#x60;qty&#x60; and &#x60;notional&#x60; are mutually exclusive on a single replace request. &#x60;notional&#x60; is only valid for IPO indications of interest (&#x60;asset_class: \&quot;ipo\&quot;&#x60;); non-IPO notional orders cannot be replaced at all.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class UpdateOrderRequest implements Serializable {

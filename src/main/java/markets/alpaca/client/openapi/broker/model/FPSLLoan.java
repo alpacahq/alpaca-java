@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
@@ -70,7 +71,7 @@ public class FPSLLoan implements Serializable {
   public static final String SERIALIZED_NAME_COLLATERAL = "collateral";
   @SerializedName(SERIALIZED_NAME_COLLATERAL)
   @javax.annotation.Nonnull
-  private Double collateral;
+  private BigDecimal collateral;
 
   public static final String SERIALIZED_NAME_CORRESPONDENT = "correspondent";
   @SerializedName(SERIALIZED_NAME_CORRESPONDENT)
@@ -90,7 +91,7 @@ public class FPSLLoan implements Serializable {
   public static final String SERIALIZED_NAME_MARKET_VALUE = "market_value";
   @SerializedName(SERIALIZED_NAME_MARKET_VALUE)
   @javax.annotation.Nonnull
-  private Double marketValue;
+  private BigDecimal marketValue;
 
   public static final String SERIALIZED_NAME_QUANTITY = "quantity";
   @SerializedName(SERIALIZED_NAME_QUANTITY)
@@ -148,7 +149,7 @@ public class FPSLLoan implements Serializable {
   }
 
 
-  public FPSLLoan collateral(@javax.annotation.Nonnull Double collateral) {
+  public FPSLLoan collateral(@javax.annotation.Nonnull BigDecimal collateral) {
     this.collateral = collateral;
     return this;
   }
@@ -158,11 +159,11 @@ public class FPSLLoan implements Serializable {
    * @return collateral
    */
   @javax.annotation.Nonnull
-  public Double getCollateral() {
+  public BigDecimal getCollateral() {
     return collateral;
   }
 
-  public void setCollateral(@javax.annotation.Nonnull Double collateral) {
+  public void setCollateral(@javax.annotation.Nonnull BigDecimal collateral) {
     this.collateral = collateral;
   }
 
@@ -211,7 +212,7 @@ public class FPSLLoan implements Serializable {
   }
 
   /**
-   * Get interest
+   * The loan&#39;s interest details. Please note that the object might not be set if interest has not yet been calculated for the loan. Additionally, interest details may be adjusted retroactively at any time until interests are finalized for the month. The loan&#39;s changed &#x60;updated_at&#x60; field can indicate such an adjustment. 
    * @return interest
    */
   @javax.annotation.Nullable
@@ -224,7 +225,7 @@ public class FPSLLoan implements Serializable {
   }
 
 
-  public FPSLLoan marketValue(@javax.annotation.Nonnull Double marketValue) {
+  public FPSLLoan marketValue(@javax.annotation.Nonnull BigDecimal marketValue) {
     this.marketValue = marketValue;
     return this;
   }
@@ -234,11 +235,11 @@ public class FPSLLoan implements Serializable {
    * @return marketValue
    */
   @javax.annotation.Nonnull
-  public Double getMarketValue() {
+  public BigDecimal getMarketValue() {
     return marketValue;
   }
 
-  public void setMarketValue(@javax.annotation.Nonnull Double marketValue) {
+  public void setMarketValue(@javax.annotation.Nonnull BigDecimal marketValue) {
     this.marketValue = marketValue;
   }
 
@@ -437,12 +438,18 @@ public class FPSLLoan implements Serializable {
       if (!jsonObj.get("account_number").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `account_number` to be a primitive type in the JSON string but got `%s`", jsonObj.get("account_number").toString()));
       }
+      if (!jsonObj.get("collateral").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `collateral` to be a primitive type in the JSON string but got `%s`", jsonObj.get("collateral").toString()));
+      }
       if (!jsonObj.get("correspondent").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `correspondent` to be a primitive type in the JSON string but got `%s`", jsonObj.get("correspondent").toString()));
       }
       // validate the optional field `interest`
       if (jsonObj.get("interest") != null && !jsonObj.get("interest").isJsonNull()) {
         FPSLInterest.validateJsonElement(jsonObj.get("interest"));
+      }
+      if (!jsonObj.get("market_value").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `market_value` to be a primitive type in the JSON string but got `%s`", jsonObj.get("market_value").toString()));
       }
       if (!jsonObj.get("symbol").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `symbol` to be a primitive type in the JSON string but got `%s`", jsonObj.get("symbol").toString()));

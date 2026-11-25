@@ -67,7 +67,7 @@ public class FPSLAnalyticsLoansResponse implements Serializable {
 
   public static final String SERIALIZED_NAME_INTEREST = "interest";
   @SerializedName(SERIALIZED_NAME_INTEREST)
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   private FPSLInterest interest;
 
   public static final String SERIALIZED_NAME_TOTAL_LENDING_ACTIVITIES = "total_lending_activities";
@@ -116,21 +116,21 @@ public class FPSLAnalyticsLoansResponse implements Serializable {
   }
 
 
-  public FPSLAnalyticsLoansResponse interest(@javax.annotation.Nullable FPSLInterest interest) {
+  public FPSLAnalyticsLoansResponse interest(@javax.annotation.Nonnull FPSLInterest interest) {
     this.interest = interest;
     return this;
   }
 
   /**
-   * Get interest
+   * The accumulated interest totals for all loans in the date range. Totals may be adjusted retroactively at any time until interests are finalized for the month. 
    * @return interest
    */
-  @javax.annotation.Nullable
+  @javax.annotation.Nonnull
   public FPSLInterest getInterest() {
     return interest;
   }
 
-  public void setInterest(@javax.annotation.Nullable FPSLInterest interest) {
+  public void setInterest(@javax.annotation.Nonnull FPSLInterest interest) {
     this.interest = interest;
   }
 
@@ -250,7 +250,7 @@ public class FPSLAnalyticsLoansResponse implements Serializable {
     openapiFields = new HashSet<String>(Arrays.asList("account_number", "in_progress_lending_activities", "interest", "total_lending_activities"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("account_number", "in_progress_lending_activities", "total_lending_activities"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("account_number", "in_progress_lending_activities", "interest", "total_lending_activities"));
   }
 
   /**
@@ -276,10 +276,8 @@ public class FPSLAnalyticsLoansResponse implements Serializable {
       if (!jsonObj.get("account_number").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `account_number` to be a primitive type in the JSON string but got `%s`", jsonObj.get("account_number").toString()));
       }
-      // validate the optional field `interest`
-      if (jsonObj.get("interest") != null && !jsonObj.get("interest").isJsonNull()) {
-        FPSLInterest.validateJsonElement(jsonObj.get("interest"));
-      }
+      // validate the required field `interest`
+      FPSLInterest.validateJsonElement(jsonObj.get("interest"));
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {

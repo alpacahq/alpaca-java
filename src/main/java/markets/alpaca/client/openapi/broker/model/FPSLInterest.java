@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.io.Serializable;
 
@@ -48,7 +49,7 @@ import java.util.Set;
 import markets.alpaca.client.openapi.broker.http.JSON;
 
 /**
- * The interest&#39;s details. Please note that the object might not be set if interest has not yet been calculated for the loan. Additionally, interest details may be adjusted retroactively at any time until interests are finalized for the month. The loan&#39;s changed &#x60;updated_at&#x60; field can indicate such an adjustment. 
+ * FPSL interest split between the customer and the partner. Interest may be adjusted retroactively at any time until interests are finalized for the month. 
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.27.0")
 public class FPSLInterest implements Serializable {
@@ -57,50 +58,50 @@ public class FPSLInterest implements Serializable {
   public static final String SERIALIZED_NAME_CUSTOMER = "customer";
   @SerializedName(SERIALIZED_NAME_CUSTOMER)
   @javax.annotation.Nonnull
-  private Double customer;
+  private BigDecimal customer;
 
   public static final String SERIALIZED_NAME_PARTNER = "partner";
   @SerializedName(SERIALIZED_NAME_PARTNER)
   @javax.annotation.Nonnull
-  private Double partner;
+  private BigDecimal partner;
 
   public FPSLInterest() {
   }
 
-  public FPSLInterest customer(@javax.annotation.Nonnull Double customer) {
+  public FPSLInterest customer(@javax.annotation.Nonnull BigDecimal customer) {
     this.customer = customer;
     return this;
   }
 
   /**
-   * The interest accrued by the customer for this loan.
+   * The interest accrued by the customer.
    * @return customer
    */
   @javax.annotation.Nonnull
-  public Double getCustomer() {
+  public BigDecimal getCustomer() {
     return customer;
   }
 
-  public void setCustomer(@javax.annotation.Nonnull Double customer) {
+  public void setCustomer(@javax.annotation.Nonnull BigDecimal customer) {
     this.customer = customer;
   }
 
 
-  public FPSLInterest partner(@javax.annotation.Nonnull Double partner) {
+  public FPSLInterest partner(@javax.annotation.Nonnull BigDecimal partner) {
     this.partner = partner;
     return this;
   }
 
   /**
-   * The interest accrued by the partner for this loan.
+   * The interest accrued by the partner.
    * @return partner
    */
   @javax.annotation.Nonnull
-  public Double getPartner() {
+  public BigDecimal getPartner() {
     return partner;
   }
 
-  public void setPartner(@javax.annotation.Nonnull Double partner) {
+  public void setPartner(@javax.annotation.Nonnull BigDecimal partner) {
     this.partner = partner;
   }
 
@@ -220,6 +221,12 @@ public class FPSLInterest implements Serializable {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if (!jsonObj.get("customer").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `customer` to be a primitive type in the JSON string but got `%s`", jsonObj.get("customer").toString()));
+      }
+      if (!jsonObj.get("partner").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `partner` to be a primitive type in the JSON string but got `%s`", jsonObj.get("partner").toString()));
+      }
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {
